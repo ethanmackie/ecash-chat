@@ -1,6 +1,60 @@
+"use client";
+import { useState, useEffect } from 'react';
 import Image from "next/image";
 
-export default function Home() {
+export default function Home() {  
+    const [address, setAddress] = useState('');
+    const [step, setStep] = useState('pending');
+
+    useEffect(() => {
+        // Listen for cashtab extension interaction messages on load
+        window.addEventListener('message', handleMessage);
+    })
+
+    const handleMessage = (event) => {
+        // Parse for an address from cashtab
+        if (
+            event &&
+            event.data &&
+            event.data.type &&
+            event.data.type === 'FROM_CASHTAB'
+        ) {
+            // print it
+            console.log(`Incoming cashtab message`, event.data);
+            // set in state
+            console.log('event.data.address: ', event.data.address);
+            setAddress(event.data.address);
+        }
+    };
+
+    const confirmCashtabProviderStatus = () => {
+        const cashTabStatus = getCashtabProviderStatus();
+        if (!cashTabStatus) {
+            setStep('install');
+        } else {
+            setStep('fresh');
+        }
+    };
+
+    const getCashtabProviderStatus = () => {
+        console.log(window.bitcoinAbc);
+        if (window && window.bitcoinAbc && window.bitcoinAbc === 'cashtab') {
+            return true;
+        }
+        return false;
+    };
+
+    const getAddress = () => {
+      window.postMessage(
+          {
+              type: 'FROM_PAGE',
+              text: 'Cashtab',
+              addressRequest: true,
+          },
+          '*',
+      );
+    };
+  
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div>
@@ -20,10 +74,26 @@ export default function Home() {
               priority
             />
           </a>
+          <br />
         </div>
         <p>
           eCash Social - onchain social platform (we'll work on the slogan later)&nbsp;
         </p>
+        <br />
+        <div>
+            Log in via
+            <Image
+              src="/cashtab-logo.png"
+              alt="eCash Logo"
+              className="dark:invert"
+              width={100}
+              height={30}
+              priority
+              onClick={() => getAddress()}
+            />
+        </div>
+        <br />
+        Address: {address}
       </div>
     </main>
   );

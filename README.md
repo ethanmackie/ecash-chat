@@ -1,37 +1,78 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# ecash-social
 
-## Getting Started
+
+## Key Features
+
+- Wallet Messaging: essentially the OP_RETURN messages seen on Cashtab. Shows the sent and received messages as well as an area to send new messages.
+- Public Townhall: a free for all forum, potentially separated into categories. Users can interact with each post by Replying to post, following the poster, or tipping in XEC or eToken.
+- Authentication and transaction broadcasting via Cashtab Extensions.
+
+
+## Development
 
 First, run the development server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Runs the app in development mode.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+The page will reload if you make edits.
+You will also see any lint errors in the console.
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The easiest way to deploy to the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
-# ecash-social
+Check out [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## Production
+
+In the project directory, run:
+
+```bash
+npm run build
+```
+
+Builds the app for production to the `build` folder.
+
+## Implementation Roadmap
+
+**V1**
+- [x] Basic landing page UI that interacts with Cashtab Extensions to retrieve user address
+- [ ] Add authentication mechanisms to complete the login process
+- [ ] Work with UI SME to make this design look more modern and web3
+- [ ] Social Profile section: allowing the user to view the associated eCash address and alias for this extension login, as well as set their other social handles if they choose to do so
+- [ ] Wallet Messaging: retrieval and rendering of sent and received OP_RETURN messages (both cashtab and external)
+- [ ] Wallet Messaging: Send Message feature which sends a query string to Cashtab Extensions using the nominal 5.5 XEC as amount
+- [ ] Wallet Messaging: Advanced Send Message feature which allows the user to customize the send amount along with the message
+- [ ] Public Town Hall: Basic posting and retrieval function
+- [ ] Public Town Hall: Introduce different categories of townhalls
+- [ ] Implement DDOS mitigations
+- [ ] Public go live
+
+**V2**
+- [ ] Enable use of emojis and [img] tags
+- [ ] Follow function
+- [ ] Tipping in XEC
+- [ ] Tipping in eToken
+- [ ] Like function for the post which will be factored to a post's rating
+- [ ] Sort by Date/Rating
+- [ ] Filter by post, category, keyword, date
+
+
+## Dev Notes
+
+Infra considerations:
+- The tx generating and broadcasting workload will be handed to Cashtab Extensions via query string.
+- Will almost certainly need another alias-server equivalent that handles the heavy lifting of parsing the central payment address for posts.
+- Where we store the social profile data is up for discussion - potentially another API call to the server that's parsing town hall posts.
+
+Spec considerations:
+- Will need a central payment address for onchain storage of town hall posts, similar to Aliases
+- Each town hall category will need to be an OP_RETURN prefix
+- Will look into memo cash spec and see if there's anything we can leverage for the concept of "replying" to posts. e.g. do we need new OP_RETURN specs that adds a post ID (e.g. txid)
