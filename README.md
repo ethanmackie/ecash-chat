@@ -44,18 +44,23 @@ Builds the app for production to the `build` folder.
 
 **V1**
 - [x] Basic landing page UI that interacts with Cashtab Extensions to retrieve user address
-- [ ] Add authentication mechanisms to complete the login process
-- [ ] Work with UI SME to make this design look more modern and web3
-- [ ] Social Profile section: allowing the user to view the associated eCash address and alias for this extension login, as well as set their other social handles if they choose to do so
+- [x] Retrieve single page tx history data via chronik
+- [ ] Work with UI SME to modernize the app's UI/UX
+- [ ] Extend tx history retrieval to promise-based multi-page calls
+- [ ] Pagination for tx history
+- [ ] Parsing of tx history to filter for OP_RETURN messages
 - [ ] Wallet Messaging: retrieval and rendering of sent and received OP_RETURN messages (both cashtab and external)
+- [ ] Unit tests and linting
+- [ ] User profile with alias-server integration
 - [ ] Wallet Messaging: Send Message feature which sends a query string to Cashtab Extensions using the nominal 5.5 XEC as amount
 - [ ] Wallet Messaging: Advanced Send Message feature which allows the user to customize the send amount along with the message
-- [ ] Public Town Hall: Basic posting and retrieval function
-- [ ] Public Town Hall: Introduce different categories of townhalls
-- [ ] Implement DDOS mitigations
-- [ ] Public go live
+- [ ] Wallet Messaging: Enables the use of alias as a destination address
 
 **V2**
+- [ ] Public Town Hall: Basic posting and retrieval function
+- [ ] Basic social-server prototype to handle parsing of posts
+- [ ] Public Town Hall: Introduce different categories of townhalls
+- [ ] Implement DDOS mitigations
 - [ ] Enable use of emojis and [img] tags
 - [ ] Follow function
 - [ ] Tipping in XEC
@@ -63,7 +68,11 @@ Builds the app for production to the `build` folder.
 - [ ] Like function for the post which will be factored to a post's rating
 - [ ] Sort by Date/Rating
 - [ ] Filter by post, category, keyword, date
+- [ ] Public go live
 
+**V3**
+- [] Explore twitter/reddit/telegram integration plugins
+- [] Explore integration with eCash community dashboards
 
 ## Dev Notes
 

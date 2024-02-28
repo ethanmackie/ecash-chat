@@ -1,17 +1,25 @@
 "use client";
 import { useState, useEffect } from 'react';
 import Image from "next/image";
+import { getHashFromAddress } from '../utils/utils';
+import { getTxHistoryPage } from '../chronik/chronik';
+import { chronik as chronikConfig } from '../config/config';
+
+import { ChronikClient } from 'chronik-client';
+const chronik = new ChronikClient(chronikConfig.urls);
 
 export default function Home() {  
     const [address, setAddress] = useState('');
+    const [hash, setHash] = useState('');
+    const [txHistory, setTxHistory] = useState('');
     const [step, setStep] = useState('pending');
 
     useEffect(() => {
         // Listen for cashtab extension interaction messages on load
         window.addEventListener('message', handleMessage);
-    })
+    }, [txHistory]);
 
-    const handleMessage = (event) => {
+    const handleMessage = async (event) => {
         // Parse for an address from cashtab
         if (
             event &&
@@ -19,12 +27,16 @@ export default function Home() {
             event.data.type &&
             event.data.type === 'FROM_CASHTAB'
         ) {
-            // print it
-            console.log(`Incoming cashtab message`, event.data);
-            // set in state
-            console.log('event.data.address: ', event.data.address);
             setAddress(event.data.address);
+            await refreshTxHistory();
         }
+    };
+
+    const refreshTxHistory = async () => {
+        const hash = await getHashFromAddress(event.data.address);
+        setHash(hash);
+        const txHistory = await getTxHistoryPage(chronik, hash);
+        setTxHistory(txHistory);
     };
 
     const confirmCashtabProviderStatus = () => {
@@ -93,7 +105,27 @@ export default function Home() {
             />
         </div>
         <br />
-        Address: {address}
+        User: {address}
+        <br />
+        Hash: {hash}
+        <br />
+        txHistory: 
+        {txHistory !== '' && (
+            <>
+            {txHistory.numPages} pages of tx history. Displaying {chronikConfig.txHistoryCount} transactions below.
+            <br />
+            {txHistory &&
+            txHistory.txs &&
+            txHistory.txs.length > 0
+                ? txHistory.txs.map(
+                      (tx, index) => (
+                          <li>tx: {tx.txid}</li>
+                      ),
+                  )
+                : ''}
+            </>
+            )
+        }
       </div>
     </main>
   );
