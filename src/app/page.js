@@ -1,23 +1,18 @@
 "use client";
 import { useState, useEffect } from 'react';
 import Image from "next/image";
-import { getHashFromAddress } from '../utils/utils';
-import { getTxHistoryPage } from '../chronik/chronik';
 import { chronik as chronikConfig } from '../config/config';
-
-import { ChronikClientNode } from 'chronik-client';
-const chronik = new ChronikClientNode(chronikConfig.urls);
+import TxHistory from './txhistory';
+import cashaddr from 'ecashaddrjs';
 
 export default function Home() {
     const [address, setAddress] = useState('');
-    const [hash, setHash] = useState('');
-    const [txHistory, setTxHistory] = useState('');
     const [step, setStep] = useState('pending');
 
     useEffect(() => {
-        // Listen for cashtab extension interaction messages on load
+        // Listen for cashtab extension messages on load
         window.addEventListener('message', handleMessage);
-    }, [txHistory]);
+    }, []);
 
     const handleMessage = async (event) => {
         // Parse for an address from cashtab
@@ -28,16 +23,7 @@ export default function Home() {
             event.data.type === 'FROM_CASHTAB'
         ) {
             setAddress(event.data.address);
-            await refreshTxHistory();
         }
-    };
-
-    const refreshTxHistory = async () => {
-        const hash = await getHashFromAddress(event.data.address);
-        setHash(hash);
-        const txHistory = await getTxHistoryPage(chronik, event.data.address);
-        txHistory === null ? '' : txHistory;
-        setTxHistory(txHistory);
     };
 
     const confirmCashtabProviderStatus = () => {
@@ -108,25 +94,8 @@ export default function Home() {
         <br />
         User: {address}
         <br />
-        Hash: {hash}
-        <br />
-        txHistory: 
-        {/*txHistory will be moved into its own component later on*/}
-        {txHistory && txHistory !== '' && (
-            <>
-            {txHistory.numPages} pages of tx history. Displaying {chronikConfig.txHistoryCount} transactions below.
-            <br />
-            {txHistory &&
-            txHistory.txs &&
-            txHistory.txs.length > 0
-                ? txHistory.txs.map(
-                      (tx, index) => (
-                          <li key={index}>tx{index+1}: {tx.txid}</li>
-                      ),
-                  )
-                : ''}
-            </>
-            )
+        {cashaddr.isValidCashAddress(address, 'ecash') &&
+            <TxHistory address={address} />
         }
       </div>
     </main>
