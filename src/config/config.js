@@ -1,9 +1,5 @@
 export const chronik = {
-    urls: [
-        'https://chronik.fabien.cash',
-        'https://chronik2.fabien.cash',
-        'https://chronik.be.cash/xec',
-    ],
-    txHistoryCount: 20,
-    txHistoryPageSize: 20,
+    urls: ['https://chronik-native.fabien.cash', 'https://chronik.pay2stay.com/xec'],
+    txHistoryCount: 50,
+    txHistoryPageSize: 50,
 };

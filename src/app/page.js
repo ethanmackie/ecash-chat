@@ -5,10 +5,10 @@ import { getHashFromAddress } from '../utils/utils';
 import { getTxHistoryPage } from '../chronik/chronik';
 import { chronik as chronikConfig } from '../config/config';
 
-import { ChronikClient } from 'chronik-client';
-const chronik = new ChronikClient(chronikConfig.urls);
+import { ChronikClientNode } from 'chronik-client';
+const chronik = new ChronikClientNode(chronikConfig.urls);
 
-export default function Home() {  
+export default function Home() {
     const [address, setAddress] = useState('');
     const [hash, setHash] = useState('');
     const [txHistory, setTxHistory] = useState('');
@@ -35,7 +35,8 @@ export default function Home() {
     const refreshTxHistory = async () => {
         const hash = await getHashFromAddress(event.data.address);
         setHash(hash);
-        const txHistory = await getTxHistoryPage(chronik, hash);
+        const txHistory = await getTxHistoryPage(chronik, event.data.address);
+        txHistory === null ? '' : txHistory;
         setTxHistory(txHistory);
     };
 
@@ -110,7 +111,8 @@ export default function Home() {
         Hash: {hash}
         <br />
         txHistory: 
-        {txHistory !== '' && (
+        {/*txHistory will be moved into its own component later on*/}
+        {txHistory && txHistory !== '' && (
             <>
             {txHistory.numPages} pages of tx history. Displaying {chronikConfig.txHistoryCount} transactions below.
             <br />
@@ -119,7 +121,7 @@ export default function Home() {
             txHistory.txs.length > 0
                 ? txHistory.txs.map(
                       (tx, index) => (
-                          <li>tx: {tx.txid}</li>
+                          <li key={index}>tx{index+1}: {tx.txid}</li>
                       ),
                   )
                 : ''}

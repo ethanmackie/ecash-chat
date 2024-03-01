@@ -1,14 +1,11 @@
 // Chronik methods
 import { chronik as chronikConfig } from '../config/config';
 
-export const getTxHistoryPage = async (chronik, hash160, page = 0) => {
+export const getTxHistoryPage = async (chronik, address, page = 0) => {
     let txHistoryPage;
     try {
-        txHistoryPage = await chronik
-            .script('p2pkh', hash160)
-            .history(page, chronikConfig.txHistoryPageSize);
-        return txHistoryPage;
+        return await chronik.address(address).history(page, chronikConfig.txHistoryPageSize);
     } catch (err) {
-        console.log(`Error in getTxHistoryPage(${hash160})`, err);
+        console.log(`Error in getTxHistoryPage(${address})`, err);
     }
 };

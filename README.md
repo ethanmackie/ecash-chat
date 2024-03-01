@@ -45,8 +45,8 @@ Builds the app for production to the `build` folder.
 **V1**
 - [x] Basic landing page UI that interacts with Cashtab Extensions to retrieve user address
 - [x] Retrieve single page tx history data via chronik
+- [x] Switch to ChronikClientNode and use the new address() API
 - [ ] Work with UI SME to modernize the app's UI/UX
-- [ ] Extend tx history retrieval to promise-based multi-page calls
 - [ ] Pagination for tx history
 - [ ] Parsing of tx history to filter for OP_RETURN messages
 - [ ] Wallet Messaging: retrieval and rendering of sent and received OP_RETURN messages (both cashtab and external)
