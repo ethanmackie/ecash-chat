@@ -43,13 +43,14 @@ Builds the app for production to the `build` folder.
 ## Implementation Roadmap
 
 **V1**
-- [x] Basic landing page UI that interacts with Cashtab Extensions to retrieve user address
+- [x] Address retrieval via extension under NextJs framework
 - [x] Retrieve single page tx history data via chronik
 - [x] Switch to ChronikClientNode and use the new address() API
+- [x] Standalone Tx History component
 - [ ] Work with UI SME to modernize the app's UI/UX
-- [ ] Pagination for tx history
-- [ ] Parsing of tx history to filter for OP_RETURN messages
-- [ ] Wallet Messaging: retrieval and rendering of sent and received OP_RETURN messages (both cashtab and external)
+- [x] Pagination for tx history
+- [ ] Parsing of tx history to render all OP_RETURN messages
+- [ ] Wallet Messaging: customize rendering of sent and received OP_RETURN messages (both cashtab and external)
 - [ ] Unit tests and linting
 - [ ] User profile with alias-server integration
 - [ ] Wallet Messaging: Send Message feature which sends a query string to Cashtab Extensions using the nominal 5.5 XEC as amount
@@ -71,8 +72,9 @@ Builds the app for production to the `build` folder.
 - [ ] Public go live
 
 **V3**
-- [] Explore twitter/reddit/telegram integration plugins
-- [] Explore integration with eCash community dashboards
+- [ ] Explore integration with gorbeious e.g. token trading notice boards
+- [ ] Explore twitter/reddit/telegram integration plugins
+- [ ] Explore integration with eCash community dashboards
 
 ## Dev Notes
 
