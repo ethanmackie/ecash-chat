@@ -76,7 +76,7 @@ export default function Home() {
           <br />
         </div>
         <p>
-          eCash Social - onchain social platform (we'll work on the slogan later)&nbsp;
+          eCash Social - onchain social platform (we&lsquo;ll work on the slogan later)&nbsp;
         </p>
         <br />
         <div>

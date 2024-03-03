@@ -49,9 +49,10 @@ Builds the app for production to the `build` folder.
 - [x] Standalone Tx History component
 - [ ] Work with UI SME to modernize the app's UI/UX
 - [x] Pagination for tx history
+- [x] Add eslint and apply to codebase
 - [ ] Parsing of tx history to render all OP_RETURN messages
 - [ ] Wallet Messaging: customize rendering of sent and received OP_RETURN messages (both cashtab and external)
-- [ ] Unit tests and linting
+- [ ] Unit/Integration tests
 - [ ] User profile with alias-server integration
 - [ ] Wallet Messaging: Send Message feature which sends a query string to Cashtab Extensions using the nominal 5.5 XEC as amount
 - [ ] Wallet Messaging: Advanced Send Message feature which allows the user to customize the send amount along with the message
