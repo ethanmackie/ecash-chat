@@ -50,7 +50,7 @@ Builds the app for production to the `build` folder.
 - [ ] Work with UI SME to modernize the app's UI/UX
 - [x] Pagination for tx history
 - [x] Add eslint and apply to codebase
-- [ ] Parsing of tx history to render all OP_RETURN messages
+- [x] Parsing of tx history to render all OP_RETURN messages
 - [ ] Wallet Messaging: customize rendering of sent and received OP_RETURN messages (both cashtab and external)
 - [ ] Unit/Integration tests
 - [ ] User profile with alias-server integration
