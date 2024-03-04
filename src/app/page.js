@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
 import Image from "next/image";
-import { chronik as chronikConfig } from '../config/config';
 import TxHistory from './txhistory';
 import cashaddr from 'ecashaddrjs';
 
@@ -12,7 +11,7 @@ export default function Home() {
     useEffect(() => {
         // Listen for cashtab extension messages on load
         window.addEventListener('message', handleMessage);
-    }, []);
+    }, [address]);
 
     const handleMessage = async (event) => {
         // Parse for an address from cashtab
@@ -22,6 +21,7 @@ export default function Home() {
             event.data.type &&
             event.data.type === 'FROM_CASHTAB'
         ) {
+            console.log(`Address ${event.data.address} shared by Cashtab`);
             setAddress(event.data.address);
         }
     };

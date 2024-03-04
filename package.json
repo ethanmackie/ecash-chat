@@ -10,11 +10,13 @@
   },
   "dependencies": {
     "chronik-client": "^0.23.0",
+    "ecash-script": "^2.1.2",
     "ecashaddrjs": "^1.5.6",
     "next": "14.1.0",
     "react": "^18",
     "react-dom": "^18",
     "react-loading-skeleton": "^3.4.0",
+    "slp-mdm": "^0.0.7",
     "styled-components": "^4.4.1"
   },
   "devDependencies": {
