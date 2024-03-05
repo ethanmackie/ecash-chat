@@ -6,6 +6,8 @@ import { appConfig } from '../config/app';
 import { getStackArray } from 'ecash-script';
 import { BN } from 'slp-mdm';
 
+// Retrieves tx history via chronik, parses the response into formatted
+// objects and filter out eToken or non-msg txs
 export const getTxHistory = async (chronik, address, page = 0) => {
     if (
         chronik === undefined ||
@@ -41,6 +43,7 @@ export const getTxHistory = async (chronik, address, page = 0) => {
     }
 };
 
+// Parses a single chronik transaction
 export const parseChronikTx = (tx, address) => {
     const { hash } = cashaddr.decode(address, true);
     const { inputs, outputs } = tx;

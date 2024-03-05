@@ -3,10 +3,15 @@ import { useState, useEffect } from 'react';
 import Image from "next/image";
 import TxHistory from './txhistory';
 import cashaddr from 'ecashaddrjs';
+import { queryAliasServer } from '../alias/alias-server';
 
 export default function Home() {
     const [address, setAddress] = useState('');
     const [step, setStep] = useState('pending');
+    const [aliases, setAliases] = useState({
+            registered: [],
+            pending: [],
+        });
 
     useEffect(() => {
         // Listen for cashtab extension messages on load
@@ -23,6 +28,31 @@ export default function Home() {
         ) {
             console.log(`Address ${event.data.address} shared by Cashtab`);
             setAddress(event.data.address);
+            getAliasesByAddress(event.data.address);
+        }
+    };
+
+    // Retrieves the aliases associated with this address
+    const getAliasesByAddress = async (thisAddress) => {
+        try {
+            const aliasesForThisAddress = await queryAliasServer(
+                'address',
+                thisAddress,
+            );
+            if (aliasesForThisAddress.error) {
+                // If an error is returned from the address endpoint
+                throw new Error(aliasesForThisAddress.error);
+            }
+            setAliases({
+                registered: aliasesForThisAddress.registered.sort((a, b) =>
+                    a.alias.localeCompare(b.alias),
+                ),
+                pending: aliasesForThisAddress.pending.sort((a, b) =>
+                    a.alias.localeCompare(b.alias),
+                ),
+            });
+        } catch (err) {
+            console.log(`getAliasesByAddress(): ${err}`);
         }
     };
 
@@ -92,7 +122,23 @@ export default function Home() {
             />
         </div>
         <br />
-        User: {address}
+            <b>User:</b> {address}
+        <br />
+            <b>Registered Aliases:</b>
+            {aliases.registered && aliases.registered.length > 0 &&
+            aliases.registered.map(
+                  (alias, index) => (
+                      <span key={index}>{alias.alias} </span>
+                  ),
+              )}
+            <br />
+            <b>Pending Aliases:</b>
+            {aliases.pending && aliases.pending.length > 0 &&
+            aliases.pending.map(
+                  (alias, index) => (
+                      <span key={index}>{alias.alias} </span>
+                  ),
+              )}
         <br />
         {cashaddr.isValidCashAddress(address, 'ecash') &&
             <TxHistory address={address} />

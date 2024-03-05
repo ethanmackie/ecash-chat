@@ -20,6 +20,7 @@ export default function TxHistory({ address }) {
         })();
     }, []);
 
+    // Retrieves the tx history specific to OP_RETURN messages
     const getTxHistoryByPage = async (page) => {
         if (
             typeof page !== "number" ||

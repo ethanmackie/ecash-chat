@@ -53,7 +53,7 @@ Builds the app for production to the `build` folder.
 - [x] Parsing of tx history to render all OP_RETURN messages
 - [ ] Wallet Messaging: customize rendering of sent and received OP_RETURN messages (both cashtab and external)
 - [ ] Unit/Integration tests
-- [ ] User profile with alias-server integration
+- [x] Retrieve registered and pending aliases for extension wallet
 - [ ] Wallet Messaging: Send Message feature which sends a query string to Cashtab Extensions using the nominal 5.5 XEC as amount
 - [ ] Wallet Messaging: Advanced Send Message feature which allows the user to customize the send amount along with the message
 - [ ] Wallet Messaging: Enables the use of alias as a destination address
