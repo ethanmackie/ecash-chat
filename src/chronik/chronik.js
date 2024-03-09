@@ -328,7 +328,6 @@ export const parseChronikTx = (tx, address) => {
     // Return eToken specific fields if eToken tx
     if (isEtokenTx) {
         return {
-            numPages: tx.numPages,
             incoming,
             xecAmount,
             isEtokenTx,
@@ -345,7 +344,6 @@ export const parseChronikTx = (tx, address) => {
     }
     // Otherwise do not include these fields
     return {
-        numPages: tx.numPages,
         incoming,
         xecAmount,
         isEtokenTx,

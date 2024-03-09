@@ -39,33 +39,61 @@ export default function TxHistory({ address }) {
     };
 
     return (
-        <div>
-          {txHistory && txHistory !== '' ? (
-              <>
-              {/*Set up pagination menu*/}
-              <br />
-              Scan recent transactions:{'   '}
-              {(() => {
-                  let page = [];
-                  for (let i = 0; i < txHistory.numPages; i += 1) {
-                    page.push(<a href={"#"} onClick={() => getTxHistoryByPage(i)} key={i}>{i*chronikConfig.txHistoryPageSize}-{(i+1)*chronikConfig.txHistoryPageSize} | </a>);
-                  }
-                  return page;
-                })()}
-              {loadingMsg}
-              {/*Render tx history*/}
-              {txHistory &&
-                txHistory.txs &&
-                  txHistory.txs.length > 0
-                  ? txHistory.txs.map(
-                        (tx, index) => (
-                            <li key={index}>{tx.incoming ? 'Received' : 'Sent'} {tx.opReturnMessage ? `msg: "${tx.opReturnMessage}"` : ' '} with {tx.xecAmount} XEC in value</li>
-                        ),
-                    )
-                  : `No messages in this range of transactions.`}
-              </>
-            ) : <Skeleton count={10} />
-          }
-        </div>
+         <>
+         {txHistory && txHistory !== '' ? (
+             <>
+             {/*Set up pagination menu*/}
+             <br />
+             Scan recent transactions{'   '}<br />
+  
+             <span>Page: 
+             <nav aria-label="Page navigation example">
+                <ul className="inline-flex -space-x-px text-base h-10">           
+                   {(() => {
+                       let page = [];
+                       for (let i = 0; i < txHistory.numPages; i += 1) {
+                         page.push(
+                           <li key={i}>
+                             <a href={"#"} onClick={() => getTxHistoryByPage(i)} key={i} className="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                                 {(i+1)}
+                             </a>
+                           </li>
+                        );
+                       }
+                       return page;
+                     })()}
+               </ul>
+               </nav>
+               </span>
+
+             {loadingMsg}
+             <br />
+             {/*Render tx history*/}
+             {txHistory &&
+               txHistory.txs &&
+                 txHistory.txs.length > 0
+                 ? txHistory.txs.map(
+                       (tx, index) => (
+                         <>
+                         <div className="flex items-start gap-2.5">
+                            <div className="flex flex-col w-full max-w-[320px] leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700">
+                               
+                            <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                               <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{tx.incoming ? 'Received from: ' : 'Sent to: '} </span>
+                               <span className="text-sm font-semibold text-gray-900 dark:text-white">{tx.replyAddress.substring(0,10)} ... {tx.replyAddress.substring(tx.replyAddress.length - 5)}</span>
+                            </div>
+                            <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
+                          <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{tx.xecAmount} XEC</span>
+                         </div>
+                        </div>
+                        <br />
+                        </>
+                       ),
+                   )
+                 : `No messages in this range of transactions.`}
+             </>
+           ) : <Skeleton count={10} />
+         }
+      </>
     );
 }
