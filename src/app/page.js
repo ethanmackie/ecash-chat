@@ -4,6 +4,8 @@ import Image from "next/image";
 import TxHistory from './txhistory';
 import cashaddr from 'ecashaddrjs';
 import { queryAliasServer } from '../alias/alias-server';
+import { encodeBip21Message } from '../utils/utils';
+import { appConfig } from '../config/app';
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -12,6 +14,8 @@ export default function Home() {
             registered: [],
             pending: [],
         });
+    const [recipient, setRecipient] = useState(null);
+    const [message, setMessage] = useState(null);
 
     useEffect(() => {
         // Listen for cashtab extension messages on load
@@ -26,9 +30,8 @@ export default function Home() {
             event.data.type &&
             event.data.type === 'FROM_CASHTAB'
         ) {
-            console.log(`Address ${event.data.address} shared by Cashtab`);
-            setAddress(event.data.address);
             getAliasesByAddress(event.data.address);
+            setAddress(event.data.address);
         }
     };
 
@@ -82,6 +85,33 @@ export default function Home() {
           },
           '*',
       );
+    };
+    
+    const handleAddressChange = e => {
+        // TODO address validation here
+        setRecipient(e.target.value);
+    };
+    
+    const handleMessageChange = e => {
+        // TODO address validation here
+        setMessage(e.target.value);
+    };
+    
+    // Pass a message tx BIP21 query string to cashtab extensions
+    const sendMessage = () => {
+        // Encode the op_return message script
+        const opReturnRaw = encodeBip21Message(message);
+
+        window.postMessage(
+            {
+                type: 'FROM_PAGE',
+                text: 'Cashtab',
+                txInfo: {
+                    bip21: `${recipient}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`,
+                },
+            },
+            '*',
+        );
     };
   
   /* Placeholder UI for now until the Tailwind UI set is ready for implementation */
@@ -195,6 +225,7 @@ export default function Home() {
                   type="text"
                   required
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  onChange={e => handleAddressChange(e)}
                 />
               </div>
             </div>
@@ -209,7 +240,9 @@ export default function Home() {
                 <textarea
                     id="message"
                     rows="4"
+                    required
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    onChange={e => handleMessageChange(e)}
                 />                
               </div>
 
@@ -217,8 +250,11 @@ export default function Home() {
 
             <div>
               <button
-                type="submit"
+                type="button"
                 className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                onClick={() => {
+                    sendMessage();
+                }}
               >
                 Send
               </button>

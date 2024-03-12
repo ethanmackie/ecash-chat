@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@bitgo/utxo-lib": "^9.34.0",
     "chronik-client": "^0.23.0",
     "ecash-script": "^2.1.2",
     "ecashaddrjs": "^1.5.6",

@@ -52,9 +52,10 @@ Builds the app for production to the `build` folder.
 - [x] Add eslint and apply to codebase
 - [x] Parsing of tx history to render all OP_RETURN messages
 - [ ] Wallet Messaging: customize rendering of sent and received OP_RETURN messages (both cashtab and external)
-- [ ] Unit/Integration tests
+- [ ] Implement Jest + add unit tests
+- [ ] Add integration tests
 - [x] Retrieve registered and pending aliases for extension wallet
-- [ ] Wallet Messaging: Send Message feature which sends a query string to Cashtab Extensions using the nominal 5.5 XEC as amount
+- [x] Wallet Messaging: Send Message feature which sends a query string to Cashtab Extensions using the nominal 5.5 XEC as amount
 - [ ] Wallet Messaging: Advanced Send Message feature which allows the user to customize the send amount along with the message
 - [ ] Wallet Messaging: Enables the use of alias as a destination address
 
@@ -73,6 +74,7 @@ Builds the app for production to the `build` folder.
 - [ ] Public go live
 
 **V3**
+- [ ] Explore NFT functionality & integration with Cashtab backend
 - [ ] Explore integration with gorbeious e.g. token trading notice boards
 - [ ] Explore twitter/reddit/telegram integration plugins
 - [ ] Explore integration with eCash community dashboards

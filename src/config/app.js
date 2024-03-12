@@ -7,6 +7,7 @@ export const appConfig = {
     defaultFee: 2.01,
     minFee: 1,
     dustSats: 550,
+    dustXec: 5.5,
     etokenSats: 546,
     cashDecimals: 2,
     fiatDecimals: 2,
