@@ -19,7 +19,9 @@ export default function Home() {
     const [recipient, setRecipient] = useState(null);
     const [recipientError, setRecipientError] = useState(false);
     const [message, setMessage] = useState(null);
-    const [messageError, setMessageError] = useState(null);
+    const [messageError, setMessageError] = useState(false);
+    const [sendAmountXec, setSendAmountXec] = useState(5.5);
+    const [sendAmountXecError, setSendAmountXecError] = useState(false);
 
     useEffect(() => {
         // Listen for cashtab extension messages on load
@@ -113,7 +115,17 @@ export default function Home() {
             setMessage(value);
             setMessageError(false);
         } else {
-            setMessageError(`Message can not exceed ${opreturnConfig.cashtabMsgByteLimit} bytes`);
+            setMessageError(`Message must be between 0 - ${opreturnConfig.cashtabMsgByteLimit} bytes`);
+        }
+    };
+
+    const handleSendAmountChange = e => {
+        const { value } = e.target;
+        if (value >= appConfig.dustXec) {
+            setSendAmountXec(value);
+            setSendAmountXecError(false);
+        } else {
+            setSendAmountXecError(`Send amount must be at minimum ${appConfig.dustXec} XEC`);
         }
     };
 
@@ -127,7 +139,7 @@ export default function Home() {
                 type: 'FROM_PAGE',
                 text: 'Cashtab',
                 txInfo: {
-                    bip21: `${recipient}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`,
+                    bip21: `${recipient}?amount=${sendAmountXec}&op_return_raw=${opReturnRaw}`,
                 },
             },
             '*',
@@ -264,15 +276,23 @@ export default function Home() {
                     required
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     onChange={e => handleMessageChange(e)}
-                />                
+                />
               </div>
               <p className="mt-2 text-sm text-red-600 dark:text-red-500">{messageError !== false && messageError}</p>
+              <label htmlFor="value-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Send XEC amount (optional, 5.5 XEC by default):</label>
+              <input
+                  type="number"
+                  id="value-input"
+                  aria-describedby="helper-text-explanation" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  placeholder="5.5"
+                  onChange={e => handleSendAmountChange(e)}
+              />
             </div>
 
             <div>
               <button
                 type="button"
-                disabled={recipientError || messageError}
+                disabled={recipientError || messageError || sendAmountXecError}
                 className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 onClick={() => {
                     sendMessage();
