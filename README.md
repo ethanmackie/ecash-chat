@@ -24,6 +24,12 @@ Runs the app in development mode.
 The page will reload if you make edits.
 You will also see any lint errors in the console.
 
+## Testing
+
+```bash
+npm run test
+```
+
 ## Deploy on Vercel
 
 The easiest way to deploy to the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme).
@@ -53,7 +59,7 @@ Builds the app for production to the `build` folder.
 - [x] Parsing of tx history to render all OP_RETURN messages
 - [ ] Wallet Messaging: customize rendering of sent and received OP_RETURN messages (both cashtab and external)
 - [x] Implement Jest + add unit tests for chronik, alias-server & utils
-- [ ] Add input validation + unit tests
+- [x] Add input validation + unit tests
 - [ ] Add integration tests
 - [x] Retrieve registered and pending aliases for extension wallet
 - [x] Wallet Messaging: Send Message feature which sends a query string to Cashtab Extensions using the nominal 5.5 XEC as amount

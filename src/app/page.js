@@ -6,6 +6,8 @@ import cashaddr from 'ecashaddrjs';
 import { queryAliasServer } from '../alias/alias-server';
 import { encodeBip21Message } from '../utils/utils';
 import { appConfig } from '../config/app';
+import { isValidRecipient, isValidMessage } from '../validation/validation';
+import { opReturn as opreturnConfig } from '../config/opreturn';
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -15,7 +17,9 @@ export default function Home() {
             pending: [],
         });
     const [recipient, setRecipient] = useState(null);
+    const [recipientError, setRecipientError] = useState(false);
     const [message, setMessage] = useState(null);
+    const [messageError, setMessageError] = useState(null);
 
     useEffect(() => {
         // Listen for cashtab extension messages on load
@@ -88,15 +92,31 @@ export default function Home() {
     };
     
     const handleAddressChange = e => {
-        // TODO address validation here
-        setRecipient(e.target.value);
+        const { value } = e.target;
+        if (
+            isValidRecipient(value) === true &&
+            value.trim() !== ''
+        ) {
+            setRecipient(value);
+            setRecipientError(false);
+        } else {
+            setRecipientError('Invalid eCash address');
+        }
     };
-    
+
     const handleMessageChange = e => {
-        // TODO address validation here
-        setMessage(e.target.value);
+        const { value } = e.target;
+        if (
+            isValidMessage(value) === true &&
+            value.trim() !== ''
+        ) {
+            setMessage(value);
+            setMessageError(false);
+        } else {
+            setMessageError(`Message can not exceed ${opreturnConfig.cashtabMsgByteLimit} bytes`);
+        }
     };
-    
+
     // Pass a message tx BIP21 query string to cashtab extensions
     const sendMessage = () => {
         // Encode the op_return message script
@@ -113,7 +133,7 @@ export default function Home() {
             '*',
         );
     };
-  
+
   /* Placeholder UI for now until the Tailwind UI set is ready for implementation */
   return (
     <>
@@ -228,6 +248,7 @@ export default function Home() {
                   onChange={e => handleAddressChange(e)}
                 />
               </div>
+              <p className="mt-2 text-sm text-red-600 dark:text-red-500">{recipientError !== false && recipientError}</p>
             </div>
 
             <div>
@@ -245,12 +266,13 @@ export default function Home() {
                     onChange={e => handleMessageChange(e)}
                 />                
               </div>
-
+              <p className="mt-2 text-sm text-red-600 dark:text-red-500">{messageError !== false && messageError}</p>
             </div>
 
             <div>
               <button
                 type="button"
+                disabled={recipientError || messageError}
                 className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 onClick={() => {
                     sendMessage();
