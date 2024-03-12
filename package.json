@@ -6,13 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "jest"
   },
   "dependencies": {
     "@bitgo/utxo-lib": "^9.34.0",
     "chronik-client": "^0.23.0",
     "ecash-script": "^2.1.2",
     "ecashaddrjs": "^1.5.6",
+    "jest-when": "^3.6.0",
     "next": "14.1.0",
     "react": "^18",
     "react-dom": "^18",
@@ -22,9 +24,13 @@
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^14.2.1",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1"
   }

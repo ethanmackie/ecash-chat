@@ -52,7 +52,8 @@ Builds the app for production to the `build` folder.
 - [x] Add eslint and apply to codebase
 - [x] Parsing of tx history to render all OP_RETURN messages
 - [ ] Wallet Messaging: customize rendering of sent and received OP_RETURN messages (both cashtab and external)
-- [ ] Implement Jest + add unit tests
+- [x] Implement Jest + add unit tests for chronik, alias-server & utils
+- [ ] Add input validation + unit tests
 - [ ] Add integration tests
 - [x] Retrieve registered and pending aliases for extension wallet
 - [x] Wallet Messaging: Send Message feature which sends a query string to Cashtab Extensions using the nominal 5.5 XEC as amount
