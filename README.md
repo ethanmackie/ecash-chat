@@ -63,8 +63,13 @@ Builds the app for production to the `build` folder.
 - [ ] Add integration tests
 - [x] Retrieve registered and pending aliases for extension wallet
 - [x] Wallet Messaging: Send Message feature which sends a query string to Cashtab Extensions using the nominal 5.5 XEC as amount
-- [ ] Wallet Messaging: Advanced Send Message feature which allows the user to customize the send amount along with the message
-- [ ] Wallet Messaging: Enables the use of alias as a destination address
+- [x] Wallet Messaging: Optional send value with message tx
+- [x] Wallet Messaging: Enables the use of alias as a destination address
+- [ ] Show messaging history for a specific address or alias
+- [ ] Logout function
+- [ ] Use blockies for avatar generation
+- [ ] Integration of cashtab contact list from extension
+- [ ] Implement google analytics
 
 **V2**
 - [ ] Public Town Hall: Basic posting and retrieval function
@@ -79,12 +84,6 @@ Builds the app for production to the `build` folder.
 - [ ] Sort by Date/Rating
 - [ ] Filter by post, category, keyword, date
 - [ ] Public go live
-
-**V3**
-- [ ] Explore NFT functionality & integration with Cashtab backend
-- [ ] Explore integration with gorbeious e.g. token trading notice boards
-- [ ] Explore twitter/reddit/telegram integration plugins
-- [ ] Explore integration with eCash community dashboards
 
 ## Dev Notes
 

@@ -93,7 +93,7 @@ export default function Home() {
       );
     };
     
-    const handleAddressChange = e => {
+    const handleAddressChange = async e => {
         const { value } = e.target;
         if (
             isValidRecipient(value) === true &&
@@ -102,7 +102,26 @@ export default function Home() {
             setRecipient(value);
             setRecipientError(false);
         } else {
-            setRecipientError('Invalid eCash address');
+            // Check if this invalid eCash address is an alias
+
+            // Extract alias without the `.xec` and check the server for validation
+            const aliasName = value.slice(0, value.length - 4);
+            // retrieve the alias details for `aliasName` from alias-server
+            let aliasDetails;
+            try {
+                aliasDetails = await queryAliasServer('alias', aliasName);
+                if (!aliasDetails.address) {
+                    setRecipientError('Invalid eCash address or alias');
+                } else {
+                    // Valid alias address response returned
+                    setRecipient(aliasDetails.address);
+                    setRecipientError(false);
+                }
+            } catch (err) {
+                setRecipientError(
+                    'Error resolving alias at indexer, contact admin.',
+                );
+            }
         }
     };
 
