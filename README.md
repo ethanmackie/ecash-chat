@@ -67,10 +67,17 @@ Builds the app for production to the `build` folder.
 - [x] Wallet Messaging: Enables the use of alias as a destination address
 - [ ] Show messaging history for a specific address or alias
 - [ ] Add emoji functions
+- [ ] Add sticker pack functions
 - [ ] Logout function
+- [ ] Add dark mode
 - [ ] Use blockies for avatar generation
 - [ ] Integration of cashtab contact list from extension
 - [ ] Implement google analytics
+- [ ] Explore Push notifications or unread/read functions
+- [ ] Explore Encryption feasibility
+- [ ] Explore File sharing feasibility
+- [ ] Explore Voice/Video messaging feasibility
+- [ ] Explore Group chats feasibility
 
 **V2**
 - [ ] Public Town Hall: Basic posting and retrieval function
