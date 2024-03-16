@@ -1,4 +1,4 @@
-# ecash-social
+# ecash-chat
 
 
 ## Key Features
@@ -66,6 +66,7 @@ Builds the app for production to the `build` folder.
 - [x] Wallet Messaging: Optional send value with message tx
 - [x] Wallet Messaging: Enables the use of alias as a destination address
 - [ ] Show messaging history for a specific address or alias
+- [ ] Add emoji functions
 - [ ] Logout function
 - [ ] Use blockies for avatar generation
 - [ ] Integration of cashtab contact list from extension

@@ -1,8 +1,8 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "eCash Social",
-  description: "On chain social platform",
+  title: "eCash Chat",
+  description: "On chain messaging platform",
 };
 
 export default function RootLayout({ children }) {
