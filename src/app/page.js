@@ -8,6 +8,7 @@ import { encodeBip21Message } from '../utils/utils';
 import { appConfig } from '../config/app';
 import { isValidRecipient, isValidMessage } from '../validation/validation';
 import { opReturn as opreturnConfig } from '../config/opreturn';
+import 'emoji-picker-element';
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -18,15 +19,26 @@ export default function Home() {
         });
     const [recipient, setRecipient] = useState(null);
     const [recipientError, setRecipientError] = useState(false);
-    const [message, setMessage] = useState(null);
+    const [message, setMessage] = useState('');
     const [messageError, setMessageError] = useState(false);
     const [sendAmountXec, setSendAmountXec] = useState(5.5);
     const [sendAmountXecError, setSendAmountXecError] = useState(false);
+    const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
 
     useEffect(() => {
         // Listen for cashtab extension messages on load
         window.addEventListener('message', handleMessage);
     }, [address]);
+
+    useEffect(() => {
+        // Listen for emoji picker selections
+        const emojiHandler = (emoji) => {
+            const newMsg = String(message).concat(emoji);
+            setMessage(newMsg);
+        };
+        document.querySelector('emoji-picker').addEventListener("emoji-click", event => emojiHandler(event.detail.unicode));
+        return () => document.querySelector('emoji-picker').removeEventListener("emoji-click", event => emojiHandler(event.detail.unicode));
+    }, [message]);
 
     // Parse for an address from cashtab
     const handleMessage = async (event) => {
@@ -127,10 +139,7 @@ export default function Home() {
 
     const handleMessageChange = e => {
         const { value } = e.target;
-        if (
-            isValidMessage(value) === true &&
-            value.trim() !== ''
-        ) {
+        if (isValidMessage(value) === true) {
             setMessage(value);
             setMessageError(false);
         } else {
@@ -292,10 +301,15 @@ export default function Home() {
                 <textarea
                     id="message"
                     rows="4"
+                    value={message}
                     required
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     onChange={e => handleMessageChange(e)}
                 />
+                <p onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}>{renderEmojiPicker ? 'Hide Emojis' : 'Show Emojis'}</p>
+                <div style={{ display: (renderEmojiPicker ? 'block' : 'none') }}>
+                      <emoji-picker></emoji-picker>
+                </div>
               </div>
               <p className="mt-2 text-sm text-red-600 dark:text-red-500">{messageError !== false && messageError}</p>
               <label htmlFor="value-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Send XEC amount (optional, 5.5 XEC by default):</label>
@@ -307,7 +321,6 @@ export default function Home() {
                   onChange={e => handleSendAmountChange(e)}
               />
             </div>
-
             <div>
               <button
                 type="button"

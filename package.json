@@ -14,6 +14,7 @@
     "chronik-client": "^0.23.0",
     "ecash-script": "^2.1.2",
     "ecashaddrjs": "^1.5.6",
+    "emoji-picker-element": "^1.21.1",
     "jest-when": "^3.6.0",
     "next": "14.1.0",
     "react": "^18",
