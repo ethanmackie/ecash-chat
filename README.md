@@ -67,6 +67,7 @@ Builds the app for production to the `build` folder.
 - [x] Wallet Messaging: Enables the use of alias as a destination address
 - [ ] Show messaging history for a specific address or alias
 - [x] Integrate emoji picker into the message input field
+- [x] Embed images and video thumbnails into messages via [img] and [video] tags
 - [ ] Add sticker pack functions
 - [ ] Logout function
 - [ ] Add dark mode
@@ -75,7 +76,6 @@ Builds the app for production to the `build` folder.
 - [ ] Implement google analytics
 - [ ] Explore Push notifications or unread/read functions
 - [ ] Explore File sharing feasibility
-- [ ] Explore Voice/Video messaging feasibility
 - [ ] Explore Group chats feasibility
 
 **V2**

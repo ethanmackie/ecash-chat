@@ -66,6 +66,9 @@ export const parseChronikTx = (tx, address) => {
     let isEncryptedMessage = false;
     let replyAddress = '';
     let aliasFlag = false;
+    let imageSrc = false;
+    let videoSrc = false;
+    let videoId = false;
 
     if (tx.isCoinbase) {
         // Note that coinbase inputs have `undefined` for `thisInput.outputScript`
@@ -325,6 +328,31 @@ export const parseChronikTx = (tx, address) => {
     }
     etokenAmount = etokenAmount.toString();
 
+    // Parse for any image tags in the message
+    if (
+        opReturnMessage.includes('[img]') &&
+        opReturnMessage.includes('[/img]')
+    ) {
+        imageSrc = opReturnMessage.substring(
+            opReturnMessage.indexOf('[img]') + 5,
+            opReturnMessage.lastIndexOf('[/img]')
+        );
+        opReturnMessage = opReturnMessage.replace(`[img]${imageSrc}[/img]`,'');
+    }
+
+    // Parse for any video tags in the message
+    if (
+        opReturnMessage.includes('[video]') &&
+        opReturnMessage.includes('[/video]')
+    ) {
+        videoId = opReturnMessage.substring(
+            opReturnMessage.indexOf('[video]') + 7,
+            opReturnMessage.lastIndexOf('[/video]')
+        );
+        videoSrc = `https://www.youtube.com/watch?v=${videoId}`;
+        opReturnMessage = opReturnMessage.replace(`[video]${videoId}[/video]`,'');
+    }
+
     // Return eToken specific fields if eToken tx
     if (isEtokenTx) {
         return {
@@ -340,6 +368,9 @@ export const parseChronikTx = (tx, address) => {
             isCashtabMessage,
             isEncryptedMessage,
             replyAddress,
+            imageSrc,
+            videoSrc,
+            videoId,
         };
     }
     // Otherwise do not include these fields
@@ -354,5 +385,8 @@ export const parseChronikTx = (tx, address) => {
         isEncryptedMessage,
         replyAddress,
         aliasFlag,
+        imageSrc,
+        videoSrc,
+        videoId,
     };
 };

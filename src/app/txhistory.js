@@ -83,6 +83,10 @@ export default function TxHistory({ address }) {
                                <span className="text-sm font-semibold text-gray-900 dark:text-white">{tx.replyAddress.substring(0,10)} ... {tx.replyAddress.substring(tx.replyAddress.length - 5)}</span>
                             </div>
                             <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
+                            {tx.imageSrc !== false && (<img src={tx.imageSrc} />)}
+                            {tx.videoId !== false && (
+                                <a href={tx.videoSrc} target="_blank"><img src={`https://img.youtube.com/vi/${tx.videoId}/hqdefault.jpg`} /></a>
+                            )}
                           <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{tx.xecAmount} XEC</span>
                          </div>
                         </div>

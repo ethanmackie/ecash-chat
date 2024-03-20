@@ -1,7 +1,11 @@
 import { parseChronikTx } from '../chronik';
 import {
     mockXecSendTxWithOpReturn,
+    mockXecSendTxWithOpReturnImage,
+    mockXecSendTxWithOpReturnVideo,
     mockParsedXecSendTxWithOpReturn,
+    mockParsedXecSendTxWithOpReturnImage,
+    mockParsedXecSendTxWithOpReturnVideo,
 } from '../fixtures/mocks';
 
 test('parseChronikTx() correctly parses a XEC send tx with OP_RETURN data retrieved from chronik', async () => {
@@ -10,5 +14,23 @@ test('parseChronikTx() correctly parses a XEC send tx with OP_RETURN data retrie
         mockParsedXecSendTxWithOpReturn.replyAddress,
     )).toEqual(
         mockParsedXecSendTxWithOpReturn,
+    );
+});
+
+test('parseChronikTx() correctly parses a XEC send tx with image embedded OP_RETURN data retrieved from chronik', async () => {
+    await expect(parseChronikTx(
+        mockXecSendTxWithOpReturnImage,
+        mockParsedXecSendTxWithOpReturnImage.replyAddress,
+    )).toEqual(
+        mockParsedXecSendTxWithOpReturnImage,
+    );
+});
+
+test('parseChronikTx() correctly parses a XEC send tx with youtube video embedded OP_RETURN data retrieved from chronik', async () => {
+    await expect(parseChronikTx(
+        mockXecSendTxWithOpReturnVideo,
+        mockParsedXecSendTxWithOpReturnVideo.replyAddress,
+    )).toEqual(
+        mockParsedXecSendTxWithOpReturnVideo,
     );
 });
