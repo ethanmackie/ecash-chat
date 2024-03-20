@@ -46,6 +46,7 @@ export const mockParsedXecSendTxWithOpReturnVideo = {
     "isCashtabMessage": false,
     "isEncryptedMessage": false,
     "replyAddress": "ecash:qrwpz3mx89y0ph8mqrxyqlk6gxcjzuf66vc4ajscad",
+    "recipientAddress": "ecash:qrmz0egsqxj35x5jmzf8szrszdeu72fx0uxgwk3r48",
     "aliasFlag": false,
     "imageSrc": false,
     "videoSrc": "https://www.youtube.com/watch?v=gqxdP3RaDQE",
@@ -126,6 +127,7 @@ export const mockParsedXecSendTxWithOpReturnImage = {
     "isCashtabMessage": false,
     "isEncryptedMessage": false,
     "replyAddress": "ecash:qrwpz3mx89y0ph8mqrxyqlk6gxcjzuf66vc4ajscad",
+    "recipientAddress": "ecash:qrmz0egsqxj35x5jmzf8szrszdeu72fx0uxgwk3r48",
     "aliasFlag": false,
     "imageSrc": "https://i.imgur.com/A4vXOFY.jpeg",
     "videoSrc": false,
@@ -191,6 +193,7 @@ export const mockParsedXecSendTxWithOpReturn = {
     "isEncryptedMessage": false,
     "opReturnMessage": "jfrom ecash social",
     "replyAddress": "ecash:qrmz0egsqxj35x5jmzf8szrszdeu72fx0uxgwk3r48",
+    "recipientAddress": "ecash:qzekdmmurl75aazj6uj4vc68yrxgws0pmsgztm4atw",
     "imageSrc": false,
     "videoSrc": false,
     "videoId": false

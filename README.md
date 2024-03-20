@@ -65,7 +65,7 @@ Builds the app for production to the `build` folder.
 - [x] Wallet Messaging: Send Message feature which sends a query string to Cashtab Extensions using the nominal 5.5 XEC as amount
 - [x] Wallet Messaging: Optional send value with message tx
 - [x] Wallet Messaging: Enables the use of alias as a destination address
-- [ ] Show messaging history for a specific address or alias
+- [x] Real time filter on tx history for a specific address
 - [x] Integrate emoji picker into the message input field
 - [x] Embed images and video thumbnails into messages via [img] and [video] tags
 - [ ] Add sticker pack functions

@@ -65,6 +65,7 @@ export const parseChronikTx = (tx, address) => {
     let isCashtabMessage = false;
     let isEncryptedMessage = false;
     let replyAddress = '';
+    let recipientAddress = '';
     let aliasFlag = false;
     let imageSrc = false;
     let videoSrc = false;
@@ -136,6 +137,11 @@ export const parseChronikTx = (tx, address) => {
     for (let i = 0; i < tx.outputs.length; i += 1) {
         const thisOutput = tx.outputs[i];
         const thisOutputReceivedAtHash160 = thisOutput.outputScript;
+
+        // Uses output[1] as the intended recipient address
+        if (i === 1) {
+            recipientAddress = cashaddr.encodeOutputScript(thisOutputReceivedAtHash160);
+        }
 
         if (
             thisOutputReceivedAtHash160.startsWith(
@@ -368,6 +374,7 @@ export const parseChronikTx = (tx, address) => {
             isCashtabMessage,
             isEncryptedMessage,
             replyAddress,
+            recipientAddress,
             imageSrc,
             videoSrc,
             videoId,
@@ -384,6 +391,7 @@ export const parseChronikTx = (tx, address) => {
         isCashtabMessage,
         isEncryptedMessage,
         replyAddress,
+        recipientAddress,
         aliasFlag,
         imageSrc,
         videoSrc,
