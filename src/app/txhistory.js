@@ -9,6 +9,15 @@ import cashaddr from 'ecashaddrjs';
 import { isValidRecipient } from '../validation/validation';
 import { Skeleton } from "@/components/ui/skeleton"
 
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
 const chronik = new ChronikClientNode(chronikConfig.urls);
 
 export default function TxHistory({ address }) {
@@ -120,10 +129,16 @@ export default function TxHistory({ address }) {
                )
              : `No messages in this range of transactions.`
        );
+
+       
     }
+
+
+   
 
     return (
          <>
+          
          {txHistory && txHistory !== '' ? (
              <>
              {/*Set up pagination menu*/}

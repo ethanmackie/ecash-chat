@@ -10,6 +10,8 @@ import { isValidRecipient, isValidMessage } from '../validation/validation';
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import 'emoji-picker-element';
 
+import { Badge } from "@/components/ui/badge"
+
 export default function Home() {
     const [address, setAddress] = useState('');
     const [step, setStep] = useState('pending');
@@ -228,29 +230,20 @@ export default function Home() {
         <br />
             <b>Registered Aliases: </b>
             {aliases.registered && aliases.registered.length > 0 &&
-            aliases.registered.map(
-                  (alias, index) => (
-                      <kbd
-                          className="px-2 py-1.5 text-xs font-semibold text-gray-800 bg-blue-300 border border-gray-200 rounded-lg dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500"
-                          key={index}
-                      >
-                          {alias.alias}.xec 
-                      </kbd>
-                  ),
-              )}
+        aliases.registered.map((alias, index) => (
+          <Badge key={index} variant="solid" className="mr-1">
+            {alias.alias}.xec
+          </Badge>
+        ))}
+      <br />
             <br />
             <b>Pending Aliases: </b>
             {aliases.pending && aliases.pending.length > 0 &&
-            aliases.pending.map(
-                  (alias, index) => (
-                      <kbd
-                          className="px-2 py-1.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500"
-                          key={index}
-                      >
-                          {alias.alias}.xec 
-                      </kbd>
-                  ),
-              )}
+        aliases.pending.map((alias, index) => (
+          <Badge key={index} variant="outline" className="mr-1">
+            {alias.alias}.xec
+          </Badge>
+        ))}
         <br />
         
         <b>Messages:</b>
