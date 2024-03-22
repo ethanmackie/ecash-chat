@@ -1,12 +1,13 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { getTxHistory } from '../chronik/chronik';
-import Skeleton from 'react-loading-skeleton'
-import 'react-loading-skeleton/dist/skeleton.css'
+//import Skeleton from 'react-loading-skeleton'
+//import 'react-loading-skeleton/dist/skeleton.css'
 import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
 import cashaddr from 'ecashaddrjs';
 import { isValidRecipient } from '../validation/validation';
+import { Skeleton } from "@/components/ui/skeleton"
 
 const chronik = new ChronikClientNode(chronikConfig.urls);
 
@@ -204,7 +205,14 @@ export default function TxHistory({ address }) {
 
              <RenderTxHistory />
              </>
-           ) : <Skeleton count={10} />
+           ) : 
+           <div className="flex flex-col space-y-3">
+           <div className="space-y-2">
+             <Skeleton className="h-4 w-[400px]" />
+             <Skeleton className="h-4 w-[350px]" />
+             <Skeleton className="h-4 w-[300px]" />
+           </div>
+         </div>
          }
       </>
     );
