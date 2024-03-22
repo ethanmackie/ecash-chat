@@ -9,8 +9,10 @@ import { appConfig } from '../config/app';
 import { isValidRecipient, isValidMessage } from '../validation/validation';
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import 'emoji-picker-element';
-
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -41,6 +43,8 @@ export default function Home() {
         document.querySelector('emoji-picker').addEventListener("emoji-click", event => emojiHandler(event.detail.unicode));
         return () => document.querySelector('emoji-picker').removeEventListener("emoji-click", event => emojiHandler(event.detail.unicode));
     }, [message]);
+
+    
 
     // Parse for an address from cashtab
     const handleMessage = async (event) => {
@@ -273,12 +277,11 @@ export default function Home() {
                 Address
               </label>
               <div className="mt-2">
-                <input
+                <Input
                   id="address"
                   name="address"
                   type="text"
                   required
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   onChange={e => handleAddressChange(e)}
                 />
               </div>
@@ -292,22 +295,23 @@ export default function Home() {
                 </label>
               </div>
               <div className="mt-2">
-                <textarea
+                <Textarea
                     id="message"
                     rows="4"
                     value={message}
                     required
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     onChange={e => handleMessageChange(e)}
                 />
-                <p onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}>{renderEmojiPicker ? 'Hide Emojis' : 'Show Emojis'}</p>
-                <div style={{ display: (renderEmojiPicker ? 'block' : 'none') }}>
-                      <emoji-picker></emoji-picker>
-                </div>
+                <Button className="mt-2" onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}>
+    {renderEmojiPicker ? 'Hide Emojis' : 'Show Emojis'}
+  </Button>
+  <div style={{ display: (renderEmojiPicker ? 'block' : 'none') }}>
+    <emoji-picker></emoji-picker>
+  </div>
               </div>
               <p className="mt-2 text-sm text-red-600 dark:text-red-500">{messageError !== false && messageError}</p>
               <label htmlFor="value-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Send XEC amount (optional, 5.5 XEC by default):</label>
-              <input
+              <Input
                   type="number"
                   id="value-input"
                   aria-describedby="helper-text-explanation" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -316,16 +320,16 @@ export default function Home() {
               />
             </div>
             <div>
-              <button
+              <Button
                 type="button"
                 disabled={recipientError || messageError || sendAmountXecError}
-                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="flex w-full"
                 onClick={() => {
                     sendMessage();
                 }}
               >
                 Send
-              </button>
+              </Button>
             </div>
           </form>
         </div>
