@@ -195,18 +195,19 @@ export default function Home() {
               />
             </a>
 
-          <div className="hidden w-full md:block md:w-auto" id="navbar-default">
-            <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-gradient-to-t dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-              <li key="top menu option1">
-                <a href="#" className="block py-2 px-3 text-white bg-gradient-to-t rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500" aria-current="page">Top menu option</a>
-              </li>
-            </ul>
-          </div>
-        </div>
+            <div className="hidden w-full md:block md:w-auto" id="navbar-default">
+      <button
+        type="button"
+        className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+      >
+        alita test
+      </button>
+    </div>
+  </div>
       </nav>
     
     
-    <main className="flex min-h-screen flex-col items-left justify-between p-24">
+      <main className="flex min-h-screen flex-col items-left justify-center p-24">
       <div>
         <div>
             <button type="button" className="text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 me-2 mb-2">
