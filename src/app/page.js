@@ -37,7 +37,6 @@ export default function Home() {
     useEffect(() => {
         // Listen for emoji picker selections
         const emojiHandler = (emoji) => {
-            console.log('emojiHandler() triggered');
             const newMsg = String(message).concat(emoji);
             setMessage(newMsg);
         };
