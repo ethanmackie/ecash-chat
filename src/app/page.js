@@ -37,6 +37,7 @@ export default function Home() {
     useEffect(() => {
         // Listen for emoji picker selections
         const emojiHandler = (emoji) => {
+            console.log('emojiHandler() triggered');
             const newMsg = String(message).concat(emoji);
             setMessage(newMsg);
         };
@@ -302,12 +303,12 @@ export default function Home() {
                     required
                     onChange={e => handleMessageChange(e)}
                 />
-                <Button className="mt-2" onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}>
-    {renderEmojiPicker ? 'Hide Emojis' : 'Show Emojis'}
-  </Button>
-  <div style={{ display: (renderEmojiPicker ? 'block' : 'none') }}>
-    <emoji-picker></emoji-picker>
-  </div>
+                <Button className="mt-2" type="button" onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}>
+                  {renderEmojiPicker ? 'Hide Emojis' : 'Show Emojis'}
+                </Button>
+                <div style={{ display: (renderEmojiPicker ? 'block' : 'none') }}>
+                  <emoji-picker></emoji-picker>
+                </div>
               </div>
               <p className="mt-2 text-sm text-red-600 dark:text-red-500">{messageError !== false && messageError}</p>
               <label htmlFor="value-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Send XEC amount (optional, 5.5 XEC by default):</label>
