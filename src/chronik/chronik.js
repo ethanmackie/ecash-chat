@@ -348,16 +348,19 @@ export const parseChronikTx = (tx, address) => {
 
     // Parse for any video tags in the message
     if (
-        opReturnMessage.includes('[video]') &&
-        opReturnMessage.includes('[/video]')
+        opReturnMessage.includes('[yt]') &&
+        opReturnMessage.includes('[/yt]')
     ) {
         videoId = opReturnMessage.substring(
-            opReturnMessage.indexOf('[video]') + 7,
-            opReturnMessage.lastIndexOf('[/video]')
+            opReturnMessage.indexOf('[yt]') + 4,
+            opReturnMessage.lastIndexOf('[/yt]')
         );
         videoSrc = `https://www.youtube.com/watch?v=${videoId}`;
-        opReturnMessage = opReturnMessage.replace(`[video]${videoId}[/video]`,'');
+        opReturnMessage = opReturnMessage.replace(`[yt]${videoId}[/yt]`,'');
     }
+
+    // Slice the op_return prefix
+    opReturnMessage = opReturnMessage.slice(2);
 
     // Return eToken specific fields if eToken tx
     if (isEtokenTx) {
