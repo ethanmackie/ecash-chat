@@ -359,9 +359,6 @@ export const parseChronikTx = (tx, address) => {
         opReturnMessage = opReturnMessage.replace(`[yt]${videoId}[/yt]`,'');
     }
 
-    // Slice the op_return prefix
-    opReturnMessage = opReturnMessage.slice(2);
-
     // Return eToken specific fields if eToken tx
     if (isEtokenTx) {
         return {

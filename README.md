@@ -68,7 +68,8 @@ Builds the app for production to the `build` folder.
 - [x] Real time filter on tx history for a specific address
 - [x] Integrate emoji picker into the message input field
 - [x] Embed images and video thumbnails into messages via [img] and [video] tags
-- [ ] Add sticker pack functions
+- [x] Unique rendering of own address as sender or receiver
+- [ ] Tipping function
 - [ ] Logout function
 - [ ] Add dark mode
 - [ ] Use blockies for avatar generation

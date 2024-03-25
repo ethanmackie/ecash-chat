@@ -111,9 +111,29 @@ export default function TxHistory({ address }) {
 
                         <div className="flex items-center space-x-2 rtl:space-x-reverse">
                            <span className="text-sm font-normal text-gray-500 dark:text-gray-400">From: </span>
-                           <span className="text-sm font-semibold text-gray-900 dark:text-white">{tx.replyAddress.substring(0,10)} ... {tx.replyAddress.substring(tx.replyAddress.length - 5)}</span>
+                           <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                              {tx.replyAddress === address ? (
+                                <mark>
+                                  This Wallet
+                                </mark>
+                              ) :
+                                (<>
+                                  {tx.replyAddress.substring(0,10)} ... {tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                </>)
+                              }
+                           </span>
                            <span className="text-sm font-normal text-gray-500 dark:text-gray-400">To: </span>
-                           <span className="text-sm font-semibold text-gray-900 dark:text-white">{tx.recipientAddress.substring(0,10)} ... {tx.recipientAddress.substring(tx.recipientAddress.length - 5)}</span>
+                           <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                               {tx.recipientAddress === address ? (
+                                 <mark>
+                                   This Wallet
+                                 </mark>
+                               ) :
+                                 (<>
+                                   {tx.recipientAddress.substring(0,10)} ... {tx.recipientAddress.substring(tx.recipientAddress.length - 5)}
+                                 </>)
+                               }
+                           </span>
                         </div>
                         <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
                         {tx.imageSrc !== false && (<img src={tx.imageSrc} />)}
