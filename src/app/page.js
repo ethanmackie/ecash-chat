@@ -44,8 +44,6 @@ export default function Home() {
         return () => document.querySelector('emoji-picker').removeEventListener("emoji-click", event => emojiHandler(event.detail.unicode));
     }, [message]);
 
-    
-
     // Parse for an address from cashtab
     const handleMessage = async (event) => {
         if (
@@ -211,8 +209,6 @@ export default function Home() {
     </div>
   </div>
       </nav>
-    
-    
       <main className="flex min-h-screen flex-col items-left justify-center p-24">
       <div>
         <div>
@@ -334,7 +330,6 @@ export default function Home() {
           </form>
         </div>
       </div>
-      
     </main>
     </>
   );

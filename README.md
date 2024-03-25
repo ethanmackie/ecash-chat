@@ -69,7 +69,7 @@ Builds the app for production to the `build` folder.
 - [x] Integrate emoji picker into the message input field
 - [x] Embed images and video thumbnails into messages via [img] and [video] tags
 - [x] Unique rendering of own address as sender or receiver
-- [ ] Tipping function
+- [x] Tipping function
 - [ ] Logout function
 - [ ] Add dark mode
 - [ ] Use blockies for avatar generation
