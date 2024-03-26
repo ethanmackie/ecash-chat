@@ -8,7 +8,8 @@ import { encodeBip21Message } from '../utils/utils';
 import { appConfig } from '../config/app';
 import { isValidRecipient, isValidMessage } from '../validation/validation';
 import { opReturn as opreturnConfig } from '../config/opreturn';
-import 'emoji-picker-element';
+import data from '@emoji-mart/data';
+import Picker from '@emoji-mart/react';
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
@@ -39,19 +40,6 @@ export default function Home() {
         // Listen for cashtab extension messages on load
         window.addEventListener('message', handleMessage);
     }, [address]);
-
-    useEffect(() => {
-        // Only start listening for emoji picker when logged in
-        if (isLoggedIn) {
-            // Listen for emoji picker selections
-            const emojiHandler = (emoji) => {
-                const newMsg = String(message).concat(emoji);
-                setMessage(newMsg);
-            };
-            document.querySelector('emoji-picker').addEventListener("emoji-click", event => emojiHandler(event.detail.unicode));
-            return () => document.querySelector('emoji-picker').removeEventListener("emoji-click", event => emojiHandler(event.detail.unicode));
-        }
-    }, [message, isLoggedIn]);
 
     // Parse for an address from cashtab
     const handleMessage = async (event) => {
@@ -188,6 +176,8 @@ export default function Home() {
             },
             '*',
         );
+        setRecipient(null);
+        setMessage('');
     };
 
   /* Placeholder UI for now until the Tailwind UI set is ready for implementation */
@@ -372,7 +362,12 @@ export default function Home() {
                       {renderEmojiPicker ? 'Hide Emojis' : 'Show Emojis'}
                     </Button>
                     <div style={{ display: (renderEmojiPicker ? 'block' : 'none') }}>
-                      <emoji-picker></emoji-picker>
+                      <Picker
+                          data={data}
+                          onEmojiSelect={(e) => {
+                              setMessage(String(message).concat(e.native));
+                          }}
+                      />
                     </div>
                   </div>
                   <p className="mt-2 text-sm text-red-600 dark:text-red-500">{messageError !== false && messageError}</p>

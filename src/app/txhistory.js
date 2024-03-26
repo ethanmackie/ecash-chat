@@ -68,7 +68,7 @@ export default function TxHistory({ address }) {
 
         setLoadingMsg('Retrieving data from Chronik, please wait.');
         const txHistoryResp = await getTxHistory(chronik, address, page);
-        if (Array.isArray(txHistoryResp.txs)) {
+        if (txHistoryResp && Array.isArray(txHistoryResp.txs)) {
             setTxHistory(txHistoryResp);
         }
         setLoadingMsg('');
