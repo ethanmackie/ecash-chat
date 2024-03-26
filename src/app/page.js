@@ -35,7 +35,7 @@ export default function Home() {
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
-        confirmCashtabProviderStatus();
+        setTimeout(confirmCashtabProviderStatus, 750);
 
         // Listen for cashtab extension messages on load
         window.addEventListener('message', handleMessage);
