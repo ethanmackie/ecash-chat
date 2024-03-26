@@ -16,6 +16,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Popover } from "flowbite-react";
+import { Avatar } from "flowbite-react";
 
 const chronik = new ChronikClientNode(chronikConfig.urls);
 
@@ -131,14 +132,12 @@ export default function TxHistory({ address }) {
                            <span className="text-sm font-normal text-gray-500 dark:text-gray-400">From: </span>
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
                               {tx.replyAddress === address ? (
-                                <mark>
-                                  This Wallet
-                                </mark>
+                                  <Avatar size="xs">This Wallet</Avatar>
                               ) :
                                 (<>
                                   <span>
-                                  {tx.replyAddress.substring(0,10)} ... {tx.replyAddress.substring(tx.replyAddress.length - 5)}
-                                  &emsp;
+                                  <Avatar size="xs">{tx.replyAddress.substring(0,10)} ... {tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                  &nbsp;
                                   <Popover
                                     aria-labelledby="default-popover"
                                     content={
@@ -207,6 +206,7 @@ export default function TxHistory({ address }) {
                                         Tip XEC
                                     </button>
                                   </Popover>
+                                  </Avatar>
                                   </span>
                                 </>)
                               }
@@ -214,14 +214,12 @@ export default function TxHistory({ address }) {
                            <span className="text-sm font-normal text-gray-500 dark:text-gray-400">To: </span>
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
                                {tx.recipientAddress === address ? (
-                                 <mark>
-                                   This Wallet
-                                 </mark>
+                                   <Avatar size="xs">This Wallet</Avatar>
                                ) :
                                  (<>
                                    <span>
-                                   {tx.recipientAddress.substring(0,10)} ... {tx.recipientAddress.substring(tx.recipientAddress.length - 5)}
-                                   &emsp;
+                                   <Avatar size="xs">{tx.recipientAddress.substring(0,10)} ... {tx.recipientAddress.substring(tx.recipientAddress.length - 5)}
+                                   &nbsp;
                                    <Popover
                                      aria-labelledby="default-popover"
                                      content={
@@ -290,6 +288,7 @@ export default function TxHistory({ address }) {
                                          Tip XEC
                                      </button>
                                    </Popover>
+                                   </Avatar>
                                    </span>
                                  </>)
                                }
