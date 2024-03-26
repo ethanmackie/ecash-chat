@@ -70,6 +70,7 @@ Builds the app for production to the `build` folder.
 - [x] Embed images and video thumbnails into messages via [img] and [video] tags
 - [x] Unique rendering of own address as sender or receiver
 - [x] Tipping function
+- [x] Add eCash Chat protocol identifier to outbound messages
 - [ ] Logout function
 - [ ] Add dark mode
 - [ ] Use blockies for avatar generation

@@ -3,9 +3,11 @@ import {
     mockXecSendTxWithOpReturn,
     mockXecSendTxWithOpReturnImage,
     mockXecSendTxWithOpReturnVideo,
+    mockXecSendTxWithOpReturnEmoji,
     mockParsedXecSendTxWithOpReturn,
     mockParsedXecSendTxWithOpReturnImage,
     mockParsedXecSendTxWithOpReturnVideo,
+    mockParsedXecSendTxWithOpReturnEmoji,
 } from '../fixtures/mocks';
 
 test('parseChronikTx() correctly parses a XEC send tx with OP_RETURN data retrieved from chronik', async () => {
@@ -32,5 +34,14 @@ test('parseChronikTx() correctly parses a XEC send tx with youtube video embedde
         mockParsedXecSendTxWithOpReturnVideo.replyAddress,
     )).toEqual(
         mockParsedXecSendTxWithOpReturnVideo,
+    );
+});
+
+test('parseChronikTx() correctly parses a XEC send tx with emoji embedded OP_RETURN data retrieved from chronik', async () => {
+    await expect(parseChronikTx(
+        mockXecSendTxWithOpReturnEmoji,
+        mockParsedXecSendTxWithOpReturnEmoji.replyAddress,
+    )).toEqual(
+        mockParsedXecSendTxWithOpReturnEmoji,
     );
 });

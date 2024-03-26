@@ -64,6 +64,7 @@ export const parseChronikTx = (tx, address) => {
     let opReturnMessage = '';
     let isCashtabMessage = false;
     let isEncryptedMessage = false;
+    let iseCashChatMessage = false;
     let replyAddress = '';
     let recipientAddress = '';
     let aliasFlag = false;
@@ -231,6 +232,15 @@ export const parseChronikTx = (tx, address) => {
                     }`;
                     break;
                 }
+                case opreturnConfig.appPrefixesHex.eCashChat: {
+                    iseCashChatMessage = true;
+                    if (stackArray.length >= 2) {
+                        opReturnMessage = Buffer.from(stackArray[1], 'hex');
+                    } else {
+                        opReturnMessage = 'off-spec eCash Chat Msg';
+                    }
+                    break;
+                }
                 default: {
                     // utf8 decode
                     opReturnMessage = Buffer.from(
@@ -390,6 +400,7 @@ export const parseChronikTx = (tx, address) => {
         opReturnMessage,
         isCashtabMessage,
         isEncryptedMessage,
+        iseCashChatMessage,
         replyAddress,
         recipientAddress,
         aliasFlag,

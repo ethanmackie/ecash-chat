@@ -301,6 +301,12 @@ export default function TxHistory({ address }) {
                             <a href={tx.videoSrc} target="_blank"><img src={`https://img.youtube.com/vi/${tx.videoId}/hqdefault.jpg`} /></a>
                         )}
                       <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{tx.xecAmount} XEC</span>
+                      <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                          {tx.isCashtabMessage ? 'Cashtab Message' :
+                              tx.iseCashChatMessage ? 'eCash Chat Message' :
+                                  'External Message'
+                          }
+                      </span>
                      </div>
                     </div>
                     <br />
