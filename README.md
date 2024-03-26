@@ -73,7 +73,7 @@ Builds the app for production to the `build` folder.
 - [x] Unique rendering of own address as sender or receiver
 - [x] Tipping function
 - [x] Add eCash Chat protocol identifier to outbound messages
-- [ ] Add QR code next to wallet address
+- [x] Add QR code next to wallet address
 - [x] Add timestamps to messages
 - [ ] Logout function
 - [ ] Add dark mode

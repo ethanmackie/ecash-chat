@@ -13,6 +13,8 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import QRCode from "react-qr-code";
+import copy from 'copy-to-clipboard';
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -227,6 +229,27 @@ export default function Home() {
         </div>
         <br />
             <b>User:</b> {address}
+            {/*QR Code*/}
+            {address !== '' && (
+              <>
+                &nbsp;<button
+                  type="button"
+                  id="copy-address-btn"
+                  className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                  onClick={() => {
+                      copy(address);
+                  }}
+                >
+                  Copy
+                </button>
+                <QRCode
+                    value={address}
+                    size={256}
+                    style={{ height: "auto", maxWidth: "15%", width: "15%" }}
+                    viewBox={`0 0 256 256`}
+                />
+                </>
+            )}
         <br />
             <b>Registered Aliases: </b>
             {aliases.registered && aliases.registered.length > 0 &&
