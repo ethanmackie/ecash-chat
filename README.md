@@ -75,7 +75,7 @@ Builds the app for production to the `build` folder.
 - [x] Add eCash Chat protocol identifier to outbound messages
 - [x] Add QR code next to wallet address
 - [x] Add timestamps to messages
-- [ ] Logout function
+- [x] Log in and log out functionality
 - [ ] Add dark mode
 - [x] Add avatars to each address
 - [ ] Integration of cashtab contact list from extension
