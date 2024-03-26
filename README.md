@@ -76,6 +76,7 @@ Builds the app for production to the `build` folder.
 - [x] Add QR code next to wallet address
 - [x] Add timestamps to messages
 - [x] Log in and log out functionality
+- [x] Detect extension status and render accordingly
 - [ ] Add dark mode
 - [x] Add avatars to each address
 - [ ] Integration of cashtab contact list from extension
