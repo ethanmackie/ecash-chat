@@ -306,6 +306,7 @@ export default function TxHistory({ address }) {
                               tx.iseCashChatMessage ? 'eCash Chat Message' :
                                   'External Message'
                           }
+                          &nbsp;|&nbsp;{tx.txDate}&nbsp;at&nbsp;{tx.txTime}
                       </span>
                      </div>
                     </div>

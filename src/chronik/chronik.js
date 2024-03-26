@@ -3,6 +3,7 @@ import { chronik as chronikConfig } from '../config/chronik';
 import cashaddr from 'ecashaddrjs';
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import { appConfig } from '../config/app';
+import { formatDate } from '../utils/utils';
 import { getStackArray } from 'ecash-script';
 import { BN } from 'slp-mdm';
 
@@ -369,6 +370,30 @@ export const parseChronikTx = (tx, address) => {
         opReturnMessage = opReturnMessage.replace(`[yt]${videoId}[/yt]`,'');
     }
 
+    // Parse the tx's date and time
+    let txDate, txTime;
+    if (tx.timeFirstSeen === 0) {
+        // If chronik does not have a timeFirstSeen for this tx
+        if (!('block' in tx)) {
+            // If it is also unconfirmed, we have nothing to go on here
+            // Do not render txDate or txTime
+            txDate = false;
+            txTime = false;
+        } else {
+            // If it is confirmed, use the block timestamp
+            txDate = formatDate(tx.block.timestamp, navigator.language);
+            txTime = new Date(
+                parseInt(`${tx.block.timestamp}000`),
+            ).toLocaleTimeString();
+        }
+    } else {
+        // If it is unconfirmed and we have data.timeFirstSeen, use that
+        txDate = formatDate(tx.timeFirstSeen, navigator.language);
+        txTime = new Date(
+            parseInt(`${tx.timeFirstSeen}000`),
+        ).toLocaleTimeString();
+    }
+
     // Return eToken specific fields if eToken tx
     if (isEtokenTx) {
         return {
@@ -388,6 +413,8 @@ export const parseChronikTx = (tx, address) => {
             imageSrc,
             videoSrc,
             videoId,
+            txDate,
+            txTime,
         };
     }
     // Otherwise do not include these fields
@@ -407,5 +434,7 @@ export const parseChronikTx = (tx, address) => {
         imageSrc,
         videoSrc,
         videoId,
+        txDate,
+        txTime,
     };
 };

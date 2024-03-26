@@ -51,7 +51,9 @@ export const mockParsedXecSendTxWithOpReturnEmoji = {
     "aliasFlag": false,
     "imageSrc": false,
     "videoSrc": false,
-    "videoId": false
+    "videoId": false,
+    "txDate": "Mar 26, 2024",
+    "txTime": "12:08:18 pm"
 };
 
 export const mockXecSendTxWithOpReturnVideo = {
@@ -107,7 +109,9 @@ export const mockParsedXecSendTxWithOpReturnVideo = {
     "aliasFlag": false,
     "imageSrc": false,
     "videoSrc": "https://www.youtube.com/watch?v=5RuYKxKCAOA",
-    "videoId": "5RuYKxKCAOA"
+    "videoId": "5RuYKxKCAOA",
+    "txDate": "Mar 26, 2024",
+    "txTime": "12:06:47 pm"
 };
 
 export const mockXecSendTxWithOpReturnImage = {
@@ -163,7 +167,9 @@ export const mockParsedXecSendTxWithOpReturnImage = {
     "aliasFlag": false,
     "imageSrc": "https://i.imgur.com/tIqtdgJ.jpeg",
     "videoSrc": false,
-    "videoId": false
+    "videoId": false,
+    "txDate": "Mar 26, 2024",
+    "txTime": "12:04:00 pm"
 };
 
 export const mockXecSendTxWithOpReturn = {
@@ -219,5 +225,7 @@ export const mockParsedXecSendTxWithOpReturn = {
     "aliasFlag": false,
     "imageSrc": false,
     "videoSrc": false,
-    "videoId": false
+    "videoId": false,
+    "txDate": "Mar 26, 2024",
+    "txTime": "12:01:49 pm"
 };

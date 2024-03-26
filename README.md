@@ -3,9 +3,13 @@
 
 ## Key Features
 
-- Wallet Messaging: essentially the OP_RETURN messages seen on Cashtab. Shows the sent and received messages as well as an area to send new messages.
-- Public Townhall: a free for all forum, potentially separated into categories. Users can interact with each post by Replying to post, following the poster, or tipping in XEC or eToken.
-- Authentication and transaction broadcasting via Cashtab Extensions.
+- One-click metamask-like login experience
+- Displays only messaging transactions
+- Real time address specific filtering
+- XEC Tipping on addresses
+- Integrated with the eCash Alias protocol
+- Enables embedding of images, youtube videos and emojis in messages
+- Powered by In-Node Chronik via Cashtab Extensions
 
 
 ## Development
@@ -57,10 +61,8 @@ Builds the app for production to the `build` folder.
 - [x] Pagination for tx history
 - [x] Add eslint and apply to codebase
 - [x] Parsing of tx history to render all OP_RETURN messages
-- [ ] Wallet Messaging: customize rendering of sent and received OP_RETURN messages (both cashtab and external)
 - [x] Implement Jest + add unit tests for chronik, alias-server & utils
 - [x] Add input validation + unit tests
-- [ ] Add integration tests
 - [x] Retrieve registered and pending aliases for extension wallet
 - [x] Wallet Messaging: Send Message feature which sends a query string to Cashtab Extensions using the nominal 5.5 XEC as amount
 - [x] Wallet Messaging: Optional send value with message tx
@@ -71,10 +73,13 @@ Builds the app for production to the `build` folder.
 - [x] Unique rendering of own address as sender or receiver
 - [x] Tipping function
 - [x] Add eCash Chat protocol identifier to outbound messages
+- [ ] Add QR code next to wallet address
+- [x] Add timestamps to messages
 - [ ] Logout function
 - [ ] Add dark mode
 - [ ] Use blockies for avatar generation
 - [ ] Integration of cashtab contact list from extension
+- [ ] Add integration tests
 - [ ] Implement google analytics
 - [ ] Explore Push notifications or unread/read functions
 - [ ] Explore File sharing feasibility

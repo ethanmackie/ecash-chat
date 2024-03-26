@@ -21,3 +21,20 @@ export const encodeBip21Message = message => {
         console.log('Error encoding eCash Chat message: ', err);
     }
 };
+
+// Formats a date value
+export const formatDate = (dateString, userLocale = 'en') => {
+    const options = { month: 'short', day: 'numeric', year: 'numeric' };
+    const dateFormattingError = 'Unable to format date.';
+    try {
+        if (dateString) {
+            return new Date(dateString * 1000).toLocaleDateString(
+                userLocale,
+                options,
+            );
+        }
+        return new Date().toLocaleDateString(userLocale, options);
+    } catch (error) {
+        return dateFormattingError;
+    }
+};

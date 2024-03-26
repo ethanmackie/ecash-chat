@@ -1,3 +1,6 @@
+/**
+ * @jest-environment ./custom-environment
+ */
 import { parseChronikTx } from '../chronik';
 import {
     mockXecSendTxWithOpReturn,
