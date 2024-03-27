@@ -77,8 +77,8 @@ Builds the app for production to the `build` folder.
 - [x] Add timestamps to messages
 - [x] Log in and log out functionality
 - [x] Detect extension status and render accordingly
-- [ ] Add dark mode
 - [x] Add avatars to each address
+- [x] Enable embedding of tweets in messages
 - [ ] Integration of cashtab contact list from extension
 - [ ] Add integration tests
 - [ ] Implement google analytics

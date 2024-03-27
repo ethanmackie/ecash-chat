@@ -72,6 +72,7 @@ export const parseChronikTx = (tx, address) => {
     let imageSrc = false;
     let videoSrc = false;
     let videoId = false;
+    let tweetId = false;
 
     if (tx.isCoinbase) {
         // Note that coinbase inputs have `undefined` for `thisInput.outputScript`
@@ -370,6 +371,18 @@ export const parseChronikTx = (tx, address) => {
         opReturnMessage = opReturnMessage.replace(`[yt]${videoId}[/yt]`,'');
     }
 
+    // Parse for any tweet tags in the message
+    if (
+        opReturnMessage.includes('[twt]') &&
+        opReturnMessage.includes('[/twt]')
+    ) {
+        tweetId = opReturnMessage.substring(
+            opReturnMessage.indexOf('[twt]') + 5,
+            opReturnMessage.lastIndexOf('[/twt]')
+        );
+        opReturnMessage = opReturnMessage.replace(`[twt]${tweetId}[/twt]`,'');
+    }
+
     // Parse the tx's date and time
     let txDate, txTime;
     if (tx.timeFirstSeen === 0) {
@@ -415,6 +428,7 @@ export const parseChronikTx = (tx, address) => {
             videoId,
             txDate,
             txTime,
+            tweetId,
         };
     }
     // Otherwise do not include these fields
@@ -436,5 +450,6 @@ export const parseChronikTx = (tx, address) => {
         videoId,
         txDate,
         txTime,
+        tweetId,
     };
 };
