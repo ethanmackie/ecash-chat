@@ -355,7 +355,7 @@ export const parseChronikTx = (tx, address) => {
             opReturnMessage.indexOf('[img]') + 5,
             opReturnMessage.lastIndexOf('[/img]')
         );
-        opReturnMessage = opReturnMessage.replace(`[img]${imageSrc}[/img]`,'');
+        opReturnMessage = opReturnMessage.replace(`[img]${imageSrc}[/img]`,' ');
     }
 
     // Parse for any video tags in the message
@@ -368,7 +368,7 @@ export const parseChronikTx = (tx, address) => {
             opReturnMessage.lastIndexOf('[/yt]')
         );
         videoSrc = `https://www.youtube.com/watch?v=${videoId}`;
-        opReturnMessage = opReturnMessage.replace(`[yt]${videoId}[/yt]`,'');
+        opReturnMessage = opReturnMessage.replace(`[yt]${videoId}[/yt]`,' ');
     }
 
     // Parse for any tweet tags in the message
@@ -380,7 +380,7 @@ export const parseChronikTx = (tx, address) => {
             opReturnMessage.indexOf('[twt]') + 5,
             opReturnMessage.lastIndexOf('[/twt]')
         );
-        opReturnMessage = opReturnMessage.replace(`[twt]${tweetId}[/twt]`,'');
+        opReturnMessage = opReturnMessage.replace(`[twt]${tweetId}[/twt]`,' ');
     }
 
     // Parse the tx's date and time
