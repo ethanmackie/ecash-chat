@@ -79,6 +79,7 @@ Builds the app for production to the `build` folder.
 - [x] Detect extension status and render accordingly
 - [x] Add avatars to each address
 - [x] Enable embedding of tweets in messages
+- [x] Embedding markup buttons for image, youtube video and tweet markups in messages
 - [ ] Integration of cashtab contact list from extension
 - [ ] Add integration tests
 - [ ] Implement google analytics

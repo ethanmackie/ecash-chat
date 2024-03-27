@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import QRCode from "react-qr-code";
 import copy from 'copy-to-clipboard';
+import { Tooltip } from "flowbite-react";
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -25,7 +26,7 @@ export default function Home() {
             registered: [],
             pending: [],
         });
-    const [recipient, setRecipient] = useState(null);
+    const [recipient, setRecipient] = useState('');
     const [recipientError, setRecipientError] = useState(false);
     const [message, setMessage] = useState('');
     const [messageError, setMessageError] = useState(false);
@@ -176,7 +177,7 @@ export default function Home() {
             },
             '*',
         );
-        setRecipient(null);
+        setRecipient('');
         setMessage('');
     };
 
@@ -337,6 +338,7 @@ export default function Home() {
                       id="address"
                       name="address"
                       type="text"
+                      value={recipient}
                       required
                       onChange={e => handleAddressChange(e)}
                     />
@@ -369,14 +371,33 @@ export default function Home() {
                           }}
                       />
                     </div>
+                    {/* Tooltip guide for embedding markups */}
+                    <div className="flex gap-2">
+                        <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
+                            <Button className="mt-2" type="button" onClick={() => setMessage(String(message).concat('[img]url[/img]'))}>
+                                Embed Image
+                            </Button>
+                        </Tooltip>
+                        <Tooltip content="e.g. [yt]5RuYKxKCAOA[/yt]" style="light">
+                            <Button className="mt-2" type="button" onClick={() => setMessage(String(message).concat('[yt]videoId[/yt]'))}>
+                                Embed Youtube
+                            </Button>
+                        </Tooltip>
+                        <Tooltip content="e.g. [twt]1762780466976002393[/twt]" style="light">
+                            <Button className="mt-2" type="button" onClick={() => setMessage(String(message).concat('[twt]tweetId[/twt]'))}>
+                                Embed Tweet
+                            </Button>
+                        </Tooltip>
+                    </div>
                   </div>
+                  <br />
                   <p className="mt-2 text-sm text-red-600 dark:text-red-500">{messageError !== false && messageError}</p>
                   <label htmlFor="value-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Send XEC amount (optional, 5.5 XEC by default):</label>
                   <Input
                       type="number"
                       id="value-input"
                       aria-describedby="helper-text-explanation" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      placeholder="5.5"
+                      defaultValue="5.5"
                       onChange={e => handleSendAmountChange(e)}
                   />
                 </div>
