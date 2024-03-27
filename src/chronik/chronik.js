@@ -70,7 +70,6 @@ export const parseChronikTx = (tx, address) => {
     let recipientAddress = '';
     let aliasFlag = false;
     let imageSrc = false;
-    let videoSrc = false;
     let videoId = false;
     let tweetId = false;
 
@@ -358,7 +357,7 @@ export const parseChronikTx = (tx, address) => {
         opReturnMessage = opReturnMessage.replace(`[img]${imageSrc}[/img]`,' ');
     }
 
-    // Parse for any video tags in the message
+    // Parse for any youtube video tags in the message
     if (
         opReturnMessage.includes('[yt]') &&
         opReturnMessage.includes('[/yt]')
@@ -367,7 +366,6 @@ export const parseChronikTx = (tx, address) => {
             opReturnMessage.indexOf('[yt]') + 4,
             opReturnMessage.lastIndexOf('[/yt]')
         );
-        videoSrc = `https://www.youtube.com/watch?v=${videoId}`;
         opReturnMessage = opReturnMessage.replace(`[yt]${videoId}[/yt]`,' ');
     }
 
@@ -424,7 +422,6 @@ export const parseChronikTx = (tx, address) => {
             replyAddress,
             recipientAddress,
             imageSrc,
-            videoSrc,
             videoId,
             txDate,
             txTime,
@@ -446,7 +443,6 @@ export const parseChronikTx = (tx, address) => {
         recipientAddress,
         aliasFlag,
         imageSrc,
-        videoSrc,
         videoId,
         txDate,
         txTime,

@@ -18,7 +18,8 @@ import {
 import { Popover } from "flowbite-react";
 import { Avatar } from "flowbite-react";
 import { Tweet } from 'react-tweet';
-
+import LiteYouTubeEmbed from 'react-lite-youtube-embed';
+import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
 const chronik = new ChronikClientNode(chronikConfig.urls);
 
 export default function TxHistory({ address }) {
@@ -297,9 +298,7 @@ export default function TxHistory({ address }) {
                         </div>
                         <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
                         {tx.imageSrc !== false && (<img src={tx.imageSrc} />)}
-                        {tx.videoId !== false && (
-                            <a href={tx.videoSrc} target="_blank"><img src={`https://img.youtube.com/vi/${tx.videoId}/hqdefault.jpg`} /></a>
-                        )}
+                        {tx.videoId !== false && (<LiteYouTubeEmbed id={tx.videoId} />)}
                         {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
                       <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{tx.xecAmount} XEC</span>
                       <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
