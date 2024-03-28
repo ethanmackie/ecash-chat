@@ -40,7 +40,7 @@ export default function Home() {
 
         // Listen for cashtab extension messages on load
         window.addEventListener('message', handleMessage);
-    }, [address]);
+    }, []);
 
     // Parse for an address from cashtab
     const handleMessage = async (event) => {
@@ -162,6 +162,16 @@ export default function Home() {
         }
     };
 
+    const insertMarkupTags = tooltipStr => {
+        const updatedMsg = String(message).concat(tooltipStr);
+        setMessage(updatedMsg);
+        handleMessageChange({
+            target: {
+                value: updatedMsg,
+            },
+        });
+    };
+
     // Pass a message tx BIP21 query string to cashtab extensions
     const sendMessage = () => {
         // Encode the op_return message script
@@ -237,7 +247,6 @@ export default function Home() {
               priority
               onClick={() => getAddress()}
             />
-            <path fillRule="evenodd" d="M8.842 18.083a8.8 8.8 0 0 1-8.65-8.948 8.841 8.841 0 0 1 8.8-8.652h.153a8.464 8.464 0 0 1 5.7 2.257l-2.193 2.038A5.27 5.27 0 0 0 9.09 3.4a5.882 5.882 0 0 0-.2 11.76h.124a5.091 5.091 0 0 0 5.248-4.057L14.3 11H9V8h8.34c.066.543.095 1.09.088 1.636-.086 5.053-3.463 8.449-8.4 8.449l-.186-.002Z" clipRule="evenodd"/>
             </button>
         </div>
         )}
@@ -254,8 +263,6 @@ export default function Home() {
                       height={50}
                       priority
                     />
-
-                <path fillRule="evenodd" d="M8.842 18.083a8.8 8.8 0 0 1-8.65-8.948 8.841 8.841 0 0 1 8.8-8.652h.153a8.464 8.464 0 0 1 5.7 2.257l-2.193 2.038A5.27 5.27 0 0 0 9.09 3.4a5.882 5.882 0 0 0-.2 11.76h.124a5.091 5.091 0 0 0 5.248-4.057L14.3 11H9V8h8.34c.066.543.095 1.09.088 1.636-.086 5.053-3.463 8.449-8.4 8.449l-.186-.002Z" clipRule="evenodd"/>
                 </button>
             </a>
         )}
@@ -374,17 +381,17 @@ export default function Home() {
                     {/* Tooltip guide for embedding markups */}
                     <div className="flex gap-2">
                         <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
-                            <Button className="mt-2" type="button" onClick={() => setMessage(String(message).concat('[img]url[/img]'))}>
+                            <Button className="mt-2" type="button" onClick={() => insertMarkupTags('[img]url[/img]')}>
                                 Embed Image
                             </Button>
                         </Tooltip>
                         <Tooltip content="e.g. [yt]5RuYKxKCAOA[/yt]" style="light">
-                            <Button className="mt-2" type="button" onClick={() => setMessage(String(message).concat('[yt]videoId[/yt]'))}>
+                            <Button className="mt-2" type="button" onClick={() => insertMarkupTags('[yt]videoId[/yt]')}>
                                 Embed Youtube
                             </Button>
                         </Tooltip>
                         <Tooltip content="e.g. [twt]1762780466976002393[/twt]" style="light">
-                            <Button className="mt-2" type="button" onClick={() => setMessage(String(message).concat('[twt]tweetId[/twt]'))}>
+                            <Button className="mt-2" type="button" onClick={() => insertMarkupTags('[yt]videoId[/yt]')}>
                                 Embed Tweet
                             </Button>
                         </Tooltip>

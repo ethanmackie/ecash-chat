@@ -26,7 +26,7 @@ export default function TxHistory({ address }) {
     const [txHistory, setTxHistory] = useState('');
     const [loadingMsg, setLoadingMsg] = useState('');
     const [txHistoryByAddress, setTxHistoryByAddress] = useState(false);
-    const [addressToSearch, setAddressToSearch] = useState(null);
+    const [addressToSearch, setAddressToSearch] = useState('');
     const [addressToSearchError, setAddressToSearchError] = useState(false);
     const [tipRecipient, setTipRecipient] = useState(false);
     const [tipRecipientAmount, setTipRecipientAmount] = useState(false);
@@ -127,7 +127,7 @@ export default function TxHistory({ address }) {
              ? latestTxHistory.txs.map(
                    (tx, index) => (
                      <>
-                     <div className="flex items-start gap-2.5">
+                     <div className="flex items-start gap-2.5" key={"txHistory"+index}>
                         <div className="flex flex-col w-full max-w-[550px] leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700">
 
                         <div className="flex items-center space-x-2 rtl:space-x-reverse">
@@ -334,8 +334,8 @@ export default function TxHistory({ address }) {
                        let page = [];
                        for (let i = 0; i < txHistory.numPages; i += 1) {
                          page.push(
-                           <li key={i}>
-                             <a href={"#"} onClick={() => getTxHistoryByPage(i)} key={i} className="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                           <li key={"Page"+i}>
+                             <a href={"#"} onClick={() => getTxHistoryByPage(i)} className="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
                                  {(i+1)}
                              </a>
                            </li>
@@ -360,6 +360,7 @@ export default function TxHistory({ address }) {
                      id="address"
                      name="address"
                      type="text"
+                     value={addressToSearch}
                      required
                      className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                      onChange={e => handleAddressChange(e)}
@@ -383,7 +384,7 @@ export default function TxHistory({ address }) {
                    className="flex justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                    onClick={() => {
                        setTxHistoryByAddress('');
-                       setAddressToSearch(null);
+                       setAddressToSearch('');
                        getTxHistoryByPage(0);
                    }}
                  >
