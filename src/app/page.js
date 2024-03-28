@@ -391,7 +391,7 @@ export default function Home() {
                             </Button>
                         </Tooltip>
                         <Tooltip content="e.g. [twt]1762780466976002393[/twt]" style="light">
-                            <Button className="mt-2" type="button" onClick={() => insertMarkupTags('[yt]videoId[/yt]')}>
+                            <Button className="mt-2" type="button" onClick={() => insertMarkupTags('[twt]tweetId[/twt]')}>
                                 Embed Tweet
                             </Button>
                         </Tooltip>
