@@ -8,7 +8,7 @@
 - Real time address specific filtering
 - XEC Tipping on addresses
 - Integrated with the eCash Alias protocol
-- Enables embedding of images, youtube videos and emojis in messages
+- Enables embedding of images, Youtube videos, Twitter tweets and emojis in messages
 - Powered by In-Node Chronik via Cashtab Extensions
 
 
@@ -80,10 +80,10 @@ Builds the app for production to the `build` folder.
 - [x] Add avatars to each address
 - [x] Enable embedding of tweets in messages
 - [x] Embedding markup buttons for image, youtube video and tweet markups in messages
+- [x] Export chat history
 - [ ] Integration of cashtab contact list from extension
 - [ ] Add integration tests
 - [ ] Implement google analytics
-- [ ] Explore Push notifications or unread/read functions
 - [ ] Explore File sharing feasibility
 - [ ] Explore Group chats feasibility
 

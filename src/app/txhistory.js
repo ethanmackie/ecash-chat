@@ -107,6 +107,46 @@ export default function TxHistory({ address }) {
         );
     };
 
+    // Exports the message history of this wallet.
+    // If the history is filtered on a specific address, then the
+    // exported history will filtered accordingly.
+    const exportMessageHistory = () => {
+        let latestTxHistory;
+
+        if (
+            Array.isArray(txHistoryByAddress) &&
+            txHistoryByAddress.length > 0
+        ) {
+            latestTxHistory = { txs: txHistoryByAddress };
+        } else {
+            latestTxHistory = txHistory;
+        }
+
+        // convert object array into csv data
+        let csvContent =
+            'data:text/csv;charset=utf-8,' +
+            latestTxHistory.txs.map(
+                element => '\n'
+                    + element.txDate + '|'
+                    + element.txTime + '|'
+                    + element.opReturnMessage + '|'
+                    + element.xecAmount + '|'
+            );
+
+        // encode csv
+        var encodedUri = encodeURI(csvContent);
+
+        // hidden DOM node to set the default file name
+        var csvLink = document.createElement('a');
+        csvLink.setAttribute('href', encodedUri);
+        csvLink.setAttribute(
+            'download',
+            'eCash_Chat_History.csv',
+        );
+        document.body.appendChild(csvLink);
+        csvLink.click();
+    };
+
     // Renders the tx history based on whether a filter has been applied based on address
     const RenderTxHistory = () => {
       let latestTxHistory;
@@ -391,6 +431,13 @@ export default function TxHistory({ address }) {
                    Reset
                  </button>
 
+                 <button
+                     type="button"
+                     className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                     onClick={() => exportMessageHistory()}
+                 >
+                   Export Message History
+                 </button>
               </div>
              </form>
 
