@@ -33,6 +33,7 @@ export default function Home() {
     const [sendAmountXec, setSendAmountXec] = useState(5.5);
     const [sendAmountXecError, setSendAmountXecError] = useState(false);
     const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
+    const [contactList, setContactList] = useState([]);
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
@@ -42,7 +43,7 @@ export default function Home() {
         window.addEventListener('message', handleMessage);
     }, []);
 
-    // Parse for an address from cashtab
+    // Parse for an address or contact list from cashtab
     const handleMessage = async (event) => {
         if (
             event &&
@@ -50,10 +51,16 @@ export default function Home() {
             event.data.type &&
             event.data.type === 'FROM_CASHTAB'
         ) {
-            getAliasesByAddress(event.data.address);
-            setAddress(event.data.address);
-            if (event.data.address !== 'Address request denied by user') {
-                setIsLoggedIn(true);
+            if (event.data.contacts) {
+                // If this response is the extension sharing the contact list
+                setContactList(event.data.contacts);
+            } else {
+                // Otherwise this is the extension sharing the address
+                getAliasesByAddress(event.data.address);
+                setAddress(event.data.address);
+                if (event.data.address !== 'Address request denied by user') {
+                    setIsLoggedIn(true);
+                }
             }
         }
     };
@@ -99,6 +106,7 @@ export default function Home() {
         return false;
     };
 
+    // Sends a request to the extension to share the address
     const getAddress = () => {
       window.postMessage(
           {
@@ -110,6 +118,18 @@ export default function Home() {
       );
     };
     
+    // Sends a request to the extension to share the contact list
+    const getContacts = () => {
+      window.postMessage(
+          {
+              type: 'FROM_PAGE',
+              text: 'Cashtab',
+              contactsRequest: true,
+          },
+          '*',
+      );
+    };
+
     const handleAddressChange = async e => {
         const { value } = e.target;
         if (
@@ -332,6 +352,16 @@ export default function Home() {
               <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
                 Send Message
               </h2>
+            </div>
+
+            {/* Render contact list from Cashtab */}
+            <div>
+                <Button className="mt-2 flex items-center justify-between" type="button" onClick={() => getContacts()}>
+                    Get contact list from Cashtab
+                </Button>
+                {Array.isArray(contactList) && contactList.map(
+                    (contact, index) => (<p key={index}>Name: {contact.name} | Address: {contact.address}</p>))
+                }
             </div>
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
