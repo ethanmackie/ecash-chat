@@ -81,10 +81,10 @@ Builds the app for production to the `build` folder.
 - [x] Enable embedding of tweets in messages
 - [x] Embedding markup buttons for image, youtube video and tweet markups in messages
 - [x] Export chat history
+- [x] Sharing of chat content with other social platforms
 - [ ] Add integration tests
 - [ ] Implement google analytics
 - [ ] Explore File sharing feasibility
-- [ ] Explore Group chats feasibility
 
 **V2**
 - [ ] Public Town Hall: Basic posting and retrieval function

@@ -20,6 +20,16 @@ import { Avatar } from "flowbite-react";
 import { Tweet } from 'react-tweet';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
+import {
+    TwitterShareButton,
+    TwitterIcon,
+    FacebookShareButton,
+    FacebookIcon,
+    RedditShareButton,
+    RedditIcon,
+    TelegramShareButton,
+    TelegramIcon,
+} from 'next-share';
 const chronik = new ChronikClientNode(chronikConfig.urls);
 
 export default function TxHistory({ address }) {
@@ -261,7 +271,7 @@ export default function TxHistory({ address }) {
                                  (<>
                                    <span>
                                    <Avatar size="xs">{tx.recipientAddress.substring(0,10)} ... {tx.recipientAddress.substring(tx.recipientAddress.length - 5)}
-                                   &nbsp;
+                                   &emsp;
                                    <Popover
                                      aria-labelledby="default-popover"
                                      content={
@@ -347,6 +357,55 @@ export default function TxHistory({ address }) {
                                   'External Message'
                           }
                           &nbsp;|&nbsp;{tx.txDate}&nbsp;at&nbsp;{tx.txTime}
+                          {/* Share buttons with other social platforms */}
+                          &emsp;
+                          <TwitterShareButton
+                            url={
+                                tx.imageSrc !== false ? tx.imageSrc
+                                    : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                    : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                    : 'https://ecashchat.com'
+                            }
+                            title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
+                          >
+                            <TwitterIcon size={25} round />
+                          </TwitterShareButton>
+                          &nbsp;
+                          <FacebookShareButton
+                            url={
+                                tx.imageSrc !== false ? tx.imageSrc
+                                    : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                    : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                    : 'https://ecashchat.com'
+                            }
+                            quote={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
+                          >
+                            <FacebookIcon  size={25} round />
+                          </FacebookShareButton>
+                          &nbsp;
+                          <RedditShareButton
+                            url={
+                                tx.imageSrc !== false ? tx.imageSrc
+                                    : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                    : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                    : 'https://ecashchat.com'
+                            }
+                            title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
+                          >
+                            <RedditIcon size={25} round />
+                          </RedditShareButton>
+                          &nbsp;
+                          <TelegramShareButton
+                            url={
+                                tx.imageSrc !== false ? tx.imageSrc
+                                    : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                    : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                    : 'https://ecashchat.com'
+                            }
+                            title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
+                          >
+                            <TelegramIcon  size={25} round />
+                          </TelegramShareButton>
                       </span>
                      </div>
                     </div>
