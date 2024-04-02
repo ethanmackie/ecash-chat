@@ -470,17 +470,17 @@ export default function TxHistory({ address }) {
                  <button
                    type="button"
                    disabled={addressToSearchError}
-                   className="flex justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                   className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                    onClick={e => {
                        getTxHistoryByAddress(e);
                    }}
                  >
                    Search
                  </button>
-
+                 &nbsp;
                  <button
                    type="button"
-                   className="flex justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                   className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                    onClick={() => {
                        setTxHistoryByAddress('');
                        setAddressToSearch('');
@@ -489,7 +489,7 @@ export default function TxHistory({ address }) {
                  >
                    Reset
                  </button>
-
+                 &nbsp;
                  <button
                      type="button"
                      className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
@@ -499,7 +499,7 @@ export default function TxHistory({ address }) {
                  </button>
               </div>
              </form>
-
+             <br />
              <RenderTxHistory />
              </>
            ) : 

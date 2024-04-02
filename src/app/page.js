@@ -16,7 +16,11 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import QRCode from "react-qr-code";
 import copy from 'copy-to-clipboard';
-import { Tooltip } from "flowbite-react";
+import { Tooltip, Tabs, Accordion } from "flowbite-react";
+import { HiOutlineMail, HiOutlineNewspaper } from "react-icons/hi";
+import { IoMdInformationCircleOutline } from "react-icons/io";
+import { PiHandCoins } from "react-icons/pi";
+import { GiDiscussion } from "react-icons/gi";
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -213,7 +217,6 @@ export default function Home() {
               />
             </a>
 
-            <div className="hidden w-full md:block md:w-auto" id="navbar-default">
             <button
               type="button"
               className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
@@ -229,7 +232,6 @@ export default function Home() {
                   Log Out
                 </button>
             )}
-          </div>
         </div>
       </nav>
 
@@ -271,161 +273,172 @@ export default function Home() {
         {/* If logged in, render wallet details and message history */}
         {isLoggedIn === true && (
           <>
-        <br />
-            <b>User:</b> {address}
-            {/*QR Code*/}
-            {address !== '' && (
-              <>
-                &nbsp;<button
-                  type="button"
-                  id="copy-address-btn"
-                  className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                  onClick={() => {
-                      copy(address);
-                  }}
-                >
-                  Copy
-                </button>
-                <QRCode
-                    value={address}
-                    size={256}
-                    style={{ height: "auto", maxWidth: "15%", width: "15%" }}
-                    viewBox={`0 0 256 256`}
-                />
-                </>
-            )}
-        <br />
-            <b>Registered Aliases: </b>
-            {aliases.registered && aliases.registered.length > 0 &&
-        aliases.registered.map((alias, index) => (
-          <Badge key={index} variant="solid" className="mr-1">
-            {alias.alias}.xec
-          </Badge>
-        ))}
-      <br />
-            <br />
-            <b>Pending Aliases: </b>
-            {aliases.pending && aliases.pending.length > 0 &&
-        aliases.pending.map((alias, index) => (
-          <Badge key={index} variant="outline" className="mr-1">
-            {alias.alias}.xec
-          </Badge>
-        ))}
-        <br />
-        
-        <b>Messages:</b>
-        <br />
-        
-        {cashaddr.isValidCashAddress(address, 'ecash') &&
-            <TxHistory address={address} />
-        }
-        </>
-        )}
-      </div>
-      <div style={{ display: (isLoggedIn ? 'block' : 'none') }}>
-          <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-              <img
-                className="mx-auto h-10 w-auto"
-                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                alt="eCash Chat"
-              />
-              <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-                Send Message
-              </h2>
-            </div>
+          {/* Dropdown for user details */}
+          <Accordion collapseAll>
+              <Accordion.Panel>
+                  <Accordion.Title>User Profile</Accordion.Title>
+                  <Accordion.Content>
+                      <b>User:</b> {address}&nbsp;
+                      <button
+                        type="button"
+                        id="copy-address-btn"
+                        className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                        onClick={() => {
+                            copy(address);
+                        }}
+                      >
+                        Copy
+                      </button>
+                      {/*QR Code*/}
+                      {address !== '' && (
+                        <>
+                          <QRCode
+                              value={address}
+                              size={256}
+                              style={{ height: "auto", maxWidth: "15%", width: "15%" }}
+                              viewBox={`0 0 256 256`}
+                          />
+                          </>
+                      )}
+                      <br />
+                      <b>Registered Aliases: </b>
+                      {aliases.registered && aliases.registered.length > 0 &&
+                          aliases.registered.map((alias, index) => (
+                            <Badge key={index} variant="solid" className="mr-1">
+                              {alias.alias}.xec
+                            </Badge>
+                          ))}
+                      <br />
+                      <br />
+                      <b>Pending Aliases: </b>
+                      {aliases.pending && aliases.pending.length > 0 &&
+                          aliases.pending.map((alias, index) => (
+                      <Badge key={index} variant="outline" className="mr-1">
+                        {alias.alias}.xec
+                      </Badge>
+                      ))}
+                  </Accordion.Content>
+              </Accordion.Panel>
+          </Accordion>
 
-            <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-              <form className="space-y-6" action="#" method="POST">
-                <div>
-                  <label htmlFor="address" className="block text-sm font-medium leading-6 text-gray-900">
-                    Address
-                  </label>
-                  <div className="mt-2">
-                    <Input
-                      id="address"
-                      name="address"
-                      type="text"
-                      value={recipient}
-                      required
-                      onChange={e => handleAddressChange(e)}
-                    />
-                  </div>
-                  <p className="mt-2 text-sm text-red-600 dark:text-red-500">{recipientError !== false && recipientError}</p>
-                </div>
+          {/* Tab navigation */}
+          <Tabs aria-label="eCash Chat" style="default">
+              <Tabs.Item active title="Inbox" icon={HiOutlineMail}>
+                  {cashaddr.isValidCashAddress(address, 'ecash') &&
+                      <TxHistory address={address} />
+                  }
+              </Tabs.Item>
 
-                <div>
-                  <div className="flex items-center justify-between">
-                    <label htmlFor="message" className="block text-sm font-medium leading-6 text-gray-900">
-                      Message
-                    </label>
-                  </div>
-                  <div className="mt-2">
-                    <Textarea
-                        id="message"
-                        rows="4"
-                        value={message}
-                        required
-                        onChange={e => handleMessageChange(e)}
-                    />
-                    <Button className="mt-2" type="button" onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}>
-                      {renderEmojiPicker ? 'Hide Emojis' : 'Show Emojis'}
-                    </Button>
-                    <div style={{ display: (renderEmojiPicker ? 'block' : 'none') }}>
-                      <Picker
-                          data={data}
-                          onEmojiSelect={(e) => {
-                              setMessage(String(message).concat(e.native));
-                          }}
-                      />
-                    </div>
-                    {/* Tooltip guide for embedding markups */}
-                    <div className="flex gap-2">
-                        <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
-                            <Button className="mt-2" type="button" onClick={() => insertMarkupTags('[img]url[/img]')}>
-                                Embed Image
-                            </Button>
-                        </Tooltip>
-                        <Tooltip content="e.g. [yt]5RuYKxKCAOA[/yt]" style="light">
-                            <Button className="mt-2" type="button" onClick={() => insertMarkupTags('[yt]videoId[/yt]')}>
-                                Embed Youtube
-                            </Button>
-                        </Tooltip>
-                        <Tooltip content="e.g. [twt]1762780466976002393[/twt]" style="light">
-                            <Button className="mt-2" type="button" onClick={() => insertMarkupTags('[twt]tweetId[/twt]')}>
-                                Embed Tweet
-                            </Button>
-                        </Tooltip>
-                    </div>
-                  </div>
-                  <br />
-                  <p className="mt-2 text-sm text-red-600 dark:text-red-500">{messageError !== false && messageError}</p>
-                  <label htmlFor="value-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Send XEC amount (optional, 5.5 XEC by default):</label>
-                  <Input
-                      type="number"
-                      id="value-input"
-                      aria-describedby="helper-text-explanation" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      defaultValue="5.5"
-                      onChange={e => handleSendAmountChange(e)}
-                  />
+              <Tabs.Item title="Send Message" icon={HiOutlineNewspaper}>
+                  <div style={{ display: (isLoggedIn ? 'block' : 'none') }}>
+                      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+                            <form className="space-y-6" action="#" method="POST">
+                              <div>
+                                <label htmlFor="address" className="block text-sm font-medium leading-6 text-gray-900">
+                                  Address
+                                </label>
+                                <div className="mt-2">
+                                  <Input
+                                    id="address"
+                                    name="address"
+                                    type="text"
+                                    value={recipient}
+                                    required
+                                    onChange={e => handleAddressChange(e)}
+                                  />
+                                </div>
+                                <p className="mt-2 text-sm text-red-600 dark:text-red-500">{recipientError !== false && recipientError}</p>
+                              </div>
+
+                              <div>
+                                <div className="flex items-center justify-between">
+                                  <label htmlFor="message" className="block text-sm font-medium leading-6 text-gray-900">
+                                    Message
+                                  </label>
+                                </div>
+                                <div className="mt-2">
+                                  <Textarea
+                                      id="message"
+                                      rows="4"
+                                      value={message}
+                                      required
+                                      onChange={e => handleMessageChange(e)}
+                                  />
+                                  <Button className="mt-2" type="button" onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}>
+                                    {renderEmojiPicker ? 'Hide Emojis' : 'Show Emojis'}
+                                  </Button>
+                                  <div style={{ display: (renderEmojiPicker ? 'block' : 'none') }}>
+                                    <Picker
+                                        data={data}
+                                        onEmojiSelect={(e) => {
+                                            setMessage(String(message).concat(e.native));
+                                        }}
+                                    />
+                                  </div>
+                                  {/* Tooltip guide for embedding markups */}
+                                  <div className="flex gap-2">
+                                      <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
+                                          <Button className="mt-2" type="button" onClick={() => insertMarkupTags('[img]url[/img]')}>
+                                              Embed Image
+                                          </Button>
+                                      </Tooltip>
+                                      <Tooltip content="e.g. [yt]5RuYKxKCAOA[/yt]" style="light">
+                                          <Button className="mt-2" type="button" onClick={() => insertMarkupTags('[yt]videoId[/yt]')}>
+                                              Embed Youtube
+                                          </Button>
+                                      </Tooltip>
+                                      <Tooltip content="e.g. [twt]1762780466976002393[/twt]" style="light">
+                                          <Button className="mt-2" type="button" onClick={() => insertMarkupTags('[twt]tweetId[/twt]')}>
+                                              Embed Tweet
+                                          </Button>
+                                      </Tooltip>
+                                  </div>
+                                </div>
+                                <br />
+                                <p className="mt-2 text-sm text-red-600 dark:text-red-500">{messageError !== false && messageError}</p>
+                                <label htmlFor="value-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Send XEC amount (optional, 5.5 XEC by default):</label>
+                                <Input
+                                    type="number"
+                                    id="value-input"
+                                    aria-describedby="helper-text-explanation" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    defaultValue="5.5"
+                                    onChange={e => handleSendAmountChange(e)}
+                                />
+                              </div>
+                              <div>
+                                <Button
+                                  type="button"
+                                  disabled={recipientError || messageError || sendAmountXecError}
+                                  className="flex w-full"
+                                  onClick={() => {
+                                      sendMessage();
+                                  }}
+                                >
+                                  Send
+                                </Button>
+                              </div>
+                          </form>
+                   </div>
                 </div>
-                <div>
-                  <Button
-                    type="button"
-                    disabled={recipientError || messageError || sendAmountXecError}
-                    className="flex w-full"
-                    onClick={() => {
-                        sendMessage();
-                    }}
-                  >
-                    Send
-                  </Button>
-                </div>
-              </form>
-            </div>
-          </div>
-      </div>
-    </main>
+              </Tabs.Item>
+
+              <Tabs.Item title="Townhall (Coming Soon)" icon={GiDiscussion} disabled>
+                  Town Hall
+              </Tabs.Item>
+
+              <Tabs.Item title="Get XEC" icon={PiHandCoins}>
+                  Get XEC
+              </Tabs.Item>
+
+              <Tabs.Item title="About" icon={IoMdInformationCircleOutline}>
+                  About
+              </Tabs.Item>
+
+              </Tabs>
+              </>
+              )}
+        </div>
+      </main>
     </>
   );
 }
