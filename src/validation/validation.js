@@ -11,3 +11,8 @@ export const isValidRecipient = value => {
 export const isValidMessage = message => {
     return opreturnConfig.cashtabMsgByteLimit >= Buffer.from(message, 'utf8').length;
 };
+
+// Validates the length of the townhall post
+export const isValidPost = post => {
+    return opreturnConfig.townhallPostByteLimit >= Buffer.from(post, 'utf8').length;
+};

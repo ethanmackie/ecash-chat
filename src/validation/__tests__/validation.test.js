@@ -1,4 +1,4 @@
-import { isValidRecipient, isValidMessage } from '../validation';
+import { isValidRecipient, isValidMessage, isValidPost } from '../validation';
 
 it(`isValidRecipient() validates a valid eCash address`, () => {
     expect(isValidRecipient('ecash:prfhcnyqnl5cgrnmlfmms675w93ld7mvvqd0y8lz07')).toEqual(true);
@@ -31,6 +31,31 @@ it(`isValidMessage() validates a valid message with non-english characters`, () 
 });
 it(`isValidMessage() invalidates a message longer than cashtabMsgByteLimit`, () => {
     expect(isValidMessage(
+        'Use the following styles to indicate a disabled button. This can be often used inside form elements to disable the submit button before all the form elements have been complete inside the form elements to disable tddddd'),
+    ).toEqual(false);
+});
+it(`isValidPost() validates a post within byte limits`, () => {
+    expect(isValidPost(
+        'this is a short message'),
+    ).toEqual(true);
+});
+it(`isValidPost() validates a post exactly townhallPostByteLimit long`, () => {
+    expect(isValidPost(
+        'Use the following styles to indicate a disabled button. This can be often used inside form elements to disable the submit button before all the form elements have been complete inside the form elements to disab'),
+    ).toEqual(true);
+});
+it(`isValidPost() validates a valid post with symbols`, () => {
+    expect(isValidPost(
+        'Use the ©☎ submit button before all the form elements have been complete inside the form elements to disable td'),
+    ).toEqual(true);
+});
+it(`isValidPost() validates a valid post with non-english characters`, () => {
+    expect(isValidPost(
+        'Use the 안녕하세요 submit button before all the form elements have been complete inside the form elements to disable td'),
+    ).toEqual(true);
+});
+it(`isValidPost() invalidates a post longer than townhallPostByteLimit`, () => {
+    expect(isValidPost(
         'Use the following styles to indicate a disabled button. This can be often used inside form elements to disable the submit button before all the form elements have been complete inside the form elements to disable tddddd'),
     ).toEqual(false);
 });

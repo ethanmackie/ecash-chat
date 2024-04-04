@@ -51,6 +51,7 @@ export const mockParsedXecSendTxWithOpReturnTweet = {
     "isCashtabMessage": false,
     "isEncryptedMessage": false,
     "iseCashChatMessage": true,
+    "iseCashChatPost": false,
     "replyAddress": "ecash:qq9h6d0a5q65fgywv4ry64x04ep906mdku8f0gxfgx",
     "recipientAddress": "ecash:qrmz0egsqxj35x5jmzf8szrszdeu72fx0uxgwk3r48",
     "aliasFlag": false,
@@ -109,6 +110,7 @@ export const mockParsedXecSendTxWithOpReturnEmoji = {
     "isCashtabMessage": false,
     "isEncryptedMessage": false,
     "iseCashChatMessage": true,
+    "iseCashChatPost": false,
     "replyAddress": "ecash:qq9h6d0a5q65fgywv4ry64x04ep906mdku8f0gxfgx",
     "recipientAddress": "ecash:qrmz0egsqxj35x5jmzf8szrszdeu72fx0uxgwk3r48",
     "aliasFlag": false,
@@ -167,6 +169,7 @@ export const mockParsedXecSendTxWithOpReturnVideo = {
     "isCashtabMessage": false,
     "isEncryptedMessage": false,
     "iseCashChatMessage": true,
+    "iseCashChatPost": false,
     "replyAddress": "ecash:qq9h6d0a5q65fgywv4ry64x04ep906mdku8f0gxfgx",
     "recipientAddress": "ecash:qrmz0egsqxj35x5jmzf8szrszdeu72fx0uxgwk3r48",
     "aliasFlag": false,
@@ -225,6 +228,7 @@ export const mockParsedXecSendTxWithOpReturnImage = {
     "isCashtabMessage": false,
     "isEncryptedMessage": false,
     "iseCashChatMessage": true,
+    "iseCashChatPost": false,
     "replyAddress": "ecash:qq9h6d0a5q65fgywv4ry64x04ep906mdku8f0gxfgx",
     "recipientAddress": "ecash:qrmz0egsqxj35x5jmzf8szrszdeu72fx0uxgwk3r48",
     "aliasFlag": false,
@@ -283,6 +287,7 @@ export const mockParsedXecSendTxWithOpReturn = {
     "isCashtabMessage": false,
     "isEncryptedMessage": false,
     "iseCashChatMessage": true,
+    "iseCashChatPost": false,
     "replyAddress": "ecash:qq9h6d0a5q65fgywv4ry64x04ep906mdku8f0gxfgx",
     "recipientAddress": "ecash:qrmz0egsqxj35x5jmzf8szrszdeu72fx0uxgwk3r48",
     "aliasFlag": false,
@@ -291,4 +296,68 @@ export const mockParsedXecSendTxWithOpReturn = {
     "tweetId": false,
     "txDate": "Mar 26, 2024",
     "txTime": "12:01:49 pm"
+};
+
+export const mockXecSendTxWithOpReturnTownhallPost = {
+    "txid": "748e17c310772beacca8341d143e730b7c82de336e370c272c362618cc0db0c2",
+    "version": 2,
+    "inputs": [
+        {
+            "prevOut": {
+                "txid": "8aa22a1f3fcdd442792c6e9a710e9fc049ec1db95c9d4f10cc1c7973ce1da75a",
+                "outIdx": 2
+            },
+            "inputScript": "47304402202d5f879395aec72f0504c384d46cf63452cd5a066adc31e2ec14b26aacd1f63c02201c99188524312192947d8e9f3233b23284d3768439a3678b1ed01587dd58e245412102e14ed9fa680df4088485ad5712abb22fbfee91145cf350d0ea4abd51625fe319",
+            "outputScript": "76a914f2395e2350e634e4afe31eb495c3a1e2bd1f362288ac",
+            "value": 48943,
+            "sequenceNo": 4294967295
+        }
+    ],
+    "outputs": [
+        {
+            "value": 0,
+            "outputScript": "6a046368617404706f73740c796f6f6f6f6f6f20f09f9881"
+        },
+        {
+            "value": 550,
+            "outputScript": "76a91470a784633e942b7e1c9947255910c8132623225c88ac"
+        },
+        {
+            "value": 47872,
+            "outputScript": "76a914f2395e2350e634e4afe31eb495c3a1e2bd1f362288ac"
+        }
+    ],
+    "lockTime": 0,
+    "block": {
+        "height": 838888,
+        "hash": "00000000000000000ec1f309f37989a4e02d0d58ab1c846214749046bea30b35",
+        "timestamp": 1712201369
+    },
+    "timeFirstSeen": 1712200804,
+    "size": 258,
+    "isCoinbase": false,
+    "tokenEntries": [],
+    "tokenFailedParsings": [],
+    "tokenStatus": "TOKEN_STATUS_NON_TOKEN"
+};
+
+export const mockParsedXecSendTxWithOpReturnTownhallPost = {
+    "incoming": false,
+    "xecAmount": "5.5",
+    "isEtokenTx": false,
+    "airdropFlag": false,
+    "airdropTokenId": "",
+    "opReturnMessage": "yoooooo 😁",
+    "isCashtabMessage": false,
+    "isEncryptedMessage": false,
+    "iseCashChatMessage": false,
+    "iseCashChatPost": true,
+    "replyAddress": "ecash:qrerjh3r2rnrfe90uv0tf9wr583t68ekyggulcgp55",
+    "recipientAddress": "ecash:qpc20prr862zklsun9rj2kgseqfjvgezts4ah8wh7h",
+    "aliasFlag": false,
+    "imageSrc": false,
+    "videoId": false,
+    "txDate": "Apr 4, 2024",
+    "txTime": "2:20:04 pm",
+    "tweetId": false
 };

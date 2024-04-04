@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import Image from "next/image";
 import TxHistory from './txhistory';
+import Townhall from './townhall';
 import cashaddr from 'ecashaddrjs';
 import { queryAliasServer } from '../alias/alias-server';
 import { encodeBip21Message } from '../utils/utils';
@@ -364,6 +365,7 @@ export default function Home() {
                                       required
                                       onChange={e => handleMessageChange(e)}
                                   />
+                                  {/* Emoji Picker */}
                                   <Button className="mt-2" type="button" onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}>
                                     {renderEmojiPicker ? 'Hide Emojis' : 'Show Emojis'}
                                   </Button>
@@ -422,8 +424,13 @@ export default function Home() {
                 </div>
               </Tabs.Item>
 
+              {/* Optional disabling of townhall if we choose to launch with Inbox only first
               <Tabs.Item title="Townhall (Coming Soon)" icon={GiDiscussion} disabled>
                   Town Hall
+              </Tabs.Item>
+              */}
+              <Tabs.Item title="Townhall" icon={GiDiscussion}>
+                  <Townhall address={address} />
               </Tabs.Item>
 
               <Tabs.Item title="Get XEC" icon={PiHandCoins}>

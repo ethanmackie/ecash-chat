@@ -44,6 +44,63 @@ export const getTxHistory = async (chronik, address, page = 0) => {
     }
 };
 
+/**
+ * Parse opReturn output for image src, twitter ID or youtube ID
+ *
+ * @param {utf-8 string} opReturn the string value of the op_return output
+ * @returns {Object} containing attributes for the updated opReturn output and various media contents
+ *
+ */
+export const parseMediaTags = (opReturn) => {
+    let updatedImageSrc = false;
+    let updatedVideoId = false;
+    let updatedTweetId = false;
+    let updatedOpReturn = opReturn;
+
+    // Parse for any image tags in the message
+    if (
+        opReturn.includes('[img]') &&
+        opReturn.includes('[/img]')
+    ) {
+        updatedImageSrc = opReturn.substring(
+            opReturn.indexOf('[img]') + 5,
+            opReturn.lastIndexOf('[/img]')
+        );
+        updatedOpReturn = opReturn.replace(`[img]${updatedImageSrc}[/img]`,' ');
+    }
+
+    // Parse for any youtube video tags in the message
+    if (
+        opReturn.includes('[yt]') &&
+        opReturn.includes('[/yt]')
+    ) {
+        updatedVideoId = opReturn.substring(
+            opReturn.indexOf('[yt]') + 4,
+            opReturn.lastIndexOf('[/yt]')
+        );
+        updatedOpReturn = opReturn.replace(`[yt]${updatedVideoId}[/yt]`,' ');
+    }
+
+    // Parse for any tweet tags in the message
+    if (
+        opReturn.includes('[twt]') &&
+        opReturn.includes('[/twt]')
+    ) {
+        updatedTweetId = opReturn.substring(
+            opReturn.indexOf('[twt]') + 5,
+            opReturn.lastIndexOf('[/twt]')
+        );
+        updatedOpReturn = opReturn.replace(`[twt]${updatedTweetId}[/twt]`,' ');
+    }
+
+    return {
+        updatedOpReturn: updatedOpReturn,
+        updatedImageSrc: updatedImageSrc,
+        updatedVideoId: updatedVideoId,
+        updatedTweetId: updatedTweetId,
+    }
+};
+
 // Parses a single chronik transaction
 export const parseChronikTx = (tx, address) => {
     const { hash } = cashaddr.decode(address, true);
@@ -66,6 +123,7 @@ export const parseChronikTx = (tx, address) => {
     let isCashtabMessage = false;
     let isEncryptedMessage = false;
     let iseCashChatMessage = false;
+    let iseCashChatPost = false;
     let replyAddress = '';
     let recipientAddress = '';
     let aliasFlag = false;
@@ -234,9 +292,14 @@ export const parseChronikTx = (tx, address) => {
                     break;
                 }
                 case opreturnConfig.appPrefixesHex.eCashChat: {
-                    iseCashChatMessage = true;
                     if (stackArray.length >= 2) {
-                        opReturnMessage = Buffer.from(stackArray[1], 'hex');
+                        if (stackArray[1] !== opreturnConfig.townhallPostPrefixHex) {
+                            opReturnMessage = Buffer.from(stackArray[1], 'hex');
+                            iseCashChatMessage = true;
+                        } else {
+                            opReturnMessage = Buffer.from(stackArray[2], 'hex');
+                            iseCashChatPost = true;
+                        }
                     } else {
                         opReturnMessage = 'off-spec eCash Chat Msg';
                     }
@@ -345,41 +408,17 @@ export const parseChronikTx = (tx, address) => {
     }
     etokenAmount = etokenAmount.toString();
 
-    // Parse for any image tags in the message
-    if (
-        opReturnMessage.includes('[img]') &&
-        opReturnMessage.includes('[/img]')
-    ) {
-        imageSrc = opReturnMessage.substring(
-            opReturnMessage.indexOf('[img]') + 5,
-            opReturnMessage.lastIndexOf('[/img]')
-        );
-        opReturnMessage = opReturnMessage.replace(`[img]${imageSrc}[/img]`,' ');
-    }
-
-    // Parse for any youtube video tags in the message
-    if (
-        opReturnMessage.includes('[yt]') &&
-        opReturnMessage.includes('[/yt]')
-    ) {
-        videoId = opReturnMessage.substring(
-            opReturnMessage.indexOf('[yt]') + 4,
-            opReturnMessage.lastIndexOf('[/yt]')
-        );
-        opReturnMessage = opReturnMessage.replace(`[yt]${videoId}[/yt]`,' ');
-    }
-
-    // Parse for any tweet tags in the message
-    if (
-        opReturnMessage.includes('[twt]') &&
-        opReturnMessage.includes('[/twt]')
-    ) {
-        tweetId = opReturnMessage.substring(
-            opReturnMessage.indexOf('[twt]') + 5,
-            opReturnMessage.lastIndexOf('[/twt]')
-        );
-        opReturnMessage = opReturnMessage.replace(`[twt]${tweetId}[/twt]`,' ');
-    }
+    // Parse the opReturn message output for media tags
+    const {
+        updatedOpReturn,
+        updatedImageSrc,
+        updatedVideoId,
+        updatedTweetId,
+    } = parseMediaTags(opReturnMessage);
+    opReturnMessage = updatedOpReturn;
+    imageSrc = updatedImageSrc;
+    videoId = updatedVideoId;
+    tweetId = updatedTweetId;
 
     // Parse the tx's date and time
     let txDate, txTime;
@@ -419,6 +458,7 @@ export const parseChronikTx = (tx, address) => {
             opReturnMessage: '',
             isCashtabMessage,
             isEncryptedMessage,
+            iseCashChatPost,
             replyAddress,
             recipientAddress,
             imageSrc,
@@ -439,6 +479,7 @@ export const parseChronikTx = (tx, address) => {
         isCashtabMessage,
         isEncryptedMessage,
         iseCashChatMessage,
+        iseCashChatPost,
         replyAddress,
         recipientAddress,
         aliasFlag,

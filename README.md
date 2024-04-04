@@ -87,27 +87,9 @@ Builds the app for production to the `build` folder.
 - [ ] Explore File sharing feasibility
 
 **V2**
-- [ ] Public Town Hall: Basic posting and retrieval function
-- [ ] Basic social-server prototype to handle parsing of posts
+- [x] Public Town Hall: Basic posting and history parsing functions
 - [ ] Public Town Hall: Introduce different categories of townhalls
 - [ ] Implement DDOS mitigations
-- [ ] Enable use of emojis and [img] tags
 - [ ] Follow function
-- [ ] Tipping in XEC
-- [ ] Tipping in eToken
 - [ ] Like function for the post which will be factored to a post's rating
-- [ ] Sort by Date/Rating
-- [ ] Filter by post, category, keyword, date
 - [ ] Public go live
-
-## Dev Notes
-
-Infra considerations:
-- The tx generating and broadcasting workload will be handed to Cashtab Extensions via query string.
-- Will almost certainly need another alias-server equivalent that handles the heavy lifting of parsing the central payment address for posts.
-- Where we store the social profile data is up for discussion - potentially another API call to the server that's parsing town hall posts.
-
-Spec considerations:
-- Will need a central payment address for onchain storage of town hall posts, similar to Aliases
-- Each town hall category will need to be an OP_RETURN prefix
-- Will look into memo cash spec and see if there's anything we can leverage for the concept of "replying" to posts. e.g. do we need new OP_RETURN specs that adds a post ID (e.g. txid)

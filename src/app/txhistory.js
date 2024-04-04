@@ -15,8 +15,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Popover } from "flowbite-react";
-import { Avatar } from "flowbite-react";
+import { Popover, Avatar } from "flowbite-react";
 import { Tweet } from 'react-tweet';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
@@ -267,7 +266,7 @@ export default function TxHistory({ address }) {
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
                                {tx.recipientAddress === address ? (
                                    <Avatar size="xs">This Wallet</Avatar>
-                               ) :
+                               ) : tx.iseCashChatPost === true ? 'eCash Chat Townhall' :
                                  (<>
                                    <span>
                                    <Avatar size="xs">{tx.recipientAddress.substring(0,10)} ... {tx.recipientAddress.substring(tx.recipientAddress.length - 5)}
@@ -346,17 +345,25 @@ export default function TxHistory({ address }) {
                                }
                            </span>
                         </div>
+
+                        {/* Render the op_return message */}
                         <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
+
+                        {/* Render any media content within the message */}
                         {tx.imageSrc !== false && (<img src={tx.imageSrc} />)}
                         {tx.videoId !== false && (<LiteYouTubeEmbed id={tx.videoId} />)}
                         {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
-                      <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{tx.xecAmount} XEC</span>
-                      <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                        <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{tx.xecAmount} XEC</span>
+                        <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
                           {tx.isCashtabMessage ? 'Cashtab Message' :
                               tx.iseCashChatMessage ? 'eCash Chat Message' :
-                                  'External Message'
+                                  tx.iseCashChatPost ? 'eCash Townhall Post' :
+                                      'External Message'
                           }
+
+                          {/* Date and timestamp */}
                           &nbsp;|&nbsp;{tx.txDate}&nbsp;at&nbsp;{tx.txTime}
+
                           {/* Share buttons with other social platforms */}
                           &emsp;
                           <TwitterShareButton
