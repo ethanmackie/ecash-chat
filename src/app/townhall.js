@@ -218,9 +218,79 @@ export default function TownHall({ address }) {
                                      ) :
                                        (<>
                                          <span>
-                                         <Avatar size="xs">
-                                            {tx.replyAddress.substring(0,10)} ... {tx.replyAddress.substring(tx.replyAddress.length - 5)}
-                                         </Avatar>
+                                             <Avatar size="xs">
+                                                {tx.replyAddress.substring(0,10)} ... {tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                                {/* Tip XEC options */}
+                                                &nbsp;
+                                                <Popover
+                                                  aria-labelledby="default-popover"
+                                                  content={
+                                                    <div className="w-64 text-sm text-gray-500 dark:text-gray-400">
+                                                      <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
+                                                        <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Tipping Amount</h3>
+                                                      </div>
+                                                      <div className="px-3 py-2">
+                                                          <button
+                                                            type="button"
+                                                            className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                            onClick={e => {
+                                                                sendXecTip(tx.replyAddress, 100);
+                                                            }}
+                                                          >
+                                                            100
+                                                          </button>
+                                                          &nbsp;
+                                                          <button
+                                                            type="button"
+                                                            className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                            onClick={e => {
+                                                                sendXecTip(tx.replyAddress, 1000);
+                                                            }}
+                                                          >
+                                                            1k
+                                                          </button>
+                                                          &nbsp;
+                                                          <button
+                                                            type="button"
+                                                            className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                            onClick={e => {
+                                                                sendXecTip(tx.replyAddress, 10000);
+                                                            }}
+                                                          >
+                                                            10k
+                                                          </button>
+                                                          &nbsp;
+                                                          <button
+                                                            type="button"
+                                                            className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                            onClick={e => {
+                                                                sendXecTip(tx.replyAddress, 100000);
+                                                            }}
+                                                          >
+                                                            100k
+                                                          </button>
+                                                          &nbsp;
+                                                          <button
+                                                            type="button"
+                                                            className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                            onClick={e => {
+                                                                sendXecTip(tx.replyAddress, 1000000);
+                                                            }}
+                                                          >
+                                                            1M
+                                                          </button>
+                                                      </div>
+                                                    </div>
+                                                  }
+                                                  >
+                                                    <button
+                                                        type="button"
+                                                        className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                    >
+                                                        Tip XEC
+                                                    </button>
+                                                  </Popover>
+                                             </Avatar>
                                          </span>
                                        </>)
                                      }
@@ -288,127 +358,56 @@ export default function TownHall({ address }) {
                                      </button>
                                    </Popover>
 
-                                   {/* Tip XEC options */}
-                                   &nbsp;
-                                   <Popover
-                                     aria-labelledby="default-popover"
-                                     content={
-                                       <div className="w-64 text-sm text-gray-500 dark:text-gray-400">
-                                         <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
-                                           <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Tipping Amount</h3>
-                                         </div>
-                                         <div className="px-3 py-2">
-                                             <button
-                                               type="button"
-                                               className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                               onClick={e => {
-                                                   sendXecTip(tx.replyAddress, 100);
-                                               }}
-                                             >
-                                               100
-                                             </button>
-                                             &nbsp;
-                                             <button
-                                               type="button"
-                                               className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                               onClick={e => {
-                                                   sendXecTip(tx.replyAddress, 1000);
-                                               }}
-                                             >
-                                               1k
-                                             </button>
-                                             &nbsp;
-                                             <button
-                                               type="button"
-                                               className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                               onClick={e => {
-                                                   sendXecTip(tx.replyAddress, 10000);
-                                               }}
-                                             >
-                                               10k
-                                             </button>
-                                             &nbsp;
-                                             <button
-                                               type="button"
-                                               className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                               onClick={e => {
-                                                   sendXecTip(tx.replyAddress, 100000);
-                                               }}
-                                             >
-                                               100k
-                                             </button>
-                                             &nbsp;
-                                             <button
-                                               type="button"
-                                               className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                               onClick={e => {
-                                                   sendXecTip(tx.replyAddress, 1000000);
-                                               }}
-                                             >
-                                               1M
-                                             </button>
-                                         </div>
-                                       </div>
+                                   {/* Share buttons with other social platforms */}
+                                   &emsp;
+                                   <TwitterShareButton
+                                     url={
+                                         tx.imageSrc !== false ? tx.imageSrc
+                                             : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                             : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                             : 'https://ecashchat.com'
                                      }
+                                     title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
                                    >
-                                     <button
-                                         type="button"
-                                         className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                     >
-                                         Tip XEC
-                                     </button>
-                                   </Popover>
-
-                                     {/* Share buttons with other social platforms */}
-                                     &emsp;
-                                     <TwitterShareButton
-                                       url={
-                                           tx.imageSrc !== false ? tx.imageSrc
-                                               : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
-                                               : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
-                                               : 'https://ecashchat.com'
-                                       }
-                                       title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
-                                     >
-                                       <TwitterIcon size={25} round />
-                                     </TwitterShareButton>
-                                     &nbsp;
-                                     <FacebookShareButton
-                                       url={
-                                           tx.imageSrc !== false ? tx.imageSrc
-                                               : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
-                                               : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
-                                               : 'https://ecashchat.com'
-                                       }
-                                       quote={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
-                                     >
-                                       <FacebookIcon  size={25} round />
-                                     </FacebookShareButton>
-                                     &nbsp;
-                                     <RedditShareButton
-                                       url={
-                                           tx.imageSrc !== false ? tx.imageSrc
-                                               : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
-                                               : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
-                                               : 'https://ecashchat.com'
-                                       }
-                                       title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
-                                     >
-                                       <RedditIcon size={25} round />
-                                     </RedditShareButton>
-                                     &nbsp;
-                                     <TelegramShareButton
-                                       url={
-                                           tx.imageSrc !== false ? tx.imageSrc
-                                               : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
-                                               : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
-                                               : 'https://ecashchat.com'
-                                       }
-                                       title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
-                                     >
-                                       <TelegramIcon  size={25} round />
-                                     </TelegramShareButton>
-                                 </div>
+                                     <TwitterIcon size={25} round />
+                                   </TwitterShareButton>
+                                   &nbsp;
+                                   <FacebookShareButton
+                                     url={
+                                         tx.imageSrc !== false ? tx.imageSrc
+                                             : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                             : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                             : 'https://ecashchat.com'
+                                     }
+                                     quote={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
+                                   >
+                                     <FacebookIcon  size={25} round />
+                                   </FacebookShareButton>
+                                   &nbsp;
+                                   <RedditShareButton
+                                     url={
+                                         tx.imageSrc !== false ? tx.imageSrc
+                                             : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                             : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                             : 'https://ecashchat.com'
+                                     }
+                                     title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
+                                   >
+                                     <RedditIcon size={25} round />
+                                   </RedditShareButton>
+                                   &nbsp;
+                                   <TelegramShareButton
+                                     url={
+                                         tx.imageSrc !== false ? tx.imageSrc
+                                             : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                             : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                             : 'https://ecashchat.com'
+                                     }
+                                     title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
+                                   >
+                                     <TelegramIcon  size={25} round />
+                                   </TelegramShareButton>
+                               </div>
                               </div>
                            </div>
                            <br />
