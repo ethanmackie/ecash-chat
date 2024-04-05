@@ -11,6 +11,60 @@
 - Enables embedding of images, Youtube videos, Twitter tweets and emojis in messages
 - Powered by In-Node Chronik via Cashtab Extensions
 
+## Specifications
+
+The eCash Chat protocol adopts the following onchain hex prefixes:
+- Post a message = 63686174 (chat) + 706f7374 (post) + [utf-8 message]
+- Reply to post = 63686174 (chat) + 68617368 (reply) + [txid of original post] + [utf-8 reply message]
+- Set profile pic = 63686174 (chat) + 70696373 (pics) + [utf-8 NFT id] (not implemented yet)
+
+To assist with web apps in rendering these actions accordingly, here are some examples:
+
+**Sending a direct wallet to wallet message**
+```
+OP_RETURN Hex
+6a04636861742a6a7573742061206e6f726d616c2077616c6c657420746f2077616c6c6574206d657373616765f09f918d
+
+Hex breakdown
+- 6a (OP_RETURN)
+- 04 (pushdata byte indicating 4 bytes / 8 chars)
+- 63686174 (eCash Chat's protocol prefix)
+- 2a (pushdata byte indicating 42 bytes / 84 chars)
+- 6a7573742061206e6f726d616c2077616c6c657420746f2077616c6c6574206d657373616765f09f918d (the utf8 message)
+```
+
+**Post a message to townhall**
+```
+OP_RETURN Hex
+6a046368617404706f737423636865636b2074686973206f7574205b79745d74416c367350524651676b5b2f79745d
+
+Hex breakdown
+- 6a (OP_RETURN)
+- 04 (pushdata byte indicating 4 bytes / 8 chars)
+- 63686174 (eCash Chat's protocol prefix)
+- 04 (pushdata byte indicating 4 bytes / 8 chars)
+- 706f7374 (eCash Chat's townhall post prefix)
+- 23 (pushdata byte indicating 35 bytes / 70 chars)
+- 636865636b2074686973206f7574205b79745d74416c367350524651676b5b2f79745d (the post content)
+```
+
+**Post a reply to an existing message on townhall**
+```
+OP_RETURN Hex
+6a046368617404686173682087928ef3d1c89be1a0e961b45a27680d96258b7b3a05d36115381739b335df943754686973206973206d79207265706c7920746f2074686520654361736820696e74726f20766964656f202d20636f6f6c20737475666621
+
+Hex breakdown
+- 6a (OP_RETURN)
+- 04 (pushdata byte indicating 4 bytes / 8 chars)
+- 63686174 (eCash Chat's protocol prefix)
+- 04 (pushdata byte indicating 4 bytes / 8 chars)
+- 68617368 (hash prefix)
+- 20 (pushdata byte indicating 32 bytes / 64 chars)
+- 87928ef3d1c89be1a0e961b45a27680d96258b7b3a05d36115381739b335df94 (txid of original post)
+- 37 (pushdata byte indicating 55 bytes / 110 chars)
+- 54686973206973206d79207265706c7920746f2074686520654361736820696e74726f20766964656f202d20636f6f6c20737475666621 (the reply message)
+
+```
 
 ## Development
 
@@ -50,6 +104,7 @@ npm run build
 
 Builds the app for production to the `build` folder.
 
+
 ## Implementation Roadmap
 
 **V1**
@@ -88,7 +143,7 @@ Builds the app for production to the `build` folder.
 
 **V2**
 - [x] Public Town Hall: Basic posting and history parsing functions
-- [ ] Public Town Hall: Introduce different categories of townhalls
+- [x] Public Town Hall: Implement onchain reply post protocol
 - [ ] Implement DDOS mitigations
 - [ ] Follow function
 - [ ] Like function for the post which will be factored to a post's rating
