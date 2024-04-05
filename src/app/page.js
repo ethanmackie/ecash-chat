@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import QRCode from "react-qr-code";
 import copy from 'copy-to-clipboard';
-import { Tooltip, Tabs, Accordion } from "flowbite-react";
+import { Tooltip, Tabs } from "flowbite-react";
 import { HiOutlineMail, HiOutlineNewspaper } from "react-icons/hi";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { PiHandCoins } from "react-icons/pi";
@@ -197,6 +197,76 @@ export default function Home() {
         setMessage('');
     };
 
+    const CreditCardHeader = () => {
+        return (
+            <div
+                className="w-96 h-56 m-auto bg-red-100 rounded-xl relative text-white shadow-2xl transition-transform transform hover:scale-110"
+                onClick={() => {
+                    copy(address);
+                }}
+            >
+                <img className="relative object-cover w-full h-full rounded-xl" src="/creditcard-bg.png" />
+                <div className="w-full px-8 absolute top-8">
+                    <div className="flex justify-between">
+                        <div className="">
+                            <p className="font-light">
+                                {/*QR Code*/}
+                                {address !== '' && (
+                                  <>
+                                    <QRCode
+                                        value={address}
+                                        size={290}
+                                        style={{ height: "auto", maxWidth: "25%", width: "25%" }}
+                                        viewBox={`0 0 256 256`}
+                                    />
+                                    </>
+                                )}
+                            </p>
+                            <p className="font-small tracking-widest text-xs">
+                                {aliases.registered && aliases.registered.length > 0 &&
+                                    aliases.registered.map((alias, index) => (
+                                      <Badge key={index} variant="solid" className="mr-1">
+                                        {alias.alias}.xec
+                                      </Badge>
+                                    ))
+                                }
+                            </p>
+                        </div>
+                        <img className="w-14 h-14" src="/ecash-square-icon.svg"/>
+                    </div>
+                    <div className="pt-1">
+                        <p className="font-light">
+                            eCash Address
+                        </p>
+                        <p className="font-medium tracking-more-wider text-xs">
+                            {address}
+                        </p>
+                    </div>
+                    <div className="pt-6 pr-6">
+                        <div className="flex justify-between">
+                            <div className="">
+                                <p className="font-light text-xs">
+                                    Balance
+                                </p>
+                                <p className="font-medium tracking-wider text-sm">
+                                    xx,xxx,xxx XEC
+                                </p>
+                            </div>
+                            <div className="">
+                                <p className="font-light text-xs text-xs">
+                                    Aliases Registered
+                                </p>
+                                <p className="font-medium tracking-wider text-sm">
+                                    {aliases.registered ? aliases.registered.length : 0}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
   /* Placeholder UI for now until the Tailwind UI set is ready for implementation */
   return (
     <>
@@ -274,53 +344,8 @@ export default function Home() {
         {/* If logged in, render wallet details and message history */}
         {isLoggedIn === true && (
           <>
-          {/* Dropdown for user details */}
-          <Accordion collapseAll>
-              <Accordion.Panel>
-                  <Accordion.Title>User Profile</Accordion.Title>
-                  <Accordion.Content>
-                      <b>User:</b> {address}&nbsp;
-                      <button
-                        type="button"
-                        id="copy-address-btn"
-                        className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                        onClick={() => {
-                            copy(address);
-                        }}
-                      >
-                        Copy
-                      </button>
-                      {/*QR Code*/}
-                      {address !== '' && (
-                        <>
-                          <QRCode
-                              value={address}
-                              size={256}
-                              style={{ height: "auto", maxWidth: "15%", width: "15%" }}
-                              viewBox={`0 0 256 256`}
-                          />
-                          </>
-                      )}
-                      <br />
-                      <b>Registered Aliases: </b>
-                      {aliases.registered && aliases.registered.length > 0 &&
-                          aliases.registered.map((alias, index) => (
-                            <Badge key={index} variant="solid" className="mr-1">
-                              {alias.alias}.xec
-                            </Badge>
-                          ))}
-                      <br />
-                      <br />
-                      <b>Pending Aliases: </b>
-                      {aliases.pending && aliases.pending.length > 0 &&
-                          aliases.pending.map((alias, index) => (
-                      <Badge key={index} variant="outline" className="mr-1">
-                        {alias.alias}.xec
-                      </Badge>
-                      ))}
-                  </Accordion.Content>
-              </Accordion.Panel>
-          </Accordion>
+          {/* Credit card summary */}
+          <CreditCardHeader />
 
           {/* Tab navigation */}
           <Tabs aria-label="eCash Chat" style="default">
