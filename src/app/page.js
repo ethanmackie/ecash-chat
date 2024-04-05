@@ -222,15 +222,6 @@ export default function Home() {
                                     </>
                                 )}
                             </p>
-                            <p className="font-small tracking-widest text-xs">
-                                {aliases.registered && aliases.registered.length > 0 &&
-                                    aliases.registered.map((alias, index) => (
-                                      <Badge key={index} variant="solid" className="mr-1">
-                                        {alias.alias}.xec
-                                      </Badge>
-                                    ))
-                                }
-                            </p>
                         </div>
                         <img className="w-14 h-14" src="/ecash-square-icon.svg"/>
                     </div>
