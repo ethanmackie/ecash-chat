@@ -15,11 +15,12 @@
 ## Specifications
 
 The eCash Chat protocol adopts the following onchain hex prefixes:
-- Post a message = 63686174 (chat) + 706f7374 (post) + [utf-8 message]
-- Reply to post = 63686174 (chat) + 68617368 (reply) + [txid of original post] + [utf-8 reply message]
+- Send a wallet to wallet message = 63686174 (chat) + [utf-8 message]
+- Post to townhall = 63686174 (chat) + 706f7374 (post) + [utf-8 message]
+- Reply to a townhall post = 63686174 (chat) + 68617368 (reply) + [txid of original post] + [utf-8 reply message]
 - Set profile pic = 63686174 (chat) + 70696373 (pics) + [utf-8 NFT id] (not implemented yet)
 
-To assist with web apps in rendering these actions accordingly, here are some examples:
+To assist with web apps in rendering these actions accordingly, here are some example breakdowns:
 
 **Send a direct wallet to wallet message**
 ```
