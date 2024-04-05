@@ -117,6 +117,7 @@ export const parseChronikTx = (tx, address) => {
         tx.tokenEntries[0].txType === 'GENESIS';
 
     // Initialize required variables
+    const txid = tx.txid;
     let airdropFlag = false;
     let airdropTokenId = '';
     let opReturnMessage = '';
@@ -130,6 +131,7 @@ export const parseChronikTx = (tx, address) => {
     let imageSrc = false;
     let videoId = false;
     let tweetId = false;
+    let replyTxid = false;
 
     if (tx.isCoinbase) {
         // Note that coinbase inputs have `undefined` for `thisInput.outputScript`
@@ -293,12 +295,16 @@ export const parseChronikTx = (tx, address) => {
                 }
                 case opreturnConfig.appPrefixesHex.eCashChat: {
                     if (stackArray.length >= 2) {
-                        if (stackArray[1] !== opreturnConfig.townhallPostPrefixHex) {
-                            opReturnMessage = Buffer.from(stackArray[1], 'hex');
-                            iseCashChatMessage = true;
-                        } else {
+                        if (stackArray[1] === opreturnConfig.townhallPostPrefixHex) {
                             opReturnMessage = Buffer.from(stackArray[2], 'hex');
                             iseCashChatPost = true;
+                        } else if (stackArray[1] === opreturnConfig.townhallReplyPostPrefixHex) {
+                            replyTxid = stackArray[2];
+                            opReturnMessage = Buffer.from(stackArray[3], 'hex');
+                            iseCashChatPost = true;
+                        } else {
+                            opReturnMessage = Buffer.from(stackArray[1], 'hex');
+                            iseCashChatMessage = true;
                         }
                     } else {
                         opReturnMessage = 'off-spec eCash Chat Msg';
@@ -447,6 +453,7 @@ export const parseChronikTx = (tx, address) => {
     // Return eToken specific fields if eToken tx
     if (isEtokenTx) {
         return {
+            txid,
             incoming,
             xecAmount,
             isEtokenTx,
@@ -466,10 +473,12 @@ export const parseChronikTx = (tx, address) => {
             txDate,
             txTime,
             tweetId,
+            replyTxid,
         };
     }
     // Otherwise do not include these fields
     return {
+        txid,
         incoming,
         xecAmount,
         isEtokenTx,
@@ -488,5 +497,6 @@ export const parseChronikTx = (tx, address) => {
         txDate,
         txTime,
         tweetId,
+        replyTxid,
     };
 };

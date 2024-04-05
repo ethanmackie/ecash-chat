@@ -16,3 +16,8 @@ export const isValidMessage = message => {
 export const isValidPost = post => {
     return opreturnConfig.townhallPostByteLimit >= Buffer.from(post, 'utf8').length;
 };
+
+// Validates the length of the townhall reply post
+export const isValidReplyPost = post => {
+    return opreturnConfig.townhallReplyPostByteLimit >= Buffer.from(post, 'utf8').length;
+};

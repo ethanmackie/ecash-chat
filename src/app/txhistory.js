@@ -15,7 +15,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Popover, Avatar } from "flowbite-react";
+import { Popover, Avatar, Badge } from "flowbite-react";
 import { Tweet } from 'react-tweet';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
@@ -266,7 +266,7 @@ export default function TxHistory({ address }) {
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
                                {tx.recipientAddress === address ? (
                                    <Avatar size="xs">This Wallet</Avatar>
-                               ) : tx.iseCashChatPost === true ? 'eCash Chat Townhall' :
+                               ) : tx.iseCashChatPost === true ? <Badge color="info">eCash Chat Townhall</Badge> :
                                  (<>
                                    <span>
                                    <Avatar size="xs">{tx.recipientAddress.substring(0,10)} ... {tx.recipientAddress.substring(tx.recipientAddress.length - 5)}

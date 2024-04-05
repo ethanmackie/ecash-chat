@@ -2,7 +2,7 @@
  * @jest-environment ./custom-environment
  */
  
-import { encodeBip21Message, encodeBip21Post, formatDate } from '../utils';
+import { encodeBip21Message, encodeBip21Post, formatDate, encodeBip21ReplyPost } from '../utils';
 
 it(`encodeBip21Message() correctly encodes a valid message for use in a BIP21 querystring`, () => {
     expect(encodeBip21Message('encode this')).toStrictEqual('04636861740b656e636f64652074686973');
@@ -21,6 +21,21 @@ it(`encodeBip21Post() correctly encodes a valid message containing emojis for us
 });
 it(`encodeBip21Post() correctly returns empty string for no message inputs`, () => {
     expect(encodeBip21Post()).toStrictEqual('');
+});
+it(`encodeBip21ReplyPost() correctly encodes a valid message for use in a BIP21 querystring`, () => {
+    expect(encodeBip21ReplyPost(
+        'encode this',
+        '0729318a128ee8f11d18b28237c8ae7ffa4e95c88ec69ebce716758e1973c5d4',
+    )).toStrictEqual('04636861740468617368200729318a128ee8f11d18b28237c8ae7ffa4e95c88ec69ebce716758e1973c5d40b656e636f64652074686973');
+});
+it(`encodeBip21ReplyPost() correctly encodes a valid message containing emojis for use in a BIP21 querystring`, () => {
+    expect(encodeBip21ReplyPost(
+        'encode this😃',
+        '0729318a128ee8f11d18b28237c8ae7ffa4e95c88ec69ebce716758e1973c5d4',
+    )).toStrictEqual('04636861740468617368200729318a128ee8f11d18b28237c8ae7ffa4e95c88ec69ebce716758e1973c5d40f656e636f64652074686973f09f9883');
+});
+it(`encodeBip21ReplyPost() correctly returns empty string for no message inputs`, () => {
+    expect(encodeBip21ReplyPost()).toStrictEqual('');
 });
 it(`Accepts a valid unix timestamp`, () => {
     expect(formatDate('1639679649', 'fr')).toBe('17 déc. 2021');
