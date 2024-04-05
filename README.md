@@ -4,12 +4,13 @@
 ## Key Features
 
 - One-click metamask-like login experience
+- Direct wallet to wallet and an all-in townhall forum
 - Displays only messaging transactions
 - Real time address specific filtering
 - XEC Tipping on addresses
 - Integrated with the eCash Alias protocol
 - Enables embedding of images, Youtube videos, Twitter tweets and emojis in messages
-- Powered by In-Node Chronik via Cashtab Extensions
+- Powered by In-Node Chronik and Cashtab Extensions
 
 ## Specifications
 
@@ -20,7 +21,7 @@ The eCash Chat protocol adopts the following onchain hex prefixes:
 
 To assist with web apps in rendering these actions accordingly, here are some examples:
 
-**Sending a direct wallet to wallet message**
+**Send a direct wallet to wallet message**
 ```
 OP_RETURN Hex
 6a04636861742a6a7573742061206e6f726d616c2077616c6c657420746f2077616c6c6574206d657373616765f09f918d
@@ -58,12 +59,11 @@ Hex breakdown
 - 04 (pushdata byte indicating 4 bytes / 8 chars)
 - 63686174 (eCash Chat's protocol prefix)
 - 04 (pushdata byte indicating 4 bytes / 8 chars)
-- 68617368 (hash prefix)
+- 68617368 (eCash Chat's townhall reply post prefix)
 - 20 (pushdata byte indicating 32 bytes / 64 chars)
 - 87928ef3d1c89be1a0e961b45a27680d96258b7b3a05d36115381739b335df94 (txid of original post)
 - 37 (pushdata byte indicating 55 bytes / 110 chars)
 - 54686973206973206d79207265706c7920746f2074686520654361736820696e74726f20766964656f202d20636f6f6c20737475666621 (the reply message)
-
 ```
 
 ## Development
