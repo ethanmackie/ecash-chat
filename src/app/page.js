@@ -318,8 +318,8 @@ export default function Home() {
         {isMobile === true && isLoggedIn === false && (
             <>
                 <p><b>Mobile device detected </b></p>
-                <p>Please note eCash Chat is optimized for desktop users as it's integrated with Cashtab Extension.</p><br />
-                <p>You can access a read-only view of an address' public onchain messaging history below</p>
+                <p>Please note eCash Chat is optimized for desktop users.</p><br />
+                <p>You can access a read-only view of an address and their public onchain messaging history below</p>
 
                 <form className="space-y-6" action="#" method="POST">
                     <div>
