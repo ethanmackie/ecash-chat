@@ -6,6 +6,7 @@ import Townhall from './townhall';
 import cashaddr from 'ecashaddrjs';
 import { queryAliasServer } from '../alias/alias-server';
 import { encodeBip21Message } from '../utils/utils';
+import { isMobileDevice } from '../utils/mobileCheck';
 import { appConfig } from '../config/app';
 import { isValidRecipient, isValidMessage } from '../validation/validation';
 import { opReturn as opreturnConfig } from '../config/opreturn';
@@ -26,6 +27,7 @@ import { GiDiscussion } from "react-icons/gi";
 export default function Home() {
     const [address, setAddress] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const [step, setStep] = useState('pending');
     const [aliases, setAliases] = useState({
             registered: [],
@@ -43,6 +45,14 @@ export default function Home() {
         // Check whether Cashtab Extensions is installed
         setTimeout(confirmCashtabProviderStatus, 750);
 
+        (async () => {
+            if (await isMobileDevice() === true) {
+                console.log('Mobile device detected');
+                setIsMobile(true);
+            } else {
+                console.log('Desktop detected');
+            }
+        })();
         // Listen for cashtab extension messages on load
         window.addEventListener('message', handleMessage);
     }, []);
@@ -61,6 +71,13 @@ export default function Home() {
               setIsLoggedIn(true);
             }
         }
+    };
+
+    // Parse for a manual address input on mobile and log in via view-only mode
+    const viewAddress = async (address) => {
+        getAliasesByAddress(address);
+        setAddress(address);
+        setIsLoggedIn(true);
     };
 
     // Retrieves the aliases associated with this address
@@ -116,36 +133,17 @@ export default function Home() {
       );
     };
 
-    const handleAddressChange = async e => {
+    const handleAddressChange = e => {
         const { value } = e.target;
         if (
             isValidRecipient(value) === true &&
             value.trim() !== ''
         ) {
-            setRecipient(value);
             setRecipientError(false);
         } else {
-            // Check if this invalid eCash address is an alias
-
-            // Extract alias without the `.xec` and check the server for validation
-            const aliasName = value.slice(0, value.length - 4);
-            // retrieve the alias details for `aliasName` from alias-server
-            let aliasDetails;
-            try {
-                aliasDetails = await queryAliasServer('alias', aliasName);
-                if (!aliasDetails.address) {
-                    setRecipientError('Invalid eCash address or alias');
-                } else {
-                    // Valid alias address response returned
-                    setRecipient(aliasDetails.address);
-                    setRecipientError(false);
-                }
-            } catch (err) {
-                setRecipientError(
-                    'Error resolving alias at indexer, contact admin.',
-                );
-            }
+            setRecipientError('Invalid eCash address');
         }
+        setRecipient(value);
     };
 
     const handleMessageChange = e => {
@@ -300,7 +298,7 @@ export default function Home() {
       <main className="flex min-h-screen flex-col items-left justify-center p-24">
 
       <div>
-        {isLoggedIn === false && step === 'fresh' && (
+        {isLoggedIn === false && isMobile === false && step === 'fresh' && (
         <div>
             <button type="button" className="text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 me-2 mb-2">
             Sign in with&emsp;
@@ -316,8 +314,46 @@ export default function Home() {
         </div>
         )}
 
+        {/* Currently this app is not optimized for mobile use as Cashtab Extension is not available on non-desktop platforms */}
+        {isMobile === true && isLoggedIn === false && (
+            <>
+                <p><b>Mobile device detected </b></p>
+                <p>Please note eCash Chat is optimized for desktop users as it's integrated with Cashtab Extension.</p><br />
+                <p>You can access a read-only view of an address' public onchain messaging history below</p>
+
+                <form className="space-y-6" action="#" method="POST">
+                    <div>
+                        <div className="mt-2">
+                          <Input
+                            id="viewAddress"
+                            name="viewAddress"
+                            type="text"
+                            value={recipient}
+                            required
+                            onChange={e => handleAddressChange(e)}
+                          />
+                        </div>
+                        <p className="mt-2 text-sm text-red-600 dark:text-red-500">{recipientError !== false && recipientError}</p>
+
+                        <div>
+                          <Button
+                            type="button"
+                            disabled={recipientError || recipient === ''}
+                            className="flex w-full"
+                            onClick={() => {
+                                viewAddress(recipient);
+                            }}
+                          >
+                            View
+                          </Button>
+                        </div>
+                  </div>
+              </form>
+            </>
+        )}
+
         {/* If Cashtab Extension is not installed, render button to install */}
-        {isLoggedIn === false && step === 'install' && (
+        {isLoggedIn === false && isMobile === false && step === 'install' && (
             <a href="https://chromewebstore.google.com/detail/cashtab/obldfcmebhllhjlhjbnghaipekcppeag" target="_blank">
                 <button type="button" className="text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 me-2 mb-2">
                 Install &emsp;
