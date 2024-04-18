@@ -2,7 +2,7 @@
  * @jest-environment ./custom-environment
  */
  
-import { encodeBip21Message, encodeBip21Post, formatDate, encodeBip21ReplyPost } from '../utils';
+import { encodeBip21Message, encodeBip21Post, formatDate, encodeBip21ReplyPost, toXec } from '../utils';
 
 it(`encodeBip21Message() correctly encodes a valid message for use in a BIP21 querystring`, () => {
     expect(encodeBip21Message('encode this')).toStrictEqual('04636861740b656e636f64652074686973');
@@ -72,4 +72,10 @@ it(`Rejects an invalid string containing letters.`, () => {
 });
 it(`Rejects an invalid string containing numbers.`, () => {
     expect(formatDate('10000000000000000', 'en-US')).toBe('Invalid Date');
+});
+it(`toXec returns the correct XEC balance`, () => {
+    expect(toXec(parseInt(37150))).toBe(371.5);
+});
+it(`toXec returns the correct XEC balance for larger numbers`, () => {
+    expect(toXec(parseInt(137151110))).toBe(1371511.1);
 });

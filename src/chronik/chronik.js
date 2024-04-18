@@ -3,9 +3,40 @@ import { chronik as chronikConfig } from '../config/chronik';
 import cashaddr from 'ecashaddrjs';
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import { appConfig } from '../config/app';
-import { formatDate } from '../utils/utils';
+import { formatDate, toXec } from '../utils/utils';
 import { getStackArray } from 'ecash-script';
 import { BN } from 'slp-mdm';
+
+// Retrieves the utxos for an address and calculates the balance
+export const getBalance = async (chronik, address) => {
+    if (
+        chronik === undefined ||
+        !cashaddr.isValidCashAddress(address, 'ecash')
+    ) {
+        return;
+    }
+
+    try {
+        // Get all utxos for address
+        const utxoResp = await chronik.address(address).utxos();
+        const utxos = utxoResp.utxos;
+
+        // Filter for XEC utoxs only
+        let xecBalance = parseInt(0);
+        for (const utxo of utxos) {
+            if (typeof utxo.token === 'undefined') {
+                xecBalance += parseInt(utxo.value);
+            }
+        }
+        return new Number(
+            toXec(xecBalance)
+        ).toLocaleString({
+            maximumFractionDigits: appConfig.cashDecimals,
+        });
+    } catch (err) {
+        console.log(`Error in getBalance(${address})`, err);
+    }
+};
 
 // Retrieves tx history via chronik, parses the response into formatted
 // objects and filter out eToken or non-msg txs

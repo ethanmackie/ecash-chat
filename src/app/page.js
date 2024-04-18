@@ -7,6 +7,7 @@ import cashaddr from 'ecashaddrjs';
 import { queryAliasServer } from '../alias/alias-server';
 import { encodeBip21Message } from '../utils/utils';
 import { isMobileDevice } from '../utils/mobileCheck';
+import { getBalance } from '../chronik/chronik';
 import { appConfig } from '../config/app';
 import { isValidRecipient, isValidMessage } from '../validation/validation';
 import { opReturn as opreturnConfig } from '../config/opreturn';
@@ -23,6 +24,9 @@ import { HiOutlineMail, HiOutlineNewspaper } from "react-icons/hi";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { PiHandCoins } from "react-icons/pi";
 import { GiDiscussion } from "react-icons/gi";
+import { chronik as chronikConfig } from '../config/chronik';
+import { ChronikClientNode } from 'chronik-client';
+const chronik = new ChronikClientNode(chronikConfig.urls);
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -40,6 +44,7 @@ export default function Home() {
     const [sendAmountXec, setSendAmountXec] = useState(5.5);
     const [sendAmountXecError, setSendAmountXecError] = useState(false);
     const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
+    const [xecBalance, setXecBalance] = useState('Loading...');
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
@@ -56,6 +61,16 @@ export default function Home() {
         // Listen for cashtab extension messages on load
         window.addEventListener('message', handleMessage);
     }, []);
+
+    // Triggered upon change of address i.e. login
+    useEffect(() => {
+        if (address === '') {
+            return;
+        }
+        (async () => {
+            setXecBalance(await getBalance(chronik, address));
+        })();
+    }, [address]);
 
     // Parse for an address from cashtab
     const handleMessage = async (event) => {
@@ -238,7 +253,7 @@ export default function Home() {
                                     Balance
                                 </p>
                                 <p className="font-medium tracking-wider text-sm">
-                                    xx,xxx,xxx XEC
+                                    {xecBalance} XEC
                                 </p>
                             </div>
                             <div className="">

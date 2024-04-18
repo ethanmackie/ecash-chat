@@ -1,5 +1,19 @@
 import * as utxolib from '@bitgo/utxo-lib';
 import { opReturn as opreturnConfig } from '../config/opreturn';
+import { BN } from 'slp-mdm';
+const SATOSHIS_PER_XEC = 100;
+
+/**
+ * Convert an amount in satoshis to XEC
+ * @param {Integer} satoshis
+ * @returns {Number}
+ */
+export const toXec = satoshis => {
+    if (!Number.isInteger(satoshis)) {
+        throw new Error('Input param satoshis must be an integer');
+    }
+    return new BN(satoshis).div(SATOSHIS_PER_XEC).toNumber();
+};
 
 // Encode the op_return message script
 export const encodeBip21Message = message => {
