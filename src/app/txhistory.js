@@ -5,7 +5,8 @@ import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
 import cashaddr from 'ecashaddrjs';
 import { isValidRecipient } from '../validation/validation';
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton } from "@/components/ui/skeleton";
+import { AnonAvatar } from "@/components/ui/social";
 import { encodeBip21Message } from '../utils/utils';
 import {
   Pagination,
@@ -179,167 +180,187 @@ export default function TxHistory({ address }) {
                      <div className="flex items-start gap-2.5" key={"txHistory"+index}>
                         <div className="flex flex-col w-full max-w-[550px] leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700">
 
-                        <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                           <span className="text-sm font-normal text-gray-500 dark:text-gray-400">From: </span>
+                        <div className="flex items-center">
+                           <span className="text-sm font-bold text-gray-500 dark:text-gray-400">From: </span>
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
                               {tx.replyAddress === address ? (
-                                  <Avatar size="xs">This Wallet</Avatar>
+                                  <>
+                                  <div className="flex items-center gap-4">
+                                      <AnonAvatar/>
+                                      <div className="font-medium dark:text-white">
+                                          <div>This Wallet</div>
+                                      </div>
+                                  </div>
+                                  </>
                               ) :
                                 (<>
                                   <span>
-                                  <Avatar size="xs">{tx.replyAddress.substring(0,10)} ... {tx.replyAddress.substring(tx.replyAddress.length - 5)}
-                                  &nbsp;
-                                  <Popover
-                                    aria-labelledby="default-popover"
-                                    content={
-                                      <div className="w-64 text-sm text-gray-500 dark:text-gray-400">
-                                        <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
-                                          <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Tipping Amount</h3>
-                                        </div>
-                                        <div className="px-3 py-2">
-                                            <button
-                                              type="button"
-                                              className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                              onClick={e => {
-                                                  sendXecTip(tx.replyAddress, 100);
-                                              }}
-                                            >
-                                              100
-                                            </button>
-                                            &nbsp;
-                                            <button
-                                              type="button"
-                                              className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                              onClick={e => {
-                                                  sendXecTip(tx.replyAddress, 1000);
-                                              }}
-                                            >
-                                              1k
-                                            </button>
-                                            &nbsp;
-                                            <button
-                                              type="button"
-                                              className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                              onClick={e => {
-                                                  sendXecTip(tx.replyAddress, 10000);
-                                              }}
-                                            >
-                                              10k
-                                            </button>
-                                            &nbsp;
-                                            <button
-                                              type="button"
-                                              className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                              onClick={e => {
-                                                  sendXecTip(tx.replyAddress, 100000);
-                                              }}
-                                            >
-                                              100k
-                                            </button>
-                                            &nbsp;
-                                            <button
-                                              type="button"
-                                              className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                              onClick={e => {
-                                                  sendXecTip(tx.replyAddress, 1000000);
-                                              }}
-                                            >
-                                              1M
-                                            </button>
-                                        </div>
+                                  <div className="flex items-center gap-4">
+                                      <AnonAvatar/>
+                                      <div className="font-medium dark:text-white">
+                                          <div>{tx.replyAddress.substring(0,10)} ... {tx.replyAddress.substring(tx.replyAddress.length - 5)}</div>
                                       </div>
-                                    }
-                                  >
-                                    <button
-                                        type="button"
-                                        className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                    >
-                                        Tip XEC
-                                    </button>
-                                  </Popover>
-                                  </Avatar>
+                                      <Popover
+                                        aria-labelledby="default-popover"
+                                        content={
+                                          <div className="w-64 text-sm text-gray-500 dark:text-gray-400">
+                                            <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
+                                              <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Tipping Amount</h3>
+                                            </div>
+                                            <div className="px-3 py-2">
+                                                <button
+                                                  type="button"
+                                                  className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                  onClick={e => {
+                                                      sendXecTip(tx.replyAddress, 100);
+                                                  }}
+                                                >
+                                                  100
+                                                </button>
+                                                &nbsp;
+                                                <button
+                                                  type="button"
+                                                  className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                  onClick={e => {
+                                                      sendXecTip(tx.replyAddress, 1000);
+                                                  }}
+                                                >
+                                                  1k
+                                                </button>
+                                                &nbsp;
+                                                <button
+                                                  type="button"
+                                                  className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                  onClick={e => {
+                                                      sendXecTip(tx.replyAddress, 10000);
+                                                  }}
+                                                >
+                                                  10k
+                                                </button>
+                                                &nbsp;
+                                                <button
+                                                  type="button"
+                                                  className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                  onClick={e => {
+                                                      sendXecTip(tx.replyAddress, 100000);
+                                                  }}
+                                                >
+                                                  100k
+                                                </button>
+                                                &nbsp;
+                                                <button
+                                                  type="button"
+                                                  className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                  onClick={e => {
+                                                      sendXecTip(tx.replyAddress, 1000000);
+                                                  }}
+                                                >
+                                                  1M
+                                                </button>
+                                            </div>
+                                          </div>
+                                        }
+                                      >
+                                        <button
+                                            type="button"
+                                            className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                        >
+                                            Tip XEC
+                                        </button>
+                                      </Popover>
+                                    </div>
                                   </span>
                                 </>)
                               }
                            </span>
-                           <span className="text-sm font-normal text-gray-500 dark:text-gray-400">To: </span>
+                           <span className="text-sm font-bold text-gray-500 dark:text-gray-400">&emsp;&emsp;To: </span>
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
                                {tx.recipientAddress === address ? (
-                                   <Avatar size="xs">This Wallet</Avatar>
+                                    <>
+                                        <div className="flex items-center gap-4">
+                                            <AnonAvatar/>
+                                            <div className="font-medium dark:text-white">
+                                                <div>This Wallet</div>
+                                            </div>
+                                        </div>
+                                    </>
                                ) : tx.iseCashChatPost === true ? <Badge color="info">eCash Chat Townhall</Badge> :
                                  (<>
                                    <span>
-                                   <Avatar size="xs">{tx.recipientAddress.substring(0,10)} ... {tx.recipientAddress.substring(tx.recipientAddress.length - 5)}
-                                   &emsp;
-                                   <Popover
-                                     aria-labelledby="default-popover"
-                                     content={
-                                       <div className="w-64 text-sm text-gray-500 dark:text-gray-400">
-                                         <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
-                                           <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Tipping Amount</h3>
-                                         </div>
-                                         <div className="px-3 py-2">
-                                             <button
-                                               type="button"
-                                               className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                               onClick={e => {
-                                                   sendXecTip(tx.recipientAddress, 100);
-                                               }}
-                                             >
-                                               100
-                                             </button>
-                                             &nbsp;
-                                             <button
-                                               type="button"
-                                               className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                               onClick={e => {
-                                                   sendXecTip(tx.recipientAddress, 1000);
-                                               }}
-                                             >
-                                               1k
-                                             </button>
-                                             &nbsp;
-                                             <button
-                                               type="button"
-                                               className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                               onClick={e => {
-                                                   sendXecTip(tx.recipientAddress, 10000);
-                                               }}
-                                             >
-                                               10k
-                                             </button>
-                                             &nbsp;
-                                             <button
-                                               type="button"
-                                               className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                               onClick={e => {
-                                                   sendXecTip(tx.recipientAddress, 100000);
-                                               }}
-                                             >
-                                               100k
-                                             </button>
-                                             &nbsp;
-                                             <button
-                                               type="button"
-                                               className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                               onClick={e => {
-                                                   sendXecTip(tx.recipientAddress, 1000000);
-                                               }}
-                                             >
-                                               1M
-                                             </button>
-                                         </div>
+                                   <div className="flex items-center gap-4">
+                                       <AnonAvatar/>
+                                       <div className="font-medium dark:text-white">
+                                           <div>{tx.recipientAddress.substring(0,10)} ... {tx.recipientAddress.substring(tx.recipientAddress.length - 5)}</div>
                                        </div>
-                                     }
-                                   >
-                                     <button
-                                         type="button"
-                                         className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                     >
-                                         Tip XEC
-                                     </button>
-                                   </Popover>
-                                   </Avatar>
+                                       <Popover
+                                         aria-labelledby="default-popover"
+                                         content={
+                                           <div className="w-64 text-sm text-gray-500 dark:text-gray-400">
+                                             <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
+                                               <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Tipping Amount</h3>
+                                             </div>
+                                             <div className="px-3 py-2">
+                                                 <button
+                                                   type="button"
+                                                   className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                   onClick={e => {
+                                                       sendXecTip(tx.recipientAddress, 100);
+                                                   }}
+                                                 >
+                                                   100
+                                                 </button>
+                                                 &nbsp;
+                                                 <button
+                                                   type="button"
+                                                   className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                   onClick={e => {
+                                                       sendXecTip(tx.recipientAddress, 1000);
+                                                   }}
+                                                 >
+                                                   1k
+                                                 </button>
+                                                 &nbsp;
+                                                 <button
+                                                   type="button"
+                                                   className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                   onClick={e => {
+                                                       sendXecTip(tx.recipientAddress, 10000);
+                                                   }}
+                                                 >
+                                                   10k
+                                                 </button>
+                                                 &nbsp;
+                                                 <button
+                                                   type="button"
+                                                   className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                   onClick={e => {
+                                                       sendXecTip(tx.recipientAddress, 100000);
+                                                   }}
+                                                 >
+                                                   100k
+                                                 </button>
+                                                 &nbsp;
+                                                 <button
+                                                   type="button"
+                                                   className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                   onClick={e => {
+                                                       sendXecTip(tx.recipientAddress, 1000000);
+                                                   }}
+                                                 >
+                                                   1M
+                                                 </button>
+                                             </div>
+                                           </div>
+                                         }
+                                       >
+                                         <button
+                                             type="button"
+                                             className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                         >
+                                             Tip XEC
+                                         </button>
+                                       </Popover>
+                                    </div>
                                    </span>
                                  </>)
                                }
@@ -431,7 +452,7 @@ export default function TxHistory({ address }) {
              <>
              {/*Set up pagination menu*/}
              <br />
-             Scan recent transactions{'   '}<br />
+             Scan recent messaging transactions{'   '}<br />
   
              <span>Page: 
              <nav aria-label="Page navigation example">
@@ -457,7 +478,7 @@ export default function TxHistory({ address }) {
              <br />
              <form className="space-y-6" action="#" method="POST">
                <div>
-                 <label htmlFor="address" className="block text-sm font-medium leading-6 text-gray-900">
+                 <label htmlFor="address" className="block text-m font-medium leading-6 text-gray-900">
                    Search By Address
                  </label>
 
@@ -477,7 +498,7 @@ export default function TxHistory({ address }) {
                  <button
                    type="button"
                    disabled={addressToSearchError}
-                   className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                   className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                    onClick={e => {
                        getTxHistoryByAddress(e);
                    }}
@@ -487,7 +508,7 @@ export default function TxHistory({ address }) {
                  &nbsp;
                  <button
                    type="button"
-                   className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                   className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                    onClick={() => {
                        setTxHistoryByAddress('');
                        setAddressToSearch('');
@@ -499,7 +520,7 @@ export default function TxHistory({ address }) {
                  &nbsp;
                  <button
                      type="button"
-                     className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                     className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                      onClick={() => exportMessageHistory()}
                  >
                    Export Message History

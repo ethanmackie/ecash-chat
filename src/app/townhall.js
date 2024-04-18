@@ -4,7 +4,8 @@ import { appConfig } from '../config/app';
 import { Label, Textarea, Tooltip, Avatar, Popover, Accordion } from "flowbite-react";
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import { isValidPost, isValidReplyPost } from '../validation/validation';
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
+import { AnonAvatar } from "@/components/ui/social";
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
@@ -145,52 +146,51 @@ export default function TownHall({ address }) {
     };
 
     return (
-        <div className="flex min-h-screen flex-col">
-            <div className="max-w-md">
+        <div className="flex min-h-screen flex-col py-5">
+            <div>
               {/* Post input field */}
               <Textarea
                   id="post"
                   value={post}
-                  placeholder="Post your thoughts..."
+                  placeholder="Post your thoughts to the public town hall..."
                   required
                   onChange={e => handlePostChange(e)}
-                  rows={2}
+                  rows={4}
               />
 
-              {/* Emoji Picker */}
-              <Button className="mt-2" type="button" onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}>
-                {renderEmojiPicker ? 'Hide Emojis' : 'Show Emojis'}
-              </Button>
-              <div style={{ display: (renderEmojiPicker ? 'block' : 'none') }}>
-                <Picker
-                    data={data}
-                    onEmojiSelect={(e) => {
-                        setPost(String(post).concat(e.native));
-                    }}
-                />
-              </div>
-
-              {/* Tooltip guide for embedding markups */}
+              {/* Emoji picker and tooltip guide for embedding markups */}
               <div className="flex gap-2">
+                  {/* Emoji Picker */}
+                  <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}>
+                    {renderEmojiPicker ? 'Hide Emojis' : 'Show Emojis'}
+                  </button>
+                  <div style={{ display: (renderEmojiPicker ? 'block' : 'none') }}>
+                    <Picker
+                        data={data}
+                        onEmojiSelect={(e) => {
+                            setPost(String(post).concat(e.native));
+                        }}
+                    />
+                  </div>
                   <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
-                      <Button className="mt-2" type="button" onClick={() => insertMarkupTags('[img]url[/img]')}>
+                      <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[img]url[/img]')}>
                           Embed Image
-                      </Button>
+                      </button>
                   </Tooltip>
                   <Tooltip content="e.g. [yt]5RuYKxKCAOA[/yt]" style="light">
-                      <Button className="mt-2" type="button" onClick={() => insertMarkupTags('[yt]videoId[/yt]')}>
+                      <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[yt]youtube-video-id[/yt]')}>
                           Embed Youtube
-                      </Button>
+                      </button>
                   </Tooltip>
                   <Tooltip content="e.g. [twt]1762780466976002393[/twt]" style="light">
-                      <Button className="mt-2" type="button" onClick={() => insertMarkupTags('[twt]tweetId[/twt]')}>
+                      <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[twt]tweet-id[/twt]')}>
                           Embed Tweet
-                      </Button>
+                      </button>
                   </Tooltip>
-              </div>
+              </div><br />
               <button
                 type="button"
-                className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                className="flex w-full justify-center rounded bg-indigo-500 px-2 py-2 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                 onClick={() => { sendPost() }}
               >
                 Post
@@ -214,12 +214,22 @@ export default function TownHall({ address }) {
                                <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
                                   <span>
                                      {tx.replyAddress === address ? (
-                                         <Avatar size="xs">This Wallet</Avatar>
+                                         <>
+                                         <div className="flex items-center gap-4">
+                                             <AnonAvatar/>
+                                             <div className="font-medium dark:text-white">
+                                                 <div>This Wallet</div>
+                                             </div>
+                                         </div>
+                                         </>
                                      ) :
                                        (<>
                                          <span>
-                                             <Avatar size="xs">
-                                                {tx.replyAddress.substring(0,10)} ... {tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                            <div className="flex items-center gap-4">
+                                                <AnonAvatar/>
+                                                <div className="font-medium dark:text-white">
+                                                    <div>{tx.replyAddress.substring(0,10)} ... {tx.replyAddress.substring(tx.replyAddress.length - 5)}</div>
+                                                </div>
                                                 {/* Tip XEC options */}
                                                 &nbsp;
                                                 <Popover
@@ -290,7 +300,7 @@ export default function TownHall({ address }) {
                                                         Tip XEC
                                                     </button>
                                                   </Popover>
-                                             </Avatar>
+                                             </div>
                                          </span>
                                        </>)
                                      }

@@ -23,7 +23,7 @@ import { Tooltip, Tabs } from "flowbite-react";
 import { HiOutlineMail, HiOutlineNewspaper } from "react-icons/hi";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { PiHandCoins } from "react-icons/pi";
-import { GiDiscussion } from "react-icons/gi";
+import { GiDiscussion, GiAbstract010 } from "react-icons/gi";
 import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
 const chronik = new ChronikClientNode(chronikConfig.urls);
@@ -275,42 +275,41 @@ export default function Home() {
   return (
     <>
     <nav className="bg-gradient-to-t border-gray-200 dark:bg-gray-900">
-        <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-            <a
-              className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-              href="https://e.cash/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Image
-                src="/ecash-square-icon.svg"
-                alt="eCash Logo"
-                className="dark:invert"
-                width={50}
-                height={15}
-                priority
-              />
-            </a>
 
-            <button
-              type="button"
-              className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-            >
-              alita test
-            </button>
-            {isLoggedIn === true && (
-                <button
-                  type="button"
-                  className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                  onClick={() => setIsLoggedIn(false)}
-                >
-                  Log Out
-                </button>
-            )}
-        </div>
       </nav>
 
-      <main className="flex min-h-screen flex-col items-left justify-center p-24">
+      <main className="flex flex-col items-center justify-center p-8">
+
+      {isLoggedIn === false && isMobile === false ? (
+          <>
+          <br /><br /><br />
+          <a
+            className="pointer-events-none flex place-items-center"
+            href="https://e.cash/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Image
+              src="/ecash-chat-logo.png"
+              alt="eCash Chat Logo"
+              className="dark:invert"
+              width={500}
+              height={150}
+              priority
+            />
+          </a>
+          <br />
+          </>
+      ) : (
+        <Image
+          src="/ecash-chat-logo.png"
+          alt="eCash Chat Logo"
+          className="dark:invert"
+          width={250}
+          height={75}
+          priority
+        />
+      )}
 
       <div>
         {isLoggedIn === false && isMobile === false && step === 'fresh' && (
@@ -399,7 +398,7 @@ export default function Home() {
 
               <Tabs.Item title="Send Message" icon={HiOutlineNewspaper}>
                   <div style={{ display: (isLoggedIn ? 'block' : 'none') }}>
-                      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+                      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-5 lg:px-8">
                             <form className="space-y-6" action="#" method="POST">
                               <div>
                                 <label htmlFor="address" className="block text-sm font-medium leading-6 text-gray-900">
@@ -432,34 +431,34 @@ export default function Home() {
                                       required
                                       onChange={e => handleMessageChange(e)}
                                   />
-                                  {/* Emoji Picker */}
-                                  <Button className="mt-2" type="button" onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}>
-                                    {renderEmojiPicker ? 'Hide Emojis' : 'Show Emojis'}
-                                  </Button>
-                                  <div style={{ display: (renderEmojiPicker ? 'block' : 'none') }}>
-                                    <Picker
-                                        data={data}
-                                        onEmojiSelect={(e) => {
-                                            setMessage(String(message).concat(e.native));
-                                        }}
-                                    />
-                                  </div>
-                                  {/* Tooltip guide for embedding markups */}
+                                  {/* Emoji picker and tooltip guide for embedding markups */}
                                   <div className="flex gap-2">
+                                      {/* Emoji Picker */}
+                                      <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}>
+                                        {renderEmojiPicker ? 'Hide Emojis' : 'Show Emojis'}
+                                      </button>
+                                      <div style={{ display: (renderEmojiPicker ? 'block' : 'none') }}>
+                                        <Picker
+                                            data={data}
+                                            onEmojiSelect={(e) => {
+                                                setMessage(String(message).concat(e.native));
+                                            }}
+                                        />
+                                      </div>
                                       <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
-                                          <Button className="mt-2" type="button" onClick={() => insertMarkupTags('[img]url[/img]')}>
+                                          <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[img]url[/img]')}>
                                               Embed Image
-                                          </Button>
+                                          </button>
                                       </Tooltip>
                                       <Tooltip content="e.g. [yt]5RuYKxKCAOA[/yt]" style="light">
-                                          <Button className="mt-2" type="button" onClick={() => insertMarkupTags('[yt]videoId[/yt]')}>
+                                          <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[yt]youtube-video-id[/yt]')}>
                                               Embed Youtube
-                                          </Button>
+                                          </button>
                                       </Tooltip>
                                       <Tooltip content="e.g. [twt]1762780466976002393[/twt]" style="light">
-                                          <Button className="mt-2" type="button" onClick={() => insertMarkupTags('[twt]tweetId[/twt]')}>
+                                          <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[twt]tweet-id[/twt]')}>
                                               Embed Tweet
-                                          </Button>
+                                          </button>
                                       </Tooltip>
                                   </div>
                                 </div>
@@ -475,37 +474,102 @@ export default function Home() {
                                 />
                               </div>
                               <div>
-                                <Button
+                                <button
                                   type="button"
                                   disabled={recipientError || messageError || sendAmountXecError}
-                                  className="flex w-full"
+                                  className="flex justify-center w-full rounded bg-indigo-500 px-2 py-2 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                   onClick={() => {
                                       sendMessage();
                                   }}
                                 >
                                   Send
-                                </Button>
+                                </button>
                               </div>
                           </form>
                    </div>
                 </div>
               </Tabs.Item>
 
-              {/* Optional disabling of townhall if we choose to launch with Inbox only first
-              <Tabs.Item title="Townhall (Coming Soon)" icon={GiDiscussion} disabled>
-                  Town Hall
-              </Tabs.Item>
-              */}
               <Tabs.Item title="Townhall" icon={GiDiscussion}>
                   <Townhall address={address} />
               </Tabs.Item>
 
-              <Tabs.Item title="Get XEC" icon={PiHandCoins}>
-                  Get XEC
+              <Tabs.Item title="About" icon={IoMdInformationCircleOutline}>
+                  <div className="flex flex-col justify-center py-3">
+                      <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">What is eCash Chat?</h2>
+                      eCash Chat is an on-chain messaging platform on the eCash blockchain.
+                      <br />It filters for specific messaging transactions to facilitate a seamless social experience.
+                      <br /><br />
+                      <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Key features:</h2>
+                      <ul className="space-y-1 list-disc list-inside">
+                          <li>
+                              One-click metamask-like login experience
+                          </li>
+                          <li>
+                              Direct wallet to wallet and an all-in townhall forum
+                          </li>
+                          <li>
+                              Displays only messaging transactions
+                          </li>
+                          <li>
+                              Real time address specific filtering
+                          </li>
+                          <li>
+                              XEC Tipping on addresses
+                          </li>
+                          <li>
+                              Enables embedding of images, videos, tweets and emojis in messages
+                          </li>
+                          <li>
+                              Powered by In-Node Chronik and Cashtab Extensions
+                          </li>
+                          <li>
+                              Integrated with the eCash Alias protocol (coming soon)
+                          </li>
+                      </ul>
+                      <br />
+                      <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Support:</h2>
+                      <ul className="space-y-1 list-disc list-inside">
+                          <li>
+                              For general support please visit the official <a href="https://t.me/ecash" target="_blank" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">eCash Telegram Channel</a>.
+                          </li>
+                          <li>
+                              For technical references please refer to the <a href="https://github.com/ethanmackie/ecash-chat" target="_blank" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">github repository</a>.
+                          </li>
+                      </ul>
+                  </div>
               </Tabs.Item>
 
-              <Tabs.Item title="About" icon={IoMdInformationCircleOutline}>
-                  About
+              <Tabs.Item title="Settings" icon={GiAbstract010}>
+                  <div className="flex w-72 flex-col py-5">
+                      {typeof process.env.REACT_APP_VERSION === 'string' && (
+                          <>
+                              v{process.env.REACT_APP_VERSION}<br /><br />
+                          </>
+                      )}
+
+                      <button
+                        type="button"
+                        className="rounded bg-indigo-500 px-2 py-3 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                        onClick={() => setIsLoggedIn(false)}
+                      >
+                          Log Out
+                      </button>
+                      <br />
+                      <button
+                        type="button"
+                        className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                      >
+                        Set NFT Profile (Coming soon)
+                      </button>
+                      <br />
+                      <button
+                        type="button"
+                        className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                      >
+                        Link eCash Alias (Coming soon)
+                      </button>
+                  </div>
               </Tabs.Item>
 
               </Tabs>
