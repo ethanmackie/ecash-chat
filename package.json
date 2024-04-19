@@ -33,6 +33,7 @@
     "react-lite-youtube-embed": "^2.4.0",
     "react-loading-skeleton": "^3.4.0",
     "react-qr-code": "^2.0.12",
+    "react-toastify": "^10.0.5",
     "react-tweet": "^3.2.0",
     "slp-mdm": "^0.0.7",
     "styled-components": "^4.4.1",

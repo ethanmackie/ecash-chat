@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from "next/image";
 import TxHistory from './txhistory';
 import Townhall from './townhall';
@@ -24,6 +24,8 @@ import { HiOutlineMail, HiOutlineNewspaper } from "react-icons/hi";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { PiHandCoins } from "react-icons/pi";
 import { GiDiscussion, GiAbstract010 } from "react-icons/gi";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
 const chronik = new ChronikClientNode(chronikConfig.urls);
@@ -216,6 +218,7 @@ export default function Home() {
                 className="w-96 h-56 m-auto bg-red-100 rounded-xl relative text-white shadow-2xl transition-transform transform hover:scale-110"
                 onClick={() => {
                     copy(address);
+                    toast(`${address} copied to clipboard`);
                 }}
             >
                 <img className="relative object-cover w-full h-full rounded-xl" src="/creditcard-bg.png" />
@@ -274,6 +277,7 @@ export default function Home() {
   /* Placeholder UI for now until the Tailwind UI set is ready for implementation */
   return (
     <>
+    <ToastContainer />
     <nav className="bg-gradient-to-t border-gray-200 dark:bg-gray-900">
 
       </nav>

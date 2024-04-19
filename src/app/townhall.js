@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import  React, { useState, useEffect } from 'react';
 import { appConfig } from '../config/app';
 import { Label, Textarea, Tooltip, Avatar, Popover, Accordion } from "flowbite-react";
 import { opReturn as opreturnConfig } from '../config/opreturn';
@@ -23,6 +23,8 @@ import {
 } from 'next-share';
 import { encodeBip21Message, encodeBip21Post, encodeBip21ReplyPost } from '../utils/utils';
 import { getTxHistory, getReplyTxDetails, parseChronikTx } from '../chronik/chronik';
+import copy from 'copy-to-clipboard';
+import { toast } from 'react-toastify';
 import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
 const chronik = new ChronikClientNode(chronikConfig.urls);
@@ -228,7 +230,12 @@ export default function TownHall({ address }) {
                                             <div className="flex items-center gap-4">
                                                 <AnonAvatar/>
                                                 <div className="font-medium dark:text-white">
-                                                    <div>{tx.replyAddress.substring(0,10)} ... {tx.replyAddress.substring(tx.replyAddress.length - 5)}</div>
+                                                    <div onClick={() => {
+                                                        copy(tx.replyAddress);
+                                                        toast(`${tx.replyAddress} copied to clipboard`);
+                                                    }}>
+                                                        {tx.replyAddress.substring(0,10)} ... {tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                                    </div>
                                                 </div>
                                                 {/* Tip XEC options */}
                                                 &nbsp;

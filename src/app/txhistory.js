@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getTxHistory } from '../chronik/chronik';
 import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
@@ -30,6 +30,8 @@ import {
     TelegramShareButton,
     TelegramIcon,
 } from 'next-share';
+import copy from 'copy-to-clipboard';
+import { toast } from 'react-toastify';
 const chronik = new ChronikClientNode(chronikConfig.urls);
 
 export default function TxHistory({ address }) {
@@ -198,7 +200,12 @@ export default function TxHistory({ address }) {
                                   <div className="flex items-center gap-4">
                                       <AnonAvatar/>
                                       <div className="font-medium dark:text-white">
-                                          <div>{tx.replyAddress.substring(0,10)} ... {tx.replyAddress.substring(tx.replyAddress.length - 5)}</div>
+                                          <div onClick={() => {
+                                              copy(tx.replyAddress);
+                                              toast(`${tx.replyAddress} copied to clipboard`);
+                                          }}>
+                                              {tx.replyAddress.substring(0,10)} ... {tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                          </div>
                                       </div>
                                       <Popover
                                         aria-labelledby="default-popover"
@@ -290,7 +297,12 @@ export default function TxHistory({ address }) {
                                    <div className="flex items-center gap-4">
                                        <AnonAvatar/>
                                        <div className="font-medium dark:text-white">
-                                           <div>{tx.recipientAddress.substring(0,10)} ... {tx.recipientAddress.substring(tx.recipientAddress.length - 5)}</div>
+                                           <div onClick={() => {
+                                               copy(tx.recipientAddress);
+                                               toast(`${tx.recipientAddress} copied to clipboard`);
+                                           }}>
+                                              {tx.recipientAddress.substring(0,10)} ... {tx.recipientAddress.substring(tx.recipientAddress.length - 5)}
+                                          </div>
                                        </div>
                                        <Popover
                                          aria-labelledby="default-popover"
