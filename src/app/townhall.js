@@ -148,7 +148,7 @@ export default function TownHall({ address }) {
     };
 
     return (
-        <div className="flex min-h-screen flex-col py-5">
+        <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-5 lg:px-8">
             <div>
               {/* Post input field */}
               <Textarea
@@ -315,7 +315,6 @@ export default function TownHall({ address }) {
                                   {/* Date and timestamp */}
                                   &emsp;{tx.txDate}&nbsp;at&nbsp;{tx.txTime}
                                </div>
-
                                {/* If this post was a reply to another */}
                                {tx.replyTxid !== false && (
                                     <p>Replying to ...
@@ -326,7 +325,7 @@ export default function TownHall({ address }) {
                                )}
 
                                {/* Render the op_return message */}
-                               <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
+                               <p className="text-m font-normal py-2.5 text-gray-900 dark:text-white" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
 
                                {/* Render any media content within the message */}
                                {tx.imageSrc !== false && (<img src={tx.imageSrc} />)}

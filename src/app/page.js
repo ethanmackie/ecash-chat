@@ -4,6 +4,7 @@ import Image from "next/image";
 import TxHistory from './txhistory';
 import Townhall from './townhall';
 import cashaddr from 'ecashaddrjs';
+import Script from 'next/script';
 import { queryAliasServer } from '../alias/alias-server';
 import { encodeBip21Message } from '../utils/utils';
 import { isMobileDevice } from '../utils/mobileCheck';
@@ -278,6 +279,21 @@ export default function Home() {
   return (
     <>
     <ToastContainer />
+    <Script
+        strategy="lazyOnload"
+        id="google-analytics1"
+        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}`}
+    />
+    <Script id="google-analytics2" strategy="lazyOnload">
+        {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}', {
+            page_path: window.location.pathname,
+            });
+        `}
+    </Script>
     <nav className="bg-gradient-to-t border-gray-200 dark:bg-gray-900">
 
       </nav>
