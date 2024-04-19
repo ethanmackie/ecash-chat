@@ -6,7 +6,7 @@ import { ChronikClientNode } from 'chronik-client';
 import cashaddr from 'ecashaddrjs';
 import { isValidRecipient } from '../validation/validation';
 import { Skeleton } from "@/components/ui/skeleton";
-import { AnonAvatar, ShareIcon } from "@/components/ui/social";
+import { AnonAvatar, ShareIconSmall } from "@/components/ui/social";
 import { encodeBip21Message } from '../utils/utils';
 import {
   Pagination,
@@ -388,14 +388,14 @@ export default function TxHistory({ address }) {
                         {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
                         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{tx.xecAmount} XEC</span>
                         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                          {tx.isCashtabMessage ? 'Cashtab Message' :
-                              tx.iseCashChatMessage ? 'eCash Chat Message' :
-                                  tx.iseCashChatPost ? 'eCash Townhall Post' :
-                                      'External Message'
-                          }
+                        {tx.isCashtabMessage ? 'Cashtab Message' :
+                            tx.iseCashChatMessage ? 'eCash Chat Message' :
+                                tx.iseCashChatPost ? 'eCash Townhall Post' :
+                                    'External Message'
+                        }
 
-                          {/* Date and timestamp */}
-                          &nbsp;|&nbsp;{tx.txDate}&nbsp;at&nbsp;{tx.txTime}
+                        {/* Date and timestamp */}
+                        &nbsp;|&nbsp;{tx.txDate}&nbsp;at&nbsp;{tx.txTime}
 
                           {/* Share buttons with other social platforms */}
                           &emsp;
@@ -459,7 +459,7 @@ export default function TxHistory({ address }) {
                             }
                           >
                             <button type="button">
-                                <ShareIcon />
+                                <ShareIconSmall />
                             </button>
                           </Popover>
                       </span>

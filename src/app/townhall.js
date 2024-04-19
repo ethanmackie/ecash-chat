@@ -5,7 +5,7 @@ import { Label, Textarea, Tooltip, Avatar, Popover, Accordion } from "flowbite-r
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import { isValidPost, isValidReplyPost } from '../validation/validation';
 import { Button } from "@/components/ui/button";
-import { AnonAvatar, ShareIcon } from "@/components/ui/social";
+import { AnonAvatar, ShareIcon, ReplyIcon } from "@/components/ui/social";
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
@@ -175,17 +175,17 @@ export default function TownHall({ address }) {
                     />
                   </div>
                   <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
-                      <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[img]url[/img]')}>
+                      <button className="rounded bg-indigo-500 px-4 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[img]url[/img]')}>
                           Embed Image
                       </button>
                   </Tooltip>
                   <Tooltip content="e.g. [yt]5RuYKxKCAOA[/yt]" style="light">
-                      <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[yt]youtube-video-id[/yt]')}>
+                      <button className="rounded bg-indigo-500 px-4 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[yt]youtube-video-id[/yt]')}>
                           Embed Youtube
                       </button>
                   </Tooltip>
                   <Tooltip content="e.g. [twt]1762780466976002393[/twt]" style="light">
-                      <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[twt]tweet-id[/twt]')}>
+                      <button className="rounded bg-indigo-500 px-4 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[twt]tweet-id[/twt]')}>
                           Embed Tweet
                       </button>
                   </Tooltip>
@@ -242,7 +242,7 @@ export default function TownHall({ address }) {
                                                 <Popover
                                                   aria-labelledby="default-popover"
                                                   content={
-                                                    <div className="w-64 text-sm text-gray-500 dark:text-gray-400">
+                                                    <div className="w-50 text-sm text-gray-500 dark:text-gray-400">
                                                       <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
                                                         <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Tipping Amount</h3>
                                                       </div>
@@ -367,11 +367,8 @@ export default function TownHall({ address }) {
                                        </div>
                                      }
                                    >
-                                     <button
-                                         type="button"
-                                         className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                     >
-                                         Reply
+                                     <button type="button">
+                                         <ReplyIcon/>
                                      </button>
                                    </Popover>
 
