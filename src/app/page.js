@@ -20,7 +20,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import QRCode from "react-qr-code";
 import copy from 'copy-to-clipboard';
-import { Tooltip, Tabs } from "flowbite-react";
+import { Tooltip, Tabs, Alert } from "flowbite-react";
 import { HiOutlineMail, HiOutlineNewspaper } from "react-icons/hi";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { PiHandCoins } from "react-icons/pi";
@@ -214,9 +214,11 @@ export default function Home() {
     };
 
     const CreditCardHeader = () => {
+        const cardStyling = isMobile ? "w-94 h-56 m-auto bg-red-100 rounded-xl relative text-white shadow-2xl transition-transform transform hover:scale-110" :
+            "w-96 h-56 m-auto bg-red-100 rounded-xl relative text-white shadow-2xl transition-transform transform hover:scale-110";
         return (
             <div
-                className="w-96 h-56 m-auto bg-red-100 rounded-xl relative text-white shadow-2xl transition-transform transform hover:scale-110"
+                className={cardStyling}
                 onClick={() => {
                     copy(address);
                     toast(`${address} copied to clipboard`);
@@ -294,11 +296,8 @@ export default function Home() {
             });
         `}
     </Script>
-    <nav className="bg-gradient-to-t border-gray-200 dark:bg-gray-900">
 
-      </nav>
-
-      <main className="flex flex-col items-center justify-center p-8">
+      <main className="lg:flex lg:flex-col items-center justify-center p-5">
 
       {isLoggedIn === false && isMobile === false ? (
           <>
@@ -350,11 +349,12 @@ export default function Home() {
 
         {/* Currently this app is not optimized for mobile use as Cashtab Extension is not available on non-desktop platforms */}
         {isMobile === true && isLoggedIn === false && (
-            <>
-                <p><b>Mobile device detected </b></p>
-                <p>Please note eCash Chat is optimized for desktop users.</p><br />
-                <p>You can access a read-only view of an address and their public onchain messaging history below</p>
-
+            <><br />
+                <Alert color="info">
+                    <p><b>Mobile device detected </b></p>
+                    <p>Please note eCash Chat is optimized for desktop browsers as it is integrated with Cashtab Extensions.</p><br />
+                    <p>Mobile users can access a read-only view of the public townhall with limited functionality.</p>
+                </Alert>
                 <form className="space-y-6" action="#" method="POST">
                     <div>
                         <div className="mt-2">
@@ -362,6 +362,7 @@ export default function Home() {
                             id="viewAddress"
                             name="viewAddress"
                             type="text"
+                            placeholder="Enter your eCash address..."
                             value={recipient}
                             required
                             onChange={e => handleAddressChange(e)}
@@ -410,108 +411,112 @@ export default function Home() {
 
           {/* Tab navigation */}
           <Tabs aria-label="eCash Chat" style="default">
-              <Tabs.Item active title="Inbox" icon={HiOutlineMail}>
-                  {cashaddr.isValidCashAddress(address, 'ecash') &&
-                      <TxHistory address={address} />
-                  }
-              </Tabs.Item>
+              {isMobile === false && (
+                  <Tabs.Item active title="Inbox" icon={HiOutlineMail}>
+                      {cashaddr.isValidCashAddress(address, 'ecash') &&
+                          <TxHistory address={address} />
+                      }
+                  </Tabs.Item>
+              )}
 
-              <Tabs.Item title="Send Message" icon={HiOutlineNewspaper}>
-                  <div style={{ display: (isLoggedIn ? 'block' : 'none') }}>
-                      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-5 lg:px-8">
-                            <form className="space-y-6" action="#" method="POST">
-                              <div>
-                                <label htmlFor="address" className="block text-sm font-medium leading-6 text-gray-900">
-                                  Address
-                                </label>
-                                <div className="mt-2">
-                                  <Input
-                                    id="address"
-                                    name="address"
-                                    type="text"
-                                    value={recipient}
-                                    required
-                                    onChange={e => handleAddressChange(e)}
-                                  />
-                                </div>
-                                <p className="mt-2 text-sm text-red-600 dark:text-red-500">{recipientError !== false && recipientError}</p>
-                              </div>
-
-                              <div>
-                                <div className="flex items-center justify-between">
-                                  <label htmlFor="message" className="block text-sm font-medium leading-6 text-gray-900">
-                                    Message
-                                  </label>
-                                </div>
-                                <div className="mt-2">
-                                  <Textarea
-                                      id="message"
-                                      rows="4"
-                                      value={message}
-                                      required
-                                      onChange={e => handleMessageChange(e)}
-                                  />
-                                  {/* Emoji picker and tooltip guide for embedding markups */}
-                                  <div className="flex gap-2">
-                                      {/* Emoji Picker */}
-                                      <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}>
-                                        {renderEmojiPicker ? 'Hide Emojis' : 'Show Emojis'}
-                                      </button>
-                                      <div style={{ display: (renderEmojiPicker ? 'block' : 'none') }}>
-                                        <Picker
-                                            data={data}
-                                            onEmojiSelect={(e) => {
-                                                setMessage(String(message).concat(e.native));
-                                            }}
-                                        />
-                                      </div>
-                                      <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
-                                          <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[img]url[/img]')}>
-                                              Embed Image
-                                          </button>
-                                      </Tooltip>
-                                      <Tooltip content="e.g. [yt]5RuYKxKCAOA[/yt]" style="light">
-                                          <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[yt]youtube-video-id[/yt]')}>
-                                              Embed Youtube
-                                          </button>
-                                      </Tooltip>
-                                      <Tooltip content="e.g. [twt]1762780466976002393[/twt]" style="light">
-                                          <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[twt]tweet-id[/twt]')}>
-                                              Embed Tweet
-                                          </button>
-                                      </Tooltip>
+              {isMobile === false && (
+                  <Tabs.Item title="Send Message" icon={HiOutlineNewspaper}>
+                      <div style={{ display: (isLoggedIn ? 'block' : 'none') }}>
+                          <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-5 lg:px-8">
+                                <form className="space-y-6" action="#" method="POST">
+                                  <div>
+                                    <label htmlFor="address" className="block text-sm font-medium leading-6 text-gray-900">
+                                      Address
+                                    </label>
+                                    <div className="mt-2">
+                                      <Input
+                                        id="address"
+                                        name="address"
+                                        type="text"
+                                        value={recipient}
+                                        required
+                                        onChange={e => handleAddressChange(e)}
+                                      />
+                                    </div>
+                                    <p className="mt-2 text-sm text-red-600 dark:text-red-500">{recipientError !== false && recipientError}</p>
                                   </div>
-                                </div>
-                                <br />
-                                <p className="mt-2 text-sm text-red-600 dark:text-red-500">{messageError !== false && messageError}</p>
-                                <label htmlFor="value-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Send XEC amount (optional, 5.5 XEC by default):</label>
-                                <Input
-                                    type="number"
-                                    id="value-input"
-                                    aria-describedby="helper-text-explanation" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                    defaultValue="5.5"
-                                    onChange={e => handleSendAmountChange(e)}
-                                />
-                              </div>
-                              <div>
-                                <button
-                                  type="button"
-                                  disabled={recipientError || messageError || sendAmountXecError}
-                                  className="flex justify-center w-full rounded bg-indigo-500 px-2 py-2 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                  onClick={() => {
-                                      sendMessage();
-                                  }}
-                                >
-                                  Send
-                                </button>
-                              </div>
-                          </form>
-                   </div>
-                </div>
-              </Tabs.Item>
+
+                                  <div>
+                                    <div className="flex items-center justify-between">
+                                      <label htmlFor="message" className="block text-sm font-medium leading-6 text-gray-900">
+                                        Message
+                                      </label>
+                                    </div>
+                                    <div className="mt-2">
+                                      <Textarea
+                                          id="message"
+                                          rows="4"
+                                          value={message}
+                                          required
+                                          onChange={e => handleMessageChange(e)}
+                                      />
+                                      {/* Emoji picker and tooltip guide for embedding markups */}
+                                      <div className="flex gap-2">
+                                          {/* Emoji Picker */}
+                                          <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}>
+                                            {renderEmojiPicker ? 'Hide Emojis' : 'Show Emojis'}
+                                          </button>
+                                          <div style={{ display: (renderEmojiPicker ? 'block' : 'none') }}>
+                                            <Picker
+                                                data={data}
+                                                onEmojiSelect={(e) => {
+                                                    setMessage(String(message).concat(e.native));
+                                                }}
+                                            />
+                                          </div>
+                                          <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
+                                              <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[img]url[/img]')}>
+                                                  Embed Image
+                                              </button>
+                                          </Tooltip>
+                                          <Tooltip content="e.g. [yt]5RuYKxKCAOA[/yt]" style="light">
+                                              <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[yt]youtube-video-id[/yt]')}>
+                                                  Embed Youtube
+                                              </button>
+                                          </Tooltip>
+                                          <Tooltip content="e.g. [twt]1762780466976002393[/twt]" style="light">
+                                              <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[twt]tweet-id[/twt]')}>
+                                                  Embed Tweet
+                                              </button>
+                                          </Tooltip>
+                                      </div>
+                                    </div>
+                                    <br />
+                                    <p className="mt-2 text-sm text-red-600 dark:text-red-500">{messageError !== false && messageError}</p>
+                                    <label htmlFor="value-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Send XEC amount (optional, 5.5 XEC by default):</label>
+                                    <Input
+                                        type="number"
+                                        id="value-input"
+                                        aria-describedby="helper-text-explanation" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        defaultValue="5.5"
+                                        onChange={e => handleSendAmountChange(e)}
+                                    />
+                                  </div>
+                                  <div>
+                                    <button
+                                      type="button"
+                                      disabled={recipientError || messageError || sendAmountXecError}
+                                      className="flex justify-center w-full rounded bg-indigo-500 px-2 py-2 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                      onClick={() => {
+                                          sendMessage();
+                                      }}
+                                    >
+                                      Send
+                                    </button>
+                                  </div>
+                              </form>
+                       </div>
+                    </div>
+                  </Tabs.Item>
+              )}
 
               <Tabs.Item title="Townhall" icon={GiDiscussion}>
-                  <Townhall address={address} />
+                  <Townhall address={address} isMobile={isMobile} />
               </Tabs.Item>
 
               <Tabs.Item title="About" icon={IoMdInformationCircleOutline}>
