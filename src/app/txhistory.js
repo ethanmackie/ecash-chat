@@ -6,7 +6,7 @@ import { ChronikClientNode } from 'chronik-client';
 import cashaddr from 'ecashaddrjs';
 import { isValidRecipient } from '../validation/validation';
 import { Skeleton } from "@/components/ui/skeleton";
-import { AnonAvatar } from "@/components/ui/social";
+import { AnonAvatar, ShareIcon } from "@/components/ui/social";
 import { encodeBip21Message } from '../utils/utils';
 import {
   Pagination,
@@ -210,7 +210,7 @@ export default function TxHistory({ address }) {
                                       <Popover
                                         aria-labelledby="default-popover"
                                         content={
-                                          <div className="w-64 text-sm text-gray-500 dark:text-gray-400">
+                                          <div className="w-50 text-sm text-gray-500 dark:text-gray-400">
                                             <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
                                               <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Tipping Amount</h3>
                                             </div>
@@ -307,7 +307,7 @@ export default function TxHistory({ address }) {
                                        <Popover
                                          aria-labelledby="default-popover"
                                          content={
-                                           <div className="w-64 text-sm text-gray-500 dark:text-gray-400">
+                                           <div className="w-50 text-sm text-gray-500 dark:text-gray-400">
                                              <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
                                                <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Tipping Amount</h3>
                                              </div>
@@ -399,53 +399,69 @@ export default function TxHistory({ address }) {
 
                           {/* Share buttons with other social platforms */}
                           &emsp;
-                          <TwitterShareButton
-                            url={
-                                tx.imageSrc !== false ? tx.imageSrc
-                                    : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
-                                    : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
-                                    : 'https://ecashchat.com'
+                          <Popover
+                            aria-labelledby="default-popover"
+                            content={
+                              <div className="w-30 text-sm text-gray-500 dark:text-gray-400">
+                                <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
+                                  <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Platform</h3>
+                                </div>
+                                <div className="px-3 py-2">
+                                    <TwitterShareButton
+                                      url={
+                                          tx.imageSrc !== false ? tx.imageSrc
+                                              : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                              : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                              : 'https://ecashchat.com'
+                                      }
+                                      title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
+                                    >
+                                      <TwitterIcon size={25} round />
+                                    </TwitterShareButton>
+                                    &nbsp;
+                                    <FacebookShareButton
+                                      url={
+                                          tx.imageSrc !== false ? tx.imageSrc
+                                              : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                              : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                              : 'https://ecashchat.com'
+                                      }
+                                      quote={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
+                                    >
+                                      <FacebookIcon  size={25} round />
+                                    </FacebookShareButton>
+                                    &nbsp;
+                                    <RedditShareButton
+                                      url={
+                                          tx.imageSrc !== false ? tx.imageSrc
+                                              : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                              : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                              : 'https://ecashchat.com'
+                                      }
+                                      title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
+                                    >
+                                      <RedditIcon size={25} round />
+                                    </RedditShareButton>
+                                    &nbsp;
+                                    <TelegramShareButton
+                                      url={
+                                          tx.imageSrc !== false ? tx.imageSrc
+                                              : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                              : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                              : 'https://ecashchat.com'
+                                      }
+                                      title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
+                                    >
+                                      <TelegramIcon  size={25} round />
+                                    </TelegramShareButton>
+                                </div>
+                              </div>
                             }
-                            title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
                           >
-                            <TwitterIcon size={25} round />
-                          </TwitterShareButton>
-                          &nbsp;
-                          <FacebookShareButton
-                            url={
-                                tx.imageSrc !== false ? tx.imageSrc
-                                    : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
-                                    : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
-                                    : 'https://ecashchat.com'
-                            }
-                            quote={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
-                          >
-                            <FacebookIcon  size={25} round />
-                          </FacebookShareButton>
-                          &nbsp;
-                          <RedditShareButton
-                            url={
-                                tx.imageSrc !== false ? tx.imageSrc
-                                    : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
-                                    : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
-                                    : 'https://ecashchat.com'
-                            }
-                            title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
-                          >
-                            <RedditIcon size={25} round />
-                          </RedditShareButton>
-                          &nbsp;
-                          <TelegramShareButton
-                            url={
-                                tx.imageSrc !== false ? tx.imageSrc
-                                    : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
-                                    : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
-                                    : 'https://ecashchat.com'
-                            }
-                            title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
-                          >
-                            <TelegramIcon  size={25} round />
-                          </TelegramShareButton>
+                            <button type="button">
+                                <ShareIcon />
+                            </button>
+                          </Popover>
                       </span>
                      </div>
                     </div>
