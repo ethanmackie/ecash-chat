@@ -572,16 +572,16 @@ export default function Home() {
                       <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Embedding media:</h2>
                       <ul className="space-y-1 list-disc list-inside">
                           <li>
-                              <b>Images</b>: Click the "Embed Image" button which will insert the [img]url[/img] tag into<br />
-                              the message. Replace the url with the url of the image you're embedding.
+                              <b>Images</b>: Click the &quot;Embed Image&quot; button which will insert the [img]url[/img] tag into<br />
+                              the message. Replace the url with the url of the image you&apos;re embedding.
                           </li>
                           <li>
-                              <b>Videos</b>: Click the "Embed Youtube" button which will insert the [yt]youtube-video-id[/yt]<br />
-                              tag into the message. Replace the youtube-video-id between "watch?v=" and the "&" symbol.<br />
+                              <b>Videos</b>: Click the &quot;Embed Youtube&quot; button which will insert the [yt]youtube-video-id[/yt]<br />
+                              tag into the message. Replace the youtube-video-id between &quot;watch?v=&quot; and the &quot;&&quot; symbol.<br />
                               <img src="/embed-youtube.png"/>
                           </li>
                           <li>
-                              <b>Tweets</b>: Click the "Embed Tweet" button which will insert the [twt]tweet-id[/twt] tag into<br />
+                              <b>Tweets</b>: Click the &quot;Embed Tweet&quot; button which will insert the [twt]tweet-id[/twt] tag into<br />
                               the message. Replace the tweet-id with the id of the tweet.<br />
                               <img src="/embed-tweet.png"/>
                           </li>
