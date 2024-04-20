@@ -180,7 +180,7 @@ export default function TxHistory({ address }) {
                    (tx, index) => (
                      <>
                      <div className="flex items-start gap-2.5" key={"txHistory"+index}>
-                        <div className="flex flex-col w-full max-w-[550px] leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700">
+                        <div className="flex flex-col w-full max-w-[550px] leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700 shadow-2xl transition-transform transform hover:scale-110">
 
                         <div className="flex items-center">
                            <span className="text-sm font-bold text-gray-500 dark:text-gray-400">From: </span>
@@ -401,6 +401,7 @@ export default function TxHistory({ address }) {
                           &emsp;
                           <Popover
                             aria-labelledby="default-popover"
+                            placement="top"
                             content={
                               <div className="w-30 text-sm text-gray-500 dark:text-gray-400">
                                 <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
