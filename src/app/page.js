@@ -601,7 +601,6 @@ export default function Home() {
 
               <Tabs.Item title="Settings" icon={GiAbstract010}>
                   <div className="flex w-72 flex-col py-3">
-                      Version: {process.env.version}<br /><br />
 
                       <button
                         type="button"
