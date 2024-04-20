@@ -500,7 +500,7 @@ export default function Home() {
                                   <div>
                                     <button
                                       type="button"
-                                      disabled={recipientError || messageError || sendAmountXecError}
+                                      disabled={recipientError || messageError || sendAmountXecError || recipient === ''}
                                       className="flex justify-center w-full rounded bg-indigo-500 px-2 py-2 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                       onClick={() => {
                                           sendMessage();
@@ -572,17 +572,17 @@ export default function Home() {
                       <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Embedding media:</h2>
                       <ul className="space-y-1 list-disc list-inside">
                           <li>
-                              <b>Images</b>: Click the &quot;Embed Image&quot; button which will insert the [img]url[/img] tag into<br />
-                              the message. Replace the url with the url of the image you&apos;re embedding.
+                              <b>Images</b>: Click "Embed Image" to insert the [img]url[/img] tag.<br />
+                              Replace the url with the url of the image you're embedding.
                           </li>
                           <li>
-                              <b>Videos</b>: Click the &quot;Embed Youtube&quot; button which will insert the [yt]youtube-video-id[/yt]<br />
-                              tag into the message. Replace the youtube-video-id between &quot;watch?v=&quot; and the &quot;&&quot; symbol.<br />
+                              <b>Videos</b>: Click "Embed Youtube" to insert the [yt]youtube-video-id[/yt] tag.<br />
+                              Replace the youtube-video-id between "watch?v=" and the "&" symbol.<br />
                               <img src="/embed-youtube.png"/>
                           </li>
                           <li>
-                              <b>Tweets</b>: Click the &quot;Embed Tweet&quot; button which will insert the [twt]tweet-id[/twt] tag into<br />
-                              the message. Replace the tweet-id with the id of the tweet.<br />
+                              <b>Tweets</b>: Click "Embed Tweet" to insert the [twt]tweet-id[/twt] tag.<br />
+                              Replace the tweet-id with the id of the tweet.<br />
                               <img src="/embed-tweet.png"/>
                           </li>
                       </ul>

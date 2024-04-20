@@ -200,6 +200,7 @@ export default function TownHall({ address, isMobile }) {
                       </div><br />
                       <button
                         type="button"
+                        disabled={post === '' || postError}
                         className="flex w-full justify-center rounded bg-indigo-500 px-2 py-2 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                         onClick={() => { sendPost() }}
                       >
