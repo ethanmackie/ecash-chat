@@ -553,6 +553,40 @@ export default function Home() {
                           </li>
                       </ul>
                       <br />
+                      <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">User guide:</h2>
+                      <ul className="space-y-1 list-disc list-inside">
+                          <li>
+                              <b>Inbox</b>: a direct wallet to wallet messaging history.
+                          </li>
+                          <li>
+                              <b>Send Message</b>: send public messages to another wallet
+                          </li>
+                          <li>
+                              <b>Townhall</b>: public onchain discussion forum
+                          </li>
+                          <li>
+                              <b>Settings</b>: logout and profile configuration
+                          </li>
+                      </ul>
+                      <br />
+                      <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Embedding media:</h2>
+                      <ul className="space-y-1 list-disc list-inside">
+                          <li>
+                              <b>Images</b>: Click the "Embed Image" button which will insert the [img]url[/img] tag into<br />
+                              the message. Replace the url with the url of the image you're embedding.
+                          </li>
+                          <li>
+                              <b>Videos</b>: Click the "Embed Youtube" button which will insert the [yt]youtube-video-id[/yt]<br />
+                              tag into the message. Replace the youtube-video-id between "watch?v=" and the "&" symbol.<br />
+                              <img src="/embed-youtube.png"/>
+                          </li>
+                          <li>
+                              <b>Tweets</b>: Click the "Embed Tweet" button which will insert the [twt]tweet-id[/twt] tag into<br />
+                              the message. Replace the tweet-id with the id of the tweet.<br />
+                              <img src="/embed-tweet.png"/>
+                          </li>
+                      </ul>
+                      <br />
                       <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Support:</h2>
                       <ul className="space-y-1 list-disc list-inside">
                           <li>
