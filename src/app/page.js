@@ -523,7 +523,7 @@ export default function Home() {
                   <div className="flex flex-col justify-center py-3">
                       <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">What is eCash Chat?</h2>
                       eCash Chat is an on-chain messaging platform on the eCash blockchain.
-                      <br />It filters for specific messaging transactions to facilitate a seamless social experience.
+                      <br />It filters for specific messaging transactions for a seamless social experience.
                       <br /><br />
                       <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Key features:</h2>
                       <ul className="space-y-1 list-disc list-inside">
@@ -600,12 +600,8 @@ export default function Home() {
               </Tabs.Item>
 
               <Tabs.Item title="Settings" icon={GiAbstract010}>
-                  <div className="flex w-72 flex-col py-5">
-                      {typeof process.env.REACT_APP_VERSION === 'string' && (
-                          <>
-                              v{process.env.REACT_APP_VERSION}<br /><br />
-                          </>
-                      )}
+                  <div className="flex w-72 flex-col py-3">
+                      Version: {process.env.version}<br /><br />
 
                       <button
                         type="button"
