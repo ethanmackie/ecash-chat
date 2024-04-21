@@ -7,7 +7,14 @@ import { ChronikClientNode } from 'chronik-client';
 import cashaddr from 'ecashaddrjs';
 import { isValidRecipient, isValidMessage } from '../validation/validation';
 import { Skeleton } from "@/components/ui/skeleton";
-import { AnonAvatar, ShareIcon, ReplyIcon } from "@/components/ui/social";
+import {
+    AnonAvatar,
+    ShareIcon,
+    ReplyIcon,
+    SearchIcon,
+    ResetIcon,
+    ExportIcon,
+} from "@/components/ui/social";
 import { encodeBip21Message } from '../utils/utils';
 import {
   Pagination,
@@ -556,12 +563,12 @@ export default function TxHistory({ address }) {
                  <button
                    type="button"
                    disabled={addressToSearchError}
-                   className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                   className="rounded bg-indigo-500 px-3 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                    onClick={e => {
                        getTxHistoryByAddress(e);
                    }}
                  >
-                   Search
+                   <div className="flex"><SearchIcon/>&nbsp;Search</div>
                  </button>
                  &nbsp;
                  <button
@@ -570,10 +577,9 @@ export default function TxHistory({ address }) {
                    onClick={() => {
                        setTxHistoryByAddress('');
                        setAddressToSearch('');
-                       getTxHistoryByPage(0);
                    }}
                  >
-                   Reset
+                   <div className="flex"><ResetIcon/>&nbsp;Reset</div>
                  </button>
                  &nbsp;
                  <button
@@ -581,7 +587,7 @@ export default function TxHistory({ address }) {
                      className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                      onClick={() => exportMessageHistory()}
                  >
-                   Export Message History
+                   <div className="flex"><ExportIcon/>&nbsp;Export message history</div>
                  </button>
               </div>
              </form>

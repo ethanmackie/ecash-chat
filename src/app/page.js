@@ -27,7 +27,13 @@ import { PiHandCoins } from "react-icons/pi";
 import { GiDiscussion, GiAbstract010 } from "react-icons/gi";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { EmojiIcon } from "@/components/ui/social";
+import {
+    EmojiIcon,
+    SendIcon,
+    LogoutIcon,
+    ImageIcon,
+    AliasIcon,
+} from "@/components/ui/social";
 import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
 const chronik = new ChronikClientNode(chronikConfig.urls);
@@ -512,7 +518,7 @@ export default function Home() {
                                           sendMessage();
                                       }}
                                     >
-                                      Send
+                                        <div className="flex"><SendIcon/>&nbsp;Send Message</div>
                                     </button>
                                   </div>
                               </form>
@@ -610,28 +616,28 @@ export default function Home() {
               </Tabs.Item>
 
               <Tabs.Item title="Settings" icon={GiAbstract010}>
-                  <div className="flex w-72 flex-col py-3">
+                  <div className="flex w-80 flex-col py-3">
                       <Alert color="info">Version: 0.3.0</Alert><br />
                       <button
                         type="button"
-                        className="rounded bg-indigo-500 px-2 py-3 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                        className="rounded bg-indigo-500 px-3 py-3 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                         onClick={() => setIsLoggedIn(false)}
                       >
-                          Log Out
+                          <div className="flex"><LogoutIcon/>&nbsp;Log Out</div>
                       </button>
                       <br />
                       <button
                         type="button"
-                        className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                        className="rounded bg-indigo-500 px-3 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                       >
-                        Set NFT Profile (Coming soon)
+                        <div className="flex"><ImageIcon/>&nbsp;Set NFT Profile (Coming soon)</div>
                       </button>
                       <br />
                       <button
                         type="button"
-                        className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                        className="rounded bg-indigo-500 px-3 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                       >
-                        Link eCash Alias (Coming soon)
+                        <div className="flex"><AliasIcon/>&nbsp;Link eCash Alias (Coming soon)</div>
                       </button>
                   </div>
               </Tabs.Item>

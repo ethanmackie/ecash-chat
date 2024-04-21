@@ -5,7 +5,7 @@ import { Textarea, Tooltip, Avatar, Popover, Accordion, Alert } from "flowbite-r
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import { isValidPost, isValidReplyPost } from '../validation/validation';
 import { Button } from "@/components/ui/button";
-import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon } from "@/components/ui/social";
+import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon } from "@/components/ui/social";
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
@@ -235,7 +235,7 @@ export default function TownHall({ address, isMobile }) {
                         className="flex w-full justify-center rounded bg-indigo-500 px-2 py-2 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                         onClick={() => { sendPost() }}
                       >
-                        Post
+                          <div className="flex"><PostIcon/>&nbsp;Post to Townhall</div>
                       </button>
                 </div>
               <br />
