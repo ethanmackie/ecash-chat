@@ -23,7 +23,7 @@ import {
     TelegramIcon,
 } from 'next-share';
 import { encodeBip21Message, encodeBip21Post, encodeBip21ReplyPost } from '../utils/utils';
-import { getTxHistory, getReplyTxDetails, parseChronikTx } from '../chronik/chronik';
+import { getTxHistory, getReplyTxDetails, parseChronikTx, txListener } from '../chronik/chronik';
 import copy from 'copy-to-clipboard';
 import { toast } from 'react-toastify';
 import { chronik as chronikConfig } from '../config/chronik';
@@ -52,10 +52,9 @@ export default function TownHall({ address, isMobile }) {
      * @returns callback function to cleanup interval
      */
     const initializeTownHallRefresh = async () => {
-        const townhallRefreshInterval = 30000;
         const intervalId = setInterval(async function () {
             await getTownhallHistoryByPage(0);
-        }, townhallRefreshInterval);
+        }, appConfig.historyRefreshInterval);
         // Clear the interval when page unmounts
         return () => clearInterval(intervalId);
     };
@@ -125,6 +124,7 @@ export default function TownHall({ address, isMobile }) {
             '*',
         );
         setPost('');
+        txListener(chronik, address, "Townhall post sent");
     };
 
     // Pass a reply post tx BIP21 query string to cashtab extensions
@@ -150,6 +150,7 @@ export default function TownHall({ address, isMobile }) {
             },
             '*',
         );
+        txListener(chronik, address, "Townhall reply sent");
     };
 
     // Pass a XEC tip tx BIP21 query string to cashtab extensions
@@ -175,6 +176,8 @@ export default function TownHall({ address, isMobile }) {
             },
             '*',
         );
+
+        txListener(chronik, address, "Townhall XEC tip sent");
     };
 
     return (

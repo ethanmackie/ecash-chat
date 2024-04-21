@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { appConfig } from '../config/app';
-import { getTxHistory } from '../chronik/chronik';
+import { getTxHistory, txListener } from '../chronik/chronik';
 import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
 import cashaddr from 'ecashaddrjs';
@@ -84,10 +84,9 @@ export default function TxHistory({ address }) {
      * @returns callback function to cleanup interval
      */
     const initializeHistoryRefresh = async () => {
-        const historyRefreshInterval = 30000;
         const intervalId = setInterval(async function () {
             await getTxHistoryByPage(0);
-        }, historyRefreshInterval);
+        }, appConfig.historyRefreshInterval);
         // Clear the interval when page unmounts
         return () => clearInterval(intervalId);
     };
@@ -139,6 +138,8 @@ export default function TxHistory({ address }) {
             },
             '*',
         );
+
+        txListener(chronik, address, "XEC tip");
     };
 
     // Exports the message history of this wallet.

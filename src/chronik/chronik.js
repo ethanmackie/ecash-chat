@@ -6,6 +6,46 @@ import { appConfig } from '../config/app';
 import { formatDate, toXec } from '../utils/utils';
 import { getStackArray } from 'ecash-script';
 import { BN } from 'slp-mdm';
+import { toast } from 'react-toastify';
+
+/**
+ * Subscribes to a given address and listens for new websocket events
+ *
+ * @param {string} chronik the chronik-client instance
+ * @param {string} address the eCash address of the active wallet
+ * @param {string} txType the descriptor of the nature of this tx
+ * @throws {error} err chronik websocket subscription errors
+ */
+export const txListener = async (chronik, address, txType) => {
+    // Get type and hash
+    const { type, hash } = cashaddr.decode(address, true);
+
+    try {
+        const ws = chronik.ws({
+            onMessage: msg => {
+                if (msg.msgType === 'TX_ADDED_TO_MEMPOOL') {
+
+                    // Notify user
+                    toast(`${txType} sent`);
+
+                    // Unsubscribe and close websocket
+                    ws.unsubscribeFromScript(type, hash);
+                    ws.close();
+                }
+            },
+        });
+
+        // Wait for WS to be connected:
+        await ws.waitForOpen();
+
+        // Subscript to script
+        ws.subscribeToScript(type, hash);
+    } catch (err) {
+        console.log(
+            'txListener: Error in chronik websocket subscription: ' + err,
+        );
+    }
+};
 
 // Retrieves the utxos for an address and calculates the balance
 export const getBalance = async (chronik, address) => {

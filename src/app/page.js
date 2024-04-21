@@ -8,7 +8,7 @@ import Script from 'next/script';
 import { queryAliasServer } from '../alias/alias-server';
 import { encodeBip21Message } from '../utils/utils';
 import { isMobileDevice } from '../utils/mobileCheck';
-import { getBalance } from '../chronik/chronik';
+import { getBalance, txListener } from '../chronik/chronik';
 import { appConfig } from '../config/app';
 import { isValidRecipient, isValidMessage } from '../validation/validation';
 import { opReturn as opreturnConfig } from '../config/opreturn';
@@ -218,6 +218,7 @@ export default function Home() {
         );
         setRecipient('');
         setMessage('');
+        txListener(chronik, address, "Message");
     };
 
     const CreditCardHeader = () => {
@@ -621,7 +622,10 @@ export default function Home() {
                       <button
                         type="button"
                         className="rounded bg-indigo-500 px-3 py-3 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                        onClick={() => setIsLoggedIn(false)}
+                        onClick={() => {
+                            setIsLoggedIn(false)
+                            toast(`Logged out of ${address}`)
+                        }}
                       >
                           <div className="flex"><LogoutIcon/>&nbsp;Log Out</div>
                       </button>
