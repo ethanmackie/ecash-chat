@@ -27,6 +27,7 @@ import { PiHandCoins } from "react-icons/pi";
 import { GiDiscussion, GiAbstract010 } from "react-icons/gi";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { EmojiIcon } from "@/components/ui/social";
 import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
 const chronik = new ChronikClientNode(chronikConfig.urls);
@@ -459,7 +460,7 @@ export default function Home() {
                                       <div className="flex gap-2">
                                           {/* Emoji Picker */}
                                           <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}>
-                                            {renderEmojiPicker ? 'Hide Emojis' : 'Show Emojis'}
+                                              <EmojiIcon />
                                           </button>
                                           <div style={{ display: (renderEmojiPicker ? 'block' : 'none') }}>
                                             <Picker
@@ -469,6 +470,11 @@ export default function Home() {
                                                 }}
                                             />
                                           </div>
+                                          <Tooltip content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]" style="light">
+                                              <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[url]https://www...[/url]')}>
+                                                  Embed Url
+                                              </button>
+                                          </Tooltip>
                                           <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
                                               <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[img]url[/img]')}>
                                                   Embed Image
@@ -572,6 +578,10 @@ export default function Home() {
                       <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Embedding media:</h2>
                       <ul className="space-y-1 list-disc list-inside">
                           <li>
+                              <b>Urls</b>: Click "Embed Url" to insert the [url]https://www..[/url] tag.<br />
+                              Replace the hyperlink with the url you're embedding.
+                          </li>
+                          <li>
                               <b>Images</b>: Click "Embed Image" to insert the [img]url[/img] tag.<br />
                               Replace the url with the url of the image you're embedding.
                           </li>
@@ -601,7 +611,7 @@ export default function Home() {
 
               <Tabs.Item title="Settings" icon={GiAbstract010}>
                   <div className="flex w-72 flex-col py-3">
-                      <Alert color="info">Version: 0.0.3</Alert><br />
+                      <Alert color="info">Version: 0.3.0</Alert><br />
                       <button
                         type="button"
                         className="rounded bg-indigo-500 px-2 py-3 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"

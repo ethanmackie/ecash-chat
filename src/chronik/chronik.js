@@ -86,7 +86,20 @@ export const parseMediaTags = (opReturn) => {
     let updatedImageSrc = false;
     let updatedVideoId = false;
     let updatedTweetId = false;
+    let updatedUrl = false
     let updatedOpReturn = opReturn;
+
+    // Parse for any url tags in the message
+    if (
+        opReturn.includes('[url]') &&
+        opReturn.includes('[/url]')
+    ) {
+        updatedUrl = opReturn.substring(
+            opReturn.indexOf('[url]') + 5,
+            opReturn.lastIndexOf('[/url]')
+        );
+        updatedOpReturn = opReturn.replace(`[url]${updatedUrl}[/url]`,' ');
+    }
 
     // Parse for any image tags in the message
     if (
@@ -129,6 +142,7 @@ export const parseMediaTags = (opReturn) => {
         updatedImageSrc: updatedImageSrc,
         updatedVideoId: updatedVideoId,
         updatedTweetId: updatedTweetId,
+        updatedUrl: updatedUrl,
     }
 };
 
@@ -163,6 +177,7 @@ export const parseChronikTx = (tx, address) => {
     let videoId = false;
     let tweetId = false;
     let replyTxid = false;
+    let url = false;
 
     if (tx.isCoinbase) {
         // Note that coinbase inputs have `undefined` for `thisInput.outputScript`
@@ -451,11 +466,13 @@ export const parseChronikTx = (tx, address) => {
         updatedImageSrc,
         updatedVideoId,
         updatedTweetId,
+        updatedUrl,
     } = parseMediaTags(opReturnMessage);
     opReturnMessage = updatedOpReturn;
     imageSrc = updatedImageSrc;
     videoId = updatedVideoId;
     tweetId = updatedTweetId;
+    url = updatedUrl;
 
     // Parse the tx's date and time
     let txDate, txTime;
@@ -505,6 +522,7 @@ export const parseChronikTx = (tx, address) => {
             txTime,
             tweetId,
             replyTxid,
+            url,
         };
     }
     // Otherwise do not include these fields
@@ -529,5 +547,6 @@ export const parseChronikTx = (tx, address) => {
         txTime,
         tweetId,
         replyTxid,
+        url,
     };
 };

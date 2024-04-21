@@ -58,6 +58,7 @@ export const mockParsedXecSendTxWithOpReturnTweet = {
     "aliasFlag": false,
     "imageSrc": false,
     "videoId": false,
+    "url": false,
     "txDate": "27 Mar 2024",
     "txTime": "23:36:40",
     "tweetId": "1766304430423515170"
@@ -119,6 +120,7 @@ export const mockParsedXecSendTxWithOpReturnEmoji = {
     "imageSrc": false,
     "videoId": false,
     "tweetId": false,
+    "url": false,
     "txid": "68f55677b4fcacff6a47a78976aa11238dab1f323e002416b26f3335cb387ee2",
     "txDate": "Mar 26, 2024",
     "txTime": "12:08:18 pm"
@@ -179,6 +181,7 @@ export const mockParsedXecSendTxWithOpReturnVideo = {
     "aliasFlag": false,
     "imageSrc": false,
     "tweetId": false,
+    "url": false,
     "txid": "11be4139a5e76835708aa8495b4fab9db906c15bf6dea07fb63b1f223a97b2e1",
     "videoId": "5RuYKxKCAOA",
     "txDate": "Mar 26, 2024",
@@ -242,6 +245,7 @@ export const mockParsedXecSendTxWithOpReturnImage = {
     "imageSrc": "https://i.imgur.com/tIqtdgJ.jpeg",
     "videoId": false,
     "tweetId": false,
+    "url": false,
     "txDate": "Mar 26, 2024",
     "txTime": "12:04:00 pm"
 };
@@ -302,6 +306,7 @@ export const mockParsedXecSendTxWithOpReturn = {
     "imageSrc": false,
     "videoId": false,
     "tweetId": false,
+    "url": false,
     "txid": "e78a0053cc4914c5b114f8d45b08afb738bca2acfc6644fefc262f043eb03cb2",
     "txDate": "Mar 26, 2024",
     "txTime": "12:01:49 pm"
@@ -367,6 +372,7 @@ export const mockParsedXecSendTxWithOpReturnTownhallPost = {
     "aliasFlag": false,
     "imageSrc": false,
     "videoId": false,
+    "url": false,
     "txid": "748e17c310772beacca8341d143e730b7c82de336e370c272c362618cc0db0c2",
     "txDate": "Apr 4, 2024",
     "txTime": "2:20:04 pm",
@@ -436,5 +442,6 @@ export const mockParsedXecSendTxWithOpReturnTownhallReplyPost = {
     "txDate": "5 Apr 2024",
     "txTime": "15:29:46",
     "tweetId": false,
+    "url": false,
     "replyTxid": "0729318a128ee8f11d18b28237c8ae7ffa4e95c88ec69ebce716758e1973c5d4"
 };

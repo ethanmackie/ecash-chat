@@ -410,6 +410,7 @@ export default function TxHistory({ address }) {
                         {tx.imageSrc !== false && (<img src={tx.imageSrc} />)}
                         {tx.videoId !== false && (<LiteYouTubeEmbed id={tx.videoId} />)}
                         {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
+                        {tx.url !== false && (<Alert color="info"><a href={tx.url} target="_blank" >{tx.url}</a></Alert>)}
 
                         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
                             {tx.isCashtabMessage ? 'Cashtab Message' :
