@@ -1,7 +1,7 @@
 "use client";
 import  React, { useState, useEffect } from 'react';
 import { appConfig } from '../config/app';
-import { Label, Textarea, Tooltip, Avatar, Popover, Accordion, Alert } from "flowbite-react";
+import { Textarea, Tooltip, Avatar, Popover, Accordion, Alert } from "flowbite-react";
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import { isValidPost, isValidReplyPost } from '../validation/validation';
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,6 @@ export default function TownHall({ address, isMobile }) {
     const [replyPostError, setReplyPostError] = useState(false);
     const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
     const [loadingMsg, setLoadingMsg] = useState('');
-    const [replyContent, setReplyContent] = useState('');
 
     useEffect(() => {
         // Render the first page by default upon initial load
