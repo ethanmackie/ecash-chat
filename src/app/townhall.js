@@ -134,7 +134,10 @@ export default function TownHall({ address, isMobile }) {
         const bip21Str = `${appConfig.townhallAddress}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`;
 
         if (isMobile) {
-            window.location.href = `https://cashtab.com/#/send?bip21=${bip21Str}`;
+            window.open(
+                `https://cashtab.com/#/send?bip21=${bip21Str}`,
+                '_blank',
+            );
         }
 
         window.postMessage(
@@ -153,6 +156,14 @@ export default function TownHall({ address, isMobile }) {
     const sendXecTip = (recipient, tipAmount) => {
         // Encode the op_return message script
         const opReturnRaw = encodeBip21Message(`XEC tip from ${address}`);
+        const bip21Str = `${recipient}?amount=${tipAmount}&op_return_raw=${opReturnRaw}`;
+
+        if (isMobile) {
+            window.open(
+                `https://cashtab.com/#/send?bip21=${bip21Str}`,
+                '_blank',
+            );
+        }
 
         window.postMessage(
             {
@@ -299,7 +310,7 @@ export default function TownHall({ address, isMobile }) {
                                                     </div>
                                                     {/* Tip XEC options */}
                                                     &nbsp;
-                                                    {isMobile === false && (
+
                                                         <Popover
                                                           aria-labelledby="default-popover"
                                                           content={
@@ -368,7 +379,7 @@ export default function TownHall({ address, isMobile }) {
                                                                 Tip XEC
                                                             </button>
                                                           </Popover>
-                                                      )}
+
                                                  </div>
                                              </span>
                                            </>)
