@@ -374,8 +374,6 @@ export default function TownHall({ address, isMobile }) {
                                            </>)
                                          }
                                       </span>
-                                      {/* Date and timestamp */}
-                                      &emsp;{tx.txDate}&nbsp;at&nbsp;{tx.txTime}
                                    </div>
                                    {/* If this post was a reply to another */}
                                    {tx.replyTxid !== false && (
@@ -394,6 +392,11 @@ export default function TownHall({ address, isMobile }) {
                                    {tx.videoId !== false && (<LiteYouTubeEmbed id={tx.videoId} />)}
                                    {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
                                    {tx.url !== false && (<Alert color="info"><a href={tx.url} target="_blank" >{tx.url}</a></Alert>)}
+
+                                   {/* Date and timestamp */}
+                                   <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                                      &emsp;{tx.txDate}&nbsp;at&nbsp;{tx.txTime}
+                                   </span>
 
                                    {/* Reply action to a townhall post */}
                                    <div>

@@ -422,7 +422,7 @@ export default function TxHistory({ address }) {
                             {/* Date and timestamp */}
                             &nbsp;|&nbsp;{tx.txDate}&nbsp;at&nbsp;{tx.txTime}
 
-                            <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{tx.xecAmount} XEC</span>
+                            &nbsp;|&nbsp;{tx.xecAmount} XEC
                         </span>
 
                         <div>
