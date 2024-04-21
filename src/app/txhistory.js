@@ -17,7 +17,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Popover, Avatar, Badge, Textarea } from "flowbite-react";
+import { Popover, Avatar, Badge, Textarea, Alert } from "flowbite-react";
 import { Tweet } from 'react-tweet';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
@@ -49,6 +49,7 @@ export default function TxHistory({ address }) {
         (async () => {
             await getTxHistoryByPage(0);
         })();
+        initializeHistoryRefresh();
     }, []);
 
     // Filters txHistory for txs where the address matches either the sender or receiver outputs
@@ -69,6 +70,19 @@ export default function TxHistory({ address }) {
             }
             setTxHistoryByAddress(filteredTxHistory);
         }
+    };
+
+    /**
+     * Set an interval to trigger regular history refresh
+     * @returns callback function to cleanup interval
+     */
+    const initializeHistoryRefresh = async () => {
+        const historyRefreshInterval = 30000;
+        const intervalId = setInterval(async function () {
+            await getTxHistoryByPage(0);
+        }, historyRefreshInterval);
+        // Clear the interval when page unmounts
+        return () => clearInterval(intervalId);
     };
 
     // Retrieves the tx history specific to OP_RETURN messages
@@ -191,7 +205,11 @@ export default function TxHistory({ address }) {
                                   <div className="flex items-center gap-4">
                                       <AnonAvatar/>
                                       <div className="font-medium dark:text-white">
-                                          <div>This Wallet</div>
+                                          <div onClick={() => {
+                                              copy(tx.replyAddress);
+                                              toast(`${tx.replyAddress} copied to clipboard`);
+                                          }}
+                                          >This Wallet</div>
                                       </div>
                                   </div>
                                   </>
@@ -287,7 +305,12 @@ export default function TxHistory({ address }) {
                                     <>
                                         <div className="flex items-center gap-4">
                                             <AnonAvatar/>
-                                            <div className="font-medium dark:text-white">
+                                            <div className="font-medium dark:text-white"
+                                                onClick={() => {
+                                                   copy(tx.recipientAddress);
+                                                   toast(`${tx.recipientAddress} copied to clipboard`);
+                                                }}
+                                            >
                                                 <div>This Wallet</div>
                                             </div>
                                         </div>
@@ -387,7 +410,6 @@ export default function TxHistory({ address }) {
                         {tx.imageSrc !== false && (<img src={tx.imageSrc} />)}
                         {tx.videoId !== false && (<LiteYouTubeEmbed id={tx.videoId} />)}
                         {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
-                        <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{tx.xecAmount} XEC</span>
 
                         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
                             {tx.isCashtabMessage ? 'Cashtab Message' :
@@ -398,6 +420,8 @@ export default function TxHistory({ address }) {
 
                             {/* Date and timestamp */}
                             &nbsp;|&nbsp;{tx.txDate}&nbsp;at&nbsp;{tx.txTime}
+
+                            <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{tx.xecAmount} XEC</span>
                         </span>
 
                         <div>
@@ -507,7 +531,7 @@ export default function TxHistory({ address }) {
                </nav>
                </span>
 
-             {loadingMsg}
+             {loadingMsg !== '' && (<Alert color="info">{loadingMsg}</Alert>)}
              <br />
              <form className="space-y-6" action="#" method="POST">
                <div>

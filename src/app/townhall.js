@@ -9,6 +9,7 @@ import { AnonAvatar, ShareIcon, ReplyIcon } from "@/components/ui/social";
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
+import { HiInformationCircle } from "react-icons/hi";
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
 import {
@@ -41,12 +42,26 @@ export default function TownHall({ address, isMobile }) {
     useEffect(() => {
         // Render the first page by default upon initial load
         (async () => {
-            await getTxHistoryByPage(0);
+            await getTownhallHistoryByPage(0);
         })();
+        initializeTownHallRefresh();
     }, []);
 
+    /**
+     * Set an interval to trigger regular townhall refresh
+     * @returns callback function to cleanup interval
+     */
+    const initializeTownHallRefresh = async () => {
+        const townhallRefreshInterval = 30000;
+        const intervalId = setInterval(async function () {
+            await getTownhallHistoryByPage(0);
+        }, townhallRefreshInterval);
+        // Clear the interval when page unmounts
+        return () => clearInterval(intervalId);
+    };
+
     // Retrieves the post history
-    const getTxHistoryByPage = async (page) => {
+    const getTownhallHistoryByPage = async (page) => {
         if (
             typeof page !== "number" ||
             chronik === undefined
@@ -153,7 +168,7 @@ export default function TownHall({ address, isMobile }) {
 
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center py-5 lg:px-8">
-            {isMobile && (<Alert color="info">Limited functionality mode</Alert>)}
+            {isMobile && (<Alert color="failure" icon={HiInformationCircle}>Limited functionality mode</Alert>)}
             {isMobile === false && (
               <>
                 <div>
@@ -166,6 +181,7 @@ export default function TownHall({ address, isMobile }) {
                           onChange={e => handlePostChange(e)}
                           rows={4}
                       />
+                      <p className="mt-2 text-sm text-red-600 dark:text-red-500">{postError !== false && postError}</p>
 
                       {/* Emoji picker and tooltip guide for embedding markups */}
                       <div className="flex gap-2">
@@ -210,7 +226,7 @@ export default function TownHall({ address, isMobile }) {
             </>
             )}
             <hr /><br />
-            {loadingMsg}
+            {loadingMsg !== '' && (<Alert color="info">{loadingMsg}</Alert>)}
 
             {/* Townhall Post History */}
             <div>
@@ -230,7 +246,11 @@ export default function TownHall({ address, isMobile }) {
                                          <div className="flex items-center gap-4">
                                              <AnonAvatar/>
                                              <div className="font-medium dark:text-white">
-                                                 <div>This Wallet</div>
+                                                 <div onClick={() => {
+                                                     copy(tx.replyAddress);
+                                                     toast(`${tx.replyAddress} copied to clipboard`);
+                                                 }}
+                                                 >This Wallet</div>
                                              </div>
                                          </div>
                                          </>
@@ -366,8 +386,10 @@ export default function TownHall({ address, isMobile }) {
                                                  onChange={e => handleReplyPostChange(e)}
                                                  rows={2}
                                              />
+                                             <p className="mt-2 text-sm text-red-600 dark:text-red-500">{replyPostError !== false && replyPostError}</p>
                                              <button
                                                type="button"
+                                               disabled={replyPostError || replyPost === ''}
                                                className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                onClick={e => {
                                                    replytoPost(tx.txid, replyPost)

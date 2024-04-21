@@ -353,7 +353,7 @@ export default function Home() {
                 <Alert color="info">
                     <p><b>Mobile device detected </b></p>
                     <p>Please note eCash Chat is optimized for desktop browsers as it is integrated with Cashtab Extensions.</p><br />
-                    <p>Mobile users can access a read-only view of the public townhall with limited functionality.</p>
+                    <p>Mobile users can access the public townhall with limited functionality.</p>
                 </Alert>
                 <form className="space-y-6" action="#" method="POST">
                     <div>
@@ -601,7 +601,7 @@ export default function Home() {
 
               <Tabs.Item title="Settings" icon={GiAbstract010}>
                   <div className="flex w-72 flex-col py-3">
-
+                      <Alert color="info">Version: 0.0.3</Alert><br />
                       <button
                         type="button"
                         className="rounded bg-indigo-500 px-2 py-3 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
