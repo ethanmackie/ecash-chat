@@ -124,7 +124,7 @@ export default function TownHall({ address, isMobile }) {
             '*',
         );
         setPost('');
-        txListener(chronik, address, "Townhall post sent");
+        txListener(chronik, address, "Townhall post sent", getTownhallHistoryByPage);
     };
 
     // Pass a reply post tx BIP21 query string to cashtab extensions
@@ -150,7 +150,7 @@ export default function TownHall({ address, isMobile }) {
             },
             '*',
         );
-        txListener(chronik, address, "Townhall reply sent");
+        txListener(chronik, address, "Townhall reply sent", getTownhallHistoryByPage);
     };
 
     // Pass a XEC tip tx BIP21 query string to cashtab extensions
@@ -177,7 +177,7 @@ export default function TownHall({ address, isMobile }) {
             '*',
         );
 
-        txListener(chronik, address, "Townhall XEC tip sent");
+        txListener(chronik, address, "Townhall XEC tip sent", getTownhallHistoryByPage);
     };
 
     return (

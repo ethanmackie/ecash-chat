@@ -14,9 +14,10 @@ import { toast } from 'react-toastify';
  * @param {string} chronik the chronik-client instance
  * @param {string} address the eCash address of the active wallet
  * @param {string} txType the descriptor of the nature of this tx
+ * @param {callback fn} refreshCallback a callback function to either refresh inbox or townhall history
  * @throws {error} err chronik websocket subscription errors
  */
-export const txListener = async (chronik, address, txType) => {
+export const txListener = async (chronik, address, txType, refreshCallback = false) => {
     // Get type and hash
     const { type, hash } = cashaddr.decode(address, true);
 
@@ -31,6 +32,11 @@ export const txListener = async (chronik, address, txType) => {
                     // Unsubscribe and close websocket
                     ws.unsubscribeFromScript(type, hash);
                     ws.close();
+
+                    // Refresh history
+                    if (refreshCallback) {
+                        refreshCallback(0);
+                    }
                 }
             },
         });

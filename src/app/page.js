@@ -218,7 +218,7 @@ export default function Home() {
         );
         setRecipient('');
         setMessage('');
-        txListener(chronik, address, "Message");
+        txListener(chronik, address, "Message", false);
     };
 
     const CreditCardHeader = () => {

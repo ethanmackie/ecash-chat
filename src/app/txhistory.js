@@ -139,7 +139,7 @@ export default function TxHistory({ address }) {
             '*',
         );
 
-        txListener(chronik, address, "XEC tip");
+        txListener(chronik, address, "XEC tip", getTxHistoryByPage);
     };
 
     // Exports the message history of this wallet.
