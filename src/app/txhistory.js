@@ -14,6 +14,8 @@ import {
     SearchIcon,
     ResetIcon,
     ExportIcon,
+    EncryptionIcon,
+    DecryptionIcon,
 } from "@/components/ui/social";
 import { encodeBip21Message } from '../utils/utils';
 import {
@@ -24,7 +26,9 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Popover, Avatar, Badge, Textarea, Alert } from "flowbite-react";
+import { HiInformationCircle } from "react-icons/hi";
+import { Input } from "@/components/ui/input"
+import { Popover, Avatar, Badge, Textarea, Alert, Modal } from "flowbite-react";
 import { Tweet } from 'react-tweet';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
@@ -38,6 +42,7 @@ import {
     TelegramShareButton,
     TelegramIcon,
 } from 'next-share';
+const crypto = require('crypto');
 import copy from 'copy-to-clipboard';
 import { toast } from 'react-toastify';
 const chronik = new ChronikClientNode(chronikConfig.urls);
@@ -50,6 +55,9 @@ export default function TxHistory({ address }) {
     const [addressToSearchError, setAddressToSearchError] = useState(false);
     const [tipRecipient, setTipRecipient] = useState(false);
     const [tipRecipientAmount, setTipRecipientAmount] = useState(false);
+    const [openDecryptionModal, setOpenDecryptionModal] = useState(false);
+    const [decryptionInput, setDecryptionInput] = useState('');
+    const [encryptedMessage, setEncryptedMessage] = useState('');
 
     useEffect(() => {
         // Render the first page by default upon initial load
@@ -123,6 +131,13 @@ export default function TxHistory({ address }) {
         }
     };
 
+    // Handles the input of the decryption key
+    const handleDecryptionInput = e => {
+        const { value } = e.target;
+        // Future encryption algo selection checks here
+        setDecryptionInput(value);
+    };
+
     // Pass a message tx BIP21 query string to cashtab extensions
     const sendXecTip = (recipient, tipAmount) => {
         // Encode the op_return message script
@@ -140,6 +155,24 @@ export default function TxHistory({ address }) {
         );
 
         txListener(chronik, address, "XEC tip", getTxHistoryByPage);
+    };
+
+    // Decrypts the message using the provided key
+    const decryptMessage = (messageToDecrypt) => {
+        if (encryptedMessage === '') {
+            return;
+        }
+
+        try {
+            const decipher = crypto.createDecipher('aes-256-cbc', decryptionInput);
+            let decryptedMessage = decipher.update(encryptedMessage, 'hex', 'utf8');
+            decryptedMessage += decipher.final('utf8');
+            toast(`Decrypted message: ${decryptedMessage}`);
+        } catch (err) {
+            toast(`Decryption error: ${err.message}`);
+        }
+        setEncryptedMessage('');
+        setDecryptionInput('');
     };
 
     // Exports the message history of this wallet.
@@ -412,7 +445,18 @@ export default function TxHistory({ address }) {
                         </div>
 
                         {/* Render the op_return message */}
-                        <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
+                        <br />
+                        {tx.isEcashChatEncrypted ? (
+                            <>
+                                <Alert color="failure" icon={HiInformationCircle}>
+                                    &nbsp;&nbsp;<b>Encrypted Message</b><br />
+                                    &nbsp;&nbsp;{tx.opReturnMessage ? `${tx.opReturnMessage}`.substring(0,40)+'...' : ' '}
+                                </Alert>
+                            </>
+                            ) : (
+                                <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
+                            )
+                        }
 
                         {/* Render any media content within the message */}
                         {tx.imageSrc !== false && (<img src={tx.imageSrc} />)}
@@ -433,9 +477,57 @@ export default function TxHistory({ address }) {
                             &nbsp;|&nbsp;{tx.xecAmount} XEC
                         </span>
 
-                        <div>
-                            {/* Share buttons with other social platforms */}
+                        <div className="flex py-3">
+                            {/* Decryption and share buttons */}
                             <br />
+                            {tx.isEcashChatEncrypted && (
+                                <>
+                                    {/* Decryption modal */}
+                                    <Modal show={openDecryptionModal} onClose={() => {
+                                            setOpenDecryptionModal(false)
+                                            setDecryptionInput('')
+                                        }}
+                                    >
+                                        <Modal.Header><div className="flex"><DecryptionIcon />&nbsp;Decrypt Message</div></Modal.Header>
+                                        <Modal.Body>
+                                            <div className="space-y-6">
+                                              <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                                                  Please input the password used by the sender to decrypt this message.
+                                              </p>
+                                              <p>
+                                                  <Alert>{tx.opReturnMessage}</Alert>
+                                              </p>
+                                              <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                                                  {/* Decryption input */}
+                                                  <Input
+                                                    id="decryptionKey"
+                                                    name="decryptionKey"
+                                                    type="text"
+                                                    defaultValue={decryptionInput}
+                                                    onBlur={e => handleDecryptionInput(e)}
+                                                  />
+                                                  <br />
+                                                  <button disabled={decryptionInput === ''} onClick={() => {
+                                                      decryptMessage(tx.opReturnMessage)
+                                                      setOpenDecryptionModal(false)
+                                                  }} className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+                                                      Decrypt
+                                                  </button>
+                                              </p>
+                                            </div>
+                                        </Modal.Body>
+                                    </Modal>
+                                    <button type="button" onClick={() => {
+                                        setEncryptedMessage(tx.opReturnMessage);
+                                        setOpenDecryptionModal(true)
+                                    }}>
+                                        <DecryptionIcon />
+                                    </button>
+                                </>
+                            )}
+
+                            &nbsp;
+
                             <Popover
                               aria-labelledby="default-popover"
                               placement="top"

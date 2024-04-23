@@ -33,7 +33,9 @@ import {
     LogoutIcon,
     ImageIcon,
     AliasIcon,
+    EncryptionIcon,
 } from "@/components/ui/social";
+const crypto = require('crypto');
 import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
 const chronik = new ChronikClientNode(chronikConfig.urls);
@@ -50,6 +52,7 @@ export default function Home() {
     const [recipient, setRecipient] = useState('');
     const [recipientError, setRecipientError] = useState(false);
     const [message, setMessage] = useState('');
+    const [password, setPassword] = useState('');
     const [messageError, setMessageError] = useState(false);
     const [sendAmountXec, setSendAmountXec] = useState(5.5);
     const [sendAmountXecError, setSendAmountXecError] = useState(false);
@@ -203,8 +206,17 @@ export default function Home() {
 
     // Pass a message tx BIP21 query string to cashtab extensions
     const sendMessage = () => {
-        // Encode the op_return message script
-        const opReturnRaw = encodeBip21Message(message);
+        let opReturnRaw;
+
+        if (password === '') {
+            opReturnRaw = encodeBip21Message(message, false);
+        } else {
+            // if user opted to encrypt this message
+            const cipher = crypto.createCipher('aes-256-cbc', password);
+            let encryptedMessage = cipher.update(message, 'utf8', 'hex');
+            encryptedMessage += cipher.final('hex');
+            opReturnRaw = encodeBip21Message(encryptedMessage, true);
+        }
 
         window.postMessage(
             {
@@ -509,6 +521,16 @@ export default function Home() {
                                         defaultValue="5.5"
                                         onChange={e => handleSendAmountChange(e)}
                                     />
+                                    <br />
+                                    <label htmlFor="value-input" className="flex block mb-2 text-sm font-medium text-gray-900 dark:text-white"><EncryptionIcon />&nbsp;Encrypt with password (optional):</label>
+                                    <Input
+                                        type="input"
+                                        id="password-input"
+                                        value={password}
+                                        aria-describedby="helper-text-explanation" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        placeholder="Set an optional encryption password"
+                                        onChange={e => setPassword(e.target.value)}
+                                    />
                                   </div>
                                   <div>
                                     <button
@@ -545,6 +567,9 @@ export default function Home() {
                           </li>
                           <li>
                               Direct wallet to wallet and an all-in townhall forum
+                          </li>
+                          <li>
+                              Message encryption option via AES 256 CBC algorithm
                           </li>
                           <li>
                               Displays only messaging transactions
@@ -618,7 +643,7 @@ export default function Home() {
 
               <Tabs.Item title="Settings" icon={GiAbstract010}>
                   <div className="flex w-80 flex-col py-3">
-                      <Alert color="info">Version: 0.3.0</Alert><br />
+                      <Alert color="info">Version: 0.4.0</Alert><br />
                       <button
                         type="button"
                         className="rounded bg-indigo-500 px-3 py-3 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"

@@ -13,6 +13,8 @@ import {
     mockParsedXecSendTxWithOpReturnVideo,
     mockParsedXecSendTxWithOpReturnEmoji,
     mockParsedXecSendTxWithOpReturnTownhallPost,
+    mockXecEncryptedSendTxWithOpReturn,
+    mockParsedXecEncryptedSendTxWithOpReturn,
 } from '../fixtures/mocks';
 
 test('parseChronikTx() correctly parses a XEC send tx with OP_RETURN data retrieved from chronik', async () => {
@@ -57,5 +59,14 @@ test('parseChronikTx() correctly parses a XEC send tx with a townhall post embed
         mockParsedXecSendTxWithOpReturnTownhallPost.replyAddress,
     )).toEqual(
         mockParsedXecSendTxWithOpReturnTownhallPost,
+    );
+});
+
+test('parseChronikTx() correctly parses a XEC send tx with an encrypted OP_RETURN data retrieved from chronik', async () => {
+    await expect(parseChronikTx(
+        mockXecEncryptedSendTxWithOpReturn,
+        mockParsedXecEncryptedSendTxWithOpReturn.replyAddress,
+    )).toEqual(
+        mockParsedXecEncryptedSendTxWithOpReturn,
     );
 });

@@ -16,7 +16,8 @@ export const toXec = satoshis => {
 };
 
 // Encode the op_return message script
-export const encodeBip21Message = message => {
+// encryptionFlag indicates whether to use the encrypted message prefix
+export const encodeBip21Message = (message, encryptionFlag) => {
     if (typeof message !== 'string') {
         return '';
     }
@@ -25,6 +26,10 @@ export const encodeBip21Message = message => {
 
         // Push eCash Chat protocol identifier
         script.push(Buffer.from(opreturnConfig.appPrefixesHex.eCashChat, 'hex'));
+
+        if (encryptionFlag) {
+            script.push(Buffer.from(opreturnConfig.encryptedMessagePrefixHex, 'hex'));
+        }
 
         // eCash Chat messages are utf8 encoded
         const eCashChatMsgScript = Buffer.from(message, 'utf8');

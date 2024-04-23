@@ -1,3 +1,71 @@
+export const mockXecEncryptedSendTxWithOpReturn = {
+    "txid": "8d52c5f422f34f8ca725621fc4e701951c0be1418d8106718975154a3e210354",
+    "version": 2,
+    "inputs": [
+        {
+            "prevOut": {
+                "txid": "793cab54935eb0b7225fddc5cc3de1b0f670b5699d6188313ca41d4f5db4515e",
+                "outIdx": 2
+            },
+            "inputScript": "48304502210081ff84a853b68aaf9bcb93a03829c0ed6e1dead85ff8e205d8eda00f110291d7022001f3e3504b873cfc29007257a58d356f8f0c743596ad158597141e32a4750498412102e4af47715f4db1d2a8d686be40c42bba5e70d715e470314181730e797be2324b",
+            "outputScript": "76a914b366ef7c1ffd4ef452d72556634720cc8741e1dc88ac",
+            "value": 97659,
+            "sequenceNo": 4294967295
+        }
+    ],
+    "outputs": [
+        {
+            "value": 0,
+            "outputScript": "6a046368617404706173734063653138386236383233633430666566336137333034363161326639613831373634333261343738356635643463653961613865653461646339396563336134"
+        },
+        {
+            "value": 550,
+            "outputScript": "76a914b82361c5851f4ec48b995175a2e1c3646338e07688ac"
+        },
+        {
+            "value": 96483,
+            "outputScript": "76a914b366ef7c1ffd4ef452d72556634720cc8741e1dc88ac"
+        }
+    ],
+    "lockTime": 0,
+    "block": {
+        "height": 841433,
+        "hash": "0000000000000000207e8d73ce547d98c625a5df8d954b9f4b94bb694982146f",
+        "timestamp": 1713836952
+    },
+    "timeFirstSeen": 1713836836,
+    "size": 311,
+    "isCoinbase": false,
+    "tokenEntries": [],
+    "tokenFailedParsings": [],
+    "tokenStatus": "TOKEN_STATUS_NON_TOKEN"
+};
+
+export const mockParsedXecEncryptedSendTxWithOpReturn = {
+    "txid": "8d52c5f422f34f8ca725621fc4e701951c0be1418d8106718975154a3e210354",
+    "incoming": false,
+    "xecAmount": "5.5",
+    "isEtokenTx": false,
+    "airdropFlag": false,
+    "airdropTokenId": "",
+    "opReturnMessage": "ce188b6823c40fef3a730461a2f9a8176432a4785f5d4ce9aa8ee4adc99ec3a4",
+    "isCashtabMessage": false,
+    "isCashtabEncryptedMessage": false,
+    "isEcashChatEncrypted": true,
+    "iseCashChatMessage": true,
+    "iseCashChatPost": false,
+    "replyAddress": "ecash:qzekdmmurl75aazj6uj4vc68yrxgws0pmsgztm4atw",
+    "recipientAddress": "ecash:qzuzxcw9s505a3ytn9ghtghpcdjxxw8qwc3mgq8n4e",
+    "aliasFlag": false,
+    "imageSrc": false,
+    "videoId": false,
+    "txDate": "23 Apr 2024",
+    "txTime": "11:47:16",
+    "tweetId": false,
+    "replyTxid": false,
+    "url": false
+};
+
 export const mockXecSendTxWithOpReturnTweet = {
     "txid": "a98252b4230d4961011d6069012c8f0e0e1f93a0fe3693a376984dbae8243da7",
     "version": 2,
@@ -50,6 +118,7 @@ export const mockParsedXecSendTxWithOpReturnTweet = {
     "opReturnMessage": "checkout this tweet ",
     "isCashtabMessage": false,
     "isEncryptedMessage": false,
+    "isEcashChatEncrypted": false,
     "iseCashChatMessage": true,
     "iseCashChatPost": false,
     "replyTxid": false,
@@ -111,6 +180,7 @@ export const mockParsedXecSendTxWithOpReturnEmoji = {
     "opReturnMessage": "😃hello world with heaps of emojis 😇🧱🏖️🏖️🌏️🌐🍐",
     "isCashtabMessage": false,
     "isEncryptedMessage": false,
+    "isEcashChatEncrypted": false,
     "iseCashChatMessage": true,
     "iseCashChatPost": false,
     "replyTxid": false,
@@ -174,6 +244,7 @@ export const mockParsedXecSendTxWithOpReturnVideo = {
     "opReturnMessage": "hello world with a youtube video:  ",
     "isCashtabMessage": false,
     "isEncryptedMessage": false,
+    "isEcashChatEncrypted": false,
     "iseCashChatMessage": true,
     "iseCashChatPost": false,
     "replyAddress": "ecash:qq9h6d0a5q65fgywv4ry64x04ep906mdku8f0gxfgx",
@@ -236,6 +307,7 @@ export const mockParsedXecSendTxWithOpReturnImage = {
     "opReturnMessage": "hello world with an embedded image:  ",
     "isCashtabMessage": false,
     "isEncryptedMessage": false,
+    "isEcashChatEncrypted": false,
     "iseCashChatMessage": true,
     "iseCashChatPost": false,
     "replyAddress": "ecash:qq9h6d0a5q65fgywv4ry64x04ep906mdku8f0gxfgx",
@@ -296,6 +368,7 @@ export const mockParsedXecSendTxWithOpReturn = {
     "airdropTokenId": "",
     "opReturnMessage": "hello world",
     "isCashtabMessage": false,
+    "isEcashChatEncrypted": false,
     "replyTxid": false,
     "isEncryptedMessage": false,
     "iseCashChatMessage": true,
@@ -363,6 +436,7 @@ export const mockParsedXecSendTxWithOpReturnTownhallPost = {
     "airdropTokenId": "",
     "opReturnMessage": "yoooooo 😁",
     "isCashtabMessage": false,
+    "isEcashChatEncrypted": false,
     "replyTxid": false,
     "isEncryptedMessage": false,
     "iseCashChatMessage": false,
@@ -431,6 +505,7 @@ export const mockParsedXecSendTxWithOpReturnTownhallReplyPost = {
     "airdropTokenId": "",
     "opReturnMessage": "this is a reply of a reply",
     "isCashtabMessage": false,
+    "isEcashChatEncrypted": false,
     "isEncryptedMessage": false,
     "iseCashChatMessage": false,
     "iseCashChatPost": false,

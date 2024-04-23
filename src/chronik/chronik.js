@@ -213,7 +213,7 @@ export const parseChronikTx = (tx, address) => {
     let airdropTokenId = '';
     let opReturnMessage = '';
     let isCashtabMessage = false;
-    let isEncryptedMessage = false;
+    let isCashtabEncryptedMessage = false;
     let iseCashChatMessage = false;
     let iseCashChatPost = false;
     let replyAddress = '';
@@ -224,6 +224,7 @@ export const parseChronikTx = (tx, address) => {
     let tweetId = false;
     let replyTxid = false;
     let url = false;
+    let isEcashChatEncrypted = false;
 
     if (tx.isCoinbase) {
         // Note that coinbase inputs have `undefined` for `thisInput.outputScript`
@@ -344,7 +345,7 @@ export const parseChronikTx = (tx, address) => {
                 case opreturnConfig.appPrefixesHex.cashtabEncrypted: {
                     // Encrypted Cashtab msgs are deprecated, set a standard msg
                     isCashtabMessage = true;
-                    isEncryptedMessage = true;
+                    isCashtabEncryptedMessage = true;
                     opReturnMessage = 'Encrypted Cashtab Msg';
                     break;
                 }
@@ -395,8 +396,15 @@ export const parseChronikTx = (tx, address) => {
                             opReturnMessage = Buffer.from(stackArray[3], 'hex');
                             iseCashChatPost = true;
                         } else {
-                            opReturnMessage = Buffer.from(stackArray[1], 'hex');
-                            iseCashChatMessage = true;
+                            // Direct wallet to wallet message, check for encryption
+                            if (stackArray[1] === opreturnConfig.encryptedMessagePrefixHex) {
+                                opReturnMessage = Buffer.from(stackArray[2], 'hex');
+                                iseCashChatMessage = true;
+                                isEcashChatEncrypted = true;
+                            } else {
+                                opReturnMessage = Buffer.from(stackArray[1], 'hex');
+                                iseCashChatMessage = true;
+                            }
                         }
                     } else {
                         opReturnMessage = 'off-spec eCash Chat Msg';
@@ -558,7 +566,8 @@ export const parseChronikTx = (tx, address) => {
             airdropTokenId,
             opReturnMessage: '',
             isCashtabMessage,
-            isEncryptedMessage,
+            isCashtabEncryptedMessage,
+            isEcashChatEncrypted,
             iseCashChatPost,
             replyAddress,
             recipientAddress,
@@ -581,7 +590,8 @@ export const parseChronikTx = (tx, address) => {
         airdropTokenId,
         opReturnMessage,
         isCashtabMessage,
-        isEncryptedMessage,
+        isCashtabEncryptedMessage,
+        isEcashChatEncrypted,
         iseCashChatMessage,
         iseCashChatPost,
         replyAddress,

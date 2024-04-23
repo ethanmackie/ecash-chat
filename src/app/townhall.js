@@ -249,29 +249,29 @@ export default function TownHall({ address, isMobile }) {
 
             {/* Townhall Post History */}
 
-            {/*Set up pagination menu*/}
-            <br />
-            Scan recent townhall posts{'   '}<br />
+                {/*Set up pagination menu*/}
+                <br />
+                Scan recent townhall posts{'   '}<br />
 
-            <span>Page:
-            <nav aria-label="Page navigation example">
-               <ul className="inline-flex -space-x-px text-base h-10">
-                  {(() => {
-                      let page = [];
-                      for (let i = 0; i < townHallHistory.numPages; i += 1) {
-                        page.push(
-                          <li key={"Page"+i}>
-                            <a href={"#"} onClick={() => getTownhallHistoryByPage(i)} className="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-                                {(i+1)}
-                            </a>
-                          </li>
-                       );
-                      }
-                      return page;
-                    })()}
-              </ul>
-              </nav>
-              </span>
+                <span>Page:
+                <nav aria-label="Page navigation example">
+                   <ul className="inline-flex -space-x-px text-base h-10">
+                      {(() => {
+                          let page = [];
+                          for (let i = 0; i < townHallHistory.numPages; i += 1) {
+                            page.push(
+                              <li key={"Page"+i}>
+                                <a href={"#"} onClick={() => getTownhallHistoryByPage(i)} className="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                                    {(i+1)}
+                                </a>
+                              </li>
+                           );
+                          }
+                          return page;
+                        })()}
+                  </ul>
+                  </nav>
+                  </span>
 
             <div>
             {

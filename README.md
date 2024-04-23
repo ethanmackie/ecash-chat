@@ -5,6 +5,7 @@
 
 - One-click metamask-like login experience
 - Direct wallet to wallet and an all-in townhall forum
+- Message encryption option via AES 256 CBC algorithm
 - Displays only messaging transactions
 - Real time address specific filtering
 - XEC Tipping on addresses
@@ -16,6 +17,7 @@
 
 The eCash Chat protocol adopts the following onchain hex prefixes:
 - Send a wallet to wallet message = 63686174 (chat) + [utf-8 message]
+- Send an encrypted wallet to wallet message = 63686174 (chat) + 70617373 (pass) + [utf-8 message]
 - Post to townhall = 63686174 (chat) + 706f7374 (post) + [utf-8 message]
 - Reply to a townhall post = 63686174 (chat) + 68617368 (reply) + [txid of original post] + [utf-8 reply message]
 - Set profile pic = 63686174 (chat) + 70696373 (pics) + [utf-8 NFT id] (not implemented yet)
@@ -33,6 +35,21 @@ Hex breakdown
 - 63686174 (eCash Chat's protocol prefix)
 - 2a (pushdata byte indicating 42 bytes / 84 chars)
 - 6a7573742061206e6f726d616c2077616c6c657420746f2077616c6c6574206d657373616765f09f918d (the utf8 message)
+```
+
+**Send an encrypted direct wallet to wallet message**
+```
+OP_RETURN Hex
+6a04636861740470617373203165376334343363336363346365633338326562343733303839366238313433
+
+Hex breakdown
+- 6a (OP_RETURN)
+- 04 (pushdata byte indicating 4 bytes / 8 chars)
+- 63686174 (eCash Chat's protocol prefix)
+- 04 (pushdata byte indicating 4 bytes / 8 chars)
+- 70617373 (eCash Chat's encryption prefix)
+- 20 (pushdata byte indicating 32 bytes / 64 chars)
+- 3165376334343363336363346365633338326562343733303839366238313433 (the encrypted utf8 message)
 ```
 
 **Post a message to townhall**
