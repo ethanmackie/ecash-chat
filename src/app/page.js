@@ -477,6 +477,7 @@ export default function Home() {
                                           id="message"
                                           rows="4"
                                           value={message}
+                                          placeholder={encryptionMode ? 'Max. 95 bytes' : 'Max. 215 bytes'}
                                           required
                                           onChange={e => handleMessageChange(e)}
                                       />
@@ -558,7 +559,7 @@ export default function Home() {
                                   <div>
                                     <button
                                       type="button"
-                                      disabled={recipientError || messageError || sendAmountXecError || recipient === ''}
+                                      disabled={recipientError || messageError || sendAmountXecError || recipient === '' || (encryptionMode && password === '')}
                                       className="flex justify-center w-full rounded bg-indigo-500 px-2 py-2 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                       onClick={() => {
                                           sendMessage();
