@@ -58,6 +58,7 @@ export default function Home() {
     const [sendAmountXecError, setSendAmountXecError] = useState(false);
     const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
     const [xecBalance, setXecBalance] = useState('Loading...');
+    const [encryptionMode, setEncryptionMode] = useState(false);
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
@@ -176,11 +177,14 @@ export default function Home() {
 
     const handleMessageChange = e => {
         const { value } = e.target;
-        if (isValidMessage(value) === true) {
+        if (isValidMessage(value, encryptionMode) === true) {
             setMessage(value);
             setMessageError(false);
         } else {
-            setMessageError(`Message must be between 0 - ${opreturnConfig.cashtabMsgByteLimit} bytes`);
+            const error = encryptionMode ?
+                `Encrypted message must be between 0 - ${opreturnConfig.encryptedMessageByteLimit} bytes` :
+                    `Message must be between 0 - ${opreturnConfig.cashtabMsgByteLimit} bytes`;
+            setMessageError(error);
         }
     };
 
@@ -230,6 +234,7 @@ export default function Home() {
         );
         setRecipient('');
         setMessage('');
+        setPassword('');
         txListener(chronik, address, "Message", false);
     };
 
@@ -475,8 +480,9 @@ export default function Home() {
                                           required
                                           onChange={e => handleMessageChange(e)}
                                       />
+                                      <p className="mt-2 text-sm text-red-600 dark:text-red-500">{messageError !== false && messageError}</p>
                                       {/* Emoji picker and tooltip guide for embedding markups */}
-                                      <div className="flex gap-2">
+                                      <div className="flex py-1 gap-2">
                                           {/* Emoji Picker */}
                                           <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}>
                                               <EmojiIcon />
@@ -512,7 +518,6 @@ export default function Home() {
                                       </div>
                                     </div>
                                     <br />
-                                    <p className="mt-2 text-sm text-red-600 dark:text-red-500">{messageError !== false && messageError}</p>
                                     <label htmlFor="value-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Send XEC amount (optional, 5.5 XEC by default):</label>
                                     <Input
                                         type="number"
@@ -522,15 +527,33 @@ export default function Home() {
                                         onChange={e => handleSendAmountChange(e)}
                                     />
                                     <br />
-                                    <label htmlFor="value-input" className="flex block mb-2 text-sm font-medium text-gray-900 dark:text-white"><EncryptionIcon />&nbsp;Encrypt with password (optional):</label>
-                                    <Input
-                                        type="input"
-                                        id="password-input"
-                                        value={password}
-                                        aria-describedby="helper-text-explanation" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        placeholder="Set an optional encryption password"
-                                        onChange={e => setPassword(e.target.value)}
-                                    />
+                                    {/* Encryption mode toggle */}
+                                    <label class="inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            value=""
+                                            class="sr-only peer"
+                                            onClick={() => {
+                                                setMessage('')
+                                                setEncryptionMode(!encryptionMode)
+                                            }}
+                                        />
+                                        <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                        <span class="ms-3 text-sm flex font-medium text-gray-900 dark:text-gray-300"><EncryptionIcon />&nbsp;Encrypt with password (optional):</span>
+                                    </label>
+                                    {encryptionMode && (
+                                        <>
+                                            <Input
+                                                type="input"
+                                                id="password-input"
+                                                value={password}
+                                                maxlength="19"
+                                                aria-describedby="helper-text-explanation" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                placeholder="Set an optional encryption password"
+                                                onChange={e => setPassword(e.target.value)}
+                                            />
+                                        </>
+                                    )}
                                   </div>
                                   <div>
                                     <button

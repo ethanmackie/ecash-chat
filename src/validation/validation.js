@@ -7,8 +7,11 @@ export const isValidRecipient = value => {
     return cashaddr.isValidCashAddress(value, 'ecash');
 };
 
-// Validates the length of the message
-export const isValidMessage = message => {
+// Validates the length of the message based on whether it's encrypted
+export const isValidMessage = (message, encryptionFlag) => {
+    if (encryptionFlag) {
+        return opreturnConfig.encryptedMessageByteLimit >= Buffer.from(message, 'utf8').length;
+    }
     return opreturnConfig.cashtabMsgByteLimit >= Buffer.from(message, 'utf8').length;
 };
 
