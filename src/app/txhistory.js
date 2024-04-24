@@ -16,8 +16,9 @@ import {
     ExportIcon,
     EncryptionIcon,
     DecryptionIcon,
+    MoneyIcon,
 } from "@/components/ui/social";
-import { encodeBip21Message } from '../utils/utils';
+import { encodeBip21Message, encodeBip2XecTip } from '../utils/utils';
 import {
   Pagination,
   PaginationContent,
@@ -141,7 +142,7 @@ export default function TxHistory({ address }) {
     // Pass a message tx BIP21 query string to cashtab extensions
     const sendXecTip = (recipient, tipAmount) => {
         // Encode the op_return message script
-        const opReturnRaw = encodeBip21Message(`XEC tip from ${address}`);
+        const opReturnRaw = encodeBip2XecTip();
 
         window.postMessage(
             {
@@ -417,6 +418,13 @@ export default function TxHistory({ address }) {
                                 <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
                             )
                         }
+
+                        {/* XEC Tip rendering */}
+                        {tx.isXecTip && (
+                            <Alert color="info">
+                                <div className="flex"><MoneyIcon/>&nbsp;XEC tip from eCash Chat</div>
+                            </Alert>
+                        )}
 
                         {/* Render any media content within the message */}
                         {tx.imageSrc !== false && (<img src={tx.imageSrc} />)}

@@ -22,7 +22,7 @@ import {
     TelegramShareButton,
     TelegramIcon,
 } from 'next-share';
-import { encodeBip21Message, encodeBip21Post, encodeBip21ReplyPost } from '../utils/utils';
+import { encodeBip21Message, encodeBip21Post, encodeBip21ReplyPost, encodeBip2XecTip } from '../utils/utils';
 import { getTxHistory, getReplyTxDetails, parseChronikTx, txListener } from '../chronik/chronik';
 import copy from 'copy-to-clipboard';
 import { toast } from 'react-toastify';
@@ -156,7 +156,7 @@ export default function TownHall({ address, isMobile }) {
     // Pass a XEC tip tx BIP21 query string to cashtab extensions
     const sendXecTip = (recipient, tipAmount) => {
         // Encode the op_return message script
-        const opReturnRaw = encodeBip21Message(`XEC tip from ${address}`);
+        const opReturnRaw = encodeBip2XecTip();
         const bip21Str = `${recipient}?amount=${tipAmount}&op_return_raw=${opReturnRaw}`;
 
         if (isMobile) {

@@ -41,6 +41,27 @@ export const encodeBip21Message = (message, encryptionFlag) => {
     }
 };
 
+// Encodes the op_return script for an XEC tipping action
+export const encodeBip2XecTip = () => {
+    try {
+        let script = [];
+
+        // Push eCash Chat protocol identifier
+        script.push(Buffer.from(opreturnConfig.appPrefixesHex.eCashChat, 'hex'));
+
+        // Push XEC tip identifier
+        script.push(Buffer.from(opreturnConfig.xecTipPrefixHex, 'hex'));
+
+        // eCash Chat messages are utf8 encoded
+        const eCashChatMsgScript = Buffer.from(' ', 'utf8');
+        script.push(eCashChatMsgScript);
+        script = utxolib.script.compile(script).toString('hex');
+        return script;
+    } catch (err) {
+        console.log('Error encoding eCash Chat message: ', err);
+    }
+};
+
 // Encode the op_return post script
 export const encodeBip21Post = post => {
     if (typeof post !== 'string') {

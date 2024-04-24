@@ -225,6 +225,7 @@ export const parseChronikTx = (tx, address) => {
     let replyTxid = false;
     let url = false;
     let isEcashChatEncrypted = false;
+    let isXecTip = false;
 
     if (tx.isCoinbase) {
         // Note that coinbase inputs have `undefined` for `thisInput.outputScript`
@@ -395,6 +396,11 @@ export const parseChronikTx = (tx, address) => {
                             replyTxid = stackArray[2];
                             opReturnMessage = Buffer.from(stackArray[3], 'hex');
                             iseCashChatPost = true;
+                        } else if (stackArray[1] === opreturnConfig.xecTipPrefixHex) {
+                            // This is an XEC tip tx
+                            iseCashChatMessage = true;
+                            isXecTip = true;
+                            opReturnMessage = Buffer.from(stackArray[2], 'hex');
                         } else {
                             // Direct wallet to wallet message, check for encryption
                             if (stackArray[1] === opreturnConfig.encryptedMessagePrefixHex) {
@@ -578,6 +584,7 @@ export const parseChronikTx = (tx, address) => {
             tweetId,
             replyTxid,
             url,
+            isXecTip,
         };
     }
     // Otherwise do not include these fields
@@ -604,5 +611,6 @@ export const parseChronikTx = (tx, address) => {
         tweetId,
         replyTxid,
         url,
+        isXecTip,
     };
 };
