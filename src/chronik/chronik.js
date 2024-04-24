@@ -53,6 +53,17 @@ export const txListener = async (chronik, address, txType, refreshCallback = fal
     }
 };
 
+// Retrieve tx details
+export const getTxDetails = async (chronik, txid) => {
+    try {
+        const tx = await chronik.tx(txid);
+        return tx;
+    } catch (err) {
+        console.log(`Error in getTxDetails(${txid})`, err);
+    }
+};
+
+
 // Retrieves the utxos for an address and calculates the balance
 export const getBalance = async (chronik, address) => {
     if (
