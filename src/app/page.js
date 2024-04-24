@@ -40,6 +40,10 @@ import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
 const chronik = new ChronikClientNode(chronikConfig.urls);
 
+
+import Spline from '@splinetool/react-spline';
+
+
 export default function Home() {
     const [address, setAddress] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -317,7 +321,15 @@ export default function Home() {
         `}
     </Script>
 
-      <main className="lg:flex lg:flex-col items-center justify-center p-5">
+
+<div className="relative">
+  <div className="absolute inset-0 noise z-10"></div>
+  <Spline scene="https://prod.spline.design/CJswmLKxuqHXzPkl/scene.splinecode" className="fixed inset-0 z-0 blur-lg filter brightness-100" />
+</div>
+
+  
+
+      <main className="lg:flex lg:flex-col items-center justify-center p-5 relative z-10">
 
       {isLoggedIn === false && isMobile === false ? (
           <>
@@ -332,8 +344,8 @@ export default function Home() {
               src="/ecash-chat-logo.png"
               alt="eCash Chat Logo"
               className="dark:invert"
-              width={500}
-              height={150}
+              width={250}
+              height={75}
               priority
             />
           </a>
@@ -349,7 +361,7 @@ export default function Home() {
           priority
         />
       )}
-
+ 
       <div>
         {isLoggedIn === false && isMobile === false && step === 'fresh' && (
         <div>
@@ -430,7 +442,7 @@ export default function Home() {
           <CreditCardHeader />
 
           {/* Tab navigation */}
-          <Tabs aria-label="eCash Chat" style="default">
+          <Tabs aria-label="eCash Chat" style="default" className='z-10 relative'>
               {isMobile === false && (
                   <Tabs.Item active title="Inbox" icon={HiOutlineMail}>
                       {cashaddr.isValidCashAddress(address, 'ecash') &&
@@ -554,8 +566,8 @@ export default function Home() {
                   <Townhall address={address} isMobile={isMobile} />
               </Tabs.Item>
 
-              <Tabs.Item title="About" icon={IoMdInformationCircleOutline}>
-                  <div className="flex flex-col justify-center py-3">
+              <Tabs.Item title="About" icon={IoMdInformationCircleOutline} >
+                  <div className="flex flex-col justify-center py-3 z-10 relative">
                       <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">What is eCash Chat?</h2>
                       eCash Chat is an on-chain messaging platform on the eCash blockchain.
                       <br />It filters for specific messaging transactions for a seamless social experience.
@@ -676,6 +688,7 @@ export default function Home() {
               )}
         </div>
       </main>
+  
     </>
   );
 }
