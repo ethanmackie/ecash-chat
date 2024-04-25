@@ -16,8 +16,9 @@ import {
     ExportIcon,
     EncryptionIcon,
     DecryptionIcon,
+    MoneyIcon,
 } from "@/components/ui/social";
-import { encodeBip21Message } from '../utils/utils';
+import { encodeBip21Message, encodeBip2XecTip } from '../utils/utils';
 import {
   Pagination,
   PaginationContent,
@@ -141,7 +142,7 @@ export default function TxHistory({ address }) {
     // Pass a message tx BIP21 query string to cashtab extensions
     const sendXecTip = (recipient, tipAmount) => {
         // Encode the op_return message script
-        const opReturnRaw = encodeBip21Message(`XEC tip from ${address}`);
+        const opReturnRaw = encodeBip2XecTip();
 
         window.postMessage(
             {
@@ -173,46 +174,6 @@ export default function TxHistory({ address }) {
         }
         setEncryptedMessage('');
         setDecryptionInput('');
-    };
-
-    // Exports the message history of this wallet.
-    // If the history is filtered on a specific address, then the
-    // exported history will filtered accordingly.
-    const exportMessageHistory = () => {
-        let latestTxHistory;
-
-        if (
-            Array.isArray(txHistoryByAddress) &&
-            txHistoryByAddress.length > 0
-        ) {
-            latestTxHistory = { txs: txHistoryByAddress };
-        } else {
-            latestTxHistory = txHistory;
-        }
-
-        // convert object array into csv data
-        let csvContent =
-            'data:text/csv;charset=utf-8,' +
-            latestTxHistory.txs.map(
-                element => '\n'
-                    + element.txDate + '|'
-                    + element.txTime + '|'
-                    + element.opReturnMessage + '|'
-                    + element.xecAmount + '|'
-            );
-
-        // encode csv
-        var encodedUri = encodeURI(csvContent);
-
-        // hidden DOM node to set the default file name
-        var csvLink = document.createElement('a');
-        csvLink.setAttribute('href', encodedUri);
-        csvLink.setAttribute(
-            'download',
-            'eCash_Chat_History.csv',
-        );
-        document.body.appendChild(csvLink);
-        csvLink.click();
     };
 
     // Renders the tx history based on whether a filter has been applied based on address
@@ -458,6 +419,13 @@ export default function TxHistory({ address }) {
                             )
                         }
 
+                        {/* XEC Tip rendering */}
+                        {tx.isXecTip && (
+                            <Alert color="info">
+                                <div className="flex"><MoneyIcon/>&nbsp;XEC tip from eCash Chat</div>
+                            </Alert>
+                        )}
+
                         {/* Render any media content within the message */}
                         {tx.imageSrc !== false && (<img src={tx.imageSrc} />)}
                         {tx.videoId !== false && (<LiteYouTubeEmbed id={tx.videoId} />)}
@@ -673,14 +641,6 @@ export default function TxHistory({ address }) {
                    }}
                  >
                    <div className="flex"><ResetIcon/>&nbsp;Reset</div>
-                 </button>
-                 &nbsp;
-                 <button
-                     type="button"
-                     className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                     onClick={() => exportMessageHistory()}
-                 >
-                   <div className="flex"><ExportIcon/>&nbsp;Export message history</div>
                  </button>
               </div>
              </form>

@@ -22,8 +22,14 @@ import {
     TelegramShareButton,
     TelegramIcon,
 } from 'next-share';
-import { encodeBip21Message, encodeBip21Post, encodeBip21ReplyPost } from '../utils/utils';
-import { getTxHistory, getReplyTxDetails, parseChronikTx, txListener } from '../chronik/chronik';
+import { encodeBip21Message, encodeBip21Post, encodeBip21ReplyPost, encodeBip2XecTip } from '../utils/utils';
+import {
+    getTxHistory,
+    getReplyTxDetails,
+    parseChronikTx,
+    txListener,
+    getTxDetails,
+} from '../chronik/chronik';
 import copy from 'copy-to-clipboard';
 import { toast } from 'react-toastify';
 import { chronik as chronikConfig } from '../config/chronik';
@@ -38,6 +44,7 @@ export default function TownHall({ address, isMobile }) {
     const [replyPostError, setReplyPostError] = useState(false);
     const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
     const [loadingMsg, setLoadingMsg] = useState('');
+    const [replySource, setReplySource] = useState('');
 
     useEffect(() => {
         // Render the first page by default upon initial load
@@ -156,7 +163,7 @@ export default function TownHall({ address, isMobile }) {
     // Pass a XEC tip tx BIP21 query string to cashtab extensions
     const sendXecTip = (recipient, tipAmount) => {
         // Encode the op_return message script
-        const opReturnRaw = encodeBip21Message(`XEC tip from ${address}`);
+        const opReturnRaw = encodeBip2XecTip();
         const bip21Str = `${recipient}?amount=${tipAmount}&op_return_raw=${opReturnRaw}`;
 
         if (isMobile) {
@@ -281,7 +288,7 @@ export default function TownHall({ address, isMobile }) {
                     ? townHallHistory.txs.map(
                           (tx, index) => (
                             <>
-                                <div className="flex items-start gap-2.5" key={"txHistory"+index}>
+                                <div className="flex items-start gap-2.5" key={"txHistory"+index} onMouseLeave={() => setReplySource('')}>
                                    <div className="flex flex-col w-full max-w-[550px] break-all leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700 shadow-2xl transition-transform transform hover:scale-110">
                                    <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
                                       <span>
@@ -389,17 +396,22 @@ export default function TownHall({ address, isMobile }) {
                                          }
                                       </span>
                                    </div>
+
                                    {/* If this post was a reply to another */}
                                    {tx.replyTxid !== false && (
-                                        <p>Replying to ...
-                                            <a href={appConfig.blockExplorerUrl+'/tx/'+tx.replyTxid} target="_blank">
-                                                {tx.replyTxid.substring(tx.replyTxid.length - 15)}
-                                            </a>
-                                        </p>
+                                        <Alert className="py-4" color="info"
+                                            onMouseOver={() => {getTxDetails(chronik, tx.replyTxid).then((txDetails) => {setReplySource(parseChronikTx(txDetails, address).opReturnMessage)})}}
+                                        >
+                                            <Tooltip
+                                               content={replySource}
+                                            >
+                                                Replying to post: ...{tx.replyTxid.substring(tx.replyTxid.length - 15)}
+                                            </Tooltip>
+                                        </Alert>
                                    )}
 
                                    {/* Render the op_return message */}
-                                   <p className="text-m font-normal py-2.5 text-gray-900 dark:text-white" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
+                                   <p className="text-m font-normal px-2 py-2.5 text-gray-900 dark:text-white" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
 
                                    {/* Render any media content within the message */}
                                    {tx.imageSrc !== false && (<img src={tx.imageSrc} />)}

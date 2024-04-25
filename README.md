@@ -18,6 +18,7 @@
 The eCash Chat protocol adopts the following onchain hex prefixes:
 - Send a wallet to wallet message = 63686174 (chat) + [utf-8 message]
 - Send an encrypted wallet to wallet message = 63686174 (chat) + 70617373 (pass) + [utf-8 message]
+- Tipping XEC to another wallet = 63686174 (chat) + 74697073 (tips) + [optional utf-8 message]
 - Post to townhall = 63686174 (chat) + 706f7374 (post) + [utf-8 message]
 - Reply to a townhall post = 63686174 (chat) + 68617368 (reply) + [txid of original post] + [utf-8 reply message]
 - Set profile pic = 63686174 (chat) + 70696373 (pics) + [utf-8 NFT id] (not implemented yet)

@@ -34,6 +34,27 @@ it(`isValidMessage() invalidates a message longer than cashtabMsgByteLimit`, () 
         'Use the following styles to indicate a disabled button. This can be often used inside form elements to disable the submit button before all the form elements have been complete inside the form elements to disable tddddd'),
     ).toEqual(false);
 });
+it(`isValidMessage() validates a message within encryptedMessageByteLimit`, () => {
+    expect(isValidMessage(
+        'this is a short message',
+        true,
+        ),
+    ).toEqual(true);
+});
+it(`isValidMessage() validates a message exactly encryptedMessageByteLimit long`, () => {
+    expect(isValidMessage(
+        'Use the following styles to indicate a disabled button. This can be often used inside form elem',
+        true,
+        ),
+    ).toEqual(true);
+});
+it(`isValidMessage() invalidates a message longer than encryptedMessageByteLimit`, () => {
+    expect(isValidMessage(
+        'Use the following styles to indicate a disabled button. This can be often used inside form elements to disable the submit button before all the form elements have been complete inside the form elements to disable tddddd',
+        true,
+        ),
+    ).toEqual(false);
+});
 it(`isValidPost() validates a post within byte limits`, () => {
     expect(isValidPost(
         'this is a short message'),
