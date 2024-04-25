@@ -4,7 +4,6 @@ import Image from "next/image";
 import TxHistory from './txhistory';
 import Townhall from './townhall';
 import cashaddr from 'ecashaddrjs';
-import Script from 'next/script';
 import { queryAliasServer } from '../alias/alias-server';
 import { encodeBip21Message } from '../utils/utils';
 import { isMobileDevice } from '../utils/mobileCheck';
@@ -308,27 +307,12 @@ export default function Home() {
   return (
     <>
     <ToastContainer />
-    <Script
-        strategy="lazyOnload"
-        id="google-analytics1"
-        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}`}
-    />
-    <Script id="google-analytics2" strategy="lazyOnload">
-        {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}', {
-            page_path: window.location.pathname,
-            });
-        `}
-    </Script>
 
-
-    <div className="relative">
+<div className="relative">
   <div className="absolute inset-0 noise z-10"></div>
-  <div className="fixed inset-0 z-0" style={{ backgroundImage: "url('/bg.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
+  <Spline scene="https://prod.spline.design/CJswmLKxuqHXzPkl/scene.splinecode" className="fixed inset-0 z-0 blur-lg filter brightness-100" />
 </div>
+
   
 
       <main className="lg:flex lg:flex-col items-center justify-center p-5 relative z-10 mt-4">
