@@ -243,8 +243,10 @@ export default function Home() {
     };
 
     const CreditCardHeader = () => {
-        const cardStyling = isMobile ? "w-94 h-56 m-auto bg-red-100 rounded-xl relative text-white shadow-2xl transition-transform transform hover:scale-110" :
-            "w-96 h-56 m-auto bg-red-100 rounded-xl relative text-white shadow-2xl transition-transform transform hover:scale-110";
+        const cardStyling = isMobile 
+        ? "w-94 h-56 m-auto bg-red-100 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105" 
+        : "w-96 h-56 m-auto bg-red-100 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105";
+    
         return (
             <div
                 className={cardStyling}
@@ -255,29 +257,25 @@ export default function Home() {
             >
                 <img className="relative object-cover w-full h-full rounded-xl" src="/creditcard-bg.png" />
                 <div className="w-full px-8 absolute top-8">
-                    <div className="flex justify-between">
-                        <div className="">
-                            <p className="font-light">
-                                {/*QR Code*/}
-                                {address !== '' && (
-                                  <>
-                                    <QRCode
-                                        value={address}
-                                        size={290}
-                                        style={{ height: "auto", maxWidth: "25%", width: "25%" }}
-                                        viewBox={`0 0 256 256`}
-                                    />
-                                    </>
-                                )}
-                            </p>
-                        </div>
+                <div className="flex justify-between items-start">
+                    <div className="bg-white p-2 rounded-lg" style={{ maxWidth: "3.5rem", maxHeight: "3.5rem", boxShadow: "0px 0px 10px rgba(0,0,0,0.1)" }}>
+                        {/*QR Code*/}
+                        {address !== '' && (
+                            <QRCode
+                                value={address}
+                                size={88} // Adjust QR code size to fit within 3.5rem x 3.5rem
+                                style={{ height: "auto", maxWidth: "100%", maxHeight: "100%" }}
+                                viewBox={`0 0 256 256`}
+                            />
+                        )}
+                    </div>
                         <img className="w-14 h-14" src="/ecash-square-icon.svg"/>
                     </div>
                     <div className="pt-1">
-                        <p className="font-light">
+                        <p className="text-base">
                             eCash Address
                         </p>
-                        <p className="font-medium tracking-more-wider text-xs">
+                        <p className="text-xs">
                             {address}
                         </p>
                     </div>
@@ -334,7 +332,7 @@ export default function Home() {
 
   
 
-      <main className="lg:flex lg:flex-col items-center justify-center p-5 relative z-10">
+      <main className="lg:flex lg:flex-col items-center justify-center p-5 relative z-10 mt-4">
 
       {isLoggedIn === false && isMobile === false ? (
           <>
@@ -349,7 +347,7 @@ export default function Home() {
               src="/ecash-chat-logo.png"
               alt="eCash Chat Logo"
               className="dark:invert"
-              width={250}
+              width={273}
               height={75}
               priority
             />
@@ -361,7 +359,7 @@ export default function Home() {
           src="/ecash-chat-logo.png"
           alt="eCash Chat Logo"
           className="dark:invert"
-          width={250}
+          width={273}
           height={75}
           priority
         />
