@@ -197,7 +197,7 @@ export default function TxHistory({ address }) {
                    (tx, index) => (
                      <>
                      <div className="flex items-start gap-2.5" key={"txHistory"+index}>
-                        <div className="flex flex-col w-full max-w-[550px] leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700 shadow-2xl transition-transform transform hover:scale-110">
+                        <div className="flex flex-col w-full max-w-[550px] leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700 shadow-2xl transition-transform transform">
 
                         <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
                            <span className="text-sm font-bold text-gray-500 dark:text-gray-400">From: </span>

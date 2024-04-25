@@ -325,11 +325,10 @@ export default function Home() {
     </Script>
 
 
-<div className="relative">
+    <div className="relative">
   <div className="absolute inset-0 noise z-10"></div>
-  <Spline scene="https://prod.spline.design/CJswmLKxuqHXzPkl/scene.splinecode" className="fixed inset-0 z-0 blur-lg filter brightness-100" />
+  <div className="fixed inset-0 z-0" style={{ backgroundImage: "url('/bg.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
 </div>
-
   
 
       <main className="lg:flex lg:flex-col items-center justify-center p-5 relative z-10 mt-4">
