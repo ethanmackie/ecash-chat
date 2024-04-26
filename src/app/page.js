@@ -349,7 +349,11 @@ export default function Home() {
       <div>
         {isLoggedIn === false && isMobile === false && step === 'fresh' && (
         <div>
-            <button type="button" className="text-white transition-transform transform hover:scale-110 shadow-2xl bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 me-2 mb-2">
+            <button
+                type="button"
+                className="text-white transition-transform transform hover:scale-110 shadow-2xl bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 me-2 mb-2"
+                onClick={() => getAddress()}
+            >
             Sign in with&emsp;
             <Image
               src="/cashtab-extension.png"
@@ -357,7 +361,6 @@ export default function Home() {
               width={150}
               height={50}
               priority
-              onClick={() => getAddress()}
             />
             </button>
         </div>
