@@ -451,6 +451,7 @@ export default function Home() {
                                         type="text"
                                         value={recipient}
                                         required
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         onChange={e => handleAddressChange(e)}
                                       />
                                     </div>
@@ -470,6 +471,7 @@ export default function Home() {
                                           value={message}
                                           placeholder={encryptionMode ? 'Max. 95 bytes' : 'Max. 215 bytes'}
                                           required
+                                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                           onChange={e => handleMessageChange(e)}
                                       />
                                       <p className="mt-2 text-sm text-red-600 dark:text-red-500">{messageError !== false && messageError}</p>
@@ -658,7 +660,7 @@ export default function Home() {
 
               <Tabs.Item title="Settings" icon={GiAbstract010}>
                   <div className="flex w-80 flex-col py-3">
-                      <Alert color="info">Version: 0.4.0</Alert><br />
+                      <Alert color="info">Version: 1.0.0</Alert><br />
                       <button
                         type="button"
                         className="rounded bg-indigo-500 px-3 py-3 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
