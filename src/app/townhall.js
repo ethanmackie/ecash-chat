@@ -6,6 +6,7 @@ import { opReturn as opreturnConfig } from '../config/opreturn';
 import { isValidPost, isValidReplyPost } from '../validation/validation';
 import { Button } from "@/components/ui/button";
 import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon } from "@/components/ui/social";
+import { PersonIcon } from '@radix-ui/react-icons';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
@@ -295,7 +296,7 @@ export default function TownHall({ address, isMobile }) {
                                          {tx.replyAddress === address ? (
                                              <>
                                              <div className="flex items-center gap-4">
-                                                 <AnonAvatar/>
+                                                 <PersonIcon/>
                                                  <div className="font-medium dark:text-white">
                                                      <div onClick={() => {
                                                          copy(tx.replyAddress);
@@ -309,7 +310,7 @@ export default function TownHall({ address, isMobile }) {
                                            (<>
                                              <span>
                                                 <div className="flex items-center gap-4">
-                                                    <AnonAvatar/>
+                                                    <PersonIcon/>
                                                     <div className="font-medium dark:text-white">
                                                         <div onClick={() => {
                                                             copy(tx.replyAddress);

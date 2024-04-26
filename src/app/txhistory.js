@@ -47,6 +47,7 @@ const crypto = require('crypto');
 import copy from 'copy-to-clipboard';
 import { toast } from 'react-toastify';
 const chronik = new ChronikClientNode(chronikConfig.urls);
+import { PersonIcon } from '@radix-ui/react-icons';
 
 export default function TxHistory({ address }) {
     const [txHistory, setTxHistory] = useState('');
@@ -205,7 +206,7 @@ export default function TxHistory({ address }) {
                               {tx.replyAddress === address ? (
                                   <>
                                   <div className="flex items-center gap-4">
-                                      <AnonAvatar/>
+                                      <PersonIcon/>
                                       <div className="font-medium dark:text-white">
                                           <div onClick={() => {
                                               copy(tx.replyAddress);
@@ -219,7 +220,7 @@ export default function TxHistory({ address }) {
                                 (<>
                                   <span>
                                   <div className="flex items-center gap-4">
-                                      <AnonAvatar/>
+                                      <PersonIcon/>
                                       <div className="font-medium dark:text-white">
                                           <div onClick={() => {
                                               copy(tx.replyAddress);
@@ -306,7 +307,7 @@ export default function TxHistory({ address }) {
                                {tx.recipientAddress === address ? (
                                     <>
                                         <div className="flex items-center gap-4">
-                                            <AnonAvatar/>
+                                            <PersonIcon/>
                                             <div className="font-medium dark:text-white"
                                                 onClick={() => {
                                                    copy(tx.recipientAddress);
@@ -321,7 +322,7 @@ export default function TxHistory({ address }) {
                                  (<>
                                    <span>
                                    <div className="flex items-center gap-4">
-                                       <AnonAvatar/>
+                                       <PersonIcon/>
                                        <div className="font-medium dark:text-white">
                                            <div onClick={() => {
                                                copy(tx.recipientAddress);
