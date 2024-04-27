@@ -1,4 +1,5 @@
-import { isValidRecipient, messageHasErrors, postHasErrors, isValidReplyPost } from '../validation';
+import { isValidRecipient, messageHasErrors, postHasErrors, replyHasErrors } from '../validation';
+import { opReturn as opreturnConfig } from '../../config/opreturn';
 
 it(`isValidRecipient() validates a valid eCash address`, () => {
     expect(isValidRecipient('ecash:prfhcnyqnl5cgrnmlfmms675w93ld7mvvqd0y8lz07')).toEqual(true);
@@ -100,28 +101,28 @@ it(`postHasErrors() invalidates a post longer than townhallPostByteLimit`, () =>
         'Use the following styles to indicate a disabled button. This can be often used inside form elements to disable the submit button before all the form elements have been complete inside the form elements to disable tddddd'),
     ).toEqual("Post must be between 0 - 210 bytes");
 });
-it(`isValidReplyPost() validates a post within byte limits`, () => {
-    expect(isValidReplyPost(
+it(`replyHasErrors() validates a post within byte limits`, () => {
+    expect(replyHasErrors(
         'this is a short message'),
-    ).toEqual(true);
-});
-it(`isValidReplyPost() validates a post exactly townhallReplyPostByteLimit long`, () => {
-    expect(isValidReplyPost(
-        'Use the following styles to indicate a disabled button. This can be often used inside form elements to disable the submit button before all the form elements have been complete '),
-    ).toEqual(true);
-});
-it(`isValidReplyPost() validates a valid post with symbols`, () => {
-    expect(isValidReplyPost(
-        'Use the ©☎ submit button before all the form elements have been complete inside the form elements to disable td'),
-    ).toEqual(true);
-});
-it(`isValidReplyPost() validates a valid post with non-english characters`, () => {
-    expect(isValidReplyPost(
-        'Use the 안녕하세요 submit button before all the form elements have been complete inside the form elements to disable td'),
-    ).toEqual(true);
-});
-it(`isValidReplyPost() invalidates a post longer than townhallReplyPostByteLimit`, () => {
-    expect(isValidReplyPost(
-        'Use the following styles to indicate a disabled button. This can be often used inside form elements to disable the submit button before all the form elements have been complete inside the form elements to disable tddddd'),
     ).toEqual(false);
+});
+it(`replyHasErrors() validates a post exactly townhallReplyPostByteLimit long`, () => {
+    expect(replyHasErrors(
+        'Use the following styles to indicate a disabled button. This can be often used inside form elements to disable the submit button before all the form elements have been complete '),
+    ).toEqual(false);
+});
+it(`replyHasErrors() validates a valid post with symbols`, () => {
+    expect(replyHasErrors(
+        'Use the ©☎ submit button before all the form elements have been complete inside the form elements to disable td'),
+    ).toEqual(false);
+});
+it(`replyHasErrors() validates a valid post with non-english characters`, () => {
+    expect(replyHasErrors(
+        'Use the 안녕하세요 submit button before all the form elements have been complete inside the form elements to disable td'),
+    ).toEqual(false);
+});
+it(`replyHasErrors() invalidates a post longer than townhallReplyPostByteLimit`, () => {
+    expect(replyHasErrors(
+        'Use the following styles to indicate a disabled button. This can be often used inside form elements to disable the submit button before all the form elements have been complete inside the form elements to disable tddddd'),
+    ).toEqual(`Post must be between 0 - ${opreturnConfig.townhallReplyPostByteLimit} bytes`);
 });

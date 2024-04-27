@@ -64,7 +64,29 @@ export const postHasErrors = post => {
     return errorMessage;
 };
 
-// Validates the length of the townhall reply post
-export const isValidReplyPost = post => {
-    return opreturnConfig.townhallReplyPostByteLimit >= Buffer.from(post, 'utf8').length;
+// Validates the townhall reply post
+export const replyHasErrors = post => {
+    let errorMessage = false;
+
+    // Check validity of any img tags
+    if (
+        post.includes('[img]') &&
+        post.includes('[/img]')
+    ) {
+        let imageLink = post.substring(
+            post.indexOf('[img]') + 5,
+            post.lastIndexOf('[/img]')
+        );
+        let dotIndex = imageLink.lastIndexOf('.');
+        let extension = imageLink.substring(dotIndex);
+        const validExtensions = ['.jpg', '.jpeg', 'png', 'gif'];
+        if (!validExtensions.some(substring => extension.includes(substring))) {
+            errorMessage = "Image link needs to be a direct link to the image ending in .jpg, .jpeg, .png or .gif";
+        }
+    }
+
+    if (Buffer.from(post, 'utf8').length > opreturnConfig.townhallReplyPostByteLimit) {
+        errorMessage = `Post must be between 0 - ${opreturnConfig.townhallReplyPostByteLimit} bytes`;
+    }
+    return errorMessage;
 };

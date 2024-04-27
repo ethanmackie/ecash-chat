@@ -3,7 +3,7 @@ import  React, { useState, useEffect } from 'react';
 import { appConfig } from '../config/app';
 import { Textarea, Tooltip, Avatar, Popover, Accordion, Alert } from "flowbite-react";
 import { opReturn as opreturnConfig } from '../config/opreturn';
-import { postHasErrors, isValidReplyPost } from '../validation/validation';
+import { postHasErrors, replyHasErrors } from '../validation/validation';
 import { Button } from "@/components/ui/button";
 import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon } from "@/components/ui/social";
 import { PersonIcon } from '@radix-ui/react-icons';
@@ -84,15 +84,61 @@ export default function TownHall({ address, isMobile }) {
         setLoadingMsg('');
     };
 
-    // Validate the reply post content length
+    // Validate the reply post
     const handleReplyPostChange = e => {
         const { value } = e.target;
-        if (isValidReplyPost(value) === true) {
-            setReplyPost(value);
+        const replyValidation = replyHasErrors(value);
+        let parsedMessage = value;
+        if (!replyValidation) {
+            // Reply validates ok
             setReplyPostError(false);
+
+            // Automatically extract video and tweet IDs
+
+            // If youtube embedding is present
+            if (
+                value.includes('[yt]') &&
+                value.includes('[/yt]')
+            ) {
+                let updatedVideoId;
+                let videoId = value.substring(
+                    value.indexOf('[yt]') + 4,
+                    value.lastIndexOf('[/yt]')
+                );
+                // Check if video Id contains the full youtube url
+                if (videoId.includes('watch?v=')) {
+                    // Extract the youtube video Id between the '/watch?v=' and '&' substrings
+                    updatedVideoId = videoId.substring(
+                        videoId.indexOf('https://www.youtube.com/watch?v=') + 32,
+                        videoId.indexOf('&')
+                    );
+                    // Now replace the original full youtube url in the message with the updated videoId
+                    parsedMessage = parsedMessage.replace(videoId, updatedVideoId);
+                }
+            }
+
+            // If tweet embedding is present
+            if (
+                value.includes('[twt]') &&
+                value.includes('[/twt]')
+            ) {
+                let updatedTweetId;
+                let tweetId = value.substring(
+                    value.indexOf('[twt]') + 5,
+                    value.lastIndexOf('[/twt]')
+                );
+                // Check if video Id contains the full tweet url
+                if (tweetId.includes('status/')) {
+                    // Extract the tweet Id after the 'status/' substring
+                    updatedTweetId = tweetId.split('status/')[1];
+                    // Now replace the original full tweet url in the message with the updated tweet id
+                    parsedMessage = parsedMessage.replace(tweetId, updatedTweetId);
+                }
+            }
         } else {
-            setReplyPostError(`Post must be between 0 - ${opreturnConfig.townhallReplyPostByteLimit} bytes`);
+            setReplyPostError(replyValidation);
         }
+        setReplyPost(parsedMessage);
     };
 
     // Validate the post content length
