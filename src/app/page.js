@@ -9,7 +9,7 @@ import { encodeBip21Message } from '../utils/utils';
 import { isMobileDevice } from '../utils/mobileCheck';
 import { getBalance, txListener } from '../chronik/chronik';
 import { appConfig } from '../config/app';
-import { isValidRecipient, isValidMessage } from '../validation/validation';
+import { isValidRecipient, messageHasErrors } from '../validation/validation';
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
@@ -178,15 +178,13 @@ export default function Home() {
 
     const handleMessageChange = e => {
         const { value } = e.target;
-        if (isValidMessage(value, encryptionMode) === true) {
-            setMessage(value);
+        const messageValidation = messageHasErrors(value, encryptionMode);
+        if (!messageValidation) {
             setMessageError(false);
         } else {
-            const error = encryptionMode ?
-                `Encrypted message must be between 0 - ${opreturnConfig.encryptedMessageByteLimit} bytes` :
-                    `Message must be between 0 - ${opreturnConfig.cashtabMsgByteLimit} bytes`;
-            setMessageError(error);
+            setMessageError(messageValidation);
         }
+        setMessage(value);
     };
 
     const handleSendAmountChange = e => {
@@ -498,7 +496,7 @@ export default function Home() {
                                               </button>
                                           </Tooltip>
                                           <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
-                                              <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[img]url[/img]')}>
+                                              <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[img]url.jpeg[/img]')}>
                                                   Embed Image
                                               </button>
                                           </Tooltip>
@@ -663,7 +661,7 @@ export default function Home() {
 
               <Tabs.Item title="Settings" icon={GiAbstract010}>
                   <div className="flex w-80 flex-col py-3">
-                      <Alert color="info">Version: 1.0.0</Alert><br />
+                      <Alert color="info">Version: 1.0.1</Alert><br />
                       <button
                         type="button"
                         className="rounded bg-indigo-500 px-3 py-3 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"

@@ -3,7 +3,7 @@ import  React, { useState, useEffect } from 'react';
 import { appConfig } from '../config/app';
 import { Textarea, Tooltip, Avatar, Popover, Accordion, Alert } from "flowbite-react";
 import { opReturn as opreturnConfig } from '../config/opreturn';
-import { isValidPost, isValidReplyPost } from '../validation/validation';
+import { postHasErrors, isValidReplyPost } from '../validation/validation';
 import { Button } from "@/components/ui/button";
 import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon } from "@/components/ui/social";
 import { PersonIcon } from '@radix-ui/react-icons';
@@ -98,12 +98,13 @@ export default function TownHall({ address, isMobile }) {
     // Validate the post content length
     const handlePostChange = e => {
         const { value } = e.target;
-        if (isValidPost(value) === true) {
-            setPost(value);
+        const postValidation = postHasErrors(value);
+        if (!postValidation) {
             setPostError(false);
         } else {
-            setPostError(`Post must be between 0 - ${opreturnConfig.townhallPostByteLimit} bytes`);
+            setPostError(postValidation);
         }
+        setPost(value);
     };
 
     const insertMarkupTags = tooltipStr => {
@@ -225,7 +226,7 @@ export default function TownHall({ address, isMobile }) {
                               </button>
                           </Tooltip>
                           <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
-                              <button className="rounded bg-indigo-500 px-4 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[img]url[/img]')}>
+                              <button className="rounded bg-indigo-500 px-4 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[img]url.jpeg[/img]')}>
                                   Embed Image
                               </button>
                           </Tooltip>
