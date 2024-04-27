@@ -661,7 +661,7 @@ export default function Home() {
 
               <Tabs.Item title="Settings" icon={GiAbstract010}>
                   <div className="flex w-80 flex-col py-3">
-                      <Alert color="info">Version: 1.0.1</Alert><br />
+                      <Alert color="info">Version: 1.0.2</Alert><br />
                       <button
                         type="button"
                         className="rounded bg-indigo-500 px-3 py-3 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
