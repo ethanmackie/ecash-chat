@@ -99,12 +99,57 @@ export default function TownHall({ address, isMobile }) {
     const handlePostChange = e => {
         const { value } = e.target;
         const postValidation = postHasErrors(value);
+        let parsedMessage = value;
         if (!postValidation) {
+            // Post validates ok
             setPostError(false);
+
+            // Automatically extract video and tweet IDs
+
+            // If youtube embedding is present
+            if (
+                value.includes('[yt]') &&
+                value.includes('[/yt]')
+            ) {
+                let updatedVideoId;
+                let videoId = value.substring(
+                    value.indexOf('[yt]') + 4,
+                    value.lastIndexOf('[/yt]')
+                );
+                // Check if video Id contains the full youtube url
+                if (videoId.includes('watch?v=')) {
+                    // Extract the youtube video Id between the '/watch?v=' and '&' substrings
+                    updatedVideoId = videoId.substring(
+                        videoId.indexOf('https://www.youtube.com/watch?v=') + 32,
+                        videoId.indexOf('&')
+                    );
+                    // Now replace the original full youtube url in the message with the updated videoId
+                    parsedMessage = parsedMessage.replace(videoId, updatedVideoId);
+                }
+            }
+
+            // If tweet embedding is present
+            if (
+                value.includes('[twt]') &&
+                value.includes('[/twt]')
+            ) {
+                let updatedTweetId;
+                let tweetId = value.substring(
+                    value.indexOf('[twt]') + 5,
+                    value.lastIndexOf('[/twt]')
+                );
+                // Check if video Id contains the full tweet url
+                if (tweetId.includes('status/')) {
+                    // Extract the tweet Id after the 'status/' substring
+                    updatedTweetId = tweetId.split('status/')[1];
+                    // Now replace the original full tweet url in the message with the updated tweet id
+                    parsedMessage = parsedMessage.replace(tweetId, updatedTweetId);
+                }
+            }
         } else {
             setPostError(postValidation);
         }
-        setPost(value);
+        setPost(parsedMessage);
     };
 
     const insertMarkupTags = tooltipStr => {
@@ -226,17 +271,17 @@ export default function TownHall({ address, isMobile }) {
                               </button>
                           </Tooltip>
                           <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
-                              <button className="rounded bg-indigo-500 px-4 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[img]url.jpeg[/img]')}>
+                              <button className="rounded bg-indigo-500 px-4 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[img]https://www.url.jpeg[/img]')}>
                                   Embed Image
                               </button>
                           </Tooltip>
-                          <Tooltip content="e.g. [yt]5RuYKxKCAOA[/yt]" style="light">
-                              <button className="rounded bg-indigo-500 px-4 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[yt]youtube-video-id[/yt]')}>
+                          <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=8oIHo0vCZDs[/yt]" style="light">
+                              <button className="rounded bg-indigo-500 px-4 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[yt]youtube-url[/yt]')}>
                                   Embed Youtube
                               </button>
                           </Tooltip>
-                          <Tooltip content="e.g. [twt]1762780466976002393[/twt]" style="light">
-                              <button className="rounded bg-indigo-500 px-4 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[twt]tweet-id[/twt]')}>
+                          <Tooltip content="e.g. [twt]https://twitter.com/eCashCommunity/status/1783932847528583665[/twt]" style="light">
+                              <button className="rounded bg-indigo-500 px-4 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[twt]tweet-url[/twt]')}>
                                   Embed Tweet
                               </button>
                           </Tooltip>
