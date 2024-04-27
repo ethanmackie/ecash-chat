@@ -17,7 +17,7 @@ it(`messageHasErrors() validates a message within byte limits`, () => {
 it(`messageHasErrors() invalidates a message with an invalid img tag`, () => {
     expect(messageHasErrors(
         'this is a short message[img]https://imgur.com/gallery/nv9jLg7[/img]'),
-    ).toEqual("Image link needs to be a direct link to the image ending in .jpg, .jpeg or .png");
+    ).toEqual("Image link needs to be a direct link to the image ending in .jpg, .jpeg, .png or .gif");
 });
 it(`messageHasErrors() validates a message with a valid img tag`, () => {
     expect(messageHasErrors(
@@ -88,7 +88,7 @@ it(`postHasErrors() validates a valid post with non-english characters`, () => {
 it(`postHasErrors() invalidates a post with an invalid img tag`, () => {
     expect(postHasErrors(
         'this is a short message[img]https://imgur.com/gallery/nv9jLg7[/img]'),
-    ).toEqual("Image link needs to be a direct link to the image ending in .jpg, .jpeg or .png");
+    ).toEqual("Image link needs to be a direct link to the image ending in .jpg, .jpeg, .png or .gif");
 });
 it(`postHasErrors() validates a message with a valid img tag`, () => {
     expect(postHasErrors(

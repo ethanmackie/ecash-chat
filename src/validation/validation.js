@@ -22,9 +22,9 @@ export const messageHasErrors = (message, encryptionFlag) => {
         );
         let dotIndex = imageLink.lastIndexOf('.');
         let extension = imageLink.substring(dotIndex);
-        const validExtensions = ['.jpg', '.jpeg', 'png'];
+        const validExtensions = ['.jpg', '.jpeg', 'png', 'gif'];
         if (!validExtensions.some(substring => extension.includes(substring))) {
-            errorMessage = "Image link needs to be a direct link to the image ending in .jpg, .jpeg or .png";
+            errorMessage = "Image link needs to be a direct link to the image ending in .jpg, .jpeg, .png or .gif";
         }
     }
 
@@ -52,9 +52,9 @@ export const postHasErrors = post => {
         );
         let dotIndex = imageLink.lastIndexOf('.');
         let extension = imageLink.substring(dotIndex);
-        const validExtensions = ['.jpg', '.jpeg', 'png'];
+        const validExtensions = ['.jpg', '.jpeg', 'png', 'gif'];
         if (!validExtensions.some(substring => extension.includes(substring))) {
-            errorMessage = "Image link needs to be a direct link to the image ending in .jpg, .jpeg or .png";
+            errorMessage = "Image link needs to be a direct link to the image ending in .jpg, .jpeg, .png or .gif";
         }
     }
 
