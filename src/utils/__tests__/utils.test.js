@@ -13,7 +13,7 @@ import {
 
 it(`getTweetId() correctly extracts the tweet ID from a valid tweet url`, () => {
     const tweetUrl = '[twt]https://twitter.com/CashtabWallet/status/1784451748028944549[/twt]';
-    expect(getTweetId(tweetUrl)).toStrictEqual('[twt]1784451748028944549[/twt]');
+    expect(getTweetId(tweetUrl)).toStrictEqual('1784451748028944549');
 });
 it(`getTweetId() correctly returns the input an invalid valid tweet url`, () => {
     expect(getTweetId('[twt]https://www.youtube.com/watch?v=tAl6sPRFQgk[/twt]')).toStrictEqual('[twt]https://www.youtube.com/watch?v=tAl6sPRFQgk[/twt]');

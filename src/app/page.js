@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import QRCode from "react-qr-code";
 import copy from 'copy-to-clipboard';
-import { Tooltip, Tabs, Alert } from "flowbite-react";
+import { Tooltip, Tabs, Alert, Modal } from "flowbite-react";
 import { HiOutlineMail, HiOutlineNewspaper } from "react-icons/hi";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { PiHandCoins } from "react-icons/pi";
@@ -40,6 +40,9 @@ import { ChronikClientNode } from 'chronik-client';
 const chronik = new ChronikClientNode(chronikConfig.urls);
 import Spline from '@splinetool/react-spline';
 import YouTubeVideoId from 'youtube-video-id';
+import LiteYouTubeEmbed from 'react-lite-youtube-embed';
+import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
+import { Tweet } from 'react-tweet';
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -60,6 +63,7 @@ export default function Home() {
     const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
     const [xecBalance, setXecBalance] = useState('Loading...');
     const [encryptionMode, setEncryptionMode] = useState(false);
+    const [showMessagePreview, setShowMessagePreview] = useState(false);
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
@@ -179,46 +183,14 @@ export default function Home() {
     const handleMessageChange = e => {
         const { value } = e.target;
         const messageValidation = messageHasErrors(value, encryptionMode);
-        let parsedMessage = value;
+
         if (!messageValidation) {
             // Message validates ok
             setMessageError(false);
-            // If youtube embedding is present
-            if (
-                value.includes('[yt]') &&
-                value.includes('[/yt]')&&
-                !value.includes('youtubeurl') &&
-                !value.includes('https://www.youtube.com/shorts/')
-            ) {
-                parsedMessage = '[yt]'+YouTubeVideoId(value)+'[/yt]';
-            }
-            // If youtube shorts is being embedded
-            if (
-                value.includes('[yt]') &&
-                value.includes('[/yt]')&&
-                !value.includes('youtubeurl') &&
-                value.includes('https://www.youtube.com/shorts/')
-            ) {
-                let updatedVideoId;
-                let videoId = value.substring(
-                    value.indexOf('[yt]') + 4,
-                    value.lastIndexOf('[/yt]')
-                );
-                parsedMessage = '[yt]'+videoId.split('https://www.youtube.com/shorts/')[1]+'[/yt]';
-            }
-
-            // If tweet embedding is present
-            if (
-                value.includes('[twt]') &&
-                value.includes('[/twt]') &&
-                !value.includes('tweeturl')
-            ) {
-                parsedMessage = getTweetId(value);
-            }
         } else {
             setMessageError(messageValidation);
         }
-        setMessage(parsedMessage);
+        setMessage(value);
     };
 
     const handleSendAmountChange = e => {
@@ -246,7 +218,52 @@ export default function Home() {
         let opReturnRaw;
 
         if (password === '') {
-            opReturnRaw = encodeBip21Message(message, false);
+            // Parse the message for any media tags
+            let parsedMessage = message;
+            // If youtube embedding is present
+            if (
+                message.includes('[yt]') &&
+                message.includes('[/yt]') &&
+                !message.includes('youtubeurl') &&
+                !message.includes('https://www.youtube.com/shorts/')
+            ) {
+                const tagStartIndex = message.indexOf('[yt]');
+                const tagEndIndex = message.lastIndexOf('[/yt]');
+                const remainderMessage = message.substring(0, tagStartIndex) + message.substring(tagEndIndex+5);
+                parsedMessage = remainderMessage + '[yt]'+YouTubeVideoId(message)+'[/yt]';
+            }
+
+            // If youtube shorts is being embedded
+            if (
+                message.includes('[yt]') &&
+                message.includes('[/yt]') &&
+                !message.includes('youtubeurl') &&
+                message.includes('https://www.youtube.com/shorts/')
+            ) {
+                let updatedVideoId;
+                let videoId = message.substring(
+                    message.indexOf('[yt]') + 4,
+                    message.lastIndexOf('[/yt]')
+                );
+                const tagStartIndex = message.indexOf('[yt]');
+                const tagEndIndex = message.lastIndexOf('[/yt]');
+                const remainderMessage = message.substring(0, tagStartIndex) + message.substring(tagEndIndex+5);
+                parsedMessage = remainderMessage + '[yt]'+videoId.split('https://www.youtube.com/shorts/')[1]+'[/yt]';
+            }
+
+            // If tweet embedding is present
+            if (
+                message.includes('[twt]') &&
+                message.includes('[/twt]') &&
+                !message.includes('tweeturl')
+            ) {
+                const tagStartIndex = message.indexOf('[twt]');
+                const tagEndIndex = message.lastIndexOf('[/twt]');
+                const remainderMessage = message.substring(0, tagStartIndex) + message.substring(tagEndIndex+6);
+                parsedMessage = remainderMessage + '[twt]' + getTweetId(message) + '[/twt]';
+            }
+
+            opReturnRaw = encodeBip21Message(parsedMessage, false);
         } else {
             // if user opted to encrypt this message
             const cipher = crypto.createCipher('aes-256-cbc', password);
@@ -271,11 +288,68 @@ export default function Home() {
         txListener(chronik, address, "Message", false);
     };
 
+    const MessagePreviewModal = () => {
+        return (
+            <Modal show={showMessagePreview} onClose={() => setShowMessagePreview(false)}>
+                <Modal.Header>Message Preview</Modal.Header>
+                <Modal.Body>
+                    <div className="space-y-6">
+                        <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                            {password !== '' ? (
+                                <>
+                                    <Alert color="failure" icon={HiInformationCircle}>
+                                        &nbsp;&nbsp;<b>Encrypted Message</b><br />
+                                        &nbsp;&nbsp;{message.substring(0,40)+'...'}
+                                    </Alert>
+                                </>
+                                ) : (
+                                    <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white text-ellipsis break-words min-w-0">
+                                        {message}
+                                    </p>
+                                )
+                            }
+                            <br />Media Preview:
+                            {/* Render any media content within the message */}
+                            {message.includes('[img]') && message.includes('[/img]') && (
+                                <img src={message.substring(message.indexOf('[img]') + 5, message.lastIndexOf('[/img]'))} />
+                            )}
+                            {message.includes('[yt]') && message.includes('[/yt]') && !message.includes('https://www.youtube.com/shorts/') && (
+                                <LiteYouTubeEmbed id={YouTubeVideoId(message.substring(message.indexOf('[yt]') + 4, message.lastIndexOf('[/yt]')))} />
+                            )}
+                            {message.includes('[yt]') && message.includes('[/yt]') && message.includes('https://www.youtube.com/shorts/') && (
+                                <LiteYouTubeEmbed id={YouTubeVideoId((message.substring(message.indexOf('[yt]') + 4, message.lastIndexOf('[/yt]'))).split('https://www.youtube.com/shorts/')[1])} />
+                            )}
+                            {message.includes('[twt]') && message.includes('[/twt]') && !message.includes('tweeturl') && (
+                                <Tweet id={getTweetId(message)} />
+                            )}
+                            {message.includes('[url]') && message.includes('[/url]') && (
+                                <a href={message.substring(message.indexOf('[url]') + 5, message.lastIndexOf('[/url]'))} target="_blank">
+                                    {message.substring(message.indexOf('[url]') + 5, message.lastIndexOf('[/url]'))}
+                                </a>
+                            )}
+                        </p>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={() => {
+                        setShowMessagePreview(false)
+                        sendMessage()
+                    }}>
+                        Looks good
+                    </Button>
+                    <Button color="gray" onClick={() => setShowMessagePreview(false)}>
+                        Cancel
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        );
+    };
+
     const CreditCardHeader = () => {
         const cardStyling = isMobile 
         ? "w-94 h-56 m-auto bg-red-100 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105" 
         : "w-96 h-56 m-auto bg-red-100 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105";
-    
+
         return (
             <div
                 className={cardStyling}
@@ -338,12 +412,10 @@ export default function Home() {
     <>
     <ToastContainer />
 
-    <div className="relative">
-  <div className="absolute inset-0 noise z-10"></div>
-  <div className="fixed inset-0 z-0" style={{ backgroundImage: "url('/bg.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
-</div>
-
-  
+      <div className="relative">
+          <div className="absolute inset-0 noise z-10"></div>
+          <div className="fixed inset-0 z-0" style={{ backgroundImage: "url('/bg.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
+      </div>
 
       <main className="lg:flex lg:flex-col items-center justify-center p-5 relative z-10 mt-4">
 
@@ -474,6 +546,8 @@ export default function Home() {
                   <Tabs.Item title="Send Message" icon={HiOutlineNewspaper}>
                       <div style={{ display: (isLoggedIn ? 'block' : 'none') }}>
                           <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-5 lg:px-8">
+                                <MessagePreviewModal />
+
                                 <form className="space-y-6" action="#" method="POST">
                                   <div>
                                     <label htmlFor="address" className="block text-sm font-medium leading-6 text-gray-900">
@@ -525,12 +599,12 @@ export default function Home() {
                                             />
                                           </div>
                                           <Tooltip content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]" style="light">
-                                              <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[url]https://www...[/url]')}>
+                                              <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[url]theurl[/url]')}>
                                                   Embed Url
                                               </button>
                                           </Tooltip>
                                           <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
-                                              <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[img]https://www.url.jpeg[/img]')}>
+                                              <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[img]imageurl[/img]')}>
                                                   Embed Image
                                               </button>
                                           </Tooltip>
@@ -590,7 +664,7 @@ export default function Home() {
                                       disabled={recipientError || messageError || sendAmountXecError || recipient === '' || (encryptionMode && password === '')}
                                       className="flex justify-center w-full rounded bg-indigo-500 px-2 py-2 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                       onClick={() => {
-                                          sendMessage();
+                                          setShowMessagePreview(true);
                                       }}
                                     >
                                         <div className="flex"><SendIcon/>&nbsp;Send Message</div>
@@ -693,7 +767,7 @@ export default function Home() {
 
               <Tabs.Item title="Settings" icon={GiAbstract010}>
                   <div className="flex w-80 flex-col py-3">
-                      <Alert color="info">Version: 1.0.6</Alert><br />
+                      <Alert color="info">Version: 1.0.7</Alert><br />
                       <button
                         type="button"
                         className="rounded bg-indigo-500 px-3 py-3 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"

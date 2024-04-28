@@ -18,9 +18,7 @@ export const getTweetId = tweetUrl => {
     // Check if video Id contains the full tweet url
     if (tweetId.includes('status/')) {
         // Extract the tweet Id after the 'status/' substring
-        updatedTweetId = tweetId.split('status/')[1];
-        // Now replace the original full tweet url in the message with the updated tweet id
-        parsedMessage = parsedMessage.replace(tweetId, updatedTweetId);
+        return tweetId.split('status/')[1];
     }
     return parsedMessage;
 };

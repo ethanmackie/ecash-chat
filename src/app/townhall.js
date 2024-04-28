@@ -1,7 +1,7 @@
 "use client";
 import  React, { useState, useEffect } from 'react';
 import { appConfig } from '../config/app';
-import { Textarea, Tooltip, Avatar, Popover, Accordion, Alert } from "flowbite-react";
+import { Textarea, Tooltip, Avatar, Popover, Accordion, Alert, Modal } from "flowbite-react";
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import { postHasErrors, replyHasErrors } from '../validation/validation';
 import { Button } from "@/components/ui/button";
@@ -47,6 +47,7 @@ export default function TownHall({ address, isMobile }) {
     const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
     const [loadingMsg, setLoadingMsg] = useState('');
     const [replySource, setReplySource] = useState('');
+    const [showMessagePreview, setShowMessagePreview] = useState(false);
 
     useEffect(() => {
         // Render the first page by default upon initial load
@@ -139,49 +140,13 @@ export default function TownHall({ address, isMobile }) {
     const handlePostChange = e => {
         const { value } = e.target;
         const postValidation = postHasErrors(value);
-        let parsedMessage = value;
         if (!postValidation) {
             // Post validates ok
             setPostError(false);
-
-            // Automatically extract video and tweet IDs
-
-            // If youtube embedding is present
-            if (
-                value.includes('[yt]') &&
-                value.includes('[/yt]') &&
-                !value.includes('youtubeurl') &&
-                !value.includes('https://www.youtube.com/shorts/')
-            ) {
-                parsedMessage = '[yt]'+YouTubeVideoId(value)+'[/yt]';
-            }
-            // If youtube shorts is being embedded
-            if (
-                value.includes('[yt]') &&
-                value.includes('[/yt]')&&
-                !value.includes('youtubeurl') &&
-                value.includes('https://www.youtube.com/shorts/')
-            ) {
-                let updatedVideoId;
-                let videoId = value.substring(
-                    value.indexOf('[yt]') + 4,
-                    value.lastIndexOf('[/yt]')
-                );
-                parsedMessage = '[yt]'+videoId.split('https://www.youtube.com/shorts/')[1]+'[/yt]';
-            }
-
-            // If tweet embedding is present
-            if (
-                value.includes('[twt]') &&
-                value.includes('[/twt]') &&
-                !value.includes('tweeturl')
-            ) {
-                parsedMessage = getTweetId(value);
-            }
         } else {
             setPostError(postValidation);
         }
-        setPost(parsedMessage);
+        setPost(value);
     };
 
     const insertMarkupTags = tooltipStr => {
@@ -196,8 +161,53 @@ export default function TownHall({ address, isMobile }) {
 
     // Pass a post tx BIP21 query string to cashtab extensions
     const sendPost = () => {
+        // Parse the message for any media tags
+        let parsedPost= post;
+        // If youtube embedding is present
+        if (
+            post.includes('[yt]') &&
+            post.includes('[/yt]') &&
+            !post.includes('youtubeurl') &&
+            !post.includes('https://www.youtube.com/shorts/')
+        ) {
+            const tagStartIndex = post.indexOf('[yt]');
+            const tagEndIndex = post.lastIndexOf('[/yt]');
+            const remainderPost = post.substring(0, tagStartIndex) + post.substring(tagEndIndex+5);
+            parsedPost = remainderPost + '[yt]'+YouTubeVideoId(post)+'[/yt]';
+        }
+
+        // If youtube shorts is being embedded
+        if (
+            post.includes('[yt]') &&
+            post.includes('[/yt]') &&
+            !post.includes('youtubeurl') &&
+            post.includes('https://www.youtube.com/shorts/')
+        ) {
+            let updatedVideoId;
+            let videoId = post.substring(
+                post.indexOf('[yt]') + 4,
+                post.lastIndexOf('[/yt]')
+            );
+            const tagStartIndex = post.indexOf('[yt]');
+            const tagEndIndex = post.lastIndexOf('[/yt]');
+            const remainderPost = post.substring(0, tagStartIndex) + post.substring(tagEndIndex+5);
+            parsedPost = remainderPost + '[yt]'+videoId.split('https://www.youtube.com/shorts/')[1]+'[/yt]';
+        }
+
+        // If tweet embedding is present
+        if (
+            post.includes('[twt]') &&
+            post.includes('[/twt]') &&
+            !post.includes('tweeturl')
+        ) {
+            const tagStartIndex = post.indexOf('[twt]');
+            const tagEndIndex = post.lastIndexOf('[/twt]');
+            const remainderPost = post.substring(0, tagStartIndex) + post.substring(tagEndIndex+6);
+            parsedPost = remainderPost + '[twt]' + getTweetId(post) + '[/twt]';
+        }
+
         // Encode the op_return post script
-        const opReturnRaw = encodeBip21Post(post);
+        const opReturnRaw = encodeBip21Post(parsedPost);
 
         window.postMessage(
             {
@@ -239,6 +249,55 @@ export default function TownHall({ address, isMobile }) {
         txListener(chronik, address, "Townhall reply sent", getTownhallHistoryByPage);
     };
 
+    const MessagePreviewModal = () => {
+        return (
+            <Modal show={showMessagePreview} onClose={() => setShowMessagePreview(false)}>
+                <Modal.Header>Post Preview</Modal.Header>
+                <Modal.Body>
+                    <div className="space-y-6">
+                        <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                            {(
+                                  <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white text-ellipsis break-words min-w-0">
+                                      {post}
+                                  </p>
+                            )}
+                            <br />Media Preview:
+                            {/* Render any media content within the message */}
+                            {post.includes('[img]') && post.includes('[/img]') && (
+                                <img src={post.substring(post.indexOf('[img]') + 5, post.lastIndexOf('[/img]'))} />
+                            )}
+                            {post.includes('[yt]') && post.includes('[/yt]') && !post.includes('https://www.youtube.com/shorts/') && (
+                                <LiteYouTubeEmbed id={YouTubeVideoId(post.substring(post.indexOf('[yt]') + 4, post.lastIndexOf('[/yt]')))} />
+                            )}
+                            {post.includes('[yt]') && post.includes('[/yt]') && post.includes('https://www.youtube.com/shorts/') && (
+                                <LiteYouTubeEmbed id={YouTubeVideoId((post.substring(post.indexOf('[yt]') + 4, post.lastIndexOf('[/yt]'))).split('https://www.youtube.com/shorts/')[1])} />
+                            )}
+                            {post.includes('[twt]') && post.includes('[/twt]') && !post.includes('tweeturl') && (
+                                <Tweet id={getTweetId(post)} />
+                            )}
+                            {post.includes('[url]') && post.includes('[/url]') && (
+                                <a href={post.substring(post.indexOf('[url]') + 5, post.lastIndexOf('[/url]'))} target="_blank">
+                                    {post.substring(post.indexOf('[url]') + 5, post.lastIndexOf('[/url]'))}
+                                </a>
+                            )}
+                        </p>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={() => {
+                        setShowMessagePreview(false)
+                        sendPost()
+                    }}>
+                        Looks good
+                    </Button>
+                    <Button color="gray" onClick={() => setShowMessagePreview(false)}>
+                        Cancel
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        );
+    };
+
     // Pass a XEC tip tx BIP21 query string to cashtab extensions
     const sendXecTip = (recipient, tipAmount) => {
         // Encode the op_return message script
@@ -268,6 +327,7 @@ export default function TownHall({ address, isMobile }) {
 
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center py-5 lg:px-8">
+            <MessagePreviewModal />
             {isMobile && (<Alert color="failure" icon={HiInformationCircle}>Limited functionality mode</Alert>)}
             {isMobile === false && (
               <>
@@ -298,12 +358,12 @@ export default function TownHall({ address, isMobile }) {
                             />
                           </div>
                           <Tooltip content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]" style="light">
-                              <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[url]https://www...[/url]')}>
+                              <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[url]theurl[/url]')}>
                                   Embed Url
                               </button>
                           </Tooltip>
                           <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
-                              <button className="rounded bg-indigo-500 px-4 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[img]https://www.url.jpeg[/img]')}>
+                              <button className="rounded bg-indigo-500 px-4 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[img]imageurl[/img]')}>
                                   Embed Image
                               </button>
                           </Tooltip>
@@ -322,7 +382,7 @@ export default function TownHall({ address, isMobile }) {
                         type="button"
                         disabled={post === '' || postError}
                         className="flex w-full justify-center rounded bg-indigo-500 px-2 py-2 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                        onClick={() => { sendPost() }}
+                        onClick={() => { setShowMessagePreview(true) }}
                       >
                           <div className="flex"><PostIcon/>&nbsp;Post to Townhall</div>
                       </button>
