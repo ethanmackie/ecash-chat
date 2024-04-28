@@ -382,7 +382,7 @@ export default function TownHall({ address, isMobile }) {
                           (tx, index) => (
                             <>
                                 <div className="flex items-start gap-2.5" key={"txHistory"+index} onMouseLeave={() => setReplySource('')}>
-                                   <div className="flex flex-col w-full max-w-[550px] break-words leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700 shadow-2xl transition-transform transform">
+                                   <div className="flex flex-col w-full max-w-[590px] break-words line-clamp-1 leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700 shadow-2xl transition-transform transform">
                                    <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
                                       <span>
                                          {tx.replyAddress === address ? (
@@ -510,8 +510,9 @@ export default function TownHall({ address, isMobile }) {
                                    {tx.imageSrc !== false && (<img src={tx.imageSrc} />)}
                                    {tx.videoId !== false && (<LiteYouTubeEmbed id={tx.videoId} />)}
                                    {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
-                                   {tx.url !== false && (<Alert color="info"><a href={tx.url} target="_blank" >{tx.url}</a></Alert>)}
-
+                                   <p className="line-clamp-1">
+                                      {tx.url !== false && (<Alert color="info"><a href={tx.url} target="_blank" >{tx.url}</a></Alert>)}
+                                   </p>
                                    {/* Date and timestamp */}
                                    <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
                                       &emsp;{tx.txDate}&nbsp;at&nbsp;{tx.txTime}
