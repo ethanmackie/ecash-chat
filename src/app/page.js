@@ -197,12 +197,19 @@ export default function Home() {
                     value.lastIndexOf('[/yt]')
                 );
                 // Check if video Id contains the full youtube url
-                if (videoId.includes('watch?v=')) {
+                if (videoId.includes('watch?v=') && videoId.includes('&')) {
                     // Extract the youtube video Id between the '/watch?v=' and '&' substrings
                     updatedVideoId = videoId.substring(
                         videoId.indexOf('https://www.youtube.com/watch?v=') + 32,
                         videoId.indexOf('&')
                     );
+                    // Now replace the original full youtube url in the message with the updated videoId
+                    parsedMessage = parsedMessage.replace(videoId, updatedVideoId);
+                }
+                // Check if video Id is a shortened one without the ending &
+                if (videoId.includes('watch?v=') && !videoId.includes('&')) {
+                    // Extract the youtube video Id after the '/watch?v='
+                    updatedVideoId = videoId.split('https://www.youtube.com/watch?v=')[1];
                     // Now replace the original full youtube url in the message with the updated videoId
                     parsedMessage = parsedMessage.replace(videoId, updatedVideoId);
                 }
@@ -546,12 +553,12 @@ export default function Home() {
                                               </button>
                                           </Tooltip>
                                           <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=8oIHo0vCZDs[/yt]" style="light">
-                                              <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[yt]youtube-url[/yt]')}>
+                                              <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}>
                                                   Embed Youtube
                                               </button>
                                           </Tooltip>
                                           <Tooltip content="e.g. [twt]https://twitter.com/eCashCommunity/status/1783932847528583665[/twt]" style="light">
-                                              <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[twt]tweet-url[/twt]')}>
+                                              <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}>
                                                   Embed Tweet
                                               </button>
                                           </Tooltip>
@@ -704,7 +711,7 @@ export default function Home() {
 
               <Tabs.Item title="Settings" icon={GiAbstract010}>
                   <div className="flex w-80 flex-col py-3">
-                      <Alert color="info">Version: 1.0.5</Alert><br />
+                      <Alert color="info">Version: 1.0.6</Alert><br />
                       <button
                         type="button"
                         className="rounded bg-indigo-500 px-3 py-3 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
