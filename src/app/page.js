@@ -5,7 +5,7 @@ import TxHistory from './txhistory';
 import Townhall from './townhall';
 import cashaddr from 'ecashaddrjs';
 import { queryAliasServer } from '../alias/alias-server';
-import { encodeBip21Message } from '../utils/utils';
+import { encodeBip21Message, getTweetId } from '../utils/utils';
 import { isMobileDevice } from '../utils/mobileCheck';
 import { getBalance, txListener } from '../chronik/chronik';
 import { appConfig } from '../config/app';
@@ -39,7 +39,7 @@ import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
 const chronik = new ChronikClientNode(chronikConfig.urls);
 import Spline from '@splinetool/react-spline';
-
+import YouTubeVideoId from 'youtube-video-id';
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -183,55 +183,37 @@ export default function Home() {
         if (!messageValidation) {
             // Message validates ok
             setMessageError(false);
-
-            // Automatically extract video and tweet IDs
-
             // If youtube embedding is present
             if (
                 value.includes('[yt]') &&
-                value.includes('[/yt]')
+                value.includes('[/yt]')&&
+                !value.includes('youtubeurl') &&
+                !value.includes('https://www.youtube.com/shorts/')
+            ) {
+                parsedMessage = '[yt]'+YouTubeVideoId(value)+'[/yt]';
+            }
+            // If youtube shorts is being embedded
+            if (
+                value.includes('[yt]') &&
+                value.includes('[/yt]')&&
+                !value.includes('youtubeurl') &&
+                value.includes('https://www.youtube.com/shorts/')
             ) {
                 let updatedVideoId;
                 let videoId = value.substring(
                     value.indexOf('[yt]') + 4,
                     value.lastIndexOf('[/yt]')
                 );
-                // Check if video Id contains the full youtube url
-                if (videoId.includes('watch?v=') && videoId.includes('&')) {
-                    // Extract the youtube video Id between the '/watch?v=' and '&' substrings
-                    updatedVideoId = videoId.substring(
-                        videoId.indexOf('https://www.youtube.com/watch?v=') + 32,
-                        videoId.indexOf('&')
-                    );
-                    // Now replace the original full youtube url in the message with the updated videoId
-                    parsedMessage = parsedMessage.replace(videoId, updatedVideoId);
-                }
-                // Check if video Id is a shortened one without the ending &
-                if (videoId.includes('watch?v=') && !videoId.includes('&')) {
-                    // Extract the youtube video Id after the '/watch?v='
-                    updatedVideoId = videoId.split('https://www.youtube.com/watch?v=')[1];
-                    // Now replace the original full youtube url in the message with the updated videoId
-                    parsedMessage = parsedMessage.replace(videoId, updatedVideoId);
-                }
+                parsedMessage = '[yt]'+videoId.split('https://www.youtube.com/shorts/')[1]+'[/yt]';
             }
 
             // If tweet embedding is present
             if (
                 value.includes('[twt]') &&
-                value.includes('[/twt]')
+                value.includes('[/twt]') &&
+                !value.includes('tweeturl')
             ) {
-                let updatedTweetId;
-                let tweetId = value.substring(
-                    value.indexOf('[twt]') + 5,
-                    value.lastIndexOf('[/twt]')
-                );
-                // Check if video Id contains the full tweet url
-                if (tweetId.includes('status/')) {
-                    // Extract the tweet Id after the 'status/' substring
-                    updatedTweetId = tweetId.split('status/')[1];
-                    // Now replace the original full tweet url in the message with the updated tweet id
-                    parsedMessage = parsedMessage.replace(tweetId, updatedTweetId);
-                }
+                parsedMessage = getTweetId(value);
             }
         } else {
             setMessageError(messageValidation);

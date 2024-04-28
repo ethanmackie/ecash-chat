@@ -4,6 +4,28 @@ import { BN } from 'slp-mdm';
 const SATOSHIS_PER_XEC = 100;
 
 /**
+ * Extracts a tweet ID from a twitter url
+ * @param {string} the full twitter Url
+ * @returns {string} tweet Id
+ */
+export const getTweetId = tweetUrl => {
+    let updatedTweetId;
+    let parsedMessage = tweetUrl;
+    let tweetId = tweetUrl.substring(
+        tweetUrl.indexOf('[twt]') + 5,
+        tweetUrl.lastIndexOf('[/twt]')
+    );
+    // Check if video Id contains the full tweet url
+    if (tweetId.includes('status/')) {
+        // Extract the tweet Id after the 'status/' substring
+        updatedTweetId = tweetId.split('status/')[1];
+        // Now replace the original full tweet url in the message with the updated tweet id
+        parsedMessage = parsedMessage.replace(tweetId, updatedTweetId);
+    }
+    return parsedMessage;
+};
+
+/**
  * Convert an amount in satoshis to XEC
  * @param {Integer} satoshis
  * @returns {Number}

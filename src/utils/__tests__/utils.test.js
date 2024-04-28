@@ -2,8 +2,22 @@
  * @jest-environment ./custom-environment
  */
  
-import { encodeBip21Message, encodeBip21Post, formatDate, encodeBip21ReplyPost, toXec } from '../utils';
+import {
+    encodeBip21Message,
+    encodeBip21Post,
+    formatDate,
+    encodeBip21ReplyPost,
+    toXec,
+    getTweetId,
+} from '../utils';
 
+it(`getTweetId() correctly extracts the tweet ID from a valid tweet url`, () => {
+    const tweetUrl = '[twt]https://twitter.com/CashtabWallet/status/1784451748028944549[/twt]';
+    expect(getTweetId(tweetUrl)).toStrictEqual('[twt]1784451748028944549[/twt]');
+});
+it(`getTweetId() correctly returns the input an invalid valid tweet url`, () => {
+    expect(getTweetId('[twt]https://www.youtube.com/watch?v=tAl6sPRFQgk[/twt]')).toStrictEqual('[twt]https://www.youtube.com/watch?v=tAl6sPRFQgk[/twt]');
+});
 it(`encodeBip21Message() correctly encodes a valid message for use in a BIP21 querystring`, () => {
     expect(encodeBip21Message('encode this')).toStrictEqual('04636861740b656e636f64652074686973');
 });
