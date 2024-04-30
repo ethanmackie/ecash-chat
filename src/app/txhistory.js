@@ -422,9 +422,12 @@ export default function TxHistory({ address }) {
 
                         {/* XEC Tip rendering */}
                         {tx.isXecTip && (
-                            <Alert color="info">
-                                <div className="flex"><MoneyIcon/>&nbsp;XEC tip from eCash Chat</div>
-                            </Alert>
+                           <Alert color="success">
+                           <div className="flex items-center space-x-2">
+                             <MoneyIcon className="h-5 w-5 text-blue-500" />
+                             <span>XEC tip from eCash Chat</span>
+                           </div>
+                         </Alert>
                         )}
 
                         {/* Render any media content within the message */}
