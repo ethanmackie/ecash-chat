@@ -29,7 +29,8 @@ import {
 } from "@/components/ui/pagination";
 import { HiInformationCircle } from "react-icons/hi";
 import { Input } from "@/components/ui/input"
-import { Popover, Avatar, Badge, Textarea, Alert, Modal } from "flowbite-react";
+import { Popover, Avatar, Textarea, Alert, Modal } from "flowbite-react";
+import { Badge } from "@/components/ui/badge";
 import { Tweet } from 'react-tweet';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
@@ -212,7 +213,7 @@ export default function TxHistory({ address }) {
                                               copy(tx.replyAddress);
                                               toast(`${tx.replyAddress} copied to clipboard`);
                                           }}
-                                          >This Wallet</div>
+                                          ><Badge variant="outline">This Wallet</Badge></div>
                                       </div>
                                   </div>
                                   </>
@@ -314,11 +315,11 @@ export default function TxHistory({ address }) {
                                                    toast(`${tx.recipientAddress} copied to clipboard`);
                                                 }}
                                             >
-                                                <div>This Wallet</div>
+                                                <div><Badge variant="outline">This Wallet</Badge></div>
                                             </div>
                                         </div>
                                     </>
-                               ) : tx.iseCashChatPost === true ? <Badge color="info">eCash Chat Townhall</Badge> :
+                               ) : tx.iseCashChatPost === true ? <Badge variant="outline">eCash Chat Townhall</Badge> :
                                  (<>
                                    <span>
                                    <div className="flex items-center gap-4">
