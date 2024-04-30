@@ -246,6 +246,7 @@ export default function TownHall({ address, isMobile }) {
             },
             '*',
         );
+        setReplyPost('');
         txListener(chronik, address, "Townhall reply sent", getTownhallHistoryByPage);
     };
 
