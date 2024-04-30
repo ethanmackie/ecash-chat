@@ -43,6 +43,7 @@ import YouTubeVideoId from 'youtube-video-id';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
 import { Tweet } from 'react-tweet';
+const packageJson = require('../../package.json');
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -767,7 +768,7 @@ export default function Home() {
 
               <Tabs.Item title="Settings" icon={GiAbstract010}>
                   <div className="flex w-80 flex-col py-3">
-                      <Alert color="info">Version: 1.0.7</Alert><br />
+                      <Alert color="info">Version: {packageJson.version}</Alert><br />
                       <button
                         type="button"
                         className="rounded bg-indigo-500 px-3 py-3 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
