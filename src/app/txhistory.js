@@ -220,14 +220,14 @@ export default function TxHistory({ address }) {
                               ) :
                                 (<>
                                   <span>
-                                  <div className="flex items-center gap-4">
+                                  <div className="flex items-center gap-2">
                                       <PersonIcon/>
                                       <div className="font-medium dark:text-white">
                                           <div onClick={() => {
                                               copy(tx.replyAddress);
                                               toast(`${tx.replyAddress} copied to clipboard`);
                                           }}>
-                                              {tx.replyAddress.substring(0,10)} ... {tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                              {tx.replyAddress.substring(0,10)}...{tx.replyAddress.substring(tx.replyAddress.length - 5)}
                                           </div>
                                       </div>
                                       <Popover
@@ -329,7 +329,7 @@ export default function TxHistory({ address }) {
                                                copy(tx.recipientAddress);
                                                toast(`${tx.recipientAddress} copied to clipboard`);
                                            }}>
-                                              {tx.recipientAddress.substring(0,10)} ... {tx.recipientAddress.substring(tx.recipientAddress.length - 5)}
+                                              {tx.recipientAddress.substring(0,10)}...{tx.recipientAddress.substring(tx.recipientAddress.length - 5)}
                                           </div>
                                        </div>
                                        <Popover
