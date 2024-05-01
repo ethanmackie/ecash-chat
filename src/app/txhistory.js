@@ -7,12 +7,13 @@ import { ChronikClientNode } from 'chronik-client';
 import cashaddr from 'ecashaddrjs';
 import { isValidRecipient, isValidMessage } from '../validation/validation';
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { MagnifyingGlassIcon, ResetIcon } from "@radix-ui/react-icons";
 import {
     AnonAvatar,
     ShareIcon,
     ReplyIcon,
     SearchIcon,
-    ResetIcon,
     ExportIcon,
     EncryptionIcon,
     DecryptionIcon,
@@ -295,7 +296,7 @@ export default function TxHistory({ address }) {
                                             type="button"
                                             className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                         >
-                                            Tip XEC
+                                            Tip
                                         </button>
                                       </Popover>
                                     </div>
@@ -397,7 +398,7 @@ export default function TxHistory({ address }) {
                                              type="button"
                                              className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                          >
-                                             Tip XEC
+                                             Tip
                                          </button>
                                        </Popover>
                                     </div>
@@ -608,47 +609,47 @@ export default function TxHistory({ address }) {
              {loadingMsg !== '' && (<Alert color="info">{loadingMsg}</Alert>)}
              <br />
              <form className="space-y-6" action="#" method="POST">
-               <div>
-                 <label htmlFor="address" className="block text-m font-medium leading-6 text-gray-900">
-                   Search By Address
-                 </label>
+  <div>
+    <label htmlFor="address" className="block text-sm font-medium leading-6 text-gray-900">
+      Search By Address
+    </label>
 
-                 <div className="mt-2">
-                   <input
-                     id="address"
-                     name="address"
-                     type="text"
-                     value={addressToSearch}
-                     required
-                     className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                     onChange={e => handleAddressChange(e)}
-                   />
-                 </div>
-                 <p className="mt-2 text-sm text-red-600 dark:text-red-500">{addressToSearchError !== false && addressToSearchError}</p>
+    <div className="mt-2 flex items-center space-x-2">
+      <input
+        id="address"
+        name="address"
+        type="text"
+        value={addressToSearch}
+        required
+        className="flex-1 max-w-96 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+        onChange={e => handleAddressChange(e)}
+      />
 
-                 <button
-                   type="button"
-                   disabled={addressToSearchError}
-                   className="rounded bg-indigo-500 px-3 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                   onClick={e => {
-                       getTxHistoryByAddress(e);
-                   }}
-                 >
-                   <div className="flex"><SearchIcon/>&nbsp;Search</div>
-                 </button>
-                 &nbsp;
-                 <button
-                   type="button"
-                   className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                   onClick={() => {
-                       setTxHistoryByAddress('');
-                       setAddressToSearch('');
-                   }}
-                 >
-                   <div className="flex"><ResetIcon/>&nbsp;Reset</div>
-                 </button>
-              </div>
-             </form>
+      <Button
+        type="button"
+        variant="outline"
+        disabled={addressToSearchError}
+        onClick={e => {
+          getTxHistoryByAddress(e);
+        }}
+      >
+        <MagnifyingGlassIcon className="h-4 w-4" />
+      </Button>
+
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => {
+          setTxHistoryByAddress('');
+          setAddressToSearch('');
+        }}
+      >
+        <ResetIcon />
+      </Button>
+    </div>
+    <p className="mt-2 text-sm text-red-600 dark:text-red-500">{addressToSearchError !== false && addressToSearchError}</p>
+  </div>
+</form>
              <br />
              <RenderTxHistory />
              </>

@@ -526,7 +526,7 @@ export default function TownHall({ address, isMobile }) {
                                                                 type="button"
                                                                 className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                             >
-                                                                Tip XEC
+                                                                Tip
                                                             </button>
                                                           </Popover>
 
