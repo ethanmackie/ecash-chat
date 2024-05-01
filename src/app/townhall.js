@@ -429,7 +429,7 @@ export default function TownHall({ address, isMobile }) {
                           (tx, index) => (
                             <>
                                 <div className="flex items-start gap-2.5" key={"txHistory"+index} onMouseLeave={() => setReplySource('')}>
-                                   <div className="flex flex-col w-full max-w-[590px] break-words line-clamp-1 leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700 shadow-2xl transition-transform transform">
+                                   <div className="flex flex-col break-words space-y-1.5 w-full max-w-[590px] leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                                    <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
                                       <span>
                                          {tx.replyAddress === address ? (
@@ -455,7 +455,7 @@ export default function TownHall({ address, isMobile }) {
                                                             copy(tx.replyAddress);
                                                             toast(`${tx.replyAddress} copied to clipboard`);
                                                         }}>
-                                                            {tx.replyAddress.substring(0,10)} ... {tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                                            {tx.replyAddress.substring(0,10)}...{tx.replyAddress.substring(tx.replyAddress.length - 5)}
                                                         </div>
                                                     </div>
                                                     {/* Tip XEC options */}
@@ -526,7 +526,7 @@ export default function TownHall({ address, isMobile }) {
                                                                 type="button"
                                                                 className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                             >
-                                                                Tip XEC
+                                                                Tip
                                                             </button>
                                                           </Popover>
 

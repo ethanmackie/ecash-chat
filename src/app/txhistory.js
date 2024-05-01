@@ -7,12 +7,13 @@ import { ChronikClientNode } from 'chronik-client';
 import cashaddr from 'ecashaddrjs';
 import { isValidRecipient, isValidMessage } from '../validation/validation';
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { MagnifyingGlassIcon, ResetIcon } from "@radix-ui/react-icons";
 import {
     AnonAvatar,
     ShareIcon,
     ReplyIcon,
     SearchIcon,
-    ResetIcon,
     ExportIcon,
     EncryptionIcon,
     DecryptionIcon,
@@ -29,7 +30,8 @@ import {
 } from "@/components/ui/pagination";
 import { HiInformationCircle } from "react-icons/hi";
 import { Input } from "@/components/ui/input"
-import { Popover, Avatar, Badge, Textarea, Alert, Modal } from "flowbite-react";
+import { Popover, Avatar, Textarea, Alert, Modal } from "flowbite-react";
+import { Badge } from "@/components/ui/badge";
 import { Tweet } from 'react-tweet';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
@@ -198,7 +200,7 @@ export default function TxHistory({ address }) {
                    (tx, index) => (
                      <>
                      <div className="flex items-start gap-2.5" key={"txHistory"+index}>
-                        <div className="flex flex-col w-full max-w-[590px] leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700 shadow-2xl transition-transform transform">
+                        <div className="flex flex-col space-y-1.5 w-full max-w-[590px] leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
 
                         <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white break-words">
                            <span className="text-sm font-bold text-gray-500 dark:text-gray-400">From: </span>
@@ -212,21 +214,21 @@ export default function TxHistory({ address }) {
                                               copy(tx.replyAddress);
                                               toast(`${tx.replyAddress} copied to clipboard`);
                                           }}
-                                          >This Wallet</div>
+                                          ><Badge variant="outline">This Wallet</Badge></div>
                                       </div>
                                   </div>
                                   </>
                               ) :
                                 (<>
                                   <span>
-                                  <div className="flex items-center gap-4">
+                                  <div className="flex items-center gap-2">
                                       <PersonIcon/>
                                       <div className="font-medium dark:text-white">
                                           <div onClick={() => {
                                               copy(tx.replyAddress);
                                               toast(`${tx.replyAddress} copied to clipboard`);
                                           }}>
-                                              {tx.replyAddress.substring(0,10)} ... {tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                              {tx.replyAddress.substring(0,8)}...{tx.replyAddress.substring(tx.replyAddress.length - 5)}
                                           </div>
                                       </div>
                                       <Popover
@@ -294,7 +296,7 @@ export default function TxHistory({ address }) {
                                             type="button"
                                             className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                         >
-                                            Tip XEC
+                                            Tip
                                         </button>
                                       </Popover>
                                     </div>
@@ -314,11 +316,11 @@ export default function TxHistory({ address }) {
                                                    toast(`${tx.recipientAddress} copied to clipboard`);
                                                 }}
                                             >
-                                                <div>This Wallet</div>
+                                                <div><Badge variant="outline">This Wallet</Badge></div>
                                             </div>
                                         </div>
                                     </>
-                               ) : tx.iseCashChatPost === true ? <Badge color="info">eCash Chat Townhall</Badge> :
+                               ) : tx.iseCashChatPost === true ? <Badge variant="outline">eCash Chat Townhall</Badge> :
                                  (<>
                                    <span>
                                    <div className="flex items-center gap-4">
@@ -328,7 +330,7 @@ export default function TxHistory({ address }) {
                                                copy(tx.recipientAddress);
                                                toast(`${tx.recipientAddress} copied to clipboard`);
                                            }}>
-                                              {tx.recipientAddress.substring(0,10)} ... {tx.recipientAddress.substring(tx.recipientAddress.length - 5)}
+                                              {tx.recipientAddress.substring(0,8)}...{tx.recipientAddress.substring(tx.recipientAddress.length - 5)}
                                           </div>
                                        </div>
                                        <Popover
@@ -396,7 +398,7 @@ export default function TxHistory({ address }) {
                                              type="button"
                                              className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                          >
-                                             Tip XEC
+                                             Tip
                                          </button>
                                        </Popover>
                                     </div>
@@ -422,9 +424,12 @@ export default function TxHistory({ address }) {
 
                         {/* XEC Tip rendering */}
                         {tx.isXecTip && (
-                            <Alert color="info">
-                                <div className="flex"><MoneyIcon/>&nbsp;XEC tip from eCash Chat</div>
-                            </Alert>
+                           <Alert color="success">
+                           <div className="flex items-center space-x-2">
+                             <MoneyIcon className="h-5 w-5 text-blue-500" />
+                             <span>XEC tip from eCash Chat</span>
+                           </div>
+                         </Alert>
                         )}
 
                         {/* Render any media content within the message */}
@@ -604,47 +609,47 @@ export default function TxHistory({ address }) {
              {loadingMsg !== '' && (<Alert color="info">{loadingMsg}</Alert>)}
              <br />
              <form className="space-y-6" action="#" method="POST">
-               <div>
-                 <label htmlFor="address" className="block text-m font-medium leading-6 text-gray-900">
-                   Search By Address
-                 </label>
+  <div>
+    <label htmlFor="address" className="block text-sm font-medium leading-6 text-gray-900">
+      Search By Address
+    </label>
 
-                 <div className="mt-2">
-                   <input
-                     id="address"
-                     name="address"
-                     type="text"
-                     value={addressToSearch}
-                     required
-                     className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                     onChange={e => handleAddressChange(e)}
-                   />
-                 </div>
-                 <p className="mt-2 text-sm text-red-600 dark:text-red-500">{addressToSearchError !== false && addressToSearchError}</p>
+    <div className="mt-2 flex items-center space-x-2">
+      <input
+        id="address"
+        name="address"
+        type="text"
+        value={addressToSearch}
+        required
+        className="flex-1 max-w-96 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+        onChange={e => handleAddressChange(e)}
+      />
 
-                 <button
-                   type="button"
-                   disabled={addressToSearchError}
-                   className="rounded bg-indigo-500 px-3 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                   onClick={e => {
-                       getTxHistoryByAddress(e);
-                   }}
-                 >
-                   <div className="flex"><SearchIcon/>&nbsp;Search</div>
-                 </button>
-                 &nbsp;
-                 <button
-                   type="button"
-                   className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                   onClick={() => {
-                       setTxHistoryByAddress('');
-                       setAddressToSearch('');
-                   }}
-                 >
-                   <div className="flex"><ResetIcon/>&nbsp;Reset</div>
-                 </button>
-              </div>
-             </form>
+      <Button
+        type="button"
+        variant="outline"
+        disabled={addressToSearchError}
+        onClick={e => {
+          getTxHistoryByAddress(e);
+        }}
+      >
+        <MagnifyingGlassIcon className="h-4 w-4" />
+      </Button>
+
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => {
+          setTxHistoryByAddress('');
+          setAddressToSearch('');
+        }}
+      >
+        <ResetIcon />
+      </Button>
+    </div>
+    <p className="mt-2 text-sm text-red-600 dark:text-red-500">{addressToSearchError !== false && addressToSearchError}</p>
+  </div>
+</form>
              <br />
              <RenderTxHistory />
              </>
