@@ -33,6 +33,8 @@ import {
 } from '../chronik/chronik';
 import copy from 'copy-to-clipboard';
 import { toast } from 'react-toastify';
+import { Alert as ShadcnAlert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
 const chronik = new ChronikClientNode(chronikConfig.urls);
@@ -46,7 +48,6 @@ export default function TownHall({ address, isMobile }) {
     const [replyPostError, setReplyPostError] = useState(false);
     const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
     const [loadingMsg, setLoadingMsg] = useState('');
-    const [replySource, setReplySource] = useState('');
     const [showMessagePreview, setShowMessagePreview] = useState(false);
 
     useEffect(() => {
@@ -326,6 +327,48 @@ export default function TownHall({ address, isMobile }) {
         txListener(chronik, address, "Townhall XEC tip sent", getTownhallHistoryByPage);
     };
 
+    // Lookup and render any corresponding replies
+    const RenderReplies = ( { txid, replies } ) => {
+        const foundReplies = replies.filter(replyTx => replyTx.replyTxid === txid);
+
+        // If this post (i.e. txid) has no reply, don't bother rendering a reply component
+        if (foundReplies.length === 0) {
+            return;
+        }
+
+        return (
+            foundReplies.map(
+                (foundReply, index) => (
+                    <>
+                    <div className="flex flex-col break-words space-y-1.5 w-full max-w-[590px] leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                        <div className="flex items-center gap-4">
+                            <PersonIcon/>
+                            <div
+                                className="font-medium dark:text-white"
+                                onClick={() => {
+                                    copy(foundReply.replyAddress);
+                                    toast(`${foundReply.replyAddress} copied to clipboard`);
+                                }}
+                            >
+                                <Badge variant="outline">
+                                    {foundReply.replyAddress.substring(0,10)+'...'+foundReply.replyAddress.substring(foundReply.replyAddress.length - 5)}
+                                </Badge>
+                            </div>
+                        </div>
+
+                        <div className="py-2">
+                            {foundReply.opReturnMessage}
+                        </div>
+                        <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                            {foundReply.txDate}&nbsp;at&nbsp;{foundReply.txTime}
+                        </span>
+                    </div>
+                    </>
+                )
+            )
+        );
+    };
+
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center py-5 lg:px-8">
             <MessagePreviewModal />
@@ -428,7 +471,7 @@ export default function TownHall({ address, isMobile }) {
                     ? townHallHistory.txs.map(
                           (tx, index) => (
                             <>
-                                <div className="flex items-start gap-2.5" key={"txHistory"+index} onMouseLeave={() => setReplySource('')}>
+                                <div className="flex items-start gap-2.5" key={"txHistory"+index}>
                                    <div className="flex flex-col break-words space-y-1.5 w-full max-w-[590px] leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                                    <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
                                       <span>
@@ -436,6 +479,7 @@ export default function TownHall({ address, isMobile }) {
                                              <>
                                              <div className="flex items-center gap-4">
                                                  <PersonIcon/>
+                                                 <Badge variant="outline">
                                                  <div className="font-medium dark:text-white">
                                                      <div onClick={() => {
                                                          copy(tx.replyAddress);
@@ -443,6 +487,7 @@ export default function TownHall({ address, isMobile }) {
                                                      }}
                                                      >This Wallet</div>
                                                  </div>
+                                                 </Badge>
                                              </div>
                                              </>
                                          ) :
@@ -450,6 +495,7 @@ export default function TownHall({ address, isMobile }) {
                                              <span>
                                                 <div className="flex items-center gap-4">
                                                     <PersonIcon/>
+                                                    <Badge variant="outline">
                                                     <div className="font-medium dark:text-white">
                                                         <div onClick={() => {
                                                             copy(tx.replyAddress);
@@ -458,6 +504,7 @@ export default function TownHall({ address, isMobile }) {
                                                             {tx.replyAddress.substring(0,10)}...{tx.replyAddress.substring(tx.replyAddress.length - 5)}
                                                         </div>
                                                     </div>
+                                                    </Badge>
                                                     {/* Tip XEC options */}
                                                     &nbsp;
 
@@ -536,19 +583,6 @@ export default function TownHall({ address, isMobile }) {
                                          }
                                       </span>
                                    </div>
-
-                                   {/* If this post was a reply to another */}
-                                   {tx.replyTxid !== false && (
-                                        <Alert className="py-4" color="info"
-                                            onMouseOver={() => {getTxDetails(chronik, tx.replyTxid).then((txDetails) => {setReplySource(parseChronikTx(txDetails, address).opReturnMessage)})}}
-                                        >
-                                            <Tooltip
-                                               content={replySource}
-                                            >
-                                                Replying to post: ...{tx.replyTxid.substring(tx.replyTxid.length - 15)}
-                                            </Tooltip>
-                                        </Alert>
-                                   )}
 
                                    {/* Render the op_return message */}
                                    <p className="text-m font-normal px-2 py-2.5 text-gray-900 dark:text-white" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
@@ -674,10 +708,14 @@ export default function TownHall({ address, isMobile }) {
                                              <ShareIcon />
                                          </button>
                                        </Popover>
+                                       <br /><br />
+                                            {/* Render corresponding replies for this post */}
+                                            {<RenderReplies txid={tx.txid} replies={townHallHistory.replies} />}
                                    </div>
                                   </div>
                                </div>
-                               <br />
+
+                                <br />
                            </>
                           ),
                       )

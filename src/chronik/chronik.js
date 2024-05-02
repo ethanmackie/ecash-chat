@@ -110,12 +110,19 @@ export const getTxHistory = async (chronik, address, page = 0) => {
         txHistoryPage = await chronik.address(address).history(page, chronikConfig.txHistoryPageSize);
 
         const parsedTxs = [];
+        const replyTxs = [];
         for (let i = 0; i < txHistoryPage.txs.length; i += 1) {
             const parsedTx = parseChronikTx(
                 txHistoryPage.txs[i],
                 address,
             );
-            parsedTxs.push(parsedTx);
+
+            // Separate out the replies so they can be rendered underneath the main posts
+            if (parsedTx.replyTxid) {
+                replyTxs.push(parsedTx);
+            } else {
+                parsedTxs.push(parsedTx);
+            }
         }
 
         // Filter out eToken and non-message txs
@@ -125,6 +132,7 @@ export const getTxHistory = async (chronik, address, page = 0) => {
         });
         return {
             txs: parsedAndFilteredTxs,
+            replies: replyTxs,
             numPages: txHistoryPage.numPages,
         };
     } catch (err) {
