@@ -40,6 +40,15 @@ import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
 const chronik = new ChronikClientNode(chronikConfig.urls);
 import YouTubeVideoId from 'youtube-video-id';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 
 export default function TownHall({ address, isMobile }) {
     const [townHallHistory, setTownHallHistory] = useState('');
@@ -50,6 +59,10 @@ export default function TownHall({ address, isMobile }) {
     const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
     const [loadingMsg, setLoadingMsg] = useState('');
     const [showMessagePreview, setShowMessagePreview] = useState(false);
+    const [currentPage, setCurrentPage] = useState(0);
+
+    const maxPagesToShow = 7;
+    const halfMaxPages = Math.floor(maxPagesToShow / 2);
 
     useEffect(() => {
         // Render the first page by default upon initial load
@@ -445,27 +458,70 @@ export default function TownHall({ address, isMobile }) {
             {/* Townhall Post History */}
 
                 {/*Set up pagination menu*/}
-                <br />
-                Scan recent townhall posts{'   '}<br />
+            
 
-                <span>Page:
-                <nav aria-label="Page navigation example">
-                   <ul className="inline-flex -space-x-px text-base h-10">
-                      {(() => {
-                          let page = [];
-                          for (let i = 0; i < townHallHistory.numPages; i += 1) {
-                            page.push(
-                              <li key={"Page"+i}>
-                                <a href={"#"} onClick={() => getTownhallHistoryByPage(i)} className="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-                                    {(i+1)}
-                                </a>
-                              </li>
-                           );
-                          }
-                          return page;
-                        })()}
-                  </ul>
-                  </nav>
+                <span>
+                <Pagination>
+  <PaginationContent>
+    {/* Previous button */}
+    <PaginationItem>
+      <PaginationPrevious
+        href="#"
+        onClick={(e) => {
+          e.preventDefault();
+          setCurrentPage(old => Math.max(0, old - 1));
+          getTownhallHistoryByPage(Math.max(0, currentPage - 1));
+        }}
+        disabled={currentPage === 0}
+      />
+    </PaginationItem>
+
+    {/* Numbered page links with dynamic display logic */}
+    {Array.from({ length: townHallHistory.numPages }, (_, i) => i)
+      .filter(i => {
+      
+        if (townHallHistory.numPages <= maxPagesToShow) return true;
+        if (currentPage <= halfMaxPages) return i < maxPagesToShow;
+        if (currentPage >= townHallHistory.numPages - halfMaxPages) return i >= townHallHistory.numPages - maxPagesToShow;
+        return i >= currentPage - halfMaxPages && i <= currentPage + halfMaxPages;
+      })
+      .map(i => (
+        <PaginationItem key={i}>
+          <PaginationLink
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              getTownhallHistoryByPage(i);
+              setCurrentPage(i);
+            }}
+            isActive={currentPage === i}
+          >
+            {i + 1}
+          </PaginationLink>
+        </PaginationItem>
+      ))}
+
+    {/* Optional ellipsis for overflow, modifying to appear conditionally */}
+    {(townHallHistory.numPages > maxPagesToShow && currentPage < townHallHistory.numPages - halfMaxPages) && (
+      <PaginationItem>
+        <PaginationEllipsis />
+      </PaginationItem>
+    )}
+
+    {/* Next button */}
+    <PaginationItem>
+      <PaginationNext
+        href="#"
+        onClick={(e) => {
+          e.preventDefault();
+          setCurrentPage(old => Math.min(townHallHistory.numPages - 1, old + 1));
+          getTownhallHistoryByPage(Math.min(townHallHistory.numPages - 1, currentPage + 1));
+        }}
+        disabled={currentPage === townHallHistory.numPages - 1}
+      />
+    </PaginationItem>
+  </PaginationContent>
+</Pagination>
                   </span>
 
             <div>
