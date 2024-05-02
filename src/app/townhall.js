@@ -5,8 +5,9 @@ import { Textarea, Tooltip, Avatar, Popover, Accordion, Alert, Modal } from "flo
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import { postHasErrors, replyHasErrors } from '../validation/validation';
 import { Button } from "@/components/ui/button";
+import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon } from "@/components/ui/social";
-import { PersonIcon } from '@radix-ui/react-icons';
+import { PersonIcon, ChatBubbleIcon} from '@radix-ui/react-icons';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
@@ -340,21 +341,25 @@ export default function TownHall({ address, isMobile }) {
             foundReplies.map(
                 (foundReply, index) => (
                     <>
-                    <div className="flex flex-col break-words space-y-1.5 w-full max-w-[590px] leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
-                        <div className="flex items-center gap-4">
-                            <PersonIcon/>
-                            <div
-                                className="font-medium dark:text-white"
-                                onClick={() => {
-                                    copy(foundReply.replyAddress);
-                                    toast(`${foundReply.replyAddress} copied to clipboard`);
-                                }}
-                            >
-                                <Badge variant="outline">
-                                    {foundReply.replyAddress.substring(0,10)+'...'+foundReply.replyAddress.substring(foundReply.replyAddress.length - 5)}
-                                </Badge>
-                            </div>
-                        </div>
+                    <div className="flex flex-col break-words space-y-1.5 mt-2 w-full max-w-[590px] leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                    <div className="flex justify-between items-center w-full">
+    <div className="flex items-center gap-4">
+        <PersonIcon/>
+        <div className="font-medium dark:text-white" onClick={() => {
+            copy(foundReply.replyAddress);
+            toast(`${foundReply.replyAddress} copied to clipboard`);
+        }}>
+           
+          
+            <Badge variant="outline">
+                {foundReply.replyAddress.substring(0,10) + '...' + foundReply.replyAddress.substring(foundReply.replyAddress.length - 5)}
+            </Badge>
+          
+        </div>
+    
+    </div>
+    
+</div>
 
                         <div className="py-2">
                             {foundReply.opReturnMessage}
@@ -471,8 +476,8 @@ export default function TownHall({ address, isMobile }) {
                     ? townHallHistory.txs.map(
                           (tx, index) => (
                             <>
-                                <div className="flex items-start gap-2.5" key={"txHistory"+index}>
-                                   <div className="flex flex-col break-words space-y-1.5 w-full max-w-[590px] leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                                <div className="flex items-start" key={"txHistory"+index}>
+                                   <div className="flex flex-col mt-2 gap-y-0.5 break-words space-y-1.5 w-full max-w-[596.82px] leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                                    <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
                                       <span>
                                          {tx.replyAddress === address ? (
@@ -588,7 +593,7 @@ export default function TownHall({ address, isMobile }) {
                                    <p className="text-m font-normal px-2 py-2.5 text-gray-900 dark:text-white" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
 
                                    {/* Render any media content within the message */}
-                                   {tx.imageSrc !== false && (<img src={tx.imageSrc} />)}
+                                   {tx.imageSrc !== false && (<img src={tx.imageSrc} className="rounded-lg object-cover"/>)}
                                    {tx.videoId !== false && (<LiteYouTubeEmbed id={tx.videoId} />)}
                                    {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
                                    <p className="line-clamp-1">
