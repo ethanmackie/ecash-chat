@@ -208,7 +208,7 @@ export default function TxHistory({ address }) {
                         <div className="flex flex-col space-y-1.5 w-full max-w-[590px] leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
 
                         <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white break-words">
-                           <span className="text-sm font-bold text-gray-500 dark:text-gray-400">From: </span>
+                           <span className="text-sm font-semibold text-gray-900 dark:text-gray-400">From: </span>
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
                               {tx.replyAddress === address ? (
                                   <>
@@ -643,7 +643,7 @@ export default function TxHistory({ address }) {
 </Pagination>
                </span>
 
-             {loadingMsg !== '' && (<Alert color="info">{loadingMsg}</Alert>)}
+        
              <br />
              <form className="space-y-6" action="#" method="POST">
   <div>

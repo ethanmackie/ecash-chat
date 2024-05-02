@@ -453,7 +453,7 @@ export default function TownHall({ address, isMobile }) {
             </>
             )}
             <hr /><br />
-            {loadingMsg !== '' && (<Alert color="info">{loadingMsg}</Alert>)}
+         
 
             {/* Townhall Post History */}
 
