@@ -596,7 +596,6 @@ export default function TxHistory({ address }) {
       <PaginationPrevious
         href="#"
         onClick={(e) => {
-          e.preventDefault();
           setCurrentPage((old) => Math.max(0, old - 1));
           getTxHistoryByPage(Math.max(0, currentPage - 1));
         }}
@@ -617,7 +616,6 @@ export default function TxHistory({ address }) {
           <PaginationLink
             href="#"
             onClick={(e) => {
-              e.preventDefault();
               getTxHistoryByPage(i);
               setCurrentPage(i);
             }}

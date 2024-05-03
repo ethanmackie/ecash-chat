@@ -430,7 +430,7 @@ export default function Home() {
             rel="noopener noreferrer"
           >
             <Image
-              src="/ecash-chat-logo.png"
+              src="/ecash-chat-new-logo.svg"
               alt="eCash Chat Logo"
               className="dark:invert"
               width={273}
@@ -442,7 +442,7 @@ export default function Home() {
           </>
       ) : (
         <Image
-          src="/ecash-chat-logo.png"
+          src="/ecash-chat-new-logo.svg"
           alt="eCash Chat Logo"
           className="dark:invert"
           width={273}
@@ -534,7 +534,7 @@ export default function Home() {
           <CreditCardHeader />
 
           {/* Tab navigation */}
-          <Tabs aria-label="eCash Chat" style="default" className='z-10 relative mt-4'>
+          <Tabs aria-label="eCash Chat" style="default" className='z-10 relative mt-4 max-w-[591.09px]'>
               {isMobile === false && (
                   <Tabs.Item active title="Inbox" icon={HiOutlineMail}>
                       {cashaddr.isValidCashAddress(address, 'ecash') &&
