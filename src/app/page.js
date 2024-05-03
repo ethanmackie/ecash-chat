@@ -677,7 +677,7 @@ export default function Home() {
                   </Tabs.Item>
               )}
 
-              <Tabs.Item title="Town hall" icon={GiDiscussion}>
+              <Tabs.Item title="Town Hall" icon={GiDiscussion}>
                   <Townhall address={address} isMobile={isMobile} />
               </Tabs.Item>
 
