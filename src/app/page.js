@@ -534,7 +534,7 @@ export default function Home() {
           <CreditCardHeader />
 
           {/* Tab navigation */}
-          <Tabs aria-label="eCash Chat" style="default" className='z-10 relative mt-4 max-w-[591.09px]'>
+          <Tabs aria-label="eCash Chat" style="default" className='z-10 relative mt-4'>
               {isMobile === false && (
                   <Tabs.Item active title="Inbox" icon={HiOutlineMail}>
                       {cashaddr.isValidCashAddress(address, 'ecash') &&
