@@ -430,7 +430,7 @@ export default function Home() {
             rel="noopener noreferrer"
           >
             <Image
-              src="/ecash-chat-logo.png"
+              src="/ecash-chat-new-logo.svg"
               alt="eCash Chat Logo"
               className="dark:invert"
               width={273}
@@ -442,7 +442,7 @@ export default function Home() {
           </>
       ) : (
         <Image
-          src="/ecash-chat-logo.png"
+          src="/ecash-chat-new-logo.svg"
           alt="eCash Chat Logo"
           className="dark:invert"
           width={273}

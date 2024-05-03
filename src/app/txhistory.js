@@ -23,11 +23,12 @@ import { encodeBip21Message, encodeBip2XecTip } from '../utils/utils';
 import {
   Pagination,
   PaginationContent,
+  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination";
+} from "@/components/ui/pagination"
 import { HiInformationCircle } from "react-icons/hi";
 import { Input } from "@/components/ui/input"
 import { Popover, Avatar, Textarea, Alert, Modal } from "flowbite-react";
@@ -62,6 +63,10 @@ export default function TxHistory({ address }) {
     const [openDecryptionModal, setOpenDecryptionModal] = useState(false);
     const [decryptionInput, setDecryptionInput] = useState('');
     const [encryptedMessage, setEncryptedMessage] = useState('');
+    const [currentPage, setCurrentPage] = useState(0);
+
+    const maxPagesToShow = 7;
+    const halfMaxPages = Math.floor(maxPagesToShow / 2);
 
     useEffect(() => {
         // Render the first page by default upon initial load
@@ -203,7 +208,7 @@ export default function TxHistory({ address }) {
                         <div className="flex flex-col space-y-1.5 w-full max-w-[590px] leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
 
                         <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white break-words">
-                           <span className="text-sm font-bold text-gray-500 dark:text-gray-400">From: </span>
+                           <span className="text-sm font-semibold text-gray-900 dark:text-gray-400">From: </span>
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
                               {tx.replyAddress === address ? (
                                   <>
@@ -583,30 +588,60 @@ export default function TxHistory({ address }) {
          {txHistory && txHistory !== '' ? (
              <>
              {/*Set up pagination menu*/}
-             <br />
-             Scan recent messaging transactions{'   '}<br />
   
-             <span>Page: 
-             <nav aria-label="Page navigation example">
-                <ul className="inline-flex -space-x-px text-base h-10">           
-                   {(() => {
-                       let page = [];
-                       for (let i = 0; i < txHistory.numPages; i += 1) {
-                         page.push(
-                           <li key={"Page"+i}>
-                             <a href={"#"} onClick={() => getTxHistoryByPage(i)} className="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-                                 {(i+1)}
-                             </a>
-                           </li>
-                        );
-                       }
-                       return page;
-                     })()}
-               </ul>
-               </nav>
+             <span>
+             <Pagination>
+  <PaginationContent>
+    <PaginationItem>
+      <PaginationPrevious
+        href="#"
+        onClick={(e) => {
+          setCurrentPage((old) => Math.max(0, old - 1));
+          getTxHistoryByPage(Math.max(0, currentPage - 1));
+        }}
+        disabled={currentPage === 0}
+      />
+    </PaginationItem>
+
+    {Array.from({ length: txHistory.numPages }, (_, i) => i)
+      .filter(i => {
+      
+        if (txHistory.numPages <= maxPagesToShow) return true;
+        if (currentPage <= halfMaxPages) return i < maxPagesToShow;
+        if (currentPage >= txHistory.numPages - halfMaxPages) return i >= txHistory.numPages - maxPagesToShow;
+        return i >= currentPage - halfMaxPages && i <= currentPage + halfMaxPages;
+      })
+      .map(i => (
+        <PaginationItem key={i}>
+          <PaginationLink
+            href="#"
+            onClick={(e) => {
+              getTxHistoryByPage(i);
+              setCurrentPage(i);
+            }}
+            isActive={currentPage === i}
+          >
+            {i + 1}
+          </PaginationLink>
+        </PaginationItem>
+      ))}
+
+    <PaginationItem>
+      <PaginationNext
+        href="#"
+        onClick={(e) => {
+          e.preventDefault();
+          setCurrentPage((old) => Math.min(txHistory.numPages - 1, old + 1));
+          getTxHistoryByPage(Math.min(txHistory.numPages - 1, currentPage + 1));
+        }}
+        disabled={currentPage === txHistory.numPages - 1}
+      />
+    </PaginationItem>
+  </PaginationContent>
+</Pagination>
                </span>
 
-             {loadingMsg !== '' && (<Alert color="info">{loadingMsg}</Alert>)}
+        
              <br />
              <form className="space-y-6" action="#" method="POST">
   <div>
