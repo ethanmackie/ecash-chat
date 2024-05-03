@@ -7,7 +7,7 @@ import { postHasErrors, replyHasErrors } from '../validation/validation';
 import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon } from "@/components/ui/social";
-import { PersonIcon, ChatBubbleIcon} from '@radix-ui/react-icons';
+import { PersonIcon } from '@radix-ui/react-icons';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
@@ -57,7 +57,6 @@ export default function TownHall({ address, isMobile }) {
     const [replyPost, setReplyPost] = useState('');
     const [replyPostError, setReplyPostError] = useState(false);
     const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
-    const [loadingMsg, setLoadingMsg] = useState('');
     const [showMessagePreview, setShowMessagePreview] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
 
@@ -93,12 +92,10 @@ export default function TownHall({ address, isMobile }) {
             return;
         }
 
-        setLoadingMsg('Retrieving data from Chronik, please wait.');
         const txHistoryResp = await getTxHistory(chronik, appConfig.townhallAddress, page);
         if (txHistoryResp && Array.isArray(txHistoryResp.txs)) {
             setTownHallHistory(txHistoryResp);
         }
-        setLoadingMsg('');
     };
 
     // Validate the reply post
@@ -273,9 +270,9 @@ export default function TownHall({ address, isMobile }) {
                     <div className="space-y-6">
                         <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
                             {(
-                                  <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white text-ellipsis break-words min-w-0">
-                                      {post}
-                                  </p>
+                                <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white text-ellipsis break-words min-w-0">
+                                    {post}
+                                </p>
                             )}
                             <br />Media Preview:
                             {/* Render any media content within the message */}
@@ -355,25 +352,19 @@ export default function TownHall({ address, isMobile }) {
                 (foundReply, index) => (
                     <>
                     <div className="flex flex-col break-words space-y-1.5 mt-2 w-full max-w-[590px] leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
-                    <div className="flex justify-between items-center w-full">
-    <div className="flex items-center gap-4">
-        <PersonIcon/>
-        <div className="font-medium dark:text-white" onClick={() => {
-            copy(foundReply.replyAddress);
-            toast(`${foundReply.replyAddress} copied to clipboard`);
-        }}>
-           
-          
-            <Badge variant="outline">
-                {foundReply.replyAddress.substring(0,10) + '...' + foundReply.replyAddress.substring(foundReply.replyAddress.length - 5)}
-            </Badge>
-          
-        </div>
-    
-    </div>
-    
-</div>
-
+                        <div className="flex justify-between items-center w-full">
+                            <div className="flex items-center gap-4">
+                                <PersonIcon/>
+                                <div className="font-medium dark:text-white" onClick={() => {
+                                    copy(foundReply.replyAddress);
+                                    toast(`${foundReply.replyAddress} copied to clipboard`);
+                                }}>
+                                    <Badge variant="outline">
+                                        {foundReply.replyAddress.substring(0,10) + '...' + foundReply.replyAddress.substring(foundReply.replyAddress.length - 5)}
+                                    </Badge>
+                                </div>
+                            </div>
+                        </div>
                         <div className="py-2">
                             {foundReply.opReturnMessage}
                         </div>
@@ -453,76 +444,71 @@ export default function TownHall({ address, isMobile }) {
             </>
             )}
             <hr /><br />
-         
 
             {/* Townhall Post History */}
-
-                {/*Set up pagination menu*/}
-            
-
-                <span>
+            {/*Set up pagination menu*/}
+            <span>
                 <Pagination>
-  <PaginationContent>
-    {/* Previous button */}
-    <PaginationItem>
-      <PaginationPrevious
-        href="#"
-        onClick={(e) => {
-          e.preventDefault();
-          setCurrentPage(old => Math.max(0, old - 1));
-          getTownhallHistoryByPage(Math.max(0, currentPage - 1));
-        }}
-        disabled={currentPage === 0}
-      />
-    </PaginationItem>
+                    <PaginationContent>
+                        {/* Previous button */}
+                        <PaginationItem>
+                        <PaginationPrevious
+                            href="#"
+                            onClick={(e) => {
+                            e.preventDefault();
+                            setCurrentPage(old => Math.max(0, old - 1));
+                            getTownhallHistoryByPage(Math.max(0, currentPage - 1));
+                            }}
+                            disabled={currentPage === 0}
+                        />
+                        </PaginationItem>
 
-    {/* Numbered page links with dynamic display logic */}
-    {Array.from({ length: townHallHistory.numPages }, (_, i) => i)
-      .filter(i => {
-      
-        if (townHallHistory.numPages <= maxPagesToShow) return true;
-        if (currentPage <= halfMaxPages) return i < maxPagesToShow;
-        if (currentPage >= townHallHistory.numPages - halfMaxPages) return i >= townHallHistory.numPages - maxPagesToShow;
-        return i >= currentPage - halfMaxPages && i <= currentPage + halfMaxPages;
-      })
-      .map(i => (
-        <PaginationItem key={i}>
-          <PaginationLink
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              getTownhallHistoryByPage(i);
-              setCurrentPage(i);
-            }}
-            isActive={currentPage === i}
-          >
-            {i + 1}
-          </PaginationLink>
-        </PaginationItem>
-      ))}
+                        {/* Numbered page links with dynamic display logic */}
+                        {Array.from({ length: townHallHistory.numPages }, (_, i) => i)
+                        .filter(i => {
+                            if (townHallHistory.numPages <= maxPagesToShow) return true;
+                            if (currentPage <= halfMaxPages) return i < maxPagesToShow;
+                            if (currentPage >= townHallHistory.numPages - halfMaxPages) return i >= townHallHistory.numPages - maxPagesToShow;
+                            return i >= currentPage - halfMaxPages && i <= currentPage + halfMaxPages;
+                        })
+                        .map(i => (
+                            <PaginationItem key={i}>
+                            <PaginationLink
+                                href="#"
+                                onClick={(e) => {
+                                e.preventDefault();
+                                getTownhallHistoryByPage(i);
+                                setCurrentPage(i);
+                                }}
+                                isActive={currentPage === i}
+                            >
+                                {i + 1}
+                            </PaginationLink>
+                            </PaginationItem>
+                        ))}
 
-    {/* Optional ellipsis for overflow, modifying to appear conditionally */}
-    {(townHallHistory.numPages > maxPagesToShow && currentPage < townHallHistory.numPages - halfMaxPages) && (
-      <PaginationItem>
-        <PaginationEllipsis />
-      </PaginationItem>
-    )}
+                        {/* Optional ellipsis for overflow, modifying to appear conditionally */}
+                        {(townHallHistory.numPages > maxPagesToShow && currentPage < townHallHistory.numPages - halfMaxPages) && (
+                        <PaginationItem>
+                            <PaginationEllipsis />
+                        </PaginationItem>
+                        )}
 
-    {/* Next button */}
-    <PaginationItem>
-      <PaginationNext
-        href="#"
-        onClick={(e) => {
-          e.preventDefault();
-          setCurrentPage(old => Math.min(townHallHistory.numPages - 1, old + 1));
-          getTownhallHistoryByPage(Math.min(townHallHistory.numPages - 1, currentPage + 1));
-        }}
-        disabled={currentPage === townHallHistory.numPages - 1}
-      />
-    </PaginationItem>
-  </PaginationContent>
-</Pagination>
-                  </span>
+                        {/* Next button */}
+                        <PaginationItem>
+                        <PaginationNext
+                            href="#"
+                            onClick={(e) => {
+                            e.preventDefault();
+                            setCurrentPage(old => Math.min(townHallHistory.numPages - 1, old + 1));
+                            getTownhallHistoryByPage(Math.min(townHallHistory.numPages - 1, currentPage + 1));
+                            }}
+                            disabled={currentPage === townHallHistory.numPages - 1}
+                        />
+                        </PaginationItem>
+                    </PaginationContent>
+                </Pagination>
+            </span>
 
             <div>
             {
@@ -781,8 +767,7 @@ export default function TownHall({ address, isMobile }) {
                           ),
                       )
                     : `...`
-                
-            }
+                }
             </div>
         </div>
     );
