@@ -246,7 +246,7 @@ export default function TxHistory({ address }) {
                                             <div className="px-3 py-2">
                                                 <button
                                                   type="button"
-                                                  className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                  className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                   onClick={e => {
                                                       sendXecTip(tx.replyAddress, 100);
                                                   }}
@@ -256,7 +256,7 @@ export default function TxHistory({ address }) {
                                                 &nbsp;
                                                 <button
                                                   type="button"
-                                                  className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                  className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                   onClick={e => {
                                                       sendXecTip(tx.replyAddress, 1000);
                                                   }}
@@ -266,7 +266,7 @@ export default function TxHistory({ address }) {
                                                 &nbsp;
                                                 <button
                                                   type="button"
-                                                  className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                  className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                   onClick={e => {
                                                       sendXecTip(tx.replyAddress, 10000);
                                                   }}
@@ -276,7 +276,7 @@ export default function TxHistory({ address }) {
                                                 &nbsp;
                                                 <button
                                                   type="button"
-                                                  className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                  className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                   onClick={e => {
                                                       sendXecTip(tx.replyAddress, 100000);
                                                   }}
@@ -286,7 +286,7 @@ export default function TxHistory({ address }) {
                                                 &nbsp;
                                                 <button
                                                   type="button"
-                                                  className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                  className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                   onClick={e => {
                                                       sendXecTip(tx.replyAddress, 1000000);
                                                   }}
@@ -299,7 +299,7 @@ export default function TxHistory({ address }) {
                                       >
                                         <button
                                             type="button"
-                                            className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                            className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                         >
                                             Tip
                                         </button>
@@ -348,7 +348,7 @@ export default function TxHistory({ address }) {
                                              <div className="px-3 py-2">
                                                  <button
                                                    type="button"
-                                                   className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                   className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                    onClick={e => {
                                                        sendXecTip(tx.recipientAddress, 100);
                                                    }}
@@ -358,7 +358,7 @@ export default function TxHistory({ address }) {
                                                  &nbsp;
                                                  <button
                                                    type="button"
-                                                   className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                   className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                    onClick={e => {
                                                        sendXecTip(tx.recipientAddress, 1000);
                                                    }}
@@ -368,7 +368,7 @@ export default function TxHistory({ address }) {
                                                  &nbsp;
                                                  <button
                                                    type="button"
-                                                   className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                   className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                    onClick={e => {
                                                        sendXecTip(tx.recipientAddress, 10000);
                                                    }}
@@ -378,7 +378,7 @@ export default function TxHistory({ address }) {
                                                  &nbsp;
                                                  <button
                                                    type="button"
-                                                   className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                   className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                    onClick={e => {
                                                        sendXecTip(tx.recipientAddress, 100000);
                                                    }}
@@ -388,7 +388,7 @@ export default function TxHistory({ address }) {
                                                  &nbsp;
                                                  <button
                                                    type="button"
-                                                   className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                   className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                    onClick={e => {
                                                        sendXecTip(tx.recipientAddress, 1000000);
                                                    }}
@@ -401,7 +401,7 @@ export default function TxHistory({ address }) {
                                        >
                                          <button
                                              type="button"
-                                             className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                             className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                          >
                                              Tip
                                          </button>
@@ -489,7 +489,7 @@ export default function TxHistory({ address }) {
                                                   <button disabled={decryptionInput === ''} onClick={() => {
                                                       decryptMessage(tx.opReturnMessage)
                                                       setOpenDecryptionModal(false)
-                                                  }} className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+                                                  }} className="rounded bg-blue-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
                                                       Decrypt
                                                   </button>
                                               </p>
@@ -616,6 +616,7 @@ export default function TxHistory({ address }) {
           <PaginationLink
             href="#"
             onClick={(e) => {
+              e.preventDefault();
               getTxHistoryByPage(i);
               setCurrentPage(i);
             }}
