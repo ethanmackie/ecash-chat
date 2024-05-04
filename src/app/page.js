@@ -19,12 +19,13 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import QRCode from "react-qr-code";
 import copy from 'copy-to-clipboard';
-import { Tooltip, Tabs, Alert, Modal } from "flowbite-react";
+import { Tooltip, Tabs, Alert, Modal, Popover } from "flowbite-react";
 import { HiOutlineMail, HiOutlineNewspaper } from "react-icons/hi";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { PiHandCoins } from "react-icons/pi";
 import { GiDiscussion, GiAbstract010 } from "react-icons/gi";
 import { ToastContainer, toast } from 'react-toastify';
+import { PersonIcon, FaceIcon, PaperPlaneIcon } from '@radix-ui/react-icons';
 import 'react-toastify/dist/ReactToastify.css';
 import {
     EmojiIcon,
@@ -588,37 +589,59 @@ export default function Home() {
                                       {/* Emoji picker and tooltip guide for embedding markups */}
                                       <div className="flex py-1 gap-2">
                                           {/* Emoji Picker */}
-                                          <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}>
-                                              <EmojiIcon />
-                                          </button>
-                                          <div style={{ display: (renderEmojiPicker ? 'block' : 'none') }}>
-                                            <Picker
-                                                data={data}
-                                                onEmojiSelect={(e) => {
-                                                    setMessage(String(message).concat(e.native));
-                                                }}
-                                            />
-                                          </div>
+                                          <Popover
+  aria-labelledby="emoji-popover"
+  content={
+    <div>
+      <Picker
+        data={data}
+        onEmojiSelect={(e) => {
+          setMessage(prevMessage => prevMessage.concat(e.native));
+        }}
+      />
+    </div>
+  }
+>
+  <Button className="bg-blue-500 hover:bg-blue-300" type="button">
+    <FaceIcon /> Emoji
+  </Button>
+</Popover>
                                           <Tooltip content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]" style="light">
-                                              <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[url]theurl[/url]')}>
-                                                  Embed Url
-                                              </button>
-                                          </Tooltip>
-                                          <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
-                                              <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[img]imageurl[/img]')}>
-                                                  Embed Image
-                                              </button>
-                                          </Tooltip>
-                                          <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=8oIHo0vCZDs[/yt]" style="light">
-                                              <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}>
-                                                  Embed Youtube
-                                              </button>
-                                          </Tooltip>
-                                          <Tooltip content="e.g. [twt]https://twitter.com/eCashCommunity/status/1783932847528583665[/twt]" style="light">
-                                              <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}>
-                                                  Embed Tweet
-                                              </button>
-                                          </Tooltip>
+        <Button
+          className="bg-blue-500 hover:bg-blue-300"
+          type="button"
+          onClick={() => insertMarkupTags('[url]theurl[/url]')}
+        >
+          Embed Url
+        </Button>
+      </Tooltip>
+      <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
+        <Button
+          className="bg-blue-500 hover:bg-blue-300"
+          type="button"
+          onClick={() => insertMarkupTags('[img]imageurl[/img]')}
+        >
+          Embed Image
+        </Button>
+      </Tooltip>
+      <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=8oIHo0vCZDs[/yt]" style="light">
+        <Button
+          className="bg-blue-500 hover:bg-blue-300"
+          type="button"
+          onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}
+        >
+          Embed Youtube
+        </Button>
+      </Tooltip>
+      <Tooltip content="e.g. [twt]https://twitter.com/eCashCommunity/status/1783932847528583665[/twt]" style="light">
+        <Button
+          className="bg-blue-500 hover:bg-blue-300"
+          type="button"
+          onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}
+        >
+          Embed Tweet
+        </Button>
+      </Tooltip>
                                       </div>
                                     </div>
                                     <br />
@@ -663,7 +686,7 @@ export default function Home() {
                                     <button
                                       type="button"
                                       disabled={recipientError || messageError || sendAmountXecError || recipient === '' || (encryptionMode && password === '')}
-                                      className="flex justify-center w-full rounded bg-indigo-500 px-2 py-2 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                      className="flex justify-center w-full rounded bg-blue-500 px-2 py-2 text-m font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                       onClick={() => {
                                           setShowMessagePreview(true);
                                       }}
@@ -767,32 +790,32 @@ export default function Home() {
               </Tabs.Item>
 
               <Tabs.Item title="Settings" icon={GiAbstract010}>
-                  <div className="flex w-80 flex-col py-3">
-                      <Alert color="info">Version: {packageJson.version}</Alert><br />
-                      <button
-                        type="button"
-                        className="rounded bg-indigo-500 px-3 py-3 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                        onClick={() => {
-                            setIsLoggedIn(false)
-                            toast(`Logged out of ${address}`)
-                        }}
-                      >
-                          <div className="flex"><LogoutIcon/>&nbsp;Log Out</div>
-                      </button>
-                      <br />
-                      <button
-                        type="button"
-                        className="rounded bg-indigo-500 px-3 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                      >
-                        <div className="flex"><ImageIcon/>&nbsp;Set NFT Profile (Coming soon)</div>
-                      </button>
-                      <br />
-                      <button
-                        type="button"
-                        className="rounded bg-indigo-500 px-3 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                      >
-                        <div className="flex"><AliasIcon/>&nbsp;Link eCash Alias (Coming soon)</div>
-                      </button>
+                  <div className="flex w-full flex-col py-3 items-center">
+                      <Alert color="info" className="w-96">Version: {packageJson.version}</Alert><br />
+                      <Button
+        type="button"
+        className="bg-blue-500 w-96 hover:bg-blue-300"
+        onClick={() => {
+          setIsLoggedIn(false);
+          toast(`Logged out of ${address}`);
+        }}
+      >
+        <LogoutIcon />&nbsp;Log Out
+      </Button>
+      <br />
+      <Button
+        type="button"
+        className="bg-blue-500 w-96 hover:bg-blue-300"
+      >
+        <ImageIcon />&nbsp;Set NFT Profile (Coming soon)
+      </Button>
+      <br />
+      <Button
+        type="button"
+        className="bg-blue-500 w-96 hover:bg-blue-300"
+      >
+       <AliasIcon />&nbsp;Link eCash Alias (Coming soon)
+      </Button>
                   </div>
               </Tabs.Item>
 

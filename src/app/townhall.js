@@ -1,13 +1,15 @@
 "use client";
 import  React, { useState, useEffect } from 'react';
 import { appConfig } from '../config/app';
-import { Textarea, Tooltip, Avatar, Popover, Accordion, Alert, Modal } from "flowbite-react";
+import { Tooltip, Avatar, Popover, Accordion, Alert, Modal } from "flowbite-react";
+import { Textarea } from "@/components/ui/textarea";
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import { postHasErrors, replyHasErrors } from '../validation/validation';
 import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio"
+import { Separator } from "@/components/ui/separator"
 import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon } from "@/components/ui/social";
-import { PersonIcon } from '@radix-ui/react-icons';
+import { PersonIcon, FaceIcon, PaperPlaneIcon } from '@radix-ui/react-icons';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
@@ -394,7 +396,7 @@ export default function TownHall({ address, isMobile }) {
                   <div className="px-3 py-2">
                       <button
                         type="button"
-                        className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                        className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                         onClick={e => {
                             sendXecTip(address, 100);
                         }}
@@ -404,7 +406,7 @@ export default function TownHall({ address, isMobile }) {
                       &nbsp;
                       <button
                         type="button"
-                        className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                        className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                         onClick={e => {
                             sendXecTip(address, 1000);
                         }}
@@ -414,7 +416,7 @@ export default function TownHall({ address, isMobile }) {
                       &nbsp;
                       <button
                         type="button"
-                        className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                        className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                         onClick={e => {
                             sendXecTip(address, 10000);
                         }}
@@ -424,7 +426,7 @@ export default function TownHall({ address, isMobile }) {
                       &nbsp;
                       <button
                         type="button"
-                        className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                        className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                         onClick={e => {
                             sendXecTip(address, 100000);
                         }}
@@ -434,7 +436,7 @@ export default function TownHall({ address, isMobile }) {
                       &nbsp;
                       <button
                         type="button"
-                        className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                        className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                         onClick={e => {
                             sendXecTip(address, 1000000);
                         }}
@@ -447,7 +449,7 @@ export default function TownHall({ address, isMobile }) {
               >
                 <button
                     type="button"
-                    className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                    className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                 >
                     Tip
                 </button>
@@ -465,6 +467,7 @@ export default function TownHall({ address, isMobile }) {
                 <div>
                       {/* Post input field */}
                       <Textarea
+                      className="bg-white"
                           id="post"
                           value={post}
                           placeholder="Post your thoughts to the public town hall..."
@@ -472,57 +475,62 @@ export default function TownHall({ address, isMobile }) {
                           onChange={e => handlePostChange(e)}
                           rows={4}
                       />
-                      <p className="mt-2 text-sm text-red-600 dark:text-red-500">{postError !== false && postError}</p>
-
-                      {/* Emoji picker and tooltip guide for embedding markups */}
-                      <div className="flex gap-2">
+                      <p className="text-sm text-red-600 dark:text-red-500">{postError !== false && postError}</p>
+                      <div className="flex gap-2 mt-2">
                           {/* Emoji Picker */}
-                          <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}>
-                              <EmojiIcon />
-                          </button>
-                          <div style={{ display: (renderEmojiPicker ? 'block' : 'none') }}>
-                            <Picker
-                                data={data}
-                                onEmojiSelect={(e) => {
-                                    setPost(String(post).concat(e.native));
-                                }}
-                            />
-                          </div>
+                          <Popover
+      aria-labelledby="emoji-popover"
+      content={
+        <div>
+          <Picker
+            data={data}
+            onEmojiSelect={(e) => {
+              setPost(post + e.native);
+            }}
+          />
+        </div>
+      }
+    >
+      <Button
+        className="bg-blue-500 hover:bg-blue-300"
+        onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}
+      >
+        <FaceIcon /> Emoji
+      </Button>
+    </Popover>
                           <Tooltip content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]" style="light">
-                              <button className="rounded bg-indigo-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[url]theurl[/url]')}>
-                                  Embed Url
-                              </button>
-                          </Tooltip>
-                          <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
-                              <button className="rounded bg-indigo-500 px-4 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[img]imageurl[/img]')}>
-                                  Embed Image
-                              </button>
-                          </Tooltip>
-                          <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=8oIHo0vCZDs[/yt]" style="light">
-                              <button className="rounded bg-indigo-500 px-4 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}>
-                                  Embed Youtube
-                              </button>
-                          </Tooltip>
-                          <Tooltip content="e.g. [twt]https://twitter.com/eCashCommunity/status/1783932847528583665[/twt]" style="light">
-                              <button className="rounded bg-indigo-500 px-4 py-1 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" type="button" onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}>
-                                  Embed Tweet
-                              </button>
-                          </Tooltip>
-                      </div><br />
-                      <button
-                        type="button"
-                        disabled={post === '' || postError}
-                        className="flex w-full justify-center rounded bg-indigo-500 px-2 py-2 text-m font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                        onClick={() => { setShowMessagePreview(true) }}
-                      >
-                          <div className="flex"><PostIcon/>&nbsp;Post to Townhall</div>
-                      </button>
-                </div>
-              <br />
+        <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[url]theurl[/url]')}>
+          Embed Url
+        </Button>
+      </Tooltip>
+      <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
+        <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[img]imageurl[/img]')}>
+          Embed Image
+        </Button>
+      </Tooltip>
+      <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=8oIHo0vCZDs[/yt]" style="light">
+        <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}>
+          Embed Youtube
+        </Button>
+      </Tooltip>
+      <Tooltip content="e.g. [twt]https://twitter.com/eCashCommunity/status/1783932847528583665[/twt]" style="light">
+        <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}>
+          Embed Tweet
+        </Button>
+      </Tooltip>
+                      </div>
+                      <Button
+      type="button"
+      disabled={post === '' || postError}
+      className="w-full bg-blue-500 hover:bg-blue-300 mt-2"
+      onClick={() => { setShowMessagePreview(true); }}
+    >
+      <PostIcon />&nbsp;Post to Townhall
+    </Button>
+                </div>         
             </>
             )}
-            <hr /><br />
-
+             <Separator className="my-4" />
             {/* Townhall Post History */}
             {/*Set up pagination menu*/}
             <span>
@@ -596,7 +604,7 @@ export default function TownHall({ address, isMobile }) {
                     ? townHallHistory.txs.map(
                           (tx, index) => (
                             <>
-                                <div className="flex items-start" key={"txHistory"+index}>
+                                <div className="flex items-start mt-2" key={"txHistory"+index}>
                                    <div className="flex flex-col mt-2 gap-y-0.5 break-words space-y-1.5 w-full max-w-[596.82px] leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                                    <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
                                       <span>
@@ -681,7 +689,7 @@ export default function TownHall({ address, isMobile }) {
                                                  <button
                                                    type="button"
                                                    disabled={replyPostError || replyPost === ''}
-                                                   className="rounded bg-indigo-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                   className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                    onClick={e => {
                                                        replytoPost(tx.txid, replyPost)
                                                    }}
@@ -770,8 +778,6 @@ export default function TownHall({ address, isMobile }) {
                                    </div>
                                   </div>
                                </div>
-
-                                <br />
                            </>
                           ),
                       )
