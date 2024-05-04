@@ -1,7 +1,8 @@
 "use client";
 import  React, { useState, useEffect } from 'react';
 import { appConfig } from '../config/app';
-import { Textarea, Tooltip, Avatar, Popover, Accordion, Alert, Modal } from "flowbite-react";
+import { Tooltip, Avatar, Popover, Accordion, Alert, Modal } from "flowbite-react";
+import { Textarea } from "@/components/ui/textarea";
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import { postHasErrors, replyHasErrors } from '../validation/validation';
 import { Button } from "@/components/ui/button";
@@ -466,6 +467,7 @@ export default function TownHall({ address, isMobile }) {
                 <div>
                       {/* Post input field */}
                       <Textarea
+                      className="bg-white"
                           id="post"
                           value={post}
                           placeholder="Post your thoughts to the public town hall..."
