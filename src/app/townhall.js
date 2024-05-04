@@ -465,8 +465,8 @@ export default function TownHall({ address, isMobile }) {
             {isMobile === false && (
               <>
                 <div>
-                      {/* Post input field */}
-                      <Textarea
+                    {/* Post input field */}
+                    <Textarea
                       className="bg-white"
                           id="post"
                           value={post}
@@ -474,61 +474,61 @@ export default function TownHall({ address, isMobile }) {
                           required
                           onChange={e => handlePostChange(e)}
                           rows={4}
-                      />
-                      <p className="text-sm text-red-600 dark:text-red-500">{postError !== false && postError}</p>
-                      <div className="flex gap-2 mt-2">
-                          {/* Emoji Picker */}
-                          <Popover
-      aria-labelledby="emoji-popover"
-      content={
-        <div>
-          <Picker
-            data={data}
-            onEmojiSelect={(e) => {
-              setPost(post + e.native);
-            }}
-          />
-        </div>
-      }
-    >
-      <Button
-        className="bg-blue-500 hover:bg-blue-300"
-        onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}
-      >
-        <FaceIcon /> Emoji
-      </Button>
-    </Popover>
-                          <Tooltip content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]" style="light">
-        <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[url]theurl[/url]')}>
-          Embed Url
-        </Button>
-      </Tooltip>
-      <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
-        <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[img]imageurl[/img]')}>
-          Embed Image
-        </Button>
-      </Tooltip>
-      <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=8oIHo0vCZDs[/yt]" style="light">
-        <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}>
-          Embed Youtube
-        </Button>
-      </Tooltip>
-      <Tooltip content="e.g. [twt]https://twitter.com/eCashCommunity/status/1783932847528583665[/twt]" style="light">
-        <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}>
-          Embed Tweet
-        </Button>
-      </Tooltip>
+                    />
+                    <p className="text-sm text-red-600 dark:text-red-500">{postError !== false && postError}</p>
+                    <div className="flex gap-2 mt-2">
+                        {/* Emoji Picker */}
+                        <Popover
+                            aria-labelledby="emoji-popover"
+                            content={
+                                <div>
+                                <Picker
+                                    data={data}
+                                    onEmojiSelect={(e) => {
+                                    setPost(post + e.native);
+                                    }}
+                                />
+                                </div>
+                            }
+                            >
+                            <Button
+                                className="bg-blue-500 hover:bg-blue-300"
+                                onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}
+                            >
+                                <FaceIcon /> Emoji
+                            </Button>
+                        </Popover>
+                        <Tooltip content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]" style="light">
+                            <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[url]theurl[/url]')}>
+                                Embed Url
+                            </Button>
+                        </Tooltip>
+                        <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
+                            <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[img]imageurl[/img]')}>
+                                Embed Image
+                            </Button>
+                        </Tooltip>
+                        <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=8oIHo0vCZDs[/yt]" style="light">
+                            <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}>
+                                Embed Youtube
+                            </Button>
+                        </Tooltip>
+                        <Tooltip content="e.g. [twt]https://twitter.com/eCashCommunity/status/1783932847528583665[/twt]" style="light">
+                            <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}>
+                                Embed Tweet
+                            </Button>
+                        </Tooltip>
                       </div>
                       <Button
-      type="button"
-      disabled={post === '' || postError}
-      className="w-full bg-blue-500 hover:bg-blue-300 mt-2"
-      onClick={() => { setShowMessagePreview(true); }}
-    >
-      <PostIcon />&nbsp;Post to Townhall
-    </Button>
-                </div>         
-            </>
+                        type="button"
+                        disabled={post === '' || postError}
+                        className="w-full bg-blue-500 hover:bg-blue-300 mt-2"
+                        onClick={() => { setShowMessagePreview(true); }}
+                        >
+                        <PostIcon />&nbsp;Post to Townhall
+                        </Button>
+                    </div>
+                </>
             )}
              <Separator className="my-4" />
             {/* Townhall Post History */}
