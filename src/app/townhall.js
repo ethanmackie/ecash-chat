@@ -647,7 +647,7 @@ export default function TownHall({ address, isMobile }) {
                                          }
                                       </span>
                                    </div>
-
+                                   
                                    {/* Render the op_return message */}
                                    <p className="text-m font-normal px-2 py-2.5 text-gray-900 dark:text-white" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
 
