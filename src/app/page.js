@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button"
 import QRCode from "react-qr-code";
 import copy from 'copy-to-clipboard';
 import { Tooltip, Tabs, Alert, Modal, Popover } from "flowbite-react";
-import { HiOutlineMail, HiOutlineNewspaper } from "react-icons/hi";
+import { HiOutlineMail, HiOutlineNewspaper, HiInformationCircle } from "react-icons/hi";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { PiHandCoins } from "react-icons/pi";
 import { GiDiscussion, GiAbstract010 } from "react-icons/gi";
