@@ -14,6 +14,8 @@ import { opReturn as opreturnConfig } from '../config/opreturn';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -337,7 +339,7 @@ export default function Home() {
                         setShowMessagePreview(false)
                         sendMessage()
                     }}>
-                        Looks good
+                        Send
                     </Button>
                     <Button color="gray" onClick={() => setShowMessagePreview(false)}>
                         Cancel
@@ -549,12 +551,9 @@ export default function Home() {
                       <div style={{ display: (isLoggedIn ? 'block' : 'none') }}>
                           <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-5 lg:px-8">
                                 <MessagePreviewModal />
-
-                                <form className="space-y-6" action="#" method="POST">
+                                <form className="space-y-0" action="#" method="POST">
                                   <div>
-                                    <label htmlFor="address" className="block text-sm font-medium leading-6 text-gray-900">
-                                      Address
-                                    </label>
+                                  <Label htmlFor="address">Address</Label>
                                     <div className="mt-2">
                                       <Input
                                         id="address"
@@ -562,18 +561,16 @@ export default function Home() {
                                         type="text"
                                         value={recipient}
                                         required
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        className="bg-gray-50"
                                         onChange={e => handleAddressChange(e)}
                                       />
                                     </div>
-                                    <p className="mt-2 text-sm text-red-600 dark:text-red-500">{recipientError !== false && recipientError}</p>
+                                    <p className="mt-1 text-sm text-red-600 dark:text-red-500">{recipientError !== false && recipientError}</p>
                                   </div>
 
                                   <div>
-                                    <div className="flex items-center justify-between">
-                                      <label htmlFor="message" className="block text-sm font-medium leading-6 text-gray-900">
-                                        Message
-                                      </label>
+                                    <div className="flex items-center justify-between mt-2">
+                                      <Label htmlFor="message">Message</Label>
                                     </div>
                                     <div className="mt-2">
                                         <Textarea
@@ -643,19 +640,19 @@ export default function Home() {
                                                 </Button>
                                             </Tooltip>
                                         </div>
-                                    </div>
-                                    <br />
-                                    <label htmlFor="value-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Send XEC amount (optional, 5.5 XEC by default):</label>
+                                    </div>     
+                                    <div className="grid w-full items-center gap-1.5 mt-4">                       
+                                    <Label htmlFor="value-input">Send XEC amount (optional, 5.5 XEC by default):</Label>
                                     <Input
                                         type="number"
                                         id="value-input"
-                                        aria-describedby="helper-text-explanation" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        aria-describedby="helper-text-explanation" className="bg-gray-50"
                                         defaultValue="5.5"
                                         onChange={e => handleSendAmountChange(e)}
-                                    />
-                                    <br />
+                                    />                
+                                      </div>       
                                     {/* Encryption mode toggle */}
-                                    <label className="inline-flex items-center cursor-pointer">
+                                    <label className="inline-flex items-center cursor-pointer mt-4">
                                         <input
                                             type="checkbox"
                                             value=""
@@ -666,7 +663,10 @@ export default function Home() {
                                             }}
                                         />
                                         <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                                        <span className="ms-3 text-sm flex font-medium text-gray-900 dark:text-gray-300"><EncryptionIcon />&nbsp;Encrypt with password (optional):</span>
+                                        <span className="ml-2 flex items-center text-sm font-medium text-gray-900 dark:text-gray-300">
+                                        <EncryptionIcon className="w-4 h-4 mr-2" />
+                                        Encrypt with password (optional):
+                                        </span>
                                     </label>
                                     {encryptionMode && (
                                         <>
@@ -675,7 +675,7 @@ export default function Home() {
                                                 id="password-input"
                                                 value={password}
                                                 maxlength="19"
-                                                aria-describedby="helper-text-explanation" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                aria-describedby="helper-text-explanation" className="bg-gray-50"
                                                 placeholder="Set an optional encryption password"
                                                 onChange={e => setPassword(e.target.value)}
                                             />
@@ -683,16 +683,14 @@ export default function Home() {
                                     )}
                                   </div>
                                   <div>
-                                    <button
-                                      type="button"
-                                      disabled={recipientError || messageError || sendAmountXecError || recipient === '' || (encryptionMode && password === '')}
-                                      className="flex justify-center w-full rounded bg-blue-500 px-2 py-2 text-m font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                      onClick={() => {
-                                          setShowMessagePreview(true);
-                                      }}
-                                    >
-                                        <div className="flex"><SendIcon/>&nbsp;Send Message</div>
-                                    </button>
+                                        <Button
+                                            type="button"
+                                            disabled={recipientError || messageError || sendAmountXecError || recipient === '' || (encryptionMode && password === '')}
+                                            className="w-full bg-blue-500 hover:bg-blue-300 mt-2 mb-20"
+                                            onClick={() => { setShowMessagePreview(true); }}
+                                            >
+                                            <SendIcon/>&nbsp;Send Message
+                                        </Button>
                                   </div>
                               </form>
                        </div>
