@@ -576,7 +576,7 @@ export default function Home() {
                                       </label>
                                     </div>
                                     <div className="mt-2">
-                                      <Textarea
+                                        <Textarea
                                           id="message"
                                           rows="4"
                                           value={message}
@@ -584,65 +584,65 @@ export default function Home() {
                                           required
                                           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                           onChange={e => handleMessageChange(e)}
-                                      />
-                                      <p className="mt-2 text-sm text-red-600 dark:text-red-500">{messageError !== false && messageError}</p>
-                                      {/* Emoji picker and tooltip guide for embedding markups */}
-                                      <div className="flex py-1 gap-2">
-                                          {/* Emoji Picker */}
-                                          <Popover
-  aria-labelledby="emoji-popover"
-  content={
-    <div>
-      <Picker
-        data={data}
-        onEmojiSelect={(e) => {
-          setMessage(prevMessage => prevMessage.concat(e.native));
-        }}
-      />
-    </div>
-  }
->
-  <Button className="bg-blue-500 hover:bg-blue-300" type="button">
-    <FaceIcon /> Emoji
-  </Button>
-</Popover>
-                                          <Tooltip content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]" style="light">
-        <Button
-          className="bg-blue-500 hover:bg-blue-300"
-          type="button"
-          onClick={() => insertMarkupTags('[url]theurl[/url]')}
-        >
-          Embed Url
-        </Button>
-      </Tooltip>
-      <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
-        <Button
-          className="bg-blue-500 hover:bg-blue-300"
-          type="button"
-          onClick={() => insertMarkupTags('[img]imageurl[/img]')}
-        >
-          Embed Image
-        </Button>
-      </Tooltip>
-      <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=8oIHo0vCZDs[/yt]" style="light">
-        <Button
-          className="bg-blue-500 hover:bg-blue-300"
-          type="button"
-          onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}
-        >
-          Embed Youtube
-        </Button>
-      </Tooltip>
-      <Tooltip content="e.g. [twt]https://twitter.com/eCashCommunity/status/1783932847528583665[/twt]" style="light">
-        <Button
-          className="bg-blue-500 hover:bg-blue-300"
-          type="button"
-          onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}
-        >
-          Embed Tweet
-        </Button>
-      </Tooltip>
-                                      </div>
+                                        />
+                                        <p className="mt-2 text-sm text-red-600 dark:text-red-500">{messageError !== false && messageError}</p>
+                                        {/* Emoji picker and tooltip guide for embedding markups */}
+                                        <div className="flex py-1 gap-2">
+                                            {/* Emoji Picker */}
+                                            <Popover
+                                                aria-labelledby="emoji-popover"
+                                                content={
+                                                    <div>
+                                                    <Picker
+                                                        data={data}
+                                                        onEmojiSelect={(e) => {
+                                                        setMessage(prevMessage => prevMessage.concat(e.native));
+                                                        }}
+                                                    />
+                                                    </div>
+                                                }
+                                                >
+                                                <Button className="bg-blue-500 hover:bg-blue-300" type="button">
+                                                    <FaceIcon /> Emoji
+                                                </Button>
+                                                </Popover>
+                                            <Tooltip content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]" style="light">
+                                                <Button
+                                                className="bg-blue-500 hover:bg-blue-300"
+                                                type="button"
+                                                onClick={() => insertMarkupTags('[url]theurl[/url]')}
+                                                >
+                                                    Embed Url
+                                                </Button>
+                                            </Tooltip>
+                                            <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
+                                                <Button
+                                                className="bg-blue-500 hover:bg-blue-300"
+                                                type="button"
+                                                onClick={() => insertMarkupTags('[img]imageurl[/img]')}
+                                                >
+                                                    Embed Image
+                                                </Button>
+                                            </Tooltip>
+                                            <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=8oIHo0vCZDs[/yt]" style="light">
+                                                <Button
+                                                className="bg-blue-500 hover:bg-blue-300"
+                                                type="button"
+                                                onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}
+                                                >
+                                                    Embed Youtube
+                                                </Button>
+                                            </Tooltip>
+                                            <Tooltip content="e.g. [twt]https://twitter.com/eCashCommunity/status/1783932847528583665[/twt]" style="light">
+                                                <Button
+                                                className="bg-blue-500 hover:bg-blue-300"
+                                                type="button"
+                                                onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}
+                                                >
+                                                    Embed Tweet
+                                                </Button>
+                                            </Tooltip>
+                                        </div>
                                     </div>
                                     <br />
                                     <label htmlFor="value-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Send XEC amount (optional, 5.5 XEC by default):</label>
@@ -791,34 +791,33 @@ export default function Home() {
 
               <Tabs.Item title="Settings" icon={GiAbstract010}>
                   <div className="flex w-full flex-col py-3 items-center">
-                      <Alert color="info" className="w-96">Version: {packageJson.version}</Alert><br />
-                      <Button
-        type="button"
-        className="bg-blue-500 w-96 hover:bg-blue-300"
-        onClick={() => {
-          setIsLoggedIn(false);
-          toast(`Logged out of ${address}`);
-        }}
-      >
-        <LogoutIcon />&nbsp;Log Out
-      </Button>
-      <br />
-      <Button
-        type="button"
-        className="bg-blue-500 w-96 hover:bg-blue-300"
-      >
-        <ImageIcon />&nbsp;Set NFT Profile (Coming soon)
-      </Button>
-      <br />
-      <Button
-        type="button"
-        className="bg-blue-500 w-96 hover:bg-blue-300"
-      >
-       <AliasIcon />&nbsp;Link eCash Alias (Coming soon)
-      </Button>
+                    <Alert color="info" className="w-96">Version: {packageJson.version}</Alert><br />
+                    <Button
+                        type="button"
+                        className="bg-blue-500 w-96 hover:bg-blue-300"
+                        onClick={() => {
+                        setIsLoggedIn(false);
+                        toast(`Logged out of ${address}`);
+                        }}
+                    >
+                        <LogoutIcon />&nbsp;Log Out
+                    </Button>
+                    <br />
+                    <Button
+                        type="button"
+                        className="bg-blue-500 w-96 hover:bg-blue-300"
+                    >
+                        <ImageIcon />&nbsp;Set NFT Profile (Coming soon)
+                    </Button>
+                    <br />
+                    <Button
+                        type="button"
+                        className="bg-blue-500 w-96 hover:bg-blue-300"
+                    >
+                        <AliasIcon />&nbsp;Link eCash Alias (Coming soon)
+                    </Button>
                   </div>
               </Tabs.Item>
-
               </Tabs>
               </>
               )}
