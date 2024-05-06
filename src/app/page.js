@@ -3,11 +3,12 @@ import React, { useState, useEffect } from 'react';
 import Image from "next/image";
 import TxHistory from './txhistory';
 import Townhall from './townhall';
+import Nft from './nft';
 import cashaddr from 'ecashaddrjs';
 import { queryAliasServer } from '../alias/alias-server';
-import { encodeBip21Message, getTweetId } from '../utils/utils';
+import { encodeBip21Message, getTweetId, toXec } from '../utils/utils';
 import { isMobileDevice } from '../utils/mobileCheck';
-import { getBalance, txListener } from '../chronik/chronik';
+import { getBalance, txListener, refreshUtxos, getAllUtxos, getTokenGenesisInfo, organizeUtxosByType } from '../chronik/chronik';
 import { appConfig } from '../config/app';
 import { isValidRecipient, messageHasErrors } from '../validation/validation';
 import { opReturn as opreturnConfig } from '../config/opreturn';
@@ -22,7 +23,7 @@ import { Button } from "@/components/ui/button"
 import QRCode from "react-qr-code";
 import copy from 'copy-to-clipboard';
 import { Tooltip, Tabs, Alert, Modal, Popover } from "flowbite-react";
-import { HiOutlineMail, HiOutlineNewspaper, HiInformationCircle } from "react-icons/hi";
+import { HiOutlineMail, HiOutlineNewspaper, HiInformationCircle, HiOutlinePhotograph } from "react-icons/hi";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { PiHandCoins } from "react-icons/pi";
 import { GiDiscussion, GiAbstract010 } from "react-icons/gi";
@@ -91,7 +92,8 @@ export default function Home() {
             return;
         }
         (async () => {
-            setXecBalance(await getBalance(chronik, address));
+            const updatedCache = await refreshUtxos(chronik, address);
+            setXecBalance(updatedCache.xecBalance);
         })();
     }, [address]);
 
@@ -103,10 +105,10 @@ export default function Home() {
             event.data.type &&
             event.data.type === 'FROM_CASHTAB'
         ) {
-            getAliasesByAddress(event.data.address);
-            setAddress(event.data.address);
             if (event.data.address !== 'Address request denied by user') {
-              setIsLoggedIn(true);
+                getAliasesByAddress(event.data.address);
+                setAddress(event.data.address);
+                setIsLoggedIn(true);
             }
         }
     };
@@ -702,6 +704,10 @@ export default function Home() {
                   <Townhall address={address} isMobile={isMobile} />
               </Tabs.Item>
 
+              <Tabs.Item title="NFTs" icon={HiOutlinePhotograph}>
+                  <Nft chronik={chronik} address={address} isMobile={isMobile} />
+              </Tabs.Item>
+
               <Tabs.Item title="About" icon={IoMdInformationCircleOutline} >
                   <div className="flex flex-col justify-center py-3 z-10 relative">
                       <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">What is eCash Chat?</h2>
@@ -718,6 +724,9 @@ export default function Home() {
                           </li>
                           <li>
                               Message encryption option via AES 256 CBC algorithm
+                          </li>
+                          <li>
+                              NFT Showcases
                           </li>
                           <li>
                               Displays only messaging transactions

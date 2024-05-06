@@ -15,6 +15,8 @@ import {
     mockParsedXecSendTxWithOpReturnTownhallPost,
     mockXecEncryptedSendTxWithOpReturn,
     mockParsedXecEncryptedSendTxWithOpReturn,
+    mockXecSendTxWithOpReturnNftShowcase,
+    mockParsedXecSendTxWithOpReturnNftShowcase,
 } from '../fixtures/mocks';
 
 test('parseChronikTx() correctly parses a XEC send tx with OP_RETURN data retrieved from chronik', async () => {
@@ -68,5 +70,14 @@ test('parseChronikTx() correctly parses a XEC send tx with an encrypted OP_RETUR
         mockParsedXecEncryptedSendTxWithOpReturn.replyAddress,
     )).toEqual(
         mockParsedXecEncryptedSendTxWithOpReturn,
+    );
+});
+
+test('parseChronikTx() correctly parses a XEC send tx with an NFT showcase embedded OP_RETURN data retrieved from chronik', async () => {
+    await expect(parseChronikTx(
+        mockXecSendTxWithOpReturnNftShowcase,
+        mockParsedXecSendTxWithOpReturnNftShowcase.replyAddress,
+    )).toEqual(
+        mockParsedXecSendTxWithOpReturnNftShowcase,
     );
 });

@@ -7,6 +7,461 @@ import { formatDate, toXec } from '../utils/utils';
 import { getStackArray } from 'ecash-script';
 import { BN } from 'slp-mdm';
 import { toast } from 'react-toastify';
+import localforage from 'localforage';
+
+/**
+ * Refreshes the app's utxos, XEC balance and NFT collection
+ * @param {string} chronik the chronik-client instance
+ * @param {string} address the eCash address of the active wallet
+ * @returns {chatCache} the updated cache object
+ */
+export const refreshUtxos = async (chronik, address) => {
+    const parentNftList = [];
+    const chatCache = {
+        utxos: [],
+        slpUtxos: [],
+        nonSlpUtxos: [],
+        parentNftList: [],
+        childNftList: [],
+        childNftIds: [],
+        xecBalance: parseInt(0),
+    };
+
+    // Retrieve all utxos
+    const allUtxos = await getAllUtxos(chronik, address);
+    chatCache.utxos = allUtxos;
+
+    // Split into slp and non slp utxos
+    const { slpUtxos, nonSlpUtxos } = await organizeUtxosByType(allUtxos.utxos);
+    chatCache.nonSlpUtxos = nonSlpUtxos;
+    chatCache.slpUtxos = slpUtxos;
+
+    // Calculate XEC balance
+    let xecBalance = parseInt(0);
+    for (const utxo of nonSlpUtxos) {
+        xecBalance += parseInt(utxo.value);
+    }
+    chatCache.xecBalance = new Number(
+        toXec(xecBalance)
+    ).toLocaleString({
+        maximumFractionDigits: appConfig.cashDecimals,
+    });
+
+    // Parse for NFTs
+    const nftParents = [];
+    const nftParentIds = [];
+    const nftChildren = [];
+    for (const slpUtxo of slpUtxos) {
+        switch (slpUtxo.token.tokenType.type) {
+            case 'SLP_TOKEN_TYPE_NFT1_GROUP': {
+                nftParents.push(slpUtxo);
+                nftParentIds.push(slpUtxo.token.tokenId);
+                break;
+            }
+            case 'SLP_TOKEN_TYPE_NFT1_CHILD': {
+                nftChildren.push(slpUtxo);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
+    // Filter out the duplicate parent IDs
+    let uniqueNftParents = [...new Set(nftParentIds)];
+
+    // Retrieve the full parent NFT details
+    for (const parentId of uniqueNftParents) {
+        const nftParentDetails = await getTokenGenesisInfo(chronik, parentId);
+        parentNftList.push(nftParentDetails);
+    }
+    chatCache.parentNftList = parentNftList;
+    chatCache.childNftList = nftChildren;
+
+    // Update local storage
+    await localforage.setItem('chatCache', chatCache);
+
+    return chatCache;
+};
+
+/**
+ * Convert a token amount like one from an in-node chronik utxo to a decimalized string
+ * @param {string} amount undecimalized token amount as a string, e.g. 10012345 at 5 decimals
+ * @param {Integer} decimals
+ * @returns {string} decimalized token amount as a string, e.g. 100.12345
+ */
+export const decimalizeTokenAmount = (amount, decimals) => {
+    const STRINGIFIED_INTEGER_REGEX = /^[0-9]+$/;
+    if (typeof amount !== 'string') {
+        throw new Error('amount must be a string');
+    }
+    if (!STRINGIFIED_INTEGER_REGEX.test(amount)) {
+        throw new Error('amount must be a stringified integer');
+    }
+    if (!Number.isInteger(decimals)) {
+        throw new Error('decimals must be an integer');
+    }
+    if (decimals === 0) {
+        // If we have 0 decimal places, and amount is a stringified integer
+        // amount is already correct
+        return amount;
+    }
+
+    // Do you need to pad with leading 0's?
+    // For example, you have have "1" with 9 decimal places
+    // This should be 0.000000001 strlength 1, decimals 9
+    // So, you must add 9 zeros before the 1 before proceeding
+    // You may have "123" with 9 decimal places strlength 3, decimals 9
+    // This should be 0.000000123
+    // So, you must add 7 zeros before the 123 before proceeding
+    if (decimals > amount.length) {
+        // We pad with decimals - amount.length 0s, plus an extra zero so we return "0.000" instead of ".000"
+        amount = `${new Array(decimals - amount.length + 1)
+            .fill(0)
+            .join('')}${amount}`;
+    }
+
+    // Insert decimal point in proper place
+    const stringAfterDecimalPoint = amount.slice(-1 * decimals);
+    const stringBeforeDecimalPoint = amount.slice(
+        0,
+        amount.length - stringAfterDecimalPoint.length,
+    );
+    return `${stringBeforeDecimalPoint}.${stringAfterDecimalPoint}`;
+};
+
+/**
+ * Convert a decimalized token amount to an undecimalized amount
+ * Useful to perform integer math as you can use BigInt for amounts greater than Number.MAX_SAFE_INTEGER in js
+ * @param {string} decimalizedAmount decimalized token amount as a string, e.g. 100.12345 for a 5-decimals token
+ * @param {Integer} decimals
+ * @returns {string} undecimalized token amount as a string, e.g. 10012345 for a 5-decimals token
+ */
+export const undecimalizeTokenAmount = (decimalizedAmount, decimals) => {
+    const STRINGIFIED_DECIMALIZED_REGEX = /^\d*\.?\d*$/;
+    if (typeof decimalizedAmount !== 'string') {
+        throw new Error('decimalizedAmount must be a string');
+    }
+    if (
+        !STRINGIFIED_DECIMALIZED_REGEX.test(decimalizedAmount) ||
+        decimalizedAmount.length === 0
+    ) {
+        throw new Error(
+            `decimalizedAmount must be a non-empty string containing only decimal numbers and optionally one decimal point "."`,
+        );
+    }
+    if (!Number.isInteger(decimals)) {
+        throw new Error('decimals must be an integer');
+    }
+
+    // If decimals is 0, we should not have a decimal point, or it should be at the very end
+    if (decimals === 0) {
+        if (!decimalizedAmount.includes('.')) {
+            // If 0 decimals and no '.' in decimalizedAmount, it's the same
+            return decimalizedAmount;
+        }
+        if (decimalizedAmount.slice(-1) !== '.') {
+            // If we have a decimal anywhere but at the very end, throw precision error
+            throw new Error(
+                'decimalizedAmount specified at greater precision than supported token decimals',
+            );
+        }
+        // Everything before the decimal point is what we want
+        return decimalizedAmount.split('.')[0];
+    }
+
+    // How many decimal places does decimalizedAmount account for
+    const accountedDecimals = decimalizedAmount.includes('.')
+        ? decimalizedAmount.split('.')[1].length
+        : 0;
+
+    // Remove decimal point from the string
+    let undecimalizedAmountString = decimalizedAmount.split('.').join('');
+    // Remove leading zeros, if any
+    undecimalizedAmountString = removeLeadingZeros(undecimalizedAmountString);
+
+    if (accountedDecimals === decimals) {
+        // If decimalized amount is accounting for all decimals, we simply remove the decimal point
+        return undecimalizedAmountString;
+    }
+
+    const unAccountedDecimals = decimals - accountedDecimals;
+    if (unAccountedDecimals > 0) {
+        // Handle too little precision
+        // say, a token amount for a 9-decimal token is only specified at 3 decimals
+        // e.g. 100.123
+        const zerosToAdd = new Array(unAccountedDecimals).fill(0).join('');
+        return `${undecimalizedAmountString}${zerosToAdd}`;
+    }
+
+    // Do not accept too much precision
+    // say, a token amount for a 3-decimal token is specified at 5 decimals
+    // e.g. 100.12300 or 100.12345
+    // Note if it is specied at 100.12345, we have an error, really too much precision
+    throw new Error(
+        'decimalizedAmount specified at greater precision than supported token decimals',
+    );
+};
+
+/**
+ * Remove leading '0' characters from any string
+ * @param {string} string
+ */
+export const removeLeadingZeros = givenString => {
+    let leadingZeroCount = 0;
+    // We only iterate up to the 2nd-to-last character
+    // i.e. we only iterate over "leading" characters
+    for (let i = 0; i < givenString.length - 1; i += 1) {
+        const thisChar = givenString[i];
+        if (thisChar === '0') {
+            leadingZeroCount += 1;
+        } else {
+            // Once you hit something other than '0', there are no more "leading" zeros
+            break;
+        }
+    }
+    return givenString.slice(leadingZeroCount, givenString.length);
+};
+
+/**
+ * Get all info about a token
+ * @param {ChronikClientNode} chronik
+ * @param {string} tokenId
+ * @returns {object}
+ */
+export const getTokenGenesisInfo = async (chronik, tokenId) => {
+    // We can get timeFirstSeen, block, tokenType, and genesisInfo from the token() endpoint
+    // If we call this endpoint before the genesis tx is confirmed, we will not get block
+    // So, block does not need to be included
+    const tokenInfo = await chronik.token(tokenId);
+    const genesisTxInfo = await chronik.tx(tokenId);
+    const { timeFirstSeen, genesisInfo, tokenType } = tokenInfo;
+    const decimals = genesisInfo.decimals;
+
+    // Initialize variables for determined quantities we want to cache
+
+    /**
+     * genesisSupply {string}
+     * Quantity of token created at mint
+     * Note: we may have genesisSupply at different genesisAddresses
+     * We do not track this information, only total genesisSupply
+     * Cached as a decimalized string, e.g. 0.000 if 0 with 3 decimal places
+     * 1000.000000000 if one thousand with 9 decimal places
+     */
+    let genesisSupply = decimalizeTokenAmount('0', decimals);
+
+    /**
+     * genesisMintBatons {number}
+     * Number of mint batons created in the genesis tx for this token
+     */
+    let genesisMintBatons = 0;
+
+    /**
+     * genesisOutputScripts {Set(<outputScript>)}
+     * Address(es) where initial token supply was minted
+     */
+    let genesisOutputScripts = new Set();
+
+    // Iterate over outputs
+    for (const output of genesisTxInfo.outputs) {
+        if ('token' in output && output.token.tokenId === tokenId) {
+            // If this output of this genesis tx is associated with this tokenId
+
+            const { token, outputScript } = output;
+
+            // Add its outputScript to genesisOutputScripts
+            genesisOutputScripts.add(outputScript);
+
+            const { isMintBaton, amount } = token;
+            if (isMintBaton) {
+                // If it is a mintBaton, increment genesisMintBatons
+                genesisMintBatons += 1;
+            }
+
+            // Increment genesisSupply
+            // decimalizeTokenAmount, undecimalizeTokenAmount
+            //genesisSupply = genesisSupply.plus(new BN(amount));
+
+            genesisSupply = decimalizeTokenAmount(
+                (
+                    BigInt(undecimalizeTokenAmount(genesisSupply, decimals)) +
+                    BigInt(amount)
+                ).toString(),
+                decimals,
+            );
+        }
+    }
+
+    const tokenCache = {
+        tokenType,
+        genesisInfo,
+        timeFirstSeen,
+        genesisSupply,
+        // Return genesisOutputScripts as an array as we no longer require Set features
+        genesisOutputScripts: [...genesisOutputScripts],
+        genesisMintBatons,
+    };
+    if ('block' in tokenInfo) {
+        // If the genesis tx is confirmed at the time we check
+        tokenCache.block = tokenInfo.block;
+    }
+
+    if (tokenType.type === 'SLP_TOKEN_TYPE_NFT1_CHILD') {
+        // If this is an SLP1 NFT
+        // Get the groupTokenId
+        // This is available from the .tx() call and will never change, so it should also be cached
+        for (const tokenEntry of genesisTxInfo.tokenEntries) {
+            const { txType } = tokenEntry;
+            if (txType === 'GENESIS') {
+                const { groupTokenId } = tokenEntry;
+                tokenCache.groupTokenId = groupTokenId;
+            }
+        }
+    }
+    // Note: if it is not confirmed, we can update the cache later when we try to use this value
+
+    tokenCache.tokenId = tokenId;
+    return tokenCache;
+};
+
+/**
+ * Get all utxos for a given eCash address
+ * @param {ChronikClientNode} chronik
+ * @param {string} eCash address
+ * @returns
+ */
+export const getAllUtxos = async (chronik, address) => {
+    if (address === '') {
+        return [];
+    }
+
+    try {
+        const { type, hash } = cashaddr.decode(address, true);
+        return await chronik.script(type, hash).utxos();
+    } catch (err) {
+        console.log('getAllUtxos(): error retrieving utxos - ', err);
+        return [];
+    }
+};
+
+/**
+ * Organize utxos by token and non-token
+ * @param {Tx_InNode[]} chronikUtxos
+ * @returns {object} {slpUtxos: [], nonSlpUtxos: []}
+ */
+export const organizeUtxosByType = chronikUtxos => {
+    if (!Array.isArray(chronikUtxos)) {
+        return {
+            slpUtxos: [],
+            nonSlpUtxos: [],
+        }
+    }
+    const nonSlpUtxos = [];
+    const slpUtxos = [];
+    for (const utxo of chronikUtxos) {
+        // Construct nonSlpUtxos and slpUtxos arrays
+        if (typeof utxo.token !== 'undefined') {
+            slpUtxos.push(utxo);
+        } else {
+            nonSlpUtxos.push(utxo);
+        }
+    }
+
+    return { slpUtxos, nonSlpUtxos };
+};
+
+/**
+ * @param {string} token id of the parent NFT
+ * @returns {array} an array of child NFTs corresponding to the parent NFT
+ */
+export const getNfts = async (chronik, tokenId) => {
+	const nftParentTxHistory = await getAllTxHistoryByTokenId(
+	    chronik,
+	    tokenId,
+	);
+    const childNftsIds = getChildNftsFromParent(tokenId, nftParentTxHistory);
+    const childNftsObj = [];
+    for (const childNftId of childNftsIds) {
+        childNftsObj.push(await chronik.token(childNftId));
+    }
+
+	return childNftsObj;
+};
+
+/**
+ * @param {ChronikClientNode} chronik
+ * @param {string} tokenId
+ * @param {number} pageSize usually 200, the chronik max, but accept a parameter to simplify unit testing
+ * @returns
+ */
+export const getAllTxHistoryByTokenId = async (
+    chronik,
+    tokenId,
+    pageSize = chronikConfig.txHistoryPageSize,
+) => {
+    // We will throw an error if we get an error from chronik fetch
+    const firstPageResponse = await chronik
+        .tokenId(tokenId)
+        // call with page=0 (to get first page) and max page size, as we want all the history
+        .history(0, pageSize);
+    const { txs, numPages } = firstPageResponse;
+    // Get tx history from all pages
+    // We start with i = 1 because we already have the data from page 0
+    const tokenHistoryPromises = [];
+    for (let i = 1; i < numPages; i += 1) {
+        tokenHistoryPromises.push(
+            new Promise((resolve, reject) => {
+                chronik
+                    .tokenId(tokenId)
+                    .history(i, chronikConfig.txHistoryPageSize)
+                    .then(
+                        result => {
+                            resolve(result.txs);
+                        },
+                        err => {
+                            reject(err);
+                        },
+                    );
+            }),
+        );
+    }
+    // Get rest of txHistory using Promise.all() to execute requests in parallel
+    const restOfTxHistory = await Promise.all(tokenHistoryPromises);
+    // Flatten so we have an array of tx objects, and not an array of arrays of tx objects
+    const flatTxHistory = restOfTxHistory.flat();
+    // Combine with the first page
+    const allHistory = txs.concat(flatTxHistory);
+
+    return allHistory;
+};
+
+/**
+ * Get all child NFTs from a given parent tokenId
+ * i.e. get all NFTs in an NFT collection *
+ * @param {string} parentTokenId
+ * @param {Tx_InNode[]} allParentTokenTxHistory
+ */
+export const getChildNftsFromParent = (
+    parentTokenId,
+    allParentTokenTxHistory,
+) => {
+    const childNftsFromThisParent = [];
+    for (const tx of allParentTokenTxHistory) {
+        // Check tokenEntries
+        const { tokenEntries } = tx;
+        for (const tokenEntry of tokenEntries) {
+            const { txType } = tokenEntry;
+            if (
+                txType === 'GENESIS' &&
+                typeof tokenEntry.groupTokenId !== 'undefined' &&
+                tokenEntry.groupTokenId === parentTokenId
+            ) {
+                childNftsFromThisParent.push(tokenEntry.tokenId);
+            }
+        }
+    }
+    return childNftsFromThisParent;
+};
 
 /**
  * Subscribes to a given address and listens for new websocket events
@@ -49,6 +504,46 @@ export const txListener = async (chronik, address, txType, refreshCallback = fal
     } catch (err) {
         console.log(
             'txListener: Error in chronik websocket subscription: ' + err,
+        );
+    }
+};
+
+/**
+ * Subscribes to a given address and listens for new NFT related websocket events
+ *
+ * @param {string} chronik the chronik-client instance
+ * @param {string} address the eCash address of the active wallet
+ * @param {string} txType the descriptor of the nature of this tx
+ * @param {callback fn} refreshCallback a callback function to either refresh inbox or townhall history
+ * @throws {error} err chronik websocket subscription errors
+ */
+export const nftTxListener = async (chronik, address, toastMsg) => {
+    // Get type and hash
+    const { type, hash } = cashaddr.decode(address, true);
+
+    try {
+        const ws = chronik.ws({
+            onMessage: msg => {
+                if (msg.msgType === 'TX_ADDED_TO_MEMPOOL') {
+
+                    // Notify user
+                    toast(toastMsg);
+
+                    // Unsubscribe and close websocket
+                    ws.unsubscribeFromScript(type, hash);
+                    ws.close();
+                }
+            },
+        });
+
+        // Wait for WS to be connected:
+        await ws.waitForOpen();
+
+        // Subscript to script
+        ws.subscribeToScript(type, hash);
+    } catch (err) {
+        console.log(
+            'nftTxListener: Error in chronik websocket subscription: ' + err,
         );
     }
 };
@@ -245,6 +740,7 @@ export const parseChronikTx = (tx, address) => {
     let url = false;
     let isEcashChatEncrypted = false;
     let isXecTip = false;
+    let nftShowcaseId = false;
 
     if (tx.isCoinbase) {
         // Note that coinbase inputs have `undefined` for `thisInput.outputScript`
@@ -413,6 +909,10 @@ export const parseChronikTx = (tx, address) => {
                             iseCashChatPost = true;
                         } else if (stackArray[1] === opreturnConfig.townhallReplyPostPrefixHex) {
                             replyTxid = stackArray[2];
+                            opReturnMessage = Buffer.from(stackArray[3], 'hex');
+                            iseCashChatPost = true;
+                        } else if (stackArray[1] === opreturnConfig.nftShowcasePrefixHex) {
+                            nftShowcaseId = stackArray[2];
                             opReturnMessage = Buffer.from(stackArray[3], 'hex');
                             iseCashChatPost = true;
                         } else if (stackArray[1] === opreturnConfig.xecTipPrefixHex) {
@@ -604,6 +1104,7 @@ export const parseChronikTx = (tx, address) => {
             replyTxid,
             url,
             isXecTip,
+            nftShowcaseId,
         };
     }
     // Otherwise do not include these fields
@@ -631,5 +1132,6 @@ export const parseChronikTx = (tx, address) => {
         replyTxid,
         url,
         isXecTip,
+        nftShowcaseId,
     };
 };

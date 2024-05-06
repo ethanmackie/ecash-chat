@@ -1,7 +1,7 @@
 "use client";
 import  React, { useState, useEffect } from 'react';
 import { appConfig } from '../config/app';
-import { Tooltip, Avatar, Popover, Accordion, Alert, Modal } from "flowbite-react";
+import { Tooltip, Avatar, Popover, Accordion, Alert, Modal, Card } from "flowbite-react";
 import { Textarea } from "@/components/ui/textarea";
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import { postHasErrors, replyHasErrors } from '../validation/validation';
@@ -354,7 +354,7 @@ export default function TownHall({ address, isMobile }) {
                 (foundReply, index) => (
                     <>
                     <div className="flex flex-col break-words space-y-1.5 mt-2 w-full max-w-[590px] leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
-                        <div className="flex justify-between items-center w-full">
+                        <div className="flex justify-between items-center w-full" key={"townhallReply"+index}>
                             <div className="flex items-center gap-4">
                                 <PersonIcon/>
                                 <div className="font-medium dark:text-white" onClick={() => {
@@ -567,6 +567,7 @@ export default function TownHall({ address, isMobile }) {
                                 setCurrentPage(i);
                                 }}
                                 isActive={currentPage === i}
+                                key={"pagination"+i}
                             >
                                 {i + 1}
                             </PaginationLink>
@@ -604,7 +605,7 @@ export default function TownHall({ address, isMobile }) {
                     ? townHallHistory.txs.map(
                           (tx, index) => (
                             <>
-                                <div className="flex items-start mt-2" key={"txHistory"+index}>
+                                <div className="flex items-start mt-2" key={"townhallTxHistory"+index}>
                                    <div className="flex flex-col mt-2 gap-y-0.5 break-words space-y-1.5 w-full max-w-[596.82px] leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                                    <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
                                       <span>
@@ -647,11 +648,28 @@ export default function TownHall({ address, isMobile }) {
                                          }
                                       </span>
                                    </div>
-                                   
+
                                    {/* Render the op_return message */}
                                    <p className="text-m font-normal px-2 py-2.5 text-gray-900 dark:text-white" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
 
                                    {/* Render any media content within the message */}
+                                   {tx.nftShowcaseId !== false && tx.nftShowcaseId !== undefined && (
+                                        <>
+                                            <Card href={`${appConfig.blockExplorerUrl}/tx/${tx.nftShowcaseId}`} target="_blank" className="max-w-sm">
+                                                <b>NFT Showcase</b>
+                                                    <div className="font-medium dark:text-white">
+                                                        <div onClick={() => {
+                                                            copy(tx.nftShowcaseId);
+                                                            toast(`${tx.nftShowcaseId} copied to clipboard`);
+                                                        }}>
+                                                            ID: {tx.nftShowcaseId.substring(0,15)}...{tx.nftShowcaseId.substring(tx.nftShowcaseId.length - 10)}
+                                                        </div>
+                                                        Last sale price: N/A<br /><br />
+                                                    </div>
+                                                <img src={`${appConfig.tokenIconsUrl}/256/${tx.nftShowcaseId}.png`} className="rounded-lg object-cover"/>
+                                            </Card>
+                                        </>
+                                    )}
                                    {tx.imageSrc !== false && (<img src={tx.imageSrc} className="rounded-lg object-cover"/>)}
                                    {tx.videoId !== false && (<LiteYouTubeEmbed id={tx.videoId} />)}
                                    {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}

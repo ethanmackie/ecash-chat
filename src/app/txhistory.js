@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/pagination"
 import { HiInformationCircle } from "react-icons/hi";
 import { Input } from "@/components/ui/input"
-import { Popover, Avatar, Textarea, Alert, Modal } from "flowbite-react";
+import { Popover, Avatar, Textarea, Alert, Modal, Card } from "flowbite-react";
 import { Badge } from "@/components/ui/badge";
 import { Tweet } from 'react-tweet';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
@@ -438,6 +438,23 @@ export default function TxHistory({ address }) {
                         )}
 
                         {/* Render any media content within the message */}
+                        {tx.nftShowcaseId !== false && tx.nftShowcaseId !== undefined && (
+                          <>
+                              <Card href={`${appConfig.blockExplorerUrl}/tx/${tx.nftShowcaseId}`} target="_blank" className="max-w-sm">
+                                  <b>NFT Showcase</b>
+                                      <div className="font-medium dark:text-white">
+                                          <div onClick={() => {
+                                              copy(tx.nftShowcaseId);
+                                              toast(`${tx.nftShowcaseId} copied to clipboard`);
+                                          }}>
+                                              ID: {tx.nftShowcaseId.substring(0,15)}...{tx.nftShowcaseId.substring(tx.nftShowcaseId.length - 10)}
+                                          </div>
+                                          Last sale price: N/A<br /><br />
+                                      </div>
+                                  <img src={`${appConfig.tokenIconsUrl}/256/${tx.nftShowcaseId}.png`} className="rounded-lg object-cover"/>
+                              </Card>
+                          </>
+                        )}
                         {tx.imageSrc !== false && (<img src={tx.imageSrc} />)}
                         {tx.videoId !== false && (<LiteYouTubeEmbed id={tx.videoId} />)}
                         {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}

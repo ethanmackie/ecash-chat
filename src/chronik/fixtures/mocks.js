@@ -64,7 +64,8 @@ export const mockParsedXecEncryptedSendTxWithOpReturn = {
     "txTime": "11:47:16 am",
     "tweetId": false,
     "replyTxid": false,
-    "url": false
+    "url": false,
+    "nftShowcaseId": false
 };
 
 export const mockXecSendTxWithOpReturnTweet = {
@@ -132,7 +133,8 @@ export const mockParsedXecSendTxWithOpReturnTweet = {
     "url": false,
     "txDate": "27 Mar 2024",
     "txTime": "23:36:40",
-    "tweetId": "1766304430423515170"
+    "tweetId": "1766304430423515170",
+    "nftShowcaseId": false
 };
 
 export const mockXecSendTxWithOpReturnEmoji = {
@@ -196,7 +198,8 @@ export const mockParsedXecSendTxWithOpReturnEmoji = {
     "url": false,
     "txid": "68f55677b4fcacff6a47a78976aa11238dab1f323e002416b26f3335cb387ee2",
     "txDate": "Mar 26, 2024",
-    "txTime": "12:08:18 pm"
+    "txTime": "12:08:18 pm",
+    "nftShowcaseId": false
 };
 
 export const mockXecSendTxWithOpReturnVideo = {
@@ -260,7 +263,8 @@ export const mockParsedXecSendTxWithOpReturnVideo = {
     "txid": "11be4139a5e76835708aa8495b4fab9db906c15bf6dea07fb63b1f223a97b2e1",
     "videoId": "5RuYKxKCAOA",
     "txDate": "Mar 26, 2024",
-    "txTime": "12:06:47 pm"
+    "txTime": "12:06:47 pm",
+    "nftShowcaseId": false
 };
 
 export const mockXecSendTxWithOpReturnImage = {
@@ -324,7 +328,8 @@ export const mockParsedXecSendTxWithOpReturnImage = {
     "tweetId": false,
     "url": false,
     "txDate": "Mar 26, 2024",
-    "txTime": "12:04:00 pm"
+    "txTime": "12:04:00 pm",
+    "nftShowcaseId": false
 };
 
 export const mockXecSendTxWithOpReturn = {
@@ -388,7 +393,8 @@ export const mockParsedXecSendTxWithOpReturn = {
     "url": false,
     "txid": "e78a0053cc4914c5b114f8d45b08afb738bca2acfc6644fefc262f043eb03cb2",
     "txDate": "Mar 26, 2024",
-    "txTime": "12:01:49 pm"
+    "txTime": "12:01:49 pm",
+    "nftShowcaseId": false
 };
 
 export const mockXecSendTxWithOpReturnTownhallPost = {
@@ -457,7 +463,8 @@ export const mockParsedXecSendTxWithOpReturnTownhallPost = {
     "txid": "748e17c310772beacca8341d143e730b7c82de336e370c272c362618cc0db0c2",
     "txDate": "Apr 4, 2024",
     "txTime": "2:20:04 pm",
-    "tweetId": false
+    "tweetId": false,
+    "nftShowcaseId": false
 };
 
 export const mockXecSendTxWithOpReturnTownhallReplyPost = {
@@ -526,5 +533,76 @@ export const mockParsedXecSendTxWithOpReturnTownhallReplyPost = {
     "txTime": "15:29:46",
     "tweetId": false,
     "url": false,
-    "replyTxid": "0729318a128ee8f11d18b28237c8ae7ffa4e95c88ec69ebce716758e1973c5d4"
+    "replyTxid": "0729318a128ee8f11d18b28237c8ae7ffa4e95c88ec69ebce716758e1973c5d4",
+    "nftShowcaseId": false
+};
+
+export const mockXecSendTxWithOpReturnNftShowcase = {
+    "txid": "ff1dfef02709a81485053c2f27e6a01a9b1ee9c8021120a8b1f479571f9e4813",
+    "version": 2,
+    "inputs": [
+        {
+            "prevOut": {
+                "txid": "baf6520e484e28f662141e072e3de3c438b108adaf664a84e41533b9230c2cc5",
+                "outIdx": 0
+            },
+            "inputScript": "483045022100b217874ec928e94b93118de0c8693fb71ec5873598be924cf9bad9bee94eb47602204cda55f82d15e19b5d1952a7c1c6e4ee34ae2db0fed8158498885fbb06d75ce8412102f9e8383fe6fc81852f60909f5feb8a314949c3d2c9013c5e67563e3ba03e60ad",
+            "outputScript": "76a914396addff64044d33431e0106b41c6903c7d0d28988ac",
+            "value": 10000,
+            "sequenceNo": 4294967295
+        }
+    ],
+    "outputs": [
+        {
+            "value": 0,
+            "outputScript": "6a0463686174046e66747320076fc97838cea01911b1b83e26f5ec5c040e4aed039f24df6e3d076737c4348200"
+        },
+        {
+            "value": 550,
+            "outputScript": "76a91470a784633e942b7e1c9947255910c8132623225c88ac"
+        },
+        {
+            "value": 8887,
+            "outputScript": "76a914396addff64044d33431e0106b41c6903c7d0d28988ac"
+        }
+    ],
+    "lockTime": 0,
+    "block": {
+        "height": 843463,
+        "hash": "000000000000000006b6002ad1c6c11ad8a71dea4e496a7ba476f1b066314e58",
+        "timestamp": 1714995866
+    },
+    "timeFirstSeen": 1714995823,
+    "size": 280,
+    "isCoinbase": false,
+    "tokenEntries": [],
+    "tokenFailedParsings": [],
+    "tokenStatus": "TOKEN_STATUS_NON_TOKEN"
+};
+
+export const mockParsedXecSendTxWithOpReturnNftShowcase = {
+    "txid": "ff1dfef02709a81485053c2f27e6a01a9b1ee9c8021120a8b1f479571f9e4813",
+    "incoming": false,
+    "xecAmount": "5.5",
+    "isEtokenTx": false,
+    "airdropFlag": false,
+    "airdropTokenId": "",
+    "opReturnMessage": "\u0000",
+    "isCashtabMessage": false,
+    "isCashtabEncryptedMessage": false,
+    "isEcashChatEncrypted": false,
+    "iseCashChatMessage": false,
+    "iseCashChatPost": true,
+    "replyAddress": "ecash:qquk4h0lvszy6v6rrcqsddqudypu05xj3yx7d0s32f",
+    "recipientAddress": "ecash:qpc20prr862zklsun9rj2kgseqfjvgezts4ah8wh7h",
+    "aliasFlag": false,
+    "imageSrc": false,
+    "videoId": false,
+    "txDate": "May 6, 2024",
+    "txTime": "9:43:43 pm",
+    "tweetId": false,
+    "replyTxid": false,
+    "url": false,
+    "isXecTip": false,
+    "nftShowcaseId": "076fc97838cea01911b1b83e26f5ec5c040e4aed039f24df6e3d076737c43482"
 };
