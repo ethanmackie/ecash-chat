@@ -118,12 +118,10 @@ export default function TxHistory({ address }) {
             return;
         }
 
-        setLoadingMsg('Retrieving data from Chronik, please wait.');
         const txHistoryResp = await getTxHistory(chronik, address, page);
         if (txHistoryResp && Array.isArray(txHistoryResp.txs)) {
             setTxHistory(txHistoryResp);
         }
-        setLoadingMsg('');
     };
 
     // Validates the address being filtered for

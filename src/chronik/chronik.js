@@ -509,6 +509,46 @@ export const txListener = async (chronik, address, txType, refreshCallback = fal
 };
 
 /**
+ * Permanently subscribes to a given address and listens for new websocket events
+ * It silently updates the header balance upon mempool event.
+ *
+ * @param {string} chronik the chronik-client instance
+ * @param {string} address the eCash address of the active wallet
+ * @param {callback fn} refreshCallback a callback function to refresh header balance
+ * @throws {error} err chronik websocket subscription errors
+ */
+export const txListenerOngoing = async (chronik, address, refreshCallback = false) => {
+    // Get type and hash
+    const { type, hash } = cashaddr.decode(address, true);
+
+    try {
+        const ws = chronik.ws({
+            onMessage: msg => {
+                if (msg.msgType === 'TX_ADDED_TO_MEMPOOL') {
+                    // Refresh history
+                    if (refreshCallback) {
+                        (async () => {
+                            const updatedCache = await refreshUtxos(chronik, address);
+                            refreshCallback(updatedCache.xecBalance);
+                        })();
+                    }
+                }
+            },
+        });
+
+        // Wait for WS to be connected:
+        await ws.waitForOpen();
+
+        // Subscript to script
+        ws.subscribeToScript(type, hash);
+    } catch (err) {
+        console.log(
+            'txListener: Error in chronik websocket subscription: ' + err,
+        );
+    }
+};
+
+/**
  * Subscribes to a given address and listens for new NFT related websocket events
  *
  * @param {string} chronik the chronik-client instance

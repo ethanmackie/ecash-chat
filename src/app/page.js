@@ -8,7 +8,7 @@ import cashaddr from 'ecashaddrjs';
 import { queryAliasServer } from '../alias/alias-server';
 import { encodeBip21Message, getTweetId, toXec } from '../utils/utils';
 import { isMobileDevice } from '../utils/mobileCheck';
-import { getBalance, txListener, refreshUtxos, getAllUtxos, getTokenGenesisInfo, organizeUtxosByType } from '../chronik/chronik';
+import { txListener, refreshUtxos, txListenerOngoing } from '../chronik/chronik';
 import { appConfig } from '../config/app';
 import { isValidRecipient, messageHasErrors } from '../validation/validation';
 import { opReturn as opreturnConfig } from '../config/opreturn';
@@ -95,6 +95,10 @@ export default function Home() {
             const updatedCache = await refreshUtxos(chronik, address);
             setXecBalance(updatedCache.xecBalance);
         })();
+
+        // Listens for all mempool events for this address and silently
+        // updates XEC balance in the background
+        txListenerOngoing(chronik, address, setXecBalance);
     }, [address]);
 
     // Parse for an address from cashtab
