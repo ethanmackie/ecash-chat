@@ -427,7 +427,7 @@ export default function Home() {
           <div className="fixed inset-0 z-0" style={{ backgroundImage: "url('/bg.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
       </div>
 
-      <main className="lg:flex lg:flex-col items-center justify-center p-5 relative z-10 mt-4">
+      <main className="sm:flex flex-col items-center justify-center p-5 relative z-10 mt-4">
 
       {isLoggedIn === false && isMobile === false ? (
           <>
@@ -543,7 +543,7 @@ export default function Home() {
           <CreditCardHeader />
 
           {/* Tab navigation */}
-          <Tabs aria-label="eCash Chat" style="default" className='z-10 relative mt-4 items-center'>
+          <Tabs aria-label="eCash Chat" style="default" className='z-10 relative mt-4 justify-center'>
               {isMobile === false && (
                   <Tabs.Item active title="Inbox" icon={HiOutlineMail}>
                       {cashaddr.isValidCashAddress(address, 'ecash') &&
@@ -555,7 +555,7 @@ export default function Home() {
               {isMobile === false && (
                   <Tabs.Item title="Send Message" icon={HiOutlineNewspaper} >
                       <div style={{ display: (isLoggedIn ? 'block' : 'none') }}>
-                          <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full max-w-xl lg:min-w-[576px] min-w-96">
+                          <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
                                 <MessagePreviewModal />
                                 <form className="space-y-0" action="#" method="POST">
                                   <div>
@@ -713,7 +713,7 @@ export default function Home() {
               </Tabs.Item>
 
               <Tabs.Item title="About" icon={IoMdInformationCircleOutline} >
-              <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full max-w-xl lg:min-w-[576px] min-w-96">
+              <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
                       <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">What is eCash Chat?</h2>
                       eCash Chat is an on-chain messaging platform on the eCash blockchain.
                       <br />It filters for specific messaging transactions for a seamless social experience.
@@ -801,7 +801,7 @@ export default function Home() {
               </Tabs.Item>
 
               <Tabs.Item title="Settings" icon={GiAbstract010}>
-                  <div className="flex min-h-full flex-1 flex-col items-center justify-center px-4 sm:px-6 lg:px-8 w-full max-w-xl lg:min-w-[576px] min-w-96">
+                  <div className="flex min-h-full flex-1 flex-col items-center justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
                     <Alert color="info" className="w-96">Version: {packageJson.version}</Alert><br />
                     <Button
                         type="button"

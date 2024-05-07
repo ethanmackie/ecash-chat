@@ -476,7 +476,7 @@ export default function TownHall({ address, isMobile }) {
     };
 
     return (
-        <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full max-w-xl lg:min-w-[576px]">
+        <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px]">
             <MessagePreviewModal />
             {isMobile && (<Alert color="failure" icon={HiInformationCircle}>Limited functionality mode</Alert>)}
             {isMobile === false && (
@@ -622,8 +622,8 @@ export default function TownHall({ address, isMobile }) {
                     ? townHallHistory.txs.map(
                           (tx, index) => (
                             <>
-                                <div className="flex items-start mt-2" key={"townhallTxHistory"+index}>
-                                   <div className="flex flex-col mt-2 gap-y-0.5 break-words space-y-1.5 w-full leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                                <div className="flex flex-col items-center mt-2" key={"townhallTxHistory"+index}>
+                                   <div className="flex flex-col mt-2 max-w-xl gap-y-0.5 break-words space-y-1.5 w-full leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                                    <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
                                       <span>
                                          {tx.replyAddress === address ? (
