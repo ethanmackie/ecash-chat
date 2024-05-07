@@ -1,21 +1,28 @@
 "use client";
 import  React, { useState, useEffect } from 'react';
 import { appConfig } from '../config/app';
-import { Tooltip, Avatar, Popover, Accordion, Alert, Modal, Card } from "flowbite-react";
+import { Tooltip, Avatar, Popover, Accordion, Alert, Modal } from "flowbite-react";
 import { Textarea } from "@/components/ui/textarea";
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import { postHasErrors, replyHasErrors } from '../validation/validation';
 import { Button } from "@/components/ui/button";
-import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { Separator } from "@/components/ui/separator"
 import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon } from "@/components/ui/social";
-import { PersonIcon, FaceIcon, PaperPlaneIcon } from '@radix-ui/react-icons';
+import { PersonIcon, FaceIcon, Link2Icon } from '@radix-ui/react-icons';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
 import { HiInformationCircle } from "react-icons/hi";
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+  } from "@/components/ui/card"
 import {
     TwitterShareButton,
     TwitterIcon,
@@ -655,19 +662,35 @@ export default function TownHall({ address, isMobile }) {
                                    {/* Render any media content within the message */}
                                    {tx.nftShowcaseId !== false && tx.nftShowcaseId !== undefined && (
                                         <>
-                                            <Card href={`${appConfig.blockExplorerUrl}/tx/${tx.nftShowcaseId}`} target="_blank" className="max-w-sm">
-                                                <b>NFT Showcase</b>
-                                                    <div className="font-medium dark:text-white">
-                                                        <div onClick={() => {
-                                                            copy(tx.nftShowcaseId);
-                                                            toast(`${tx.nftShowcaseId} copied to clipboard`);
-                                                        }}>
-                                                            ID: {tx.nftShowcaseId.substring(0,15)}...{tx.nftShowcaseId.substring(tx.nftShowcaseId.length - 10)}
-                                                        </div>
-                                                        Last sale price: N/A<br /><br />
-                                                    </div>
-                                                <img src={`${appConfig.tokenIconsUrl}/256/${tx.nftShowcaseId}.png`} className="rounded-lg object-cover"/>
-                                            </Card>
+                                <Card className="max-w-sm transition-shadow duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50">
+                                    <CardHeader>
+                                        <CardTitle>NFT Showcase</CardTitle>
+                                        <CardDescription>
+                                        <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
+                                        <span onClick={() => {
+                                            copy(tx.nftShowcaseId);
+                                            toast(`${tx.nftShowcaseId} copied to clipboard`);
+                                        }}>
+                                            ID: {tx.nftShowcaseId.substring(0,15)}...{tx.nftShowcaseId.substring(tx.nftShowcaseId.length - 10)}
+                                        </span>
+                                        <a 
+                                            href={`${appConfig.blockExplorerUrl}/tx/${tx.nftShowcaseId}`} 
+                                            target="_blank" 
+                                            className="ml-2 dark:text-white font-medium" // 使用 margin-left 来添加空间
+                                        >
+                                            <Link2Icon />
+                                        </a>
+                                    </div>
+                                            Last sale price: N/A
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <img src={`${appConfig.tokenIconsUrl}/256/${tx.nftShowcaseId}.png`} className="rounded-lg w-full object-cover"/>
+                                    </CardContent>
+                                    <CardFooter>
+                                      
+                                    </CardFooter>
+                                </Card>
                                         </>
                                     )}
                                    {tx.imageSrc !== false && (<img src={tx.imageSrc} className="rounded-lg object-cover"/>)}
