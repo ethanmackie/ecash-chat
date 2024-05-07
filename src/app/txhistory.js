@@ -64,8 +64,18 @@ export default function TxHistory({ address }) {
     const [decryptionInput, setDecryptionInput] = useState('');
     const [encryptedMessage, setEncryptedMessage] = useState('');
     const [currentPage, setCurrentPage] = useState(0);
+    const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here 
 
-    const maxPagesToShow = 7;
+    useEffect(() => {
+      const handleResize = () => {
+          setMaxPagesToShow(window.innerWidth < 576 ? 5 : 7);
+      };
+
+      window.addEventListener('resize', handleResize);
+      handleResize();
+      return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
     const halfMaxPages = Math.floor(maxPagesToShow / 2);
 
     useEffect(() => {
@@ -204,7 +214,6 @@ export default function TxHistory({ address }) {
                      <>
                      <div className="flex items-start gap-2.5" key={"txHistory"+index}>
                         <div className="flex flex-col space-y-1.5 w-full max-w-[590px] leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
-
                         <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white break-words">
                            <span className="text-sm font-semibold text-gray-900 dark:text-gray-400">From: </span>
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -231,7 +240,10 @@ export default function TxHistory({ address }) {
                                               copy(tx.replyAddress);
                                               toast(`${tx.replyAddress} copied to clipboard`);
                                           }}>
-                                              {tx.replyAddress.substring(0,8)}...{tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                        <Badge variant="outline">
+                                             {tx.replyAddress.substring(0,8)}...{tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                        </Badge>
+                                            
                                           </div>
                                       </div>
                                       <Popover
@@ -307,7 +319,7 @@ export default function TxHistory({ address }) {
                                 </>)
                               }
                            </span>
-                           <span className="text-sm font-bold text-gray-500 dark:text-gray-400">&emsp;&emsp;To: </span>
+                           <span className="text-sm font-semibold text-gray-900 dark:text-gray-400">&emsp;&emsp;To: </span>
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
                                {tx.recipientAddress === address ? (
                                     <>
@@ -333,7 +345,10 @@ export default function TxHistory({ address }) {
                                                copy(tx.recipientAddress);
                                                toast(`${tx.recipientAddress} copied to clipboard`);
                                            }}>
-                                              {tx.recipientAddress.substring(0,8)}...{tx.recipientAddress.substring(tx.recipientAddress.length - 5)}
+                                            <Badge variant="outline">
+                                            {tx.recipientAddress.substring(0,8)}...{tx.recipientAddress.substring(tx.recipientAddress.length - 5)}
+                                           </Badge>
+                                              
                                           </div>
                                        </div>
                                        <Popover
@@ -427,13 +442,18 @@ export default function TxHistory({ address }) {
 
                         {/* XEC Tip rendering */}
                         {tx.isXecTip && (
-                           <Alert color="success">
-                           <div className="flex items-center space-x-2">
-                             <MoneyIcon className="h-5 w-5 text-blue-500" />
-                             <span>XEC tip from eCash Chat</span>
-                           </div>
-                         </Alert>
-                        )}
+                          <Alert color="success">
+                              <div className="flex items-center space-x-2">
+                                  <MoneyIcon className="h-5 w-5 text-blue-500" />
+                                  <span>
+                                      {tx.recipientAddress === address ? 
+                                          `Received ${tx.xecAmount} XEC tip from eCash Chat` :
+                                          `Sent ${tx.xecAmount} XEC tip via eCash Chat`
+                                      }
+                                  </span>
+                              </div>
+                          </Alert>
+                      )}
 
                         {/* Render any media content within the message */}
                         {tx.nftShowcaseId !== false && tx.nftShowcaseId !== undefined && (
@@ -599,7 +619,7 @@ export default function TxHistory({ address }) {
 
     return (
          <>
-          
+         <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full max-w-xl lg:min-w-[576px] min-w-96">
          {txHistory && txHistory !== '' ? (
              <>
              {/*Set up pagination menu*/}
@@ -713,6 +733,7 @@ export default function TxHistory({ address }) {
            </div>
          </div>
          }
+         </div>    
       </>
     );
 }

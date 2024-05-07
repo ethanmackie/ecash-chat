@@ -357,8 +357,8 @@ export default function Home() {
 
     const CreditCardHeader = () => {
         const cardStyling = isMobile 
-        ? "w-94 h-56 m-auto bg-red-100 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105" 
-        : "w-96 h-56 m-auto bg-red-100 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105";
+        ? "w-94 h-56 m-auto break-words bg-red-100 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105" 
+        : "w-96 h-56 m-auto break-words bg-red-100 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105";
 
         return (
             <div
@@ -543,7 +543,7 @@ export default function Home() {
           <CreditCardHeader />
 
           {/* Tab navigation */}
-          <Tabs aria-label="eCash Chat" style="default" className='z-10 relative mt-4'>
+          <Tabs aria-label="eCash Chat" style="default" className='z-10 relative mt-4 items-center'>
               {isMobile === false && (
                   <Tabs.Item active title="Inbox" icon={HiOutlineMail}>
                       {cashaddr.isValidCashAddress(address, 'ecash') &&
@@ -553,9 +553,9 @@ export default function Home() {
               )}
 
               {isMobile === false && (
-                  <Tabs.Item title="Send Message" icon={HiOutlineNewspaper}>
+                  <Tabs.Item title="Send Message" icon={HiOutlineNewspaper} >
                       <div style={{ display: (isLoggedIn ? 'block' : 'none') }}>
-                          <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-5 lg:px-8">
+                          <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full max-w-xl lg:min-w-[576px] min-w-96">
                                 <MessagePreviewModal />
                                 <form className="space-y-0" action="#" method="POST">
                                   <div>
@@ -615,7 +615,7 @@ export default function Home() {
                                                 type="button"
                                                 onClick={() => insertMarkupTags('[url]theurl[/url]')}
                                                 >
-                                                    Embed Url
+                                                    Url
                                                 </Button>
                                             </Tooltip>
                                             <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
@@ -624,7 +624,7 @@ export default function Home() {
                                                 type="button"
                                                 onClick={() => insertMarkupTags('[img]imageurl[/img]')}
                                                 >
-                                                    Embed Image
+                                                    Image
                                                 </Button>
                                             </Tooltip>
                                             <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=8oIHo0vCZDs[/yt]" style="light">
@@ -633,7 +633,7 @@ export default function Home() {
                                                 type="button"
                                                 onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}
                                                 >
-                                                    Embed Youtube
+                                                    Youtube
                                                 </Button>
                                             </Tooltip>
                                             <Tooltip content="e.g. [twt]https://twitter.com/eCashCommunity/status/1783932847528583665[/twt]" style="light">
@@ -642,7 +642,7 @@ export default function Home() {
                                                 type="button"
                                                 onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}
                                                 >
-                                                    Embed Tweet
+                                                    Tweet
                                                 </Button>
                                             </Tooltip>
                                         </div>
@@ -713,7 +713,7 @@ export default function Home() {
               </Tabs.Item>
 
               <Tabs.Item title="About" icon={IoMdInformationCircleOutline} >
-                  <div className="flex flex-col justify-center py-3 z-10 relative">
+              <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full max-w-xl lg:min-w-[576px] min-w-96">
                       <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">What is eCash Chat?</h2>
                       eCash Chat is an on-chain messaging platform on the eCash blockchain.
                       <br />It filters for specific messaging transactions for a seamless social experience.
@@ -801,7 +801,7 @@ export default function Home() {
               </Tabs.Item>
 
               <Tabs.Item title="Settings" icon={GiAbstract010}>
-                  <div className="flex w-full flex-col py-3 items-center">
+                  <div className="flex min-h-full flex-1 flex-col items-center justify-center px-4 sm:px-6 lg:px-8 w-full max-w-xl lg:min-w-[576px] min-w-96">
                     <Alert color="info" className="w-96">Version: {packageJson.version}</Alert><br />
                     <Button
                         type="button"

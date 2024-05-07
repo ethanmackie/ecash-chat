@@ -68,8 +68,18 @@ export default function TownHall({ address, isMobile }) {
     const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
     const [showMessagePreview, setShowMessagePreview] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
+    const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here 
 
-    const maxPagesToShow = 7;
+    useEffect(() => {
+      const handleResize = () => {
+          setMaxPagesToShow(window.innerWidth < 576 ? 5 : 7);
+      };
+
+      window.addEventListener('resize', handleResize);
+      handleResize();
+      return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
     const halfMaxPages = Math.floor(maxPagesToShow / 2);
 
     useEffect(() => {
@@ -360,7 +370,7 @@ export default function TownHall({ address, isMobile }) {
             foundReplies.map(
                 (foundReply, index) => (
                     <>
-                    <div className="flex flex-col break-words space-y-1.5 mt-2 w-full max-w-[590px] leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                    <div className="flex flex-col break-words space-y-1.5 mt-2 w-full leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                         <div className="flex justify-between items-center w-full" key={"townhallReply"+index}>
                             <div className="flex items-center gap-4">
                                 <PersonIcon/>
@@ -466,7 +476,7 @@ export default function TownHall({ address, isMobile }) {
     };
 
     return (
-        <div className="flex min-h-full flex-1 flex-col justify-center py-5 lg:px-8">
+        <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full max-w-xl lg:min-w-[576px]">
             <MessagePreviewModal />
             {isMobile && (<Alert color="failure" icon={HiInformationCircle}>Limited functionality mode</Alert>)}
             {isMobile === false && (
@@ -507,22 +517,22 @@ export default function TownHall({ address, isMobile }) {
                         </Popover>
                         <Tooltip content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]" style="light">
                             <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[url]theurl[/url]')}>
-                                Embed Url
+                                Url
                             </Button>
                         </Tooltip>
                         <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
                             <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[img]imageurl[/img]')}>
-                                Embed Image
+                                Image
                             </Button>
                         </Tooltip>
                         <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=8oIHo0vCZDs[/yt]" style="light">
                             <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}>
-                                Embed Youtube
+                                Youtube
                             </Button>
                         </Tooltip>
                         <Tooltip content="e.g. [twt]https://twitter.com/eCashCommunity/status/1783932847528583665[/twt]" style="light">
                             <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}>
-                                Embed Tweet
+                                Tweet
                             </Button>
                         </Tooltip>
                       </div>
@@ -613,7 +623,7 @@ export default function TownHall({ address, isMobile }) {
                           (tx, index) => (
                             <>
                                 <div className="flex items-start mt-2" key={"townhallTxHistory"+index}>
-                                   <div className="flex flex-col mt-2 gap-y-0.5 break-words space-y-1.5 w-full max-w-[596.82px] leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                                   <div className="flex flex-col mt-2 gap-y-0.5 break-words space-y-1.5 w-full leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                                    <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
                                       <span>
                                          {tx.replyAddress === address ? (
