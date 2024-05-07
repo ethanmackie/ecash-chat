@@ -688,7 +688,6 @@ export default function TownHall({ address, isMobile }) {
                                         <img src={`${appConfig.tokenIconsUrl}/256/${tx.nftShowcaseId}.png`} className="rounded-lg w-full object-cover"/>
                                     </CardContent>
                                     <CardFooter>
-                                      
                                     </CardFooter>
                                 </Card>
                                         </>
