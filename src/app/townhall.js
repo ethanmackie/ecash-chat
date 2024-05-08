@@ -370,7 +370,7 @@ export default function TownHall({ address, isMobile }) {
             foundReplies.map(
                 (foundReply, index) => (
                     <>
-                    <div className="flex flex-col break-words space-y-1.5 mt-2 w-full leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                    <div className="flex flex-col break-words space-y-1.5 gap-2 mt-2 w-full leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                         <div className="flex justify-between items-center w-full" key={"townhallReply"+index}>
                             <div className="flex items-center gap-4">
                                 <PersonIcon/>
@@ -385,7 +385,7 @@ export default function TownHall({ address, isMobile }) {
                                 <RenderTipping address={foundReply.replyAddress} />
                             </div>
                         </div>
-                        <div className="py-2">
+                        <div className="py-2 text-sm font-medium leading-none">
                             {foundReply.opReturnMessage}
                         </div>
                         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
@@ -671,12 +671,13 @@ export default function TownHall({ address, isMobile }) {
                                    </div>
 
                                    {/* Render the op_return message */}
-                                   <p className="text-m font-normal px-2 py-2.5 text-gray-900 dark:text-white" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
-
+                                   <div class="p-4">
+                                   <p className="text-sm font-medium leading-none" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
+                                    </div>
                                    {/* Render any media content within the message */}
                                    {tx.nftShowcaseId !== false && tx.nftShowcaseId !== undefined && (
                                         <>
-                                <Card className="max-w-sm transition-shadow duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50">
+                                <Card className="max-w-md w-full mx-auto transition-shadow duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50">
                                     <CardHeader>
                                         <CardTitle>NFT Showcase</CardTitle>
                                         <CardDescription>
@@ -690,7 +691,7 @@ export default function TownHall({ address, isMobile }) {
                                         <a 
                                             href={`${appConfig.blockExplorerUrl}/tx/${tx.nftShowcaseId}`} 
                                             target="_blank" 
-                                            className="ml-2 dark:text-white font-medium" // 使用 margin-left 来添加空间
+                                            className="ml-2 dark:text-white font-medium" 
                                         >
                                             <Link2Icon />
                                         </a>

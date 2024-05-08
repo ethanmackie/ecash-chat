@@ -8,7 +8,7 @@ import cashaddr from 'ecashaddrjs';
 import { isValidRecipient, isValidMessage } from '../validation/validation';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { MagnifyingGlassIcon, ResetIcon } from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon, ResetIcon, Link2Icon } from "@radix-ui/react-icons";
 import {
     AnonAvatar,
     ShareIcon,
@@ -31,7 +31,15 @@ import {
 } from "@/components/ui/pagination"
 import { HiInformationCircle } from "react-icons/hi";
 import { Input } from "@/components/ui/input"
-import { Popover, Avatar, Textarea, Alert, Modal, Card } from "flowbite-react";
+import { Popover, Avatar, Textarea, Alert, Modal } from "flowbite-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tweet } from 'react-tweet';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
@@ -456,23 +464,36 @@ export default function TxHistory({ address }) {
                       )}
 
                         {/* Render any media content within the message */}
-                        {tx.nftShowcaseId !== false && tx.nftShowcaseId !== undefined && (
-                          <>
-                              <Card href={`${appConfig.blockExplorerUrl}/tx/${tx.nftShowcaseId}`} target="_blank" className="max-w-sm">
-                                  <b>NFT Showcase</b>
-                                      <div className="font-medium dark:text-white">
-                                          <div onClick={() => {
-                                              copy(tx.nftShowcaseId);
-                                              toast(`${tx.nftShowcaseId} copied to clipboard`);
-                                          }}>
-                                              ID: {tx.nftShowcaseId.substring(0,15)}...{tx.nftShowcaseId.substring(tx.nftShowcaseId.length - 10)}
-                                          </div>
-                                          Last sale price: N/A<br /><br />
-                                      </div>
-                                  <img src={`${appConfig.tokenIconsUrl}/256/${tx.nftShowcaseId}.png`} className="rounded-lg object-cover"/>
-                              </Card>
-                          </>
-                        )}
+                         {tx.nftShowcaseId !== false && tx.nftShowcaseId !== undefined && (
+                                <Card className="max-w-xl w-full mx-auto transition-shadow duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50">
+                                <CardHeader>
+                                  <CardTitle>NFT Showcase</CardTitle>
+                                  <CardDescription>
+                               <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
+                                        <span onClick={() => {
+                                            copy(tx.nftShowcaseId);
+                                            toast(`${tx.nftShowcaseId} copied to clipboard`);
+                                        }}>
+                                            ID: {tx.nftShowcaseId.substring(0,15)}...{tx.nftShowcaseId.substring(tx.nftShowcaseId.length - 10)}
+                                        </span>
+                                        <a 
+                                            href={`${appConfig.blockExplorerUrl}/tx/${tx.nftShowcaseId}`} 
+                                            target="_blank" 
+                                            className="ml-2 dark:text-white font-medium" 
+                                        >
+                                            <Link2Icon />
+                                        </a>
+                                    </div>
+                                            Last sale price: N/A
+                                        </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                <img src={`${appConfig.tokenIconsUrl}/256/${tx.nftShowcaseId}.png`} className="rounded-lg w-full object-cover"/>
+                                </CardContent>
+                                <CardFooter>
+                                </CardFooter>
+                              </Card>   
+                )}
                         {tx.imageSrc !== false && (<img src={tx.imageSrc} />)}
                         {tx.videoId !== false && (<LiteYouTubeEmbed id={tx.videoId} />)}
                         {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
@@ -679,14 +700,14 @@ export default function TxHistory({ address }) {
           <div>
       <div className="max-w-xl mt-10 w-full mx-auto">
         <div className="flex items-center space-x-2">
-          <input
+          <Input
             id="address"
             name="address"
             type="text"
             value={addressToSearch}
             required
+            className="bg-gray-50"
             placeholder='Search By Address'
-            className="flex-1 max-w-xl rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             onChange={e => handleAddressChange(e)}
           />
 
