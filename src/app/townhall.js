@@ -7,8 +7,8 @@ import { opReturn as opreturnConfig } from '../config/opreturn';
 import { postHasErrors, replyHasErrors } from '../validation/validation';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator"
-import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon } from "@/components/ui/social";
-import { PersonIcon, FaceIcon, Link2Icon } from '@radix-ui/react-icons';
+import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon, YoutubeIcon } from "@/components/ui/social";
+import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon } from '@radix-ui/react-icons';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
@@ -493,8 +493,10 @@ export default function TownHall({ address, isMobile }) {
                           rows={4}
                     />
                     <p className="text-sm text-red-600 dark:text-red-500">{postError !== false && postError}</p>
-                    <div className="flex gap-2 mt-2">
-                        {/* Emoji Picker */}
+                    <div className="flex justify-between items-center mt-2">
+
+                        {/* this is icons, buttons on left */}
+                        <div className="flex gap-2">
                         <Popover
                             aria-labelledby="emoji-popover"
                             content={
@@ -509,41 +511,43 @@ export default function TownHall({ address, isMobile }) {
                             }
                             >
                             <Button
-                                className="bg-blue-500 hover:bg-blue-300"
+                                variant="ghost"
                                 onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}
                             >
-                                <FaceIcon /> Emoji
+                                <FaceIcon /> 
                             </Button>
                         </Popover>
                         <Tooltip content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]" style="light">
-                            <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[url]theurl[/url]')}>
-                                Url
+                            <Button variant="ghost" onClick={() => insertMarkupTags('[url]theurl[/url]')}>
+                            <Link2Icon/>
                             </Button>
                         </Tooltip>
                         <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
-                            <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[img]imageurl[/img]')}>
-                                Image
+                            <Button variant="ghost" onClick={() => insertMarkupTags('[img]imageurl[/img]')}>
+                            <ImageIcon/>
                             </Button>
                         </Tooltip>
                         <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=8oIHo0vCZDs[/yt]" style="light">
-                            <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}>
-                                Youtube
+                            <Button variant="ghost" onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}>
+                                <YoutubeIcon/>
                             </Button>
                         </Tooltip>
                         <Tooltip content="e.g. [twt]https://twitter.com/eCashCommunity/status/1783932847528583665[/twt]" style="light">
-                            <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}>
-                                Tweet
+                            <Button variant="ghost" onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}>
+                            <UITwitterIcon/>
                             </Button>
                         </Tooltip>
-                      </div>
-                      <Button
+                        </div>
+                        {/* well this is post button*/}
+                        <Button
                         type="button"
                         disabled={post === '' || postError}
-                        className="w-full bg-blue-500 hover:bg-blue-300 mt-2"
+                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={() => { setShowMessagePreview(true); }}
                         >
-                        <PostIcon />&nbsp;Post to Townhall
+                        <PostIcon />&nbsp;Post
                         </Button>
+                        </div>
                     </div>
                 </>
             )}

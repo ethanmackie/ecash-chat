@@ -212,7 +212,7 @@ export default function TxHistory({ address }) {
              ? latestTxHistory.txs.map(
                    (tx, index) => (
                      <>
-                     <div className="flex items-start gap-2.5" key={"txHistory"+index}>
+                     <div className="flex flex-col items-center mt-2" key={"txHistory"+index}>
                         <div className="flex flex-col space-y-1.5 w-full max-w-2xl leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                         <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white break-words">
                            <span className="text-sm font-semibold text-gray-900 dark:text-gray-400">From: </span>
@@ -609,7 +609,6 @@ export default function TxHistory({ address }) {
                         </div>
                      </div>
                     </div>
-                    <br />
                     </>
                    ),
                )
@@ -676,22 +675,16 @@ export default function TxHistory({ address }) {
   </PaginationContent>
 </Pagination>
                </span>
-
-        
-             <br />
              <form className="space-y-6" action="#" method="POST">
   <div>
-    <label htmlFor="address" className="block text-sm font-medium leading-6 text-gray-900">
-      Search By Address
-    </label>
-
-    <div className="mt-2 flex items-center space-x-2">
+    <div className="mt-10 flex items-center space-x-2">
       <input
         id="address"
         name="address"
         type="text"
         value={addressToSearch}
         required
+        placeholder='Search By Address'
         className="flex-1 max-w-96 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
         onChange={e => handleAddressChange(e)}
       />
@@ -721,7 +714,6 @@ export default function TxHistory({ address }) {
     <p className="mt-2 text-sm text-red-600 dark:text-red-500">{addressToSearchError !== false && addressToSearchError}</p>
   </div>
 </form>
-             <br />
              <RenderTxHistory />
              </>
            ) : 
