@@ -25,16 +25,14 @@ import copy from 'copy-to-clipboard';
 import { Tooltip, Tabs, Alert, Modal, Popover } from "flowbite-react";
 import { HiOutlineMail, HiOutlineNewspaper, HiInformationCircle, HiOutlinePhotograph } from "react-icons/hi";
 import { IoMdInformationCircleOutline } from "react-icons/io";
-import { PiHandCoins } from "react-icons/pi";
 import { GiDiscussion, GiAbstract010 } from "react-icons/gi";
 import { ToastContainer, toast } from 'react-toastify';
-import { PersonIcon, FaceIcon, PaperPlaneIcon } from '@radix-ui/react-icons';
+import { PersonIcon, FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon } from '@radix-ui/react-icons';
 import 'react-toastify/dist/ReactToastify.css';
+import { YoutubeIcon } from "@/components/ui/social";
 import {
-    EmojiIcon,
     SendIcon,
     LogoutIcon,
-    ImageIcon,
     AliasIcon,
     EncryptionIcon,
 } from "@/components/ui/social";
@@ -42,7 +40,6 @@ const crypto = require('crypto');
 import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
 const chronik = new ChronikClientNode(chronikConfig.urls);
-import Spline from '@splinetool/react-spline';
 import YouTubeVideoId from 'youtube-video-id';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
@@ -357,8 +354,8 @@ export default function Home() {
 
     const CreditCardHeader = () => {
         const cardStyling = isMobile 
-        ? "w-94 h-56 m-auto bg-red-100 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105" 
-        : "w-96 h-56 m-auto bg-red-100 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105";
+        ? "w-94 h-56 m-auto break-words bg-red-100 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105" 
+        : "w-96 h-56 m-auto break-words bg-red-100 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105";
 
         return (
             <div
@@ -384,11 +381,8 @@ export default function Home() {
                     </div>
                         <img className="w-14 h-14" src="/ecash-square-icon.svg"/>
                     </div>
-                    <div className="pt-1">
-                        <p className="text-base">
-                            eCash Address
-                        </p>
-                        <p className="text-xs">
+                    <div className="pt-4">
+                        <p className="font-medium tracking-wider text-sm">
                             {address}
                         </p>
                     </div>
@@ -427,7 +421,7 @@ export default function Home() {
           <div className="fixed inset-0 z-0" style={{ backgroundImage: "url('/bg.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
       </div>
 
-      <main className="lg:flex lg:flex-col items-center justify-center p-5 relative z-10 mt-4">
+      <main className="sm:flex flex-col items-center justify-center p-5 relative z-10 mt-4">
 
       {isLoggedIn === false && isMobile === false ? (
           <>
@@ -543,7 +537,7 @@ export default function Home() {
           <CreditCardHeader />
 
           {/* Tab navigation */}
-          <Tabs aria-label="eCash Chat" style="default" className='z-10 relative mt-4'>
+          <Tabs aria-label="eCash Chat" className="z-10 relative mt-4 justify-center">
               {isMobile === false && (
                   <Tabs.Item active title="Inbox" icon={HiOutlineMail}>
                       {cashaddr.isValidCashAddress(address, 'ecash') &&
@@ -553,11 +547,11 @@ export default function Home() {
               )}
 
               {isMobile === false && (
-                  <Tabs.Item title="Send Message" icon={HiOutlineNewspaper}>
+                  <Tabs.Item title="Send Message" icon={HiOutlineNewspaper} >
                       <div style={{ display: (isLoggedIn ? 'block' : 'none') }}>
-                          <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-5 lg:px-8">
+                          <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
                                 <MessagePreviewModal />
-                                <form className="space-y-0" action="#" method="POST">
+                                <form className="space-y-0 w-full mx-auto max-w-xl" action="#" method="POST">
                                   <div>
                                   <Label htmlFor="address">Address</Label>
                                     <div className="mt-2">
@@ -567,6 +561,7 @@ export default function Home() {
                                         type="text"
                                         value={recipient}
                                         required
+                                        placeholder="to:address"
                                         className="bg-gray-50"
                                         onChange={e => handleAddressChange(e)}
                                       />
@@ -585,7 +580,7 @@ export default function Home() {
                                           value={message}
                                           placeholder={encryptionMode ? 'Max. 95 bytes' : 'Max. 215 bytes'}
                                           required
-                                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                          className="bg-gray-50"
                                           onChange={e => handleMessageChange(e)}
                                         />
                                         <p className="mt-2 text-sm text-red-600 dark:text-red-500">{messageError !== false && messageError}</p>
@@ -605,44 +600,44 @@ export default function Home() {
                                                     </div>
                                                 }
                                                 >
-                                                <Button className="bg-blue-500 hover:bg-blue-300" type="button">
-                                                    <FaceIcon /> Emoji
+                                                <Button variant="ghost" type="button">
+                                                    <FaceIcon /> 
                                                 </Button>
                                                 </Popover>
                                             <Tooltip content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]" style="light">
                                                 <Button
-                                                className="bg-blue-500 hover:bg-blue-300"
+                                               variant="ghost"
                                                 type="button"
                                                 onClick={() => insertMarkupTags('[url]theurl[/url]')}
                                                 >
-                                                    Embed Url
+                                                    <Link2Icon/>
                                                 </Button>
                                             </Tooltip>
                                             <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
                                                 <Button
-                                                className="bg-blue-500 hover:bg-blue-300"
+                                                variant="ghost"
                                                 type="button"
                                                 onClick={() => insertMarkupTags('[img]imageurl[/img]')}
                                                 >
-                                                    Embed Image
+                                                     <ImageIcon/>
                                                 </Button>
                                             </Tooltip>
                                             <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=8oIHo0vCZDs[/yt]" style="light">
                                                 <Button
-                                                className="bg-blue-500 hover:bg-blue-300"
+                                               variant="ghost"
                                                 type="button"
                                                 onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}
                                                 >
-                                                    Embed Youtube
+                                                      <YoutubeIcon/>
                                                 </Button>
                                             </Tooltip>
                                             <Tooltip content="e.g. [twt]https://twitter.com/eCashCommunity/status/1783932847528583665[/twt]" style="light">
                                                 <Button
-                                                className="bg-blue-500 hover:bg-blue-300"
+                                               variant="ghost"
                                                 type="button"
                                                 onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}
                                                 >
-                                                    Embed Tweet
+                                                    <UITwitterIcon/>
                                                 </Button>
                                             </Tooltip>
                                         </div>
@@ -659,7 +654,7 @@ export default function Home() {
                                       </div>       
                                     {/* Encryption mode toggle */}
                                     <label className="inline-flex items-center cursor-pointer mt-4">
-                                        <input
+                                        <Input
                                             type="checkbox"
                                             value=""
                                             className="sr-only peer"
@@ -704,16 +699,16 @@ export default function Home() {
                   </Tabs.Item>
               )}
 
-              <Tabs.Item title="Town Hall" icon={GiDiscussion}>
+              <Tabs.Item title="Town Hall" icon={GiDiscussion} >
                   <Townhall address={address} isMobile={isMobile} />
               </Tabs.Item>
 
-              <Tabs.Item title="NFTs" icon={HiOutlinePhotograph}>
+              <Tabs.Item title="NFTs" icon={HiOutlinePhotograph} >
                   <Nft chronik={chronik} address={address} isMobile={isMobile} />
               </Tabs.Item>
 
               <Tabs.Item title="About" icon={IoMdInformationCircleOutline} >
-                  <div className="flex flex-col justify-center py-3 z-10 relative">
+              <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
                       <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">What is eCash Chat?</h2>
                       eCash Chat is an on-chain messaging platform on the eCash blockchain.
                       <br />It filters for specific messaging transactions for a seamless social experience.
@@ -801,7 +796,7 @@ export default function Home() {
               </Tabs.Item>
 
               <Tabs.Item title="Settings" icon={GiAbstract010}>
-                  <div className="flex w-full flex-col py-3 items-center">
+                  <div className="flex min-h-full flex-1 flex-col items-center justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
                     <Alert color="info" className="w-96">Version: {packageJson.version}</Alert><br />
                     <Button
                         type="button"

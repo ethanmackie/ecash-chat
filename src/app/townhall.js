@@ -1,21 +1,28 @@
 "use client";
 import  React, { useState, useEffect } from 'react';
 import { appConfig } from '../config/app';
-import { Tooltip, Avatar, Popover, Accordion, Alert, Modal, Card } from "flowbite-react";
+import { Tooltip, Avatar, Popover, Accordion, Alert, Modal } from "flowbite-react";
 import { Textarea } from "@/components/ui/textarea";
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import { postHasErrors, replyHasErrors } from '../validation/validation';
 import { Button } from "@/components/ui/button";
-import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { Separator } from "@/components/ui/separator"
-import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon } from "@/components/ui/social";
-import { PersonIcon, FaceIcon, PaperPlaneIcon } from '@radix-ui/react-icons';
+import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon, YoutubeIcon } from "@/components/ui/social";
+import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon } from '@radix-ui/react-icons';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
 import { HiInformationCircle } from "react-icons/hi";
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+  } from "@/components/ui/card"
 import {
     TwitterShareButton,
     TwitterIcon,
@@ -61,8 +68,18 @@ export default function TownHall({ address, isMobile }) {
     const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
     const [showMessagePreview, setShowMessagePreview] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
+    const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here 
 
-    const maxPagesToShow = 7;
+    useEffect(() => {
+      const handleResize = () => {
+          setMaxPagesToShow(window.innerWidth < 576 ? 5 : 7);
+      };
+
+      window.addEventListener('resize', handleResize);
+      handleResize();
+      return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
     const halfMaxPages = Math.floor(maxPagesToShow / 2);
 
     useEffect(() => {
@@ -353,7 +370,7 @@ export default function TownHall({ address, isMobile }) {
             foundReplies.map(
                 (foundReply, index) => (
                     <>
-                    <div className="flex flex-col break-words space-y-1.5 mt-2 w-full max-w-[590px] leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                    <div className="flex flex-col break-words space-y-1.5 gap-2 mt-2 w-full leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                         <div className="flex justify-between items-center w-full" key={"townhallReply"+index}>
                             <div className="flex items-center gap-4">
                                 <PersonIcon/>
@@ -368,7 +385,7 @@ export default function TownHall({ address, isMobile }) {
                                 <RenderTipping address={foundReply.replyAddress} />
                             </div>
                         </div>
-                        <div className="py-2">
+                        <div className="py-2 text-sm font-medium leading-none">
                             {foundReply.opReturnMessage}
                         </div>
                         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
@@ -459,12 +476,12 @@ export default function TownHall({ address, isMobile }) {
     };
 
     return (
-        <div className="flex min-h-full flex-1 flex-col justify-center py-5 lg:px-8">
+        <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px]">
             <MessagePreviewModal />
             {isMobile && (<Alert color="failure" icon={HiInformationCircle}>Limited functionality mode</Alert>)}
             {isMobile === false && (
               <>
-                <div>
+                <div className="max-w-xl w-full mx-auto">
                     {/* Post input field */}
                     <Textarea
                       className="bg-white"
@@ -476,8 +493,10 @@ export default function TownHall({ address, isMobile }) {
                           rows={4}
                     />
                     <p className="text-sm text-red-600 dark:text-red-500">{postError !== false && postError}</p>
-                    <div className="flex gap-2 mt-2">
-                        {/* Emoji Picker */}
+                    <div className="flex justify-between items-center mt-2">
+
+                        {/* this is icons, buttons on left */}
+                        <div className="flex gap-2">
                         <Popover
                             aria-labelledby="emoji-popover"
                             content={
@@ -492,41 +511,43 @@ export default function TownHall({ address, isMobile }) {
                             }
                             >
                             <Button
-                                className="bg-blue-500 hover:bg-blue-300"
+                                variant="ghost"
                                 onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}
                             >
-                                <FaceIcon /> Emoji
+                                <FaceIcon /> 
                             </Button>
                         </Popover>
                         <Tooltip content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]" style="light">
-                            <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[url]theurl[/url]')}>
-                                Embed Url
+                            <Button variant="ghost" onClick={() => insertMarkupTags('[url]theurl[/url]')}>
+                            <Link2Icon/>
                             </Button>
                         </Tooltip>
                         <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
-                            <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[img]imageurl[/img]')}>
-                                Embed Image
+                            <Button variant="ghost" onClick={() => insertMarkupTags('[img]imageurl[/img]')}>
+                            <ImageIcon/>
                             </Button>
                         </Tooltip>
                         <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=8oIHo0vCZDs[/yt]" style="light">
-                            <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}>
-                                Embed Youtube
+                            <Button variant="ghost" onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}>
+                                <YoutubeIcon/>
                             </Button>
                         </Tooltip>
                         <Tooltip content="e.g. [twt]https://twitter.com/eCashCommunity/status/1783932847528583665[/twt]" style="light">
-                            <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}>
-                                Embed Tweet
+                            <Button variant="ghost" onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}>
+                            <UITwitterIcon/>
                             </Button>
                         </Tooltip>
-                      </div>
-                      <Button
+                        </div>
+                        {/* well this is post button*/}
+                        <Button
                         type="button"
                         disabled={post === '' || postError}
-                        className="w-full bg-blue-500 hover:bg-blue-300 mt-2"
+                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={() => { setShowMessagePreview(true); }}
                         >
-                        <PostIcon />&nbsp;Post to Townhall
+                        <PostIcon />&nbsp;Post
                         </Button>
+                        </div>
                     </div>
                 </>
             )}
@@ -605,8 +626,8 @@ export default function TownHall({ address, isMobile }) {
                     ? townHallHistory.txs.map(
                           (tx, index) => (
                             <>
-                                <div className="flex items-start mt-2" key={"townhallTxHistory"+index}>
-                                   <div className="flex flex-col mt-2 gap-y-0.5 break-words space-y-1.5 w-full max-w-[596.82px] leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                                <div className="flex flex-col items-center mt-2" key={"townhallTxHistory"+index}>
+                                   <div className="flex flex-col mt-2 max-w-xl gap-y-0.5 break-words space-y-1.5 w-full leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                                    <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
                                       <span>
                                          {tx.replyAddress === address ? (
@@ -650,24 +671,40 @@ export default function TownHall({ address, isMobile }) {
                                    </div>
 
                                    {/* Render the op_return message */}
-                                   <p className="text-m font-normal px-2 py-2.5 text-gray-900 dark:text-white" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
-
+                                   <div class="p-4">
+                                   <p className="text-sm font-medium leading-none" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
+                                    </div>
                                    {/* Render any media content within the message */}
                                    {tx.nftShowcaseId !== false && tx.nftShowcaseId !== undefined && (
                                         <>
-                                            <Card href={`${appConfig.blockExplorerUrl}/tx/${tx.nftShowcaseId}`} target="_blank" className="max-w-sm">
-                                                <b>NFT Showcase</b>
-                                                    <div className="font-medium dark:text-white">
-                                                        <div onClick={() => {
-                                                            copy(tx.nftShowcaseId);
-                                                            toast(`${tx.nftShowcaseId} copied to clipboard`);
-                                                        }}>
-                                                            ID: {tx.nftShowcaseId.substring(0,15)}...{tx.nftShowcaseId.substring(tx.nftShowcaseId.length - 10)}
-                                                        </div>
-                                                        Last sale price: N/A<br /><br />
-                                                    </div>
-                                                <img src={`${appConfig.tokenIconsUrl}/256/${tx.nftShowcaseId}.png`} className="rounded-lg object-cover"/>
-                                            </Card>
+                                <Card className="max-w-md w-full mx-auto transition-shadow duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50">
+                                    <CardHeader>
+                                        <CardTitle>NFT Showcase</CardTitle>
+                                        <CardDescription>
+                                        <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
+                                        <span onClick={() => {
+                                            copy(tx.nftShowcaseId);
+                                            toast(`${tx.nftShowcaseId} copied to clipboard`);
+                                        }}>
+                                            ID: {tx.nftShowcaseId.substring(0,15)}...{tx.nftShowcaseId.substring(tx.nftShowcaseId.length - 10)}
+                                        </span>
+                                        <a 
+                                            href={`${appConfig.blockExplorerUrl}/tx/${tx.nftShowcaseId}`} 
+                                            target="_blank" 
+                                            className="ml-2 dark:text-white font-medium" 
+                                        >
+                                            <Link2Icon />
+                                        </a>
+                                    </div>
+                                            Last sale price: N/A
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <img src={`${appConfig.tokenIconsUrl}/256/${tx.nftShowcaseId}.png`} className="rounded-lg w-full object-cover"/>
+                                    </CardContent>
+                                    <CardFooter>
+                                    </CardFooter>
+                                </Card>
                                         </>
                                     )}
                                    {tx.imageSrc !== false && (<img src={tx.imageSrc} className="rounded-lg object-cover"/>)}

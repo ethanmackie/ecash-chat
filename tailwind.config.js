@@ -21,6 +21,12 @@ module.exports = {
       },
     },
     extend: {
+      margin: {
+        '10p': '10%',  
+      },
+      padding: {
+        '10p': '10%',  
+      },
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
       },
@@ -81,5 +87,5 @@ module.exports = {
      
     },
   },
-  plugins: [require("tailwindcss-animate"), require("flowbite/plugin")],
+  plugins: [require("tailwindcss-animate")],
 }

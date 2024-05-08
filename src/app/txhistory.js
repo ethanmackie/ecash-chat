@@ -8,7 +8,8 @@ import cashaddr from 'ecashaddrjs';
 import { isValidRecipient, isValidMessage } from '../validation/validation';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { MagnifyingGlassIcon, ResetIcon } from "@radix-ui/react-icons";
+import { Separator } from "@/components/ui/separator";
+import { MagnifyingGlassIcon, ResetIcon, Link2Icon } from "@radix-ui/react-icons";
 import {
     AnonAvatar,
     ShareIcon,
@@ -31,7 +32,15 @@ import {
 } from "@/components/ui/pagination"
 import { HiInformationCircle } from "react-icons/hi";
 import { Input } from "@/components/ui/input"
-import { Popover, Avatar, Textarea, Alert, Modal, Card } from "flowbite-react";
+import { Popover, Avatar, Textarea, Alert, Modal } from "flowbite-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tweet } from 'react-tweet';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
@@ -64,8 +73,18 @@ export default function TxHistory({ address }) {
     const [decryptionInput, setDecryptionInput] = useState('');
     const [encryptedMessage, setEncryptedMessage] = useState('');
     const [currentPage, setCurrentPage] = useState(0);
+    const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here 
 
-    const maxPagesToShow = 7;
+    useEffect(() => {
+      const handleResize = () => {
+          setMaxPagesToShow(window.innerWidth < 576 ? 5 : 7);
+      };
+
+      window.addEventListener('resize', handleResize);
+      handleResize();
+      return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
     const halfMaxPages = Math.floor(maxPagesToShow / 2);
 
     useEffect(() => {
@@ -202,9 +221,8 @@ export default function TxHistory({ address }) {
              ? latestTxHistory.txs.map(
                    (tx, index) => (
                      <>
-                     <div className="flex items-start gap-2.5" key={"txHistory"+index}>
-                        <div className="flex flex-col space-y-1.5 w-full max-w-[590px] leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
-
+                     <div className="flex flex-col items-center mt-2" key={"txHistory"+index}>
+                        <div className="flex flex-col space-y-1.5 w-full max-w-xl leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                         <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white break-words">
                            <span className="text-sm font-semibold text-gray-900 dark:text-gray-400">From: </span>
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -231,7 +249,10 @@ export default function TxHistory({ address }) {
                                               copy(tx.replyAddress);
                                               toast(`${tx.replyAddress} copied to clipboard`);
                                           }}>
-                                              {tx.replyAddress.substring(0,8)}...{tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                        <Badge variant="outline">
+                                             {tx.replyAddress.substring(0,8)}...{tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                        </Badge>
+                                            
                                           </div>
                                       </div>
                                       <Popover
@@ -307,7 +328,7 @@ export default function TxHistory({ address }) {
                                 </>)
                               }
                            </span>
-                           <span className="text-sm font-bold text-gray-500 dark:text-gray-400">&emsp;&emsp;To: </span>
+                           <span className="text-sm font-semibold text-gray-900 dark:text-gray-400">&emsp;&emsp;To: </span>
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
                                {tx.recipientAddress === address ? (
                                     <>
@@ -333,7 +354,10 @@ export default function TxHistory({ address }) {
                                                copy(tx.recipientAddress);
                                                toast(`${tx.recipientAddress} copied to clipboard`);
                                            }}>
-                                              {tx.recipientAddress.substring(0,8)}...{tx.recipientAddress.substring(tx.recipientAddress.length - 5)}
+                                            <Badge variant="outline">
+                                            {tx.recipientAddress.substring(0,8)}...{tx.recipientAddress.substring(tx.recipientAddress.length - 5)}
+                                           </Badge>
+                                              
                                           </div>
                                        </div>
                                        <Popover
@@ -427,32 +451,50 @@ export default function TxHistory({ address }) {
 
                         {/* XEC Tip rendering */}
                         {tx.isXecTip && (
-                           <Alert color="success">
-                           <div className="flex items-center space-x-2">
-                             <MoneyIcon className="h-5 w-5 text-blue-500" />
-                             <span>XEC tip from eCash Chat</span>
-                           </div>
-                         </Alert>
-                        )}
+                          <Alert color="success">
+                              <div className="flex items-center space-x-2">
+                                  <MoneyIcon className="h-5 w-5 text-blue-500" />
+                                  <span>
+                                      {tx.recipientAddress === address ? 
+                                          `Received ${tx.xecAmount} XEC tip from eCash Chat` :
+                                          `Sent ${tx.xecAmount} XEC tip via eCash Chat`
+                                      }
+                                  </span>
+                              </div>
+                          </Alert>
+                      )}
 
                         {/* Render any media content within the message */}
-                        {tx.nftShowcaseId !== false && tx.nftShowcaseId !== undefined && (
-                          <>
-                              <Card href={`${appConfig.blockExplorerUrl}/tx/${tx.nftShowcaseId}`} target="_blank" className="max-w-sm">
-                                  <b>NFT Showcase</b>
-                                      <div className="font-medium dark:text-white">
-                                          <div onClick={() => {
-                                              copy(tx.nftShowcaseId);
-                                              toast(`${tx.nftShowcaseId} copied to clipboard`);
-                                          }}>
-                                              ID: {tx.nftShowcaseId.substring(0,15)}...{tx.nftShowcaseId.substring(tx.nftShowcaseId.length - 10)}
-                                          </div>
-                                          Last sale price: N/A<br /><br />
-                                      </div>
-                                  <img src={`${appConfig.tokenIconsUrl}/256/${tx.nftShowcaseId}.png`} className="rounded-lg object-cover"/>
-                              </Card>
-                          </>
-                        )}
+                         {tx.nftShowcaseId !== false && tx.nftShowcaseId !== undefined && (
+                                <Card className="max-w-md w-full mx-auto transition-shadow duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50">
+                                <CardHeader>
+                                  <CardTitle>NFT Showcase</CardTitle>
+                                  <CardDescription>
+                               <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
+                                        <span onClick={() => {
+                                            copy(tx.nftShowcaseId);
+                                            toast(`${tx.nftShowcaseId} copied to clipboard`);
+                                        }}>
+                                            ID: {tx.nftShowcaseId.substring(0,15)}...{tx.nftShowcaseId.substring(tx.nftShowcaseId.length - 10)}
+                                        </span>
+                                        <a 
+                                            href={`${appConfig.blockExplorerUrl}/tx/${tx.nftShowcaseId}`} 
+                                            target="_blank" 
+                                            className="ml-2 dark:text-white font-medium" 
+                                        >
+                                            <Link2Icon />
+                                        </a>
+                                    </div>
+                                            Last sale price: N/A
+                                        </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                <img src={`${appConfig.tokenIconsUrl}/256/${tx.nftShowcaseId}.png`} className="rounded-lg w-full object-cover"/>
+                                </CardContent>
+                                <CardFooter>
+                                </CardFooter>
+                              </Card>   
+                )}
                         {tx.imageSrc !== false && (<img src={tx.imageSrc} />)}
                         {tx.videoId !== false && (<LiteYouTubeEmbed id={tx.videoId} />)}
                         {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
@@ -589,7 +631,6 @@ export default function TxHistory({ address }) {
                         </div>
                      </div>
                     </div>
-                    <br />
                     </>
                    ),
                )
@@ -599,109 +640,106 @@ export default function TxHistory({ address }) {
 
     return (
          <>
-          
+         <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
          {txHistory && txHistory !== '' ? (
              <>
              {/*Set up pagination menu*/}
   
              <span>
-             <Pagination>
-  <PaginationContent>
-    <PaginationItem>
-      <PaginationPrevious
-        href="#"
-        onClick={(e) => {
-          setCurrentPage((old) => Math.max(0, old - 1));
-          getTxHistoryByPage(Math.max(0, currentPage - 1));
-        }}
-        disabled={currentPage === 0}
-      />
-    </PaginationItem>
+                  <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              href="#"
+              onClick={(e) => {
+                setCurrentPage((old) => Math.max(0, old - 1));
+                getTxHistoryByPage(Math.max(0, currentPage - 1));
+              }}
+              disabled={currentPage === 0}
+            />
+          </PaginationItem>
 
-    {Array.from({ length: txHistory.numPages }, (_, i) => i)
-      .filter(i => {
-      
-        if (txHistory.numPages <= maxPagesToShow) return true;
-        if (currentPage <= halfMaxPages) return i < maxPagesToShow;
-        if (currentPage >= txHistory.numPages - halfMaxPages) return i >= txHistory.numPages - maxPagesToShow;
-        return i >= currentPage - halfMaxPages && i <= currentPage + halfMaxPages;
-      })
-      .map(i => (
-        <PaginationItem key={i}>
-          <PaginationLink
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              getTxHistoryByPage(i);
-              setCurrentPage(i);
-            }}
-            isActive={currentPage === i}
-          >
-            {i + 1}
-          </PaginationLink>
-        </PaginationItem>
-      ))}
+          {Array.from({ length: txHistory.numPages }, (_, i) => i)
+            .filter(i => {
+            
+              if (txHistory.numPages <= maxPagesToShow) return true;
+              if (currentPage <= halfMaxPages) return i < maxPagesToShow;
+              if (currentPage >= txHistory.numPages - halfMaxPages) return i >= txHistory.numPages - maxPagesToShow;
+              return i >= currentPage - halfMaxPages && i <= currentPage + halfMaxPages;
+            })
+            .map(i => (
+              <PaginationItem key={i}>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    getTxHistoryByPage(i);
+                    setCurrentPage(i);
+                  }}
+                  isActive={currentPage === i}
+                >
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
 
-    <PaginationItem>
-      <PaginationNext
-        href="#"
-        onClick={(e) => {
-          e.preventDefault();
-          setCurrentPage((old) => Math.min(txHistory.numPages - 1, old + 1));
-          getTxHistoryByPage(Math.min(txHistory.numPages - 1, currentPage + 1));
-        }}
-        disabled={currentPage === txHistory.numPages - 1}
-      />
-    </PaginationItem>
-  </PaginationContent>
-</Pagination>
+          <PaginationItem>
+            <PaginationNext
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setCurrentPage((old) => Math.min(txHistory.numPages - 1, old + 1));
+                getTxHistoryByPage(Math.min(txHistory.numPages - 1, currentPage + 1));
+              }}
+              disabled={currentPage === txHistory.numPages - 1}
+            />
+          </PaginationItem>
+        </PaginationContent>
+             </Pagination>
                </span>
-
-        
-             <br />
              <form className="space-y-6" action="#" method="POST">
-  <div>
-    <label htmlFor="address" className="block text-sm font-medium leading-6 text-gray-900">
-      Search By Address
-    </label>
+          <div>
+      <div className="max-w-xl mt-10 w-full mx-auto">
+        <div className="flex items-center space-x-2">
+          <Input
+            id="address"
+            name="address"
+            type="text"
+            value={addressToSearch}
+            required
+            className="bg-gray-50"
+            placeholder='Search By Address'
+            onChange={e => handleAddressChange(e)}
+          />
 
-    <div className="mt-2 flex items-center space-x-2">
-      <input
-        id="address"
-        name="address"
-        type="text"
-        value={addressToSearch}
-        required
-        className="flex-1 max-w-96 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-        onChange={e => handleAddressChange(e)}
-      />
+          <Button
+            type="button"
+            variant="outline"
+            disabled={addressToSearchError}
+            onClick={e => {
+              getTxHistoryByAddress(e);
+            }}
+          >
+            <MagnifyingGlassIcon className="h-4 w-4" />
+          </Button>
 
-      <Button
-        type="button"
-        variant="outline"
-        disabled={addressToSearchError}
-        onClick={e => {
-          getTxHistoryByAddress(e);
-        }}
-      >
-        <MagnifyingGlassIcon className="h-4 w-4" />
-      </Button>
-
-      <Button
-        type="button"
-        variant="outline"
-        onClick={() => {
-          setTxHistoryByAddress('');
-          setAddressToSearch('');
-        }}
-      >
-        <ResetIcon />
-      </Button>
-    </div>
-    <p className="mt-2 text-sm text-red-600 dark:text-red-500">{addressToSearchError !== false && addressToSearchError}</p>
-  </div>
-</form>
-             <br />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              setTxHistoryByAddress('');
+              setAddressToSearch('');
+            }}
+          >
+            <ResetIcon />
+          </Button>
+        </div>
+          <p className="mt-2 text-sm text-red-600 dark:text-red-500">
+            {addressToSearchError !== false && addressToSearchError}
+          </p>
+        </div>
+          </div>
+        </form>
              <RenderTxHistory />
              </>
            ) : 
@@ -713,6 +751,7 @@ export default function TxHistory({ address }) {
            </div>
          </div>
          }
+         </div>    
       </>
     );
 }
