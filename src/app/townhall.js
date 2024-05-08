@@ -481,7 +481,7 @@ export default function TownHall({ address, isMobile }) {
             {isMobile && (<Alert color="failure" icon={HiInformationCircle}>Limited functionality mode</Alert>)}
             {isMobile === false && (
               <>
-                <div>
+                <div className="max-w-xl w-full mx-auto">
                     {/* Post input field */}
                     <Textarea
                       className="bg-white"

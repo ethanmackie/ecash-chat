@@ -556,7 +556,7 @@ export default function Home() {
                       <div style={{ display: (isLoggedIn ? 'block' : 'none') }}>
                           <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
                                 <MessagePreviewModal />
-                                <form className="space-y-0 container mx-auto max-w-xl" action="#" method="POST">
+                                <form className="space-y-0 w-full mx-auto max-w-xl" action="#" method="POST">
                                   <div>
                                   <Label htmlFor="address">Address</Label>
                                     <div className="mt-2">

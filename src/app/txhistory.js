@@ -677,7 +677,7 @@ export default function TxHistory({ address }) {
                </span>
              <form className="space-y-6" action="#" method="POST">
           <div>
-      <div className="mt-10 flex flex-col items-center">
+      <div className="max-w-xl mt-10 w-full mx-auto">
         <div className="flex items-center space-x-2">
           <input
             id="address"
