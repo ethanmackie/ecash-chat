@@ -30,7 +30,7 @@ export default function Nft( { chronik, address, isMobile } ) {
                 return;
             }
 
-            // Retrieve Child NFTs for each parent
+            // Retrieve Child NFTs for each known parent
             const thisFullNfts = [];
             const childNftIds = [];
             for (const nftParent of chatCache.parentNftList) {
@@ -123,48 +123,48 @@ export default function Nft( { chronik, address, isMobile } ) {
         return (
             <>
                 {/* Child NFT modal */}
-                            <Modal
-                show={showNftModal}
-                onClose={() => {setParentNftInFocus(null)}}
-            >
-                <Modal.Header>
-                    <div className="flex">NFTs in {parentNftInFocus.genesisInfo.tokenName} collection</div>
-                </Modal.Header>
-                <Modal.Body>
-                    <div className="grid md:grid-cols-2 grid-cols-1 max-w-xl gap-2 mx-auto">
-                        {childNftObjs && childNftObjs.length > 0 && childNftObjs.map((childNftObj, index) => (
-                            <Card key={childNftObj.tokenId + index}
-                            className="transition-shadow duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50"
-                            >
-                                <CardHeader>
-                                    <CardTitle>{childNftObj.genesisInfo.tokenName} ({childNftObj.genesisInfo.tokenTicker})</CardTitle>
-                                    <CardDescription>
-                                        <p>First seen: {formatDate(childNftObj.timeFirstSeen, navigator.language)}</p>
-                                        <p>Price: N/A</p>
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <img
-                                        src={`${appConfig.tokenIconsUrl}/256/${childNftObj.tokenId}.png`}
-                                        alt=""
-                                        className="block w-full h-auto rounded-lg object-cover"
-                                    />
-                                </CardContent>
-                                <CardFooter>
-                                    <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => { nftShowCasePost(childNftObj.tokenId, '') }}>
-                                        Post to townhall
-                                    </Button>
-                                </CardFooter>
-                            </Card>
-                        ))}
-                    </div>
-                    <div className="flex justify-end mt-10">
-                        <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => { setShowNftModal(false) }}>
-                            Close
-                        </Button>
-                    </div>
-                </Modal.Body>
-            </Modal>
+                <Modal
+                    show={showNftModal}
+                    onClose={() => {setParentNftInFocus(null)}}
+                >
+                    <Modal.Header>
+                        <div className="flex">NFTs in {parentNftInFocus.genesisInfo.tokenName} collection</div>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div className="grid md:grid-cols-2 grid-cols-1 max-w-xl gap-2 mx-auto">
+                            {childNftObjs && childNftObjs.length > 0 && childNftObjs.map((childNftObj, index) => (
+                                <Card key={childNftObj.tokenId + index}
+                                className="transition-shadow duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50"
+                                >
+                                    <CardHeader>
+                                        <CardTitle>{childNftObj.genesisInfo.tokenName} ({childNftObj.genesisInfo.tokenTicker})</CardTitle>
+                                        <CardDescription>
+                                            <p>First seen: {formatDate(childNftObj.timeFirstSeen, navigator.language)}</p>
+                                            <p>Price: N/A</p>
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <img
+                                            src={`${appConfig.tokenIconsUrl}/256/${childNftObj.tokenId}.png`}
+                                            alt=""
+                                            className="block w-full h-auto rounded-lg object-cover"
+                                        />
+                                    </CardContent>
+                                    <CardFooter>
+                                        <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => { nftShowCasePost(childNftObj.tokenId, '') }}>
+                                            Post to townhall
+                                        </Button>
+                                    </CardFooter>
+                                </Card>
+                            ))}
+                        </div>
+                        <div className="flex justify-end mt-10">
+                            <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => { setShowNftModal(false) }}>
+                                Close
+                            </Button>
+                        </div>
+                    </Modal.Body>
+                </Modal>
             </>
         );
     };
