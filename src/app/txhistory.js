@@ -8,6 +8,7 @@ import cashaddr from 'ecashaddrjs';
 import { isValidRecipient, isValidMessage } from '../validation/validation';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { MagnifyingGlassIcon, ResetIcon, Link2Icon } from "@radix-ui/react-icons";
 import {
     AnonAvatar,
@@ -465,7 +466,7 @@ export default function TxHistory({ address }) {
 
                         {/* Render any media content within the message */}
                          {tx.nftShowcaseId !== false && tx.nftShowcaseId !== undefined && (
-                                <Card className="max-w-xl w-full mx-auto transition-shadow duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50">
+                                <Card className="max-w-md w-full mx-auto transition-shadow duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50">
                                 <CardHeader>
                                   <CardTitle>NFT Showcase</CardTitle>
                                   <CardDescription>

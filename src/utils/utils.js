@@ -62,7 +62,6 @@ export const encodeBip21Message = (message, encryptionFlag) => {
 };
 
 // Encodes the op_return script for an XEC tipping action
-
 export const encodeBip2XecTip = () => {
     try {
         let script = [];
@@ -134,6 +133,36 @@ export const encodeBip21ReplyPost = (post, replyTxid) => {
         return script;
     } catch (err) {
         console.log('Error encoding eCash Chat post: ', err);
+    }
+};
+
+// Encode the op_return NFT showcase script
+export const encodeBip21NftShowcase = (showcaseMsg, nftId) => {
+    if (
+        typeof showcaseMsg !== 'string' ||
+        typeof nftId !== 'string'
+    ) {
+        return '';
+    }
+    try {
+        let script = [];
+
+        // Push eCash Chat protocol identifier
+        script.push(Buffer.from(opreturnConfig.appPrefixesHex.eCashChat, 'hex'));
+
+        // Push eCash Chat NFT showcase identifier
+        script.push(Buffer.from(opreturnConfig.nftShowcasePrefixHex, 'hex'));
+
+        // Push eCash Chat nftId
+        script.push(Buffer.from(nftId, 'hex'));
+
+        // eCash Chat messages are utf8 encoded
+        const eCashChatMsgScript = Buffer.from(showcaseMsg, 'utf8');
+        script.push(eCashChatMsgScript);
+        script = utxolib.script.compile(script).toString('hex');
+        return script;
+    } catch (err) {
+        console.log('Error encoding eCash Chat nft showcase: ', err);
     }
 };
 

@@ -31,7 +31,6 @@ import { PersonIcon, FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link
 import 'react-toastify/dist/ReactToastify.css';
 import { YoutubeIcon } from "@/components/ui/social";
 import {
-    EmojiIcon,
     SendIcon,
     LogoutIcon,
     AliasIcon,
@@ -41,7 +40,6 @@ const crypto = require('crypto');
 import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
 const chronik = new ChronikClientNode(chronikConfig.urls);
-import Spline from '@splinetool/react-spline';
 import YouTubeVideoId from 'youtube-video-id';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
@@ -539,7 +537,7 @@ export default function Home() {
           <CreditCardHeader />
 
           {/* Tab navigation */}
-          <Tabs aria-label="eCash Chat" style="default" className='z-10 relative mt-4 justify-center'>
+          <Tabs aria-label="eCash Chat" className="z-10 relative mt-4 justify-center">
               {isMobile === false && (
                   <Tabs.Item active title="Inbox" icon={HiOutlineMail}>
                       {cashaddr.isValidCashAddress(address, 'ecash') &&
@@ -701,11 +699,11 @@ export default function Home() {
                   </Tabs.Item>
               )}
 
-              <Tabs.Item title="Town Hall" icon={GiDiscussion}>
+              <Tabs.Item title="Town Hall" icon={GiDiscussion} >
                   <Townhall address={address} isMobile={isMobile} />
               </Tabs.Item>
 
-              <Tabs.Item title="NFTs" icon={HiOutlinePhotograph}>
+              <Tabs.Item title="NFTs" icon={HiOutlinePhotograph} >
                   <Nft chronik={chronik} address={address} isMobile={isMobile} />
               </Tabs.Item>
 
