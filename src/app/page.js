@@ -383,11 +383,8 @@ export default function Home() {
                     </div>
                         <img className="w-14 h-14" src="/ecash-square-icon.svg"/>
                     </div>
-                    <div className="pt-1">
-                        <p className="text-base">
-                            eCash Address
-                        </p>
-                        <p className="text-xs">
+                    <div className="pt-4">
+                        <p className="font-medium tracking-wider text-sm">
                             {address}
                         </p>
                     </div>
