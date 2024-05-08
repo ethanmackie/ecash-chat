@@ -213,7 +213,7 @@ export default function TxHistory({ address }) {
                    (tx, index) => (
                      <>
                      <div className="flex flex-col items-center mt-2" key={"txHistory"+index}>
-                        <div className="flex flex-col space-y-1.5 w-full max-w-2xl leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                        <div className="flex flex-col space-y-1.5 w-full max-w-xl leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                         <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white break-words">
                            <span className="text-sm font-semibold text-gray-900 dark:text-gray-400">From: </span>
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -677,41 +677,45 @@ export default function TxHistory({ address }) {
                </span>
              <form className="space-y-6" action="#" method="POST">
   <div>
-    <div className="mt-10 flex items-center space-x-2">
-      <input
-        id="address"
-        name="address"
-        type="text"
-        value={addressToSearch}
-        required
-        placeholder='Search By Address'
-        className="flex-1 max-w-96 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-        onChange={e => handleAddressChange(e)}
-      />
+  <div className="mt-10 flex flex-col items-center">
+  <div className="flex items-center space-x-2">
+    <input
+      id="address"
+      name="address"
+      type="text"
+      value={addressToSearch}
+      required
+      placeholder='Search By Address'
+      className="flex-1 max-w-96 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+      onChange={e => handleAddressChange(e)}
+    />
 
-      <Button
-        type="button"
-        variant="outline"
-        disabled={addressToSearchError}
-        onClick={e => {
-          getTxHistoryByAddress(e);
-        }}
-      >
-        <MagnifyingGlassIcon className="h-4 w-4" />
-      </Button>
+    <Button
+      type="button"
+      variant="outline"
+      disabled={addressToSearchError}
+      onClick={e => {
+        getTxHistoryByAddress(e);
+      }}
+    >
+      <MagnifyingGlassIcon className="h-4 w-4" />
+    </Button>
 
-      <Button
-        type="button"
-        variant="outline"
-        onClick={() => {
-          setTxHistoryByAddress('');
-          setAddressToSearch('');
-        }}
-      >
-        <ResetIcon />
-      </Button>
-    </div>
-    <p className="mt-2 text-sm text-red-600 dark:text-red-500">{addressToSearchError !== false && addressToSearchError}</p>
+    <Button
+      type="button"
+      variant="outline"
+      onClick={() => {
+        setTxHistoryByAddress('');
+        setAddressToSearch('');
+      }}
+    >
+      <ResetIcon />
+    </Button>
+  </div>
+  <p className="mt-2 text-sm text-red-600 dark:text-red-500">
+    {addressToSearchError !== false && addressToSearchError}
+  </p>
+</div>
   </div>
 </form>
              <RenderTxHistory />
