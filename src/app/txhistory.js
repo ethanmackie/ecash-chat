@@ -624,100 +624,100 @@ export default function TxHistory({ address }) {
              {/*Set up pagination menu*/}
   
              <span>
-             <Pagination>
-  <PaginationContent>
-    <PaginationItem>
-      <PaginationPrevious
-        href="#"
-        onClick={(e) => {
-          setCurrentPage((old) => Math.max(0, old - 1));
-          getTxHistoryByPage(Math.max(0, currentPage - 1));
-        }}
-        disabled={currentPage === 0}
-      />
-    </PaginationItem>
+                  <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              href="#"
+              onClick={(e) => {
+                setCurrentPage((old) => Math.max(0, old - 1));
+                getTxHistoryByPage(Math.max(0, currentPage - 1));
+              }}
+              disabled={currentPage === 0}
+            />
+          </PaginationItem>
 
-    {Array.from({ length: txHistory.numPages }, (_, i) => i)
-      .filter(i => {
-      
-        if (txHistory.numPages <= maxPagesToShow) return true;
-        if (currentPage <= halfMaxPages) return i < maxPagesToShow;
-        if (currentPage >= txHistory.numPages - halfMaxPages) return i >= txHistory.numPages - maxPagesToShow;
-        return i >= currentPage - halfMaxPages && i <= currentPage + halfMaxPages;
-      })
-      .map(i => (
-        <PaginationItem key={i}>
-          <PaginationLink
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              getTxHistoryByPage(i);
-              setCurrentPage(i);
-            }}
-            isActive={currentPage === i}
-          >
-            {i + 1}
-          </PaginationLink>
-        </PaginationItem>
-      ))}
+          {Array.from({ length: txHistory.numPages }, (_, i) => i)
+            .filter(i => {
+            
+              if (txHistory.numPages <= maxPagesToShow) return true;
+              if (currentPage <= halfMaxPages) return i < maxPagesToShow;
+              if (currentPage >= txHistory.numPages - halfMaxPages) return i >= txHistory.numPages - maxPagesToShow;
+              return i >= currentPage - halfMaxPages && i <= currentPage + halfMaxPages;
+            })
+            .map(i => (
+              <PaginationItem key={i}>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    getTxHistoryByPage(i);
+                    setCurrentPage(i);
+                  }}
+                  isActive={currentPage === i}
+                >
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
 
-    <PaginationItem>
-      <PaginationNext
-        href="#"
-        onClick={(e) => {
-          e.preventDefault();
-          setCurrentPage((old) => Math.min(txHistory.numPages - 1, old + 1));
-          getTxHistoryByPage(Math.min(txHistory.numPages - 1, currentPage + 1));
-        }}
-        disabled={currentPage === txHistory.numPages - 1}
-      />
-    </PaginationItem>
-  </PaginationContent>
-</Pagination>
+          <PaginationItem>
+            <PaginationNext
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setCurrentPage((old) => Math.min(txHistory.numPages - 1, old + 1));
+                getTxHistoryByPage(Math.min(txHistory.numPages - 1, currentPage + 1));
+              }}
+              disabled={currentPage === txHistory.numPages - 1}
+            />
+          </PaginationItem>
+        </PaginationContent>
+             </Pagination>
                </span>
              <form className="space-y-6" action="#" method="POST">
-  <div>
-  <div className="mt-10 flex flex-col items-center">
-  <div className="flex items-center space-x-2">
-    <input
-      id="address"
-      name="address"
-      type="text"
-      value={addressToSearch}
-      required
-      placeholder='Search By Address'
-      className="flex-1 max-w-96 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-      onChange={e => handleAddressChange(e)}
-    />
+          <div>
+      <div className="mt-10 flex flex-col items-center">
+        <div className="flex items-center space-x-2">
+          <input
+            id="address"
+            name="address"
+            type="text"
+            value={addressToSearch}
+            required
+            placeholder='Search By Address'
+            className="flex-1 max-w-xl rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            onChange={e => handleAddressChange(e)}
+          />
 
-    <Button
-      type="button"
-      variant="outline"
-      disabled={addressToSearchError}
-      onClick={e => {
-        getTxHistoryByAddress(e);
-      }}
-    >
-      <MagnifyingGlassIcon className="h-4 w-4" />
-    </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={addressToSearchError}
+            onClick={e => {
+              getTxHistoryByAddress(e);
+            }}
+          >
+            <MagnifyingGlassIcon className="h-4 w-4" />
+          </Button>
 
-    <Button
-      type="button"
-      variant="outline"
-      onClick={() => {
-        setTxHistoryByAddress('');
-        setAddressToSearch('');
-      }}
-    >
-      <ResetIcon />
-    </Button>
-  </div>
-  <p className="mt-2 text-sm text-red-600 dark:text-red-500">
-    {addressToSearchError !== false && addressToSearchError}
-  </p>
-</div>
-  </div>
-</form>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              setTxHistoryByAddress('');
+              setAddressToSearch('');
+            }}
+          >
+            <ResetIcon />
+          </Button>
+        </div>
+          <p className="mt-2 text-sm text-red-600 dark:text-red-500">
+            {addressToSearchError !== false && addressToSearchError}
+          </p>
+        </div>
+          </div>
+        </form>
              <RenderTxHistory />
              </>
            ) : 

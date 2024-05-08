@@ -25,16 +25,15 @@ import copy from 'copy-to-clipboard';
 import { Tooltip, Tabs, Alert, Modal, Popover } from "flowbite-react";
 import { HiOutlineMail, HiOutlineNewspaper, HiInformationCircle, HiOutlinePhotograph } from "react-icons/hi";
 import { IoMdInformationCircleOutline } from "react-icons/io";
-import { PiHandCoins } from "react-icons/pi";
 import { GiDiscussion, GiAbstract010 } from "react-icons/gi";
 import { ToastContainer, toast } from 'react-toastify';
-import { PersonIcon, FaceIcon, PaperPlaneIcon } from '@radix-ui/react-icons';
+import { PersonIcon, FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon } from '@radix-ui/react-icons';
 import 'react-toastify/dist/ReactToastify.css';
+import { YoutubeIcon } from "@/components/ui/social";
 import {
     EmojiIcon,
     SendIcon,
     LogoutIcon,
-    ImageIcon,
     AliasIcon,
     EncryptionIcon,
 } from "@/components/ui/social";
@@ -557,7 +556,7 @@ export default function Home() {
                       <div style={{ display: (isLoggedIn ? 'block' : 'none') }}>
                           <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
                                 <MessagePreviewModal />
-                                <form className="space-y-0" action="#" method="POST">
+                                <form className="space-y-0 container mx-auto max-w-xl" action="#" method="POST">
                                   <div>
                                   <Label htmlFor="address">Address</Label>
                                     <div className="mt-2">
@@ -567,6 +566,7 @@ export default function Home() {
                                         type="text"
                                         value={recipient}
                                         required
+                                        placeholder="to:address"
                                         className="bg-gray-50"
                                         onChange={e => handleAddressChange(e)}
                                       />
@@ -605,44 +605,44 @@ export default function Home() {
                                                     </div>
                                                 }
                                                 >
-                                                <Button className="bg-blue-500 hover:bg-blue-300" type="button">
-                                                    <FaceIcon /> Emoji
+                                                <Button variant="ghost" type="button">
+                                                    <FaceIcon /> 
                                                 </Button>
                                                 </Popover>
                                             <Tooltip content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]" style="light">
                                                 <Button
-                                                className="bg-blue-500 hover:bg-blue-300"
+                                               variant="ghost"
                                                 type="button"
                                                 onClick={() => insertMarkupTags('[url]theurl[/url]')}
                                                 >
-                                                    Url
+                                                    <Link2Icon/>
                                                 </Button>
                                             </Tooltip>
                                             <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
                                                 <Button
-                                                className="bg-blue-500 hover:bg-blue-300"
+                                                variant="ghost"
                                                 type="button"
                                                 onClick={() => insertMarkupTags('[img]imageurl[/img]')}
                                                 >
-                                                    Image
+                                                     <ImageIcon/>
                                                 </Button>
                                             </Tooltip>
                                             <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=8oIHo0vCZDs[/yt]" style="light">
                                                 <Button
-                                                className="bg-blue-500 hover:bg-blue-300"
+                                               variant="ghost"
                                                 type="button"
                                                 onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}
                                                 >
-                                                    Youtube
+                                                      <YoutubeIcon/>
                                                 </Button>
                                             </Tooltip>
                                             <Tooltip content="e.g. [twt]https://twitter.com/eCashCommunity/status/1783932847528583665[/twt]" style="light">
                                                 <Button
-                                                className="bg-blue-500 hover:bg-blue-300"
+                                               variant="ghost"
                                                 type="button"
                                                 onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}
                                                 >
-                                                    Tweet
+                                                    <UITwitterIcon/>
                                                 </Button>
                                             </Tooltip>
                                         </div>
