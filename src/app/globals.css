@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -25,7 +26,7 @@
     --ring: 240 5.9% 10%;
     --radius: 0.75rem;
   }
- 
+
   .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
@@ -49,6 +50,7 @@
   }
 }
 
+
 @layer base {
   * {
     @apply border-border;
@@ -64,4 +66,33 @@
     background-size: 50px 50px;
     opacity: 0.5;
   }
+}
+
+.background_content {
+  height: -moz-fit-content;
+  height: fit-content;
+  z-index: 1;
+  max-width: 640px;
+  background-image: conic-gradient(
+    from 0deg at 50% 50%, 
+    #F262B5 0% 35%, 
+    #5FC5FF 35% 54%, 
+    #FFAC89 54% 60%, 
+    #8155FF 60% 66%, 
+    #789DFF 66% 72%, 
+    #9F73F1 72% 86%, 
+    transparent 86% 100%
+  );
+  position: fixed;
+  content: "";
+  width: 100%;
+  height: 80%;
+  filter: blur(100px) saturate(150%);
+  top: 80px;
+  opacity: .15;
+}
+
+.py-3px {
+  padding-top: 0.1875rem; 
+  padding-bottom: 0.1875rem; 
 }

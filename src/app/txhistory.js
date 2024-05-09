@@ -9,7 +9,7 @@ import { isValidRecipient, isValidMessage } from '../validation/validation';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { MagnifyingGlassIcon, ResetIcon, Link2Icon } from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon, ResetIcon, Link2Icon, Share1Icon } from "@radix-ui/react-icons";
 import {
     AnonAvatar,
     ShareIcon,
@@ -19,6 +19,9 @@ import {
     EncryptionIcon,
     DecryptionIcon,
     MoneyIcon,
+    AlitacoffeeIcon,
+    DefaultavatarIcon, 
+    ReplieduseravatarIcon,
 } from "@/components/ui/social";
 import { encodeBip21Message, encodeBip2XecTip } from '../utils/utils';
 import {
@@ -224,18 +227,18 @@ export default function TxHistory({ address }) {
                      <div className="flex flex-col items-center mt-2" key={"txHistory"+index}>
                         <div className="flex flex-col space-y-1.5 w-full max-w-xl leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                         <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white break-words">
-                           <span className="text-sm font-semibold text-gray-900 dark:text-gray-400">From: </span>
+                           <span className="leading-7 leading-none">From</span>
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
                               {tx.replyAddress === address ? (
                                   <>
                                   <div className="flex items-center gap-4">
-                                      <PersonIcon/>
+                                      <DefaultavatarIcon/>
                                       <div className="font-medium dark:text-white">
                                           <div onClick={() => {
                                               copy(tx.replyAddress);
                                               toast(`${tx.replyAddress} copied to clipboard`);
                                           }}
-                                          ><Badge variant="outline">This Wallet</Badge></div>
+                                          ><Badge className="leading-7 [&:not(:first-child)]:mt-6 py-3px" variant="outline">Your wallet</Badge></div>
                                       </div>
                                   </div>
                                   </>
@@ -243,13 +246,13 @@ export default function TxHistory({ address }) {
                                 (<>
                                   <span>
                                   <div className="flex items-center gap-2">
-                                      <PersonIcon/>
+                                      <ReplieduseravatarIcon/>
                                       <div className="font-medium dark:text-white">
                                           <div onClick={() => {
                                               copy(tx.replyAddress);
                                               toast(`${tx.replyAddress} copied to clipboard`);
                                           }}>
-                                        <Badge variant="outline">
+                                        <Badge className="leading-7 [&:not(:first-child)]:mt-6 py-3px" variant="outline">
                                              {tx.replyAddress.substring(0,8)}...{tx.replyAddress.substring(tx.replyAddress.length - 5)}
                                         </Badge>
                                             
@@ -316,45 +319,46 @@ export default function TxHistory({ address }) {
                                           </div>
                                         }
                                       >
-                                        <button
-                                            type="button"
-                                            className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                        >
-                                            Tip
-                                        </button>
+                                        <Button
+                                          type="button"
+                                          variant="outline" 
+                                          size="icon"
+                                      >
+                                        <AlitacoffeeIcon />
+                                      </Button>
                                       </Popover>
                                     </div>
                                   </span>
                                 </>)
                               }
                            </span>
-                           <span className="text-sm font-semibold text-gray-900 dark:text-gray-400">&emsp;&emsp;To: </span>
+                           <span className="leading-7 leading-none">&emsp;&emsp;To </span>
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
                                {tx.recipientAddress === address ? (
                                     <>
-                                        <div className="flex items-center gap-4">
-                                            <PersonIcon/>
+                                        <div className="flex items-center gap-2">
+                                            <DefaultavatarIcon/>
                                             <div className="font-medium dark:text-white"
                                                 onClick={() => {
                                                    copy(tx.recipientAddress);
                                                    toast(`${tx.recipientAddress} copied to clipboard`);
                                                 }}
                                             >
-                                                <div><Badge variant="outline">This Wallet</Badge></div>
+                                                <div><Badge className="leading-7 [&:not(:first-child)]:mt-6 py-3px" variant="outline"> Your wallet</Badge></div>
                                             </div>
                                         </div>
                                     </>
-                               ) : tx.iseCashChatPost === true ? <Badge variant="outline">eCash Chat Townhall</Badge> :
+                               ) : tx.iseCashChatPost === true ? <Badge className="leading-7 [&:not(:first-child)]:mt-6 py-3px" variant="outline">eCash Chat Townhall</Badge> :
                                  (<>
                                    <span>
-                                   <div className="flex items-center gap-4">
-                                       <PersonIcon/>
+                                   <div className="flex items-center gap-2">
+                                       <ReplieduseravatarIcon/>
                                        <div className="font-medium dark:text-white">
                                            <div onClick={() => {
                                                copy(tx.recipientAddress);
                                                toast(`${tx.recipientAddress} copied to clipboard`);
                                            }}>
-                                            <Badge variant="outline">
+                                            <Badge className="leading-7 [&:not(:first-child)]:mt-6 py-3px" variant="outline">
                                             {tx.recipientAddress.substring(0,8)}...{tx.recipientAddress.substring(tx.recipientAddress.length - 5)}
                                            </Badge>
                                               
@@ -421,12 +425,13 @@ export default function TxHistory({ address }) {
                                            </div>
                                          }
                                        >
-                                         <button
-                                             type="button"
-                                             className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                         >
-                                             Tip
-                                         </button>
+                                          <Button
+                                          type="button"
+                                          variant="outline" 
+                                          size="icon"
+                                      >
+                                        <AlitacoffeeIcon />
+                                      </Button>
                                        </Popover>
                                     </div>
                                    </span>
@@ -439,19 +444,19 @@ export default function TxHistory({ address }) {
                         <br />
                         {tx.isEcashChatEncrypted ? (
                             <>
-                                <Alert color="failure" icon={HiInformationCircle}>
+                                <Alert className="leading-7 [&:not(:first-child)]:mt-6" color="failure" icon={HiInformationCircle}>
                                     &nbsp;&nbsp;<b>Encrypted Message</b><br />
                                     &nbsp;&nbsp;{tx.opReturnMessage ? `${tx.opReturnMessage}`.substring(0,40)+'...' : ' '}
                                 </Alert>
                             </>
                             ) : (
-                                <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white text-ellipsis break-words min-w-0" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
+                                <p className="text-sm text-muted-foreground" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
                             )
                         }
 
                         {/* XEC Tip rendering */}
                         {tx.isXecTip && (
-                          <Alert color="success">
+                          <Alert className="leading-7 [&:not(:first-child)]:mt-6" color="success">
                               <div className="flex items-center space-x-2">
                                   <MoneyIcon className="h-5 w-5 text-blue-500" />
                                   <span>
@@ -500,7 +505,7 @@ export default function TxHistory({ address }) {
                         {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
                         {tx.url !== false && (<Alert color="info"><a href={tx.url} target="_blank" >{tx.url}</a></Alert>)}
 
-                        <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                        <span className="text-sm text-muted-foreground">
                             {tx.isCashtabMessage ? 'Cashtab Message' :
                                 tx.iseCashChatMessage ? 'eCash Chat Message' :
                                     tx.iseCashChatPost ? 'eCash Townhall Post' :
@@ -508,7 +513,7 @@ export default function TxHistory({ address }) {
                             }
 
                             {/* Date and timestamp */}
-                            &nbsp;|&nbsp;{tx.txDate}&nbsp;at&nbsp;{tx.txTime}
+                            |&nbsp;{tx.txDate}&nbsp;at&nbsp;{tx.txTime}
 
                             &nbsp;|&nbsp;{tx.xecAmount} XEC
                         </span>
@@ -527,13 +532,13 @@ export default function TxHistory({ address }) {
                                         <Modal.Header><div className="flex"><DecryptionIcon />&nbsp;Decrypt Message</div></Modal.Header>
                                         <Modal.Body>
                                             <div className="space-y-6">
-                                              <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                                              <p className="leading-7 [&:not(:first-child)]:mt-6">
                                                   Please input the password used by the sender to decrypt this message.
                                               </p>
                                               <p>
                                                   <Alert>{tx.opReturnMessage}</Alert>
                                               </p>
-                                              <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                                              <p className="leading-7 [&:not(:first-child)]:mt-6">
                                                   {/* Decryption input */}
                                                   <Input
                                                     id="decryptionKey"
@@ -543,12 +548,12 @@ export default function TxHistory({ address }) {
                                                     onBlur={e => handleDecryptionInput(e)}
                                                   />
                                                   <br />
-                                                  <button disabled={decryptionInput === ''} onClick={() => {
+                                                  <Button disabled={decryptionInput === ''} onClick={() => {
                                                       decryptMessage(tx.opReturnMessage)
                                                       setOpenDecryptionModal(false)
-                                                  }} className="rounded bg-blue-500 px-2 py-1 text-m font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+                                                  }} className="bg-blue-500 hover:bg-blue-300">
                                                       Decrypt
-                                                  </button>
+                                                  </Button>
                                               </p>
                                             </div>
                                         </Modal.Body>
@@ -624,9 +629,9 @@ export default function TxHistory({ address }) {
                                 </div>
                               }
                             >
-                              <button type="button">
-                                  <ShareIcon />
-                              </button>
+                               <Button variant="outline" size="icon">
+                               <Share1Icon className="h-4 w-4" />
+                              </Button>
                             </Popover>
                         </div>
                      </div>

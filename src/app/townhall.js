@@ -7,8 +7,8 @@ import { opReturn as opreturnConfig } from '../config/opreturn';
 import { postHasErrors, replyHasErrors } from '../validation/validation';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator"
-import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon, YoutubeIcon } from "@/components/ui/social";
-import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon } from '@radix-ui/react-icons';
+import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon, YoutubeIcon, AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon } from "@/components/ui/social";
+import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon, ChatBubbleIcon, Share1Icon } from '@radix-ui/react-icons';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
@@ -320,9 +320,9 @@ export default function TownHall({ address, isMobile }) {
                         setShowMessagePreview(false)
                         sendPost()
                     }}>
-                        Looks good
+                        Post now
                     </Button>
-                    <Button color="gray" onClick={() => setShowMessagePreview(false)}>
+                    <Button onClick={() => setShowMessagePreview(false)}>
                         Cancel
                     </Button>
                 </Modal.Footer>
@@ -372,20 +372,20 @@ export default function TownHall({ address, isMobile }) {
                     <>
                     <div className="flex flex-col break-words space-y-1.5 gap-2 mt-2 w-full leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                         <div className="flex justify-between items-center w-full" key={"townhallReply"+index}>
-                            <div className="flex items-center gap-4">
-                                <PersonIcon/>
+                            <div className="flex items-center gap-2">
+                                <ReplieduseravatarIcon/>
                                 <div className="font-medium dark:text-white" onClick={() => {
                                     copy(foundReply.replyAddress);
                                     toast(`${foundReply.replyAddress} copied to clipboard`);
                                 }}>
-                                    <Badge variant="outline">
+                                    <Badge className="leading-7 [&:not(:first-child)]:mt-6 py-3px" variant="outline">
                                         {foundReply.replyAddress.substring(0,10) + '...' + foundReply.replyAddress.substring(foundReply.replyAddress.length - 5)}
                                     </Badge>
                                 </div>
                                 <RenderTipping address={foundReply.replyAddress} />
                             </div>
                         </div>
-                        <div className="py-2 text-sm font-medium leading-none">
+                        <div className="py-2 text-sm text-muted-foreground">
                             {foundReply.opReturnMessage}
                         </div>
                         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
@@ -464,12 +464,13 @@ export default function TownHall({ address, isMobile }) {
                 </div>
               }
               >
-                <button
+                <Button
                     type="button"
-                    className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                    variant="outline" 
+                    size="icon"
                 >
-                    Tip
-                </button>
+                   <AlitacoffeeIcon />
+                </Button>
               </Popover>
             </>
         );
@@ -632,15 +633,15 @@ export default function TownHall({ address, isMobile }) {
                                       <span>
                                          {tx.replyAddress === address ? (
                                              <>
-                                             <div className="flex items-center gap-4">
-                                                 <PersonIcon/>
-                                                 <Badge variant="outline">
+                                             <div className="flex items-center gap-2">
+                                                 <DefaultavatarIcon/>
+                                                 <Badge variant="outline" className="py-3px">
                                                  <div className="font-medium dark:text-white">
                                                      <div onClick={() => {
                                                          copy(tx.replyAddress);
                                                          toast(`${tx.replyAddress} copied to clipboard`);
                                                      }}
-                                                     >This Wallet</div>
+                                                     >Your wallet</div>
                                                  </div>
                                                  </Badge>
                                              </div>
@@ -648,10 +649,10 @@ export default function TownHall({ address, isMobile }) {
                                          ) :
                                            (<>
                                              <span>
-                                                <div className="flex items-center gap-4">
-                                                    <PersonIcon/>
-                                                    <Badge variant="outline">
-                                                    <div className="font-medium dark:text-white">
+                                                <div className="flex items-center gap-2">
+                                                    <DefaultavatarIcon/>
+                                                    <Badge variant="outline" className="py-3px">
+                                                    <div className="leading-7 [&:not(:first-child)]:mt-6">
                                                         <div onClick={() => {
                                                             copy(tx.replyAddress);
                                                             toast(`${tx.replyAddress} copied to clipboard`);
@@ -671,8 +672,8 @@ export default function TownHall({ address, isMobile }) {
                                    </div>
 
                                    {/* Render the op_return message */}
-                                   <div class="p-4">
-                                   <p className="text-sm font-medium leading-none" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
+                                   <div class="py-4">
+                                   <p className="text-sm text-muted-foreground" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
                                     </div>
                                    {/* Render any media content within the message */}
                                    {tx.nftShowcaseId !== false && tx.nftShowcaseId !== undefined && (
@@ -711,11 +712,15 @@ export default function TownHall({ address, isMobile }) {
                                    {tx.videoId !== false && (<LiteYouTubeEmbed id={tx.videoId} />)}
                                    {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
                                    <p className="line-clamp-1">
-                                      {tx.url !== false && (<Alert color="info"><a href={tx.url} target="_blank" >{tx.url}</a></Alert>)}
+                                   {tx.url !== false && (
+                                        <Alert color="info" className="flex-nowrap text-sm text-muted-foreground break-words">
+                                            <a href={tx.url} target="_blank" className="break-words">{tx.url}</a>
+                                        </Alert>
+                                    )}
                                    </p>
                                    {/* Date and timestamp */}
-                                   <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                                      &emsp;{tx.txDate}&nbsp;at&nbsp;{tx.txTime}
+                                   <span className="text-sm text-muted-foreground">
+                                      {tx.txDate}&nbsp;at&nbsp;{tx.txTime}
                                    </span>
 
                                    {/* Reply action to a townhall post */}
@@ -736,28 +741,29 @@ export default function TownHall({ address, isMobile }) {
                                                      id="reply-post"
                                                      value={replyPost}
                                                      placeholder="Post your reply..."
+                                                     className="bg-gray-50"
                                                      required
                                                      onChange={e => handleReplyPostChange(e)}
                                                      rows={2}
                                                  />
                                                  <p className="mt-2 text-sm text-red-600 dark:text-red-500">{replyPostError !== false && replyPostError}</p>
-                                                 <button
+                                                 <Button
                                                    type="button"
                                                    disabled={replyPostError || replyPost === ''}
-                                                   className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                   className="bg-blue-500 hover:bg-blue-300"
                                                    onClick={e => {
                                                        replytoPost(tx.txid, replyPost)
                                                    }}
                                                  >
                                                    Post Reply
-                                                 </button>
+                                                 </Button>
                                              </div>
                                            </div>
                                          }
                                        >
-                                         <button type="button">
-                                             <ReplyIcon/>
-                                         </button>
+                                          <Button variant="outline" size="icon">
+                                             <ChatBubbleIcon className="h-4 w-4" />
+                                         </Button>
                                        </Popover>
 
                                        {/* Share buttons with other social platforms */}
@@ -823,9 +829,9 @@ export default function TownHall({ address, isMobile }) {
                                            </div>
                                          }
                                        >
-                                         <button type="button">
-                                             <ShareIcon />
-                                         </button>
+                                         <Button variant="outline" size="icon">
+                                          <Share1Icon className="h-4 w-4" />
+                                         </Button>
                                        </Popover>
                                        <br /><br />
                                             {/* Render corresponding replies for this post */}
