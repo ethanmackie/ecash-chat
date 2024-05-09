@@ -736,6 +736,7 @@ export default function TownHall({ address, isMobile }) {
                                                      id="reply-post"
                                                      value={replyPost}
                                                      placeholder="Post your reply..."
+                                                     className="bg-gray-50"
                                                      required
                                                      onChange={e => handleReplyPostChange(e)}
                                                      rows={2}
