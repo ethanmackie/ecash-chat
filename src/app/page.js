@@ -354,8 +354,8 @@ export default function Home() {
 
     const CreditCardHeader = () => {
         const cardStyling = isMobile 
-        ? "w-94 h-56 m-auto break-words bg-red-100 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105" 
-        : "w-96 h-56 m-auto break-words bg-red-100 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105";
+        ? "w-94 h-56 mx-auto break-words bg-red-100 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105" 
+        : "w-96 h-56 mx-auto break-words bg-red-100 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105";
 
         return (
             <div
@@ -445,7 +445,7 @@ export default function Home() {
 </div>
 </div>
 
-      <main className="sm:flex flex-col items-center justify-center p-5 relative z-10 mt-4">
+      <main className="sm:flex flex-col items-center justify-center p-1 sm:p-5 relative z-10 mt-4">
       {isLoggedIn === false && isMobile === false ? (
           <>
           <br /><br /><br />
