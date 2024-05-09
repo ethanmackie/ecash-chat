@@ -113,8 +113,11 @@ export const AliasIcon = () => {
 
 export const EncryptionIcon = () => {
     return (
-        <svg className="h-7 w-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" data-reactroot="">
+        <path fill="#4382FF" d="M12 4C10.3423 4 9 5.34228 9 7V13.54H7V7C7 4.23772 9.23772 2 12 2C13.3783 2 14.6264 2.56465 15.5322 3.45803L15.542 3.46772C16.4354 4.37351 17 5.62167 17 7V13.54H15V7C15 6.18076 14.6666 5.43086 14.1229 4.87712C13.5691 4.33336 12.8192 4 12 4Z" clip-rule="evenodd" fill-rule="evenodd" undefined="1"></path>
+        <path fill="#4382FF" d="M12 22C8.69 22 6 19.31 6 16C6 12.69 8.69 10 12 10C15.31 10 18 12.69 18 16C18 19.31 15.31 22 12 22Z" undefined="1"></path>
+        <path stroke-linejoin="round" stroke-linecap="round" stroke-miterlimit="10" stroke-width="1" stroke="#000000" d="M12 15.75C12.2761 15.75 12.5 15.5261 12.5 15.25C12.5 14.9739 12.2761 14.75 12 14.75C11.7239 14.75 11.5 14.9739 11.5 15.25C11.5 15.5261 11.7239 15.75 12 15.75Z"></path>
+        <path stroke-linejoin="round" stroke-linecap="square" stroke-miterlimit="10" stroke-width="1" stroke="#000000" d="M12 17.25V15.75"></path>
         </svg>
     );
 };
@@ -143,3 +146,39 @@ export const YoutubeIcon = () => {
         </svg>
    );
 };
+
+
+export const AlitacoffeeIcon = () => {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+        <path stroke="#111" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v-.066c0-.375.188-.726.5-.934.312-.208.5-.559.5-.934V2m3 2v-.066c0-.375.188-.726.5-.934.312-.208.5-.559.5-.934V2m3 2v-.066c0-.375.188-.726.5-.934.312-.208.5-.559.5-.934V2" opacity=".28"/>
+        <path stroke="#09090B" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.916 16c.012-.072.023-.144.033-.217C18 15.393 18 14.93 18 14v-2.8c0-.498 0-.886-.02-1.2m-.064 6a6 6 0 0 1-5.133 4.949C12.393 21 11.93 21 11 21c-.929 0-1.393 0-1.783-.051a6 6 0 0 1-5.166-5.166C4 15.393 4 14.93 4 14v-2.8c0-1.12 0-1.68.218-2.108a2 2 0 0 1 .874-.874C5.52 8 6.08 8 7.2 8h7.6c1.12 0 1.68 0 2.108.218a2 2 0 0 1 .874.874c.121.238.175.516.199.908m-.065 6H19a3 3 0 1 0 0-6h-1.02"/>
+      </svg>
+      
+   );
+};
+
+export const DefaultavatarIcon = () => {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+        <path stroke="#111" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.995 19.147C18.893 17.393 17.367 16 15.5 16h-7c-1.867 0-3.393 1.393-3.495 3.147m13.99 0A9.97 9.97 0 0 0 22 12c0-5.523-4.477-10-10-10S2 6.477 2 12a9.97 9.97 0 0 0 3.005 7.147m13.99 0A9.967 9.967 0 0 1 12 22a9.967 9.967 0 0 1-6.995-2.853M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+      </svg>    
+   );
+};
+
+export const ReplieduseravatarIcon = () => {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+        <path stroke="#111" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15H8a4 4 0 0 0-4 4 2 2 0 0 0 2 2h12a2 2 0 0 0 2-2 4 4 0 0 0-4-4Z" opacity=".28"/>
+        <path stroke="#111" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"/>
+        </svg>   
+   );
+};
+
+
+
+
+
+
+
+
