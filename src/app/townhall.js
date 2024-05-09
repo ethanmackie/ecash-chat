@@ -72,7 +72,7 @@ export default function TownHall({ address, isMobile }) {
 
     useEffect(() => {
       const handleResize = () => {
-          setMaxPagesToShow(window.innerWidth < 576 ? 5 : 7);
+          setMaxPagesToShow(window.innerWidth < 430 ? 3 : 7);
       };
 
       window.addEventListener('resize', handleResize);
@@ -500,10 +500,10 @@ export default function TownHall({ address, isMobile }) {
                           rows={4}
                     />
                     <p className="text-sm text-red-600 dark:text-red-500">{postError !== false && postError}</p>
-                    <div className="flex justify-between items-center mt-2">
+                    <div className="flex flex-col sm:flex-row justify-between items-center mt-2">
 
                         {/* this is icons, buttons on left */}
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 mb-2 sm:mb-0">
                         <Popover
                             aria-labelledby="emoji-popover"
                             content={
@@ -534,12 +534,12 @@ export default function TownHall({ address, isMobile }) {
                             <ImageIcon/>
                             </Button>
                         </Tooltip>
-                        <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=8oIHo0vCZDs[/yt]" style="light">
+                        <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=1234[/yt]" style="light">
                             <Button variant="ghost" onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}>
                                 <YoutubeIcon/>
                             </Button>
                         </Tooltip>
-                        <Tooltip content="e.g. [twt]https://twitter.com/eCashCommunity/status/1783932847528583665[/twt]" style="light">
+                        <Tooltip content="e.g. [twt]https://x.com/yourid/status/1234[/twt]" style="light">
                             <Button variant="ghost" onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}>
                             <UITwitterIcon/>
                             </Button>
@@ -692,7 +692,12 @@ export default function TownHall({ address, isMobile }) {
                                             copy(tx.nftShowcaseId);
                                             toast(`${tx.nftShowcaseId} copied to clipboard`);
                                         }}>
+                                        <span className="hidden sm:inline">
                                             ID: {tx.nftShowcaseId.substring(0,15)}...{tx.nftShowcaseId.substring(tx.nftShowcaseId.length - 10)}
+                                        </span>
+                                        <span className="sm:hidden">
+                                            ID: {tx.nftShowcaseId.substring(0,8)}...{tx.nftShowcaseId.substring(tx.nftShowcaseId.length - 5)}
+                                        </span>
                                         </span>
                                         <a 
                                             href={`${appConfig.blockExplorerUrl}/tx/${tx.nftShowcaseId}`} 

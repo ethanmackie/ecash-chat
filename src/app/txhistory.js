@@ -505,7 +505,7 @@ export default function TxHistory({ address }) {
                         {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
                         {tx.url !== false && (<Alert color="info"><a href={tx.url} target="_blank" >{tx.url}</a></Alert>)}
 
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-sm mt-40 text-muted-foreground">
                             {tx.isCashtabMessage ? 'Cashtab Message' :
                                 tx.iseCashChatMessage ? 'eCash Chat Message' :
                                     tx.iseCashChatPost ? 'eCash Townhall Post' :
