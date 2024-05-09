@@ -239,17 +239,25 @@ export default function TownHall({ address, isMobile }) {
 
         // Encode the op_return post script
         const opReturnRaw = encodeBip21Post(parsedPost);
+        const bip21Str = `${appConfig.townhallAddress}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`;
 
-        window.postMessage(
-            {
-                type: 'FROM_PAGE',
-                text: 'Cashtab',
-                txInfo: {
-                    bip21: `${appConfig.townhallAddress}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`,
+        if (isMobile) {
+            window.open(
+                `https://cashtab.com/#/send?bip21=${bip21Str}`,
+                '_blank',
+            );
+        } else {
+            window.postMessage(
+                {
+                    type: 'FROM_PAGE',
+                    text: 'Cashtab',
+                    txInfo: {
+                        bip21: `${bip21Str}`,
+                    },
                 },
-            },
-            '*',
-        );
+                '*',
+            );
+        }
         setPost('');
         txListener(chronik, address, "Townhall post sent", getTownhallHistoryByPage);
     };
@@ -265,18 +273,18 @@ export default function TownHall({ address, isMobile }) {
                 `https://cashtab.com/#/send?bip21=${bip21Str}`,
                 '_blank',
             );
-        }
-
-        window.postMessage(
-            {
-                type: 'FROM_PAGE',
-                text: 'Cashtab',
-                txInfo: {
-                    bip21: `${bip21Str}`,
+        } else {
+            window.postMessage(
+                {
+                    type: 'FROM_PAGE',
+                    text: 'Cashtab',
+                    txInfo: {
+                        bip21: `${bip21Str}`,
+                    },
                 },
-            },
-            '*',
-        );
+                '*',
+            );
+        }
         setReplyPost('');
         txListener(chronik, address, "Townhall reply sent", getTownhallHistoryByPage);
     };
@@ -479,8 +487,6 @@ export default function TownHall({ address, isMobile }) {
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px]">
             <MessagePreviewModal />
-            {isMobile && (<Alert color="failure" icon={HiInformationCircle}>Limited functionality mode</Alert>)}
-            {isMobile === false && (
               <>
                 <div className="max-w-xl w-full mx-auto">
                     {/* Post input field */}
@@ -544,14 +550,13 @@ export default function TownHall({ address, isMobile }) {
                         type="button"
                         disabled={post === '' || postError}
                         className="bg-blue-500 hover:bg-blue-300"
-                        onClick={() => { setShowMessagePreview(true); }}
+                        onClick={() => { isMobile ? sendPost() : setShowMessagePreview(true) }}
                         >
                         <PostIcon />&nbsp;Post
                         </Button>
                         </div>
                     </div>
                 </>
-            )}
              <Separator className="my-4" />
             {/* Townhall Post History */}
             {/*Set up pagination menu*/}
