@@ -415,8 +415,8 @@ export default function Home() {
   return (
     <>
     <ToastContainer />
-    <div class="sm:flex flex-col items-center justify-center p-5 relative z-10 mt-4">
-    <div class="background_content"></div>
+    <div className="sm:flex flex-col items-center justify-center p-5 relative z-10 mt-4">
+    <div className="background_content"></div>
     </div>
     <div className="relative isolate px-6 pt-14 lg:px-8">
 <div
@@ -562,7 +562,7 @@ export default function Home() {
           {/* Tab navigation */}
           <Tabs aria-label="eCash Chat" style="default" className='z-10 relative mt-4 justify-center'>
               {isMobile === false && (
-                  <Tabs.Item active title="Inbox" icon={HiOutlineMail}>
+                  <Tabs.Item title="Inbox" icon={HiOutlineMail}>
                       {cashaddr.isValidCashAddress(address, 'ecash') &&
                           <TxHistory address={address} />
                       }
@@ -718,7 +718,7 @@ export default function Home() {
                   </Tabs.Item>
               )}
 
-              <Tabs.Item title="Town Hall" icon={GiDiscussion} >
+              <Tabs.Item title="Town Hall" active icon={GiDiscussion} >
                   <Townhall address={address} isMobile={isMobile} />
               </Tabs.Item>
 

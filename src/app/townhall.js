@@ -672,7 +672,7 @@ export default function TownHall({ address, isMobile }) {
                                    </div>
 
                                    {/* Render the op_return message */}
-                                   <div class="py-4">
+                                   <div className="py-4">
                                    <p className="text-sm text-muted-foreground" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
                                     </div>
                                    {/* Render any media content within the message */}
