@@ -9,7 +9,7 @@ import { isValidRecipient, isValidMessage } from '../validation/validation';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { MagnifyingGlassIcon, ResetIcon, Link2Icon, Share1Icon } from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon, ResetIcon, Link2Icon, Share1Icon, ArrowRightIcon } from "@radix-ui/react-icons";
 import {
     AnonAvatar,
     ShareIcon,
@@ -22,6 +22,7 @@ import {
     AlitacoffeeIcon,
     DefaultavatarIcon, 
     ReplieduseravatarIcon,
+    Arrowright2Icon,
 } from "@/components/ui/social";
 import { encodeBip21Message, encodeBip2XecTip } from '../utils/utils';
 import {
@@ -225,9 +226,9 @@ export default function TxHistory({ address }) {
                    (tx, index) => (
                      <>
                      <div className="flex flex-col items-center mt-2" key={"txHistory"+index}>
-                        <div className="flex flex-col space-y-1.5 w-full max-w-xl leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                        <div className="flex flex-col w-full gap-2 max-w-xl leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                         <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white break-words">
-                           <span className="leading-7 leading-none">From</span>
+                           <span className="leading-7 leading-none"></span>
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
                               {tx.replyAddress === address ? (
                                   <>
@@ -238,7 +239,7 @@ export default function TxHistory({ address }) {
                                               copy(tx.replyAddress);
                                               toast(`${tx.replyAddress} copied to clipboard`);
                                           }}
-                                          ><Badge className="leading-7 [&:not(:first-child)]:mt-6 py-3px" variant="outline">Your wallet</Badge></div>
+                                          ><Badge className="leading-7  py-3px" variant="outline">Your wallet</Badge></div>
                                       </div>
                                   </div>
                                   </>
@@ -252,7 +253,7 @@ export default function TxHistory({ address }) {
                                               copy(tx.replyAddress);
                                               toast(`${tx.replyAddress} copied to clipboard`);
                                           }}>
-                                        <Badge className="leading-7 [&:not(:first-child)]:mt-6 py-3px" variant="outline">
+                                        <Badge className="leading-7  py-3px" variant="outline">
                                              {tx.replyAddress.substring(0,8)}...{tx.replyAddress.substring(tx.replyAddress.length - 5)}
                                         </Badge>
                                             
@@ -332,7 +333,7 @@ export default function TxHistory({ address }) {
                                 </>)
                               }
                            </span>
-                           <span className="leading-7 leading-none">&emsp;&emsp;To </span>
+                           <span className="min-w-12"><Arrowright2Icon /> </span>
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
                                {tx.recipientAddress === address ? (
                                     <>
@@ -344,11 +345,11 @@ export default function TxHistory({ address }) {
                                                    toast(`${tx.recipientAddress} copied to clipboard`);
                                                 }}
                                             >
-                                                <div><Badge className="leading-7 [&:not(:first-child)]:mt-6 py-3px" variant="outline"> Your wallet</Badge></div>
+                                                <div><Badge className="leading-7  py-3px" variant="outline"> Your wallet</Badge></div>
                                             </div>
                                         </div>
                                     </>
-                               ) : tx.iseCashChatPost === true ? <Badge className="leading-7 [&:not(:first-child)]:mt-6 py-3px" variant="outline">eCash Chat Townhall</Badge> :
+                               ) : tx.iseCashChatPost === true ? <Badge className="leading-7  py-3px" variant="outline">eCash Chat Townhall</Badge> :
                                  (<>
                                    <span>
                                    <div className="flex items-center gap-2">
@@ -358,7 +359,7 @@ export default function TxHistory({ address }) {
                                                copy(tx.recipientAddress);
                                                toast(`${tx.recipientAddress} copied to clipboard`);
                                            }}>
-                                            <Badge className="leading-7 [&:not(:first-child)]:mt-6 py-3px" variant="outline">
+                                            <Badge className="leading-7  py-3px" variant="outline">
                                             {tx.recipientAddress.substring(0,8)}...{tx.recipientAddress.substring(tx.recipientAddress.length - 5)}
                                            </Badge>
                                               
@@ -441,22 +442,21 @@ export default function TxHistory({ address }) {
                         </div>
 
                         {/* Render the op_return message */}
-                        <br />
                         {tx.isEcashChatEncrypted ? (
                             <>
-                                <Alert className="leading-7 [&:not(:first-child)]:mt-6" color="failure" icon={HiInformationCircle}>
+                                <Alert className="leading-7 my-4" color="failure" icon={HiInformationCircle}>
                                     &nbsp;&nbsp;<b>Encrypted Message</b><br />
                                     &nbsp;&nbsp;{tx.opReturnMessage ? `${tx.opReturnMessage}`.substring(0,40)+'...' : ' '}
                                 </Alert>
                             </>
                             ) : (
-                                <p className="text-sm text-muted-foreground" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
+                                <p className="leading-7 my-4 break-words" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
                             )
                         }
 
                         {/* XEC Tip rendering */}
                         {tx.isXecTip && (
-                          <Alert className="leading-7 [&:not(:first-child)]:mt-6" color="success">
+                          <Alert className="leading-7 my-4" color="success">
                               <div className="flex items-center space-x-2">
                                   <MoneyIcon className="h-5 w-5 text-blue-500" />
                                   <span>
@@ -500,23 +500,24 @@ export default function TxHistory({ address }) {
                                 </CardFooter>
                               </Card>   
                 )}
-                        {tx.imageSrc !== false && (<img src={tx.imageSrc} />)}
+                        {tx.imageSrc !== false && (<img src={tx.imageSrc} className="rounded-lg w-full object-cover"/>)}
                         {tx.videoId !== false && (<LiteYouTubeEmbed id={tx.videoId} />)}
                         {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
                         {tx.url !== false && (<Alert color="info"><a href={tx.url} target="_blank" >{tx.url}</a></Alert>)}
 
-                        <span className="text-sm mt-40 text-muted-foreground">
-                            {tx.isCashtabMessage ? 'Cashtab Message' :
+                        <div className="flex my-4 h-5 items-center space-x-4 text-sm text-muted-foreground">
+                        <div>{tx.isCashtabMessage ? 'Cashtab Message' :
                                 tx.iseCashChatMessage ? 'eCash Chat Message' :
                                     tx.iseCashChatPost ? 'eCash Townhall Post' :
                                         'External Message'
-                            }
-
-                            {/* Date and timestamp */}
-                            |&nbsp;{tx.txDate}&nbsp;at&nbsp;{tx.txTime}
-
-                            &nbsp;|&nbsp;{tx.xecAmount} XEC
-                        </span>
+                            }</div>
+                            <Separator orientation="vertical" />
+                            <div>{tx.txDate}&nbsp;at&nbsp;{tx.txTime}</div>
+                            <Separator orientation="vertical" />
+                            <div>{tx.xecAmount} XEC</div>
+                            </div>
+                      
+        
 
                         <div className="flex py-3">
                             {/* Decryption and share buttons */}
@@ -532,13 +533,13 @@ export default function TxHistory({ address }) {
                                         <Modal.Header><div className="flex"><DecryptionIcon />&nbsp;Decrypt Message</div></Modal.Header>
                                         <Modal.Body>
                                             <div className="space-y-6">
-                                              <p className="leading-7 [&:not(:first-child)]:mt-6">
+                                              <p className="leading-7">
                                                   Please input the password used by the sender to decrypt this message.
                                               </p>
                                               <p>
                                                   <Alert>{tx.opReturnMessage}</Alert>
                                               </p>
-                                              <p className="leading-7 [&:not(:first-child)]:mt-6">
+                                              <p className="leading-7 ">
                                                   {/* Decryption input */}
                                                   <Input
                                                     id="decryptionKey"

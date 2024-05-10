@@ -354,8 +354,8 @@ export default function Home() {
 
     const CreditCardHeader = () => {
         const cardStyling = isMobile 
-        ? "w-94 h-56 mx-auto break-words bg-red-100 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105" 
-        : "w-96 h-56 mx-auto break-words bg-red-100 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105";
+        ? "w-94 h-56 mx-auto break-words bg-blue-500 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105" 
+        : "w-96 h-56 mx-auto break-words bg-blue-500 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105";
 
         return (
             <div
@@ -365,7 +365,6 @@ export default function Home() {
                     toast(`${address} copied to clipboard`);
                 }}
             >
-                <img className="relative object-cover w-full h-full rounded-xl" src="/creditcard-bg.png" />
                 <div className="w-full px-8 absolute top-8">
                 <div className="flex justify-between items-start">
                     <div className="bg-white p-2 rounded-lg" style={{ maxWidth: "3.5rem", maxHeight: "3.5rem", boxShadow: "0px 0px 10px rgba(0,0,0,0.1)" }}>
@@ -641,7 +640,7 @@ export default function Home() {
                                                      <ImageIcon/>
                                                 </Button>
                                             </Tooltip>
-                                            <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=8oIHo0vCZDs[/yt]" style="light">
+                                            <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=1234[/yt]" style="light">
                                                 <Button
                                                variant="ghost"
                                                 type="button"
@@ -650,7 +649,7 @@ export default function Home() {
                                                       <YoutubeIcon/>
                                                 </Button>
                                             </Tooltip>
-                                            <Tooltip content="e.g. [twt]https://twitter.com/eCashCommunity/status/1783932847528583665[/twt]" style="light">
+                                            <Tooltip content="e.g. [twt]https://x.com/yourid/status/1234[/twt]" style="light">
                                                 <Button
                                                variant="ghost"
                                                 type="button"

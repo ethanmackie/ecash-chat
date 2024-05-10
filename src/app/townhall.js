@@ -393,7 +393,7 @@ export default function TownHall({ address, isMobile }) {
                                 <RenderTipping address={foundReply.replyAddress} />
                             </div>
                         </div>
-                        <div className="py-2 text-sm text-muted-foreground">
+                        <div className="py-2 leading-7">
                             {foundReply.opReturnMessage}
                         </div>
                         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
@@ -418,56 +418,56 @@ export default function TownHall({ address, isMobile }) {
                   <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
                     <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Tipping Amount</h3>
                   </div>
-                  <div className="px-3 py-2">
-                      <button
+                  <div className="px-3 py-4">
+                      <Button
                         type="button"
-                        className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={e => {
                             sendXecTip(address, 100);
                         }}
                       >
                         100
-                      </button>
+                      </Button>
                       &nbsp;
-                      <button
+                      <Button
                         type="button"
-                        className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={e => {
                             sendXecTip(address, 1000);
                         }}
                       >
                         1k
-                      </button>
+                      </Button>
                       &nbsp;
-                      <button
+                      <Button
                         type="button"
-                        className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={e => {
                             sendXecTip(address, 10000);
                         }}
                       >
                         10k
-                      </button>
+                      </Button>
                       &nbsp;
-                      <button
+                      <Button
                         type="button"
-                        className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={e => {
                             sendXecTip(address, 100000);
                         }}
                       >
                         100k
-                      </button>
+                      </Button>
                       &nbsp;
-                      <button
+                      <Button
                         type="button"
-                        className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={e => {
                             sendXecTip(address, 1000000);
                         }}
                       >
                         1M
-                      </button>
+                      </Button>
                   </div>
                 </div>
               }
@@ -633,7 +633,7 @@ export default function TownHall({ address, isMobile }) {
                           (tx, index) => (
                             <>
                                 <div className="flex flex-col items-center mt-2" key={"townhallTxHistory"+index}>
-                                   <div className="flex flex-col mt-2 max-w-xl gap-y-0.5 break-words space-y-1.5 w-full leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                                   <div className="flex flex-col max-w-xl gap-2 break-words w-full leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                                    <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
                                       <span>
                                          {tx.replyAddress === address ? (
@@ -677,8 +677,8 @@ export default function TownHall({ address, isMobile }) {
                                    </div>
 
                                    {/* Render the op_return message */}
-                                   <div className="py-4">
-                                   <p className="text-sm text-muted-foreground" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
+                                   <div className="my-4">
+                                   <p className="leading-7" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
                                     </div>
                                    {/* Render any media content within the message */}
                                    {tx.nftShowcaseId !== false && tx.nftShowcaseId !== undefined && (
@@ -754,7 +754,7 @@ export default function TownHall({ address, isMobile }) {
                                                      className="bg-gray-50"
                                                      required
                                                      onChange={e => handleReplyPostChange(e)}
-                                                     rows={2}
+                                                     rows={4}
                                                  />
                                                  <p className="mt-2 text-sm text-red-600 dark:text-red-500">{replyPostError !== false && replyPostError}</p>
                                                  <Button
