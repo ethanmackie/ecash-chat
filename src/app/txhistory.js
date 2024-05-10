@@ -505,18 +505,19 @@ export default function TxHistory({ address }) {
                         {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
                         {tx.url !== false && (<Alert color="info"><a href={tx.url} target="_blank" >{tx.url}</a></Alert>)}
 
-                        <span className="text-sm text-muted-foreground">
-                            {tx.isCashtabMessage ? 'Cashtab Message' :
+                        <div className="flex my-4 h-5 items-center space-x-4 text-sm text-muted-foreground">
+                        <div>{tx.isCashtabMessage ? 'Cashtab Message' :
                                 tx.iseCashChatMessage ? 'eCash Chat Message' :
                                     tx.iseCashChatPost ? 'eCash Townhall Post' :
                                         'External Message'
-                            }
-
-                            {/* Date and timestamp */}
-                            |&nbsp;{tx.txDate}&nbsp;at&nbsp;{tx.txTime}
-
-                            &nbsp;|&nbsp;{tx.xecAmount} XEC
-                        </span>
+                            }</div>
+                            <Separator orientation="vertical" />
+                            <div>{tx.txDate}&nbsp;at&nbsp;{tx.txTime}</div>
+                            <Separator orientation="vertical" />
+                            <div>{tx.xecAmount} XEC</div>
+                            </div>
+                      
+        
 
                         <div className="flex py-3">
                             {/* Decryption and share buttons */}
