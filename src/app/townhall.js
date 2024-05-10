@@ -393,7 +393,7 @@ export default function TownHall({ address, isMobile }) {
                                 <RenderTipping address={foundReply.replyAddress} />
                             </div>
                         </div>
-                        <div className="py-2 text-sm text-muted-foreground">
+                        <div className="py-2 leading-7">
                             {foundReply.opReturnMessage}
                         </div>
                         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
@@ -633,7 +633,7 @@ export default function TownHall({ address, isMobile }) {
                           (tx, index) => (
                             <>
                                 <div className="flex flex-col items-center mt-2" key={"townhallTxHistory"+index}>
-                                   <div className="flex flex-col mt-2 max-w-xl gap-y-0.5 break-words space-y-1.5 w-full leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                                   <div className="flex flex-col max-w-xl gap-2 break-words w-full leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                                    <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
                                       <span>
                                          {tx.replyAddress === address ? (
@@ -677,8 +677,8 @@ export default function TownHall({ address, isMobile }) {
                                    </div>
 
                                    {/* Render the op_return message */}
-                                   <div className="py-4">
-                                   <p className="text-sm text-muted-foreground" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
+                                   <div className="my-4">
+                                   <p className="leading-7" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
                                     </div>
                                    {/* Render any media content within the message */}
                                    {tx.nftShowcaseId !== false && tx.nftShowcaseId !== undefined && (
