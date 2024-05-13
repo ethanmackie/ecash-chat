@@ -677,8 +677,10 @@ export default function TownHall({ address, isMobile }) {
                                    </div>
 
                                    {/* Render the op_return message */}
-                                   <div className="my-4">
-                                   <p className="leading-7" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
+                                   <div className={tx.opReturnMessage ? "my-4" : "my-0"}>
+                                        <p className="leading-7" key={index}>
+                                            {tx.opReturnMessage || ' '}
+                                        </p>
                                     </div>
                                    {/* Render any media content within the message */}
                                    {tx.nftShowcaseId !== false && tx.nftShowcaseId !== undefined && (
