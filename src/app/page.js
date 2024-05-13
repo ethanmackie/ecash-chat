@@ -484,7 +484,7 @@ export default function Home() {
           
         </header>
         
-      <main className="sm:flex flex-col items-center justify-center p-1 sm:p-5 relative z-10 mt-4">
+      <main className="sm:flex flex-col items-center justify-center p-1 sm:px-5 relative z-10">
       {isLoggedIn === false && isMobile === false ? (
   <>
     <div className="mx-auto max-w-md mb-4 mt-4">
