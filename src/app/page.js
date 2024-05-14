@@ -534,7 +534,7 @@ export default function Home() {
 )}
  
       <div>
-       {isLoggedIn === false && isMobile === false && (
+      {isLoggedIn === false && isMobile === false && step === 'fresh' && (
         <div className='flex justify-center'>
             <button
                type="button"
