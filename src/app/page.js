@@ -471,7 +471,7 @@ export default function Home() {
             <nav className="flex items-center gap-6 text-sm">
               </nav>
               </div>
-              {!isMobile && ( // 这一行检查 isMobile 是否为 false
+              {!isMobile && ( 
                     <div>
                         <Button onClick={isLoggedIn ? () => {
                         setIsLoggedIn(false);
