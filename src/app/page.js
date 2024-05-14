@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import Image from "next/image";
 import TxHistory from './txhistory';
 import Townhall from './townhall';
@@ -20,6 +21,17 @@ import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+    DropdownMenuGroup,
+    DropdownMenuShortcut,
+    DropdownMenuSub,
+  } from "@/components/ui/dropdown-menu"
 import QRCode from "react-qr-code";
 import copy from 'copy-to-clipboard';
 import { Tooltip, Tabs, Alert, Modal, Popover } from "flowbite-react";
@@ -27,9 +39,9 @@ import { HiOutlineMail, HiOutlineNewspaper, HiInformationCircle, HiOutlinePhotog
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { GiDiscussion, GiAbstract010 } from "react-icons/gi";
 import { ToastContainer, toast } from 'react-toastify';
-import { PersonIcon, FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon } from '@radix-ui/react-icons';
+import { PersonIcon, FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon } from '@radix-ui/react-icons';
 import 'react-toastify/dist/ReactToastify.css';
-import { YoutubeIcon } from "@/components/ui/social";
+import { YoutubeIcon, DefaultavatarIcon, EcashchatIcon } from "@/components/ui/social";
 import {
     SendIcon,
     LogoutIcon,
@@ -45,6 +57,7 @@ import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
 import { Tweet } from 'react-tweet';
 const packageJson = require('../../package.json');
+
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -354,8 +367,8 @@ export default function Home() {
 
     const CreditCardHeader = () => {
         const cardStyling = isMobile 
-        ? "w-94 h-56 mx-auto break-words bg-blue-500 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105" 
-        : "w-96 h-56 mx-auto break-words bg-blue-500 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105";
+        ? "w-94 h-56 max-w-md mx-auto break-words bg-blue-500 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105" 
+        : "w-96 h-56 max-w-md mx-auto break-words bg-blue-500 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105";
 
         return (
             <div
@@ -444,52 +457,97 @@ export default function Home() {
 </div>
 </div>
 
-      <main className="sm:flex flex-col items-center justify-center p-1 sm:p-5 relative z-10 mt-4">
+<header className="fixed mt-4 flex top-0 z-50 w-full justify-center ">       
+          <div className="container flex items-center justify-between rounded-lg flex bg-black w-full h-14 mx-4 md:mx-auto md:max-w-xl lg:max-w-3xl border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/40">
+            <div className="sm:flex">
+              <a className="flex items-center space-x-2" href="#">
+                <EcashchatIcon />
+                <span className="font-bold sm:inline-block">
+                eCashChat 
+                </span>
+              </a>
+            </div>
+            <div className="sm:flex">
+            <nav className="flex items-center gap-6 text-sm">
+              </nav>
+              </div>
+              {!isMobile && ( 
+                    <div>
+                        <Button onClick={isLoggedIn ? () => {
+                        setIsLoggedIn(false);
+                        toast(`Logged out of ${address}`);
+                        } : () => getAddress()}
+                        variant="outline">
+                        {isLoggedIn ? 'Logout' : 'Signin'}
+                        </Button>
+                    </div>
+                    )}
+                </div>
+        </header>
+        
+      <main className="sm:flex flex-col items-center justify-center p-1 sm:px-5 relative z-10">
       {isLoggedIn === false && isMobile === false ? (
-          <>
-          <br /><br /><br />
-          <a
-            className="pointer-events-none flex place-items-center"
-            href="https://e.cash/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              src="/ecash-chat-new-logo.svg"
-              alt="eCash Chat Logo"
-              className="dark:invert"
-              width={273}
-              height={75}
-              priority
-            />
-          </a>
-          <br />
-          </>
-      ) : (
-        <Image
-          src="/ecash-chat-new-logo.svg"
-          alt="eCash Chat Logo"
-          className="dark:invert"
-          width={273}
-          height={75}
-          priority
-        />
-      )}
+  <>
+    <div className="mx-auto max-w-md mb-4 mt-4">
+    <a
+      className="flex justify-center"
+      href="https://e.cash/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <Image
+        src="/ecash-chat-new-logo.svg"
+        alt="eCash Chat Logo"
+        className="dark:invert"
+        width={273}
+        height={75}
+        priority
+      />
+    </a>
+      <div className="hidden sm:mb-8 sm:flex sm:justify-center">
+        <div className="relative flex gap-1 items-center rounded-full px-3 py-1 text-sm leading-6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/40">
+        <RocketIcon/> Version: 1.1.1{' '}
+        </div>
+      </div>
+      <div className="text-center">
+        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+        Chat on the eCash blockchain
+        </h1>
+        <p className="leading-7 [&:not(:first-child)]:mt-6">
+        eCash Chat is an on-chain messaging platform 
+        on the eCash blockchain.
+        </p>
+      </div>
+    </div>
+   
+  </>
+) : (
+    <div className="flex justify-center">
+  <Image
+    src="/ecash-chat-new-logo.svg"
+    alt="eCash Chat Logo"
+    className="dark:invert"
+    width={273}
+    height={75}
+    priority
+  />
+  </div>
+)}
  
       <div>
-        {isLoggedIn === false && isMobile === false && step === 'fresh' && (
-        <div>
+       {isLoggedIn === false && isMobile === false && step === 'fresh' && (
+        <div className='flex justify-center'>
             <button
-                type="button"
-                className="text-white transition-transform transform hover:scale-110 shadow-2xl bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 me-2 mb-2"
-                onClick={() => getAddress()}
+               type="button"
+               className="text-white transition-transform transform hover:scale-105 shadow-2xl bg-blue-500 hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55"               
+               onClick={() => getAddress()}
             >
             Sign in with&emsp;
             <Image
               src="/cashtab-extension.png"
               alt="eCash Extension Logo"
-              width={150}
-              height={50}
+              width={120}
+              height={40}
               priority
             />
             </button>
@@ -499,6 +557,7 @@ export default function Home() {
         {/* Currently this app is not optimized for mobile use as Cashtab Extension is not available on non-desktop platforms */}
         {isMobile === true && isLoggedIn === false && (
             <><br />
+            <div className="px-4">
                 <Alert color="info">
                     <p><b>Mobile device detected </b></p>
                     <p>Please note eCash Chat is optimized for desktop browsers as it is integrated with Cashtab Extensions.</p><br />
@@ -533,6 +592,7 @@ export default function Home() {
                         </div>
                   </div>
               </form>
+              </div>
             </>
         )}
 

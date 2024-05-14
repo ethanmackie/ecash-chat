@@ -226,20 +226,22 @@ export default function TxHistory({ address }) {
                    (tx, index) => (
                      <>
                      <div className="flex flex-col items-center mt-2" key={"txHistory"+index}>
-                        <div className="flex flex-col w-full gap-2 max-w-xl leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                        <div className="flex flex-col w-full gap-2 max-w-xl leading-1.5 p-5 sm:p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                         <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white break-words">
-                           <span className="leading-7 leading-none"></span>
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
                               {tx.replyAddress === address ? (
                                   <>
-                                  <div className="flex items-center gap-4">
+                                  <div className="flex items-center gap-2">
                                       <DefaultavatarIcon/>
                                       <div className="font-medium dark:text-white">
                                           <div onClick={() => {
                                               copy(tx.replyAddress);
                                               toast(`${tx.replyAddress} copied to clipboard`);
                                           }}
-                                          ><Badge className="leading-7  py-3px" variant="outline">Your wallet</Badge></div>
+                                          ><Badge className="leading-7  py-3px" variant="outline">
+                                                 <span className="hidden sm:block">Your wallet</span>
+                                                <span className="block sm:hidden">You</span>
+                                            </Badge></div>
                                       </div>
                                   </div>
                                   </>
@@ -333,7 +335,7 @@ export default function TxHistory({ address }) {
                                 </>)
                               }
                            </span>
-                           <span className="min-w-12"><Arrowright2Icon /> </span>
+                           <span className="sm:min-w-12"><Arrowright2Icon /> </span>
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
                                {tx.recipientAddress === address ? (
                                     <>
@@ -345,7 +347,12 @@ export default function TxHistory({ address }) {
                                                    toast(`${tx.recipientAddress} copied to clipboard`);
                                                 }}
                                             >
-                                                <div><Badge className="leading-7  py-3px" variant="outline"> Your wallet</Badge></div>
+                                                <div>
+                                                <Badge className="leading-7 py-3px" variant="outline">
+                                                <span className="hidden sm:block">Your wallet</span>
+                                                <span className="block sm:hidden">You</span>
+                                              </Badge>
+                                                  </div>
                                             </div>
                                         </div>
                                     </>
