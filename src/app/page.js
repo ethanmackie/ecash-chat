@@ -471,17 +471,18 @@ export default function Home() {
             <nav className="flex items-center gap-6 text-sm">
               </nav>
               </div>
-            <div>
-                <Button onClick={isLoggedIn ? () => {
-                    setIsLoggedIn(false);
-                    toast(`Logged out of ${address}`);
-                } : () => getAddress()}
-                variant="outline"> 
-                    {isLoggedIn ? 'Logout' : 'Signin'}
-                </Button>
+              {!isMobile && ( // 这一行检查 isMobile 是否为 false
+                    <div>
+                        <Button onClick={isLoggedIn ? () => {
+                        setIsLoggedIn(false);
+                        toast(`Logged out of ${address}`);
+                        } : () => getAddress()}
+                        variant="outline">
+                        {isLoggedIn ? 'Logout' : 'Signin'}
+                        </Button>
+                    </div>
+                    )}
                 </div>
-          </div>
-          
         </header>
         
       <main className="sm:flex flex-col items-center justify-center p-1 sm:px-5 relative z-10">
@@ -534,7 +535,7 @@ export default function Home() {
 )}
  
       <div>
-      {isLoggedIn === false && isMobile === false && step === 'fresh' && (
+       {isLoggedIn === false && isMobile === false && step === 'fresh' && (
         <div className='flex justify-center'>
             <button
                type="button"
