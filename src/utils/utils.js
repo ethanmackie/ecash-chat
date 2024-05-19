@@ -106,6 +106,60 @@ export const encodeBip21Post = post => {
     }
 };
 
+// Encode the op_return article script
+export const encodeBip21Article = article => {
+    if (typeof article !== 'string') {
+        return '';
+    }
+    try {
+        let script = [];
+
+        // Push eCash Chat protocol identifier
+        script.push(Buffer.from(opreturnConfig.appPrefixesHex.eCashChat, 'hex'));
+
+        // Push eCash Chat blog identifier
+        script.push(Buffer.from(opreturnConfig.articlePrefixHex, 'hex'));
+
+        // eCash Chat Article metadata are utf8 encoded
+        const eCashChatMsgScript = Buffer.from(article, 'utf8');
+        script.push(eCashChatMsgScript);
+        script = utxolib.script.compile(script).toString('hex');
+        return script;
+    } catch (err) {
+        console.log('Error encoding eCash Chat article: ', err);
+    }
+};
+
+// Encode the op_return reply article script
+export const encodeBip21ReplyArticle = (articleReply, replyTxid) => {
+    if (
+        typeof articleReply !== 'string' ||
+        typeof replyTxid !== 'string'
+    ) {
+        return '';
+    }
+    try {
+        let script = [];
+
+        // Push eCash Chat protocol identifier
+        script.push(Buffer.from(opreturnConfig.appPrefixesHex.eCashChat, 'hex'));
+
+        // Push eCash Chat reply article identifier
+        script.push(Buffer.from(opreturnConfig.articleReplyPrefixHex, 'hex'));
+
+        // Push eCash Chat reply txid
+        script.push(Buffer.from(replyTxid, 'hex'));
+
+        // eCash Chat messages are utf8 encoded
+        const eCashChatMsgScript = Buffer.from(articleReply, 'utf8');
+        script.push(eCashChatMsgScript);
+        script = utxolib.script.compile(script).toString('hex');
+        return script;
+    } catch (err) {
+        console.log('Error encoding eCash Chat article reply: ', err);
+    }
+};
+
 // Encode the op_return reply post script
 export const encodeBip21ReplyPost = (post, replyTxid) => {
     if (

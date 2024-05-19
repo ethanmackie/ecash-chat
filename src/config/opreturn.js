@@ -31,6 +31,10 @@ export const opReturn = {
     townhallReplyPostByteLimit: 177,
     townhallPostPrefixHex: '706f7374',
     townhallReplyPostPrefixHex: '68617368',
+    articleByteLimit: 5000,
+    articleReplyByteLimit: 177,
+    articlePrefixHex: '74657331', // CHANGE TO 626c6f67 for prod
+    articleReplyPrefixHex: '74657332', // CHANGE TO 726c6f67 for prod
     encryptedMessagePrefixHex: '70617373',
     encryptedMessageByteLimit: 95,
     xecTipPrefixHex: '74697073',

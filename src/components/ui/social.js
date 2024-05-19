@@ -178,22 +178,32 @@ export const ReplieduseravatarIcon = () => {
 export const Arrowright2Icon = () => {
     return (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" data-reactroot="">
-        <path fill="#09090b" d="M2 12C2 11.4477 2.44772 11 3 11H21C21.5523 11 22 11.4477 22 12C22 12.5523 21.5523 13 21 13H3C2.44772 13 2 12.5523 2 12Z" cliprule="evenodd" fillrule="evenodd" undefined="1"></path>
-        <path fill="#09090b" d="M14.2929 5.29289C14.6834 4.90237 15.3166 4.90237 15.7071 5.29289L21.7071 11.2929C22.0976 11.6834 22.0976 12.3166 21.7071 12.7071L15.7071 18.7071C15.3166 19.0976 14.6834 19.0976 14.2929 18.7071C13.9024 18.3166 13.9024 17.6834 14.2929 17.2929L19.5858 12L14.2929 6.70711C13.9024 6.31658 13.9024 5.68342 14.2929 5.29289Z" clip-rule="evenodd" fill-rule="evenodd" undefined="1"></path>
+        <path fill="#09090b" d="M2 12C2 11.4477 2.44772 11 3 11H21C21.5523 11 22 11.4477 22 12C22 12.5523 21.5523 13 21 13H3C2.44772 13 2 12.5523 2 12Z" clipRule="evenodd" fillRule="evenodd" undefined="1"></path>
+        <path fill="#09090b" d="M14.2929 5.29289C14.6834 4.90237 15.3166 4.90237 15.7071 5.29289L21.7071 11.2929C22.0976 11.6834 22.0976 12.3166 21.7071 12.7071L15.7071 18.7071C15.3166 19.0976 14.6834 19.0976 14.2929 18.7071C13.9024 18.3166 13.9024 17.6834 14.2929 17.2929L19.5858 12L14.2929 6.70711C13.9024 6.31658 13.9024 5.68342 14.2929 5.29289Z" clipRule="evenodd" fillRule="evenodd" undefined="1"></path>
         </svg>
          
    );
+};
+
+export const CrossIcon = () => {
+    return (
+        <svg className="h-8 w-8 text-neutral-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <line x1="9" y1="9" x2="15" y2="15" />
+            <line x1="15" y1="9" x2="9" y2="15" />
+        </svg>
+    );
 };
 
 export const EcashchatIcon = () => {
     return (
         <svg width="24" height="24" viewBox="0 0 270 258" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g filter="url(#filter0_bddd_635_16)">
-        <path d="M134.835 224.901C179.982 189.833 180.781 260.857 235.961 203.481M33.7087 224.852L64.346 224.899C68.7218 224.906 70.9096 224.909 72.9688 224.438C74.7945 224.021 76.5399 223.33 78.1408 222.392C79.9465 221.334 81.4935 219.853 84.5877 216.891L230.359 77.3419C236.315 71.6405 237.795 62.8255 233.258 55.8591C227.773 47.4377 220.271 40.1963 211.541 34.8201C204.544 30.5111 195.356 31.4548 189.472 37.0868L42.809 177.49C39.8262 180.345 38.3348 181.773 37.2531 183.435C36.2938 184.909 35.5749 186.514 35.1209 188.195C34.6089 190.091 34.5566 192.109 34.4521 196.146L33.7087 224.852Z" stroke="black" stroke-width="22" strokelinecap="round" strokelinejoin="round"/>
+        <path d="M134.835 224.901C179.982 189.833 180.781 260.857 235.961 203.481M33.7087 224.852L64.346 224.899C68.7218 224.906 70.9096 224.909 72.9688 224.438C74.7945 224.021 76.5399 223.33 78.1408 222.392C79.9465 221.334 81.4935 219.853 84.5877 216.891L230.359 77.3419C236.315 71.6405 237.795 62.8255 233.258 55.8591C227.773 47.4377 220.271 40.1963 211.541 34.8201C204.544 30.5111 195.356 31.4548 189.472 37.0868L42.809 177.49C39.8262 180.345 38.3348 181.773 37.2531 183.435C36.2938 184.909 35.5749 186.514 35.1209 188.195C34.6089 190.091 34.5566 192.109 34.4521 196.146L33.7087 224.852Z" stroke="black" strokeWidth="22" strokeLinecap="round" strokeLinejoin="round"/>
         </g>
         <defs>
-        <filter id="filter0_bddd_635_16" x="-20" y="-20" width="309.67" height="297.029" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-        <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+        <filter id="filter0_bddd_635_16" x="-20" y="-20" width="309.67" height="297.029" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+        <feFlood floodOpacity="0" result="BackgroundImageFix"/>
         <feGaussianBlur in="BackgroundImageFix" stdDeviation="10"/>
         <feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_635_16"/>
         <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>

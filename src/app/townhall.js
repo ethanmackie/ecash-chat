@@ -502,49 +502,48 @@ export default function TownHall({ address, isMobile }) {
                     />
                     <p className="text-sm text-red-600 dark:text-red-500">{postError !== false && postError}</p>
                     <div className="flex flex-col sm:flex-row justify-between items-center mt-2">
-
                         {/* this is icons, buttons on left */}
                         <div className="flex gap-2 mb-2 sm:mb-0">
-                        <Popover
-                            aria-labelledby="emoji-popover"
-                            content={
-                                <div>
-                                <Picker
-                                    data={data}
-                                    onEmojiSelect={(e) => {
-                                    setPost(post + e.native);
-                                    }}
-                                />
-                                </div>
-                            }
-                            >
-                            <Button
-                                variant="ghost"
-                                onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}
-                            >
-                                <FaceIcon /> 
-                            </Button>
-                        </Popover>
-                        <Tooltip content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]" style="light">
-                            <Button variant="ghost" onClick={() => insertMarkupTags('[url]theurl[/url]')}>
-                            <Link2Icon/>
-                            </Button>
-                        </Tooltip>
-                        <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
-                            <Button variant="ghost" onClick={() => insertMarkupTags('[img]imageurl[/img]')}>
-                            <ImageIcon/>
-                            </Button>
-                        </Tooltip>
-                        <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=1234[/yt]" style="light">
-                            <Button variant="ghost" onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}>
-                                <YoutubeIcon/>
-                            </Button>
-                        </Tooltip>
-                        <Tooltip content="e.g. [twt]https://x.com/yourid/status/1234[/twt]" style="light">
-                            <Button variant="ghost" onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}>
-                            <UITwitterIcon/>
-                            </Button>
-                        </Tooltip>
+                            <Popover
+                                aria-labelledby="emoji-popover"
+                                content={
+                                    <div>
+                                    <Picker
+                                        data={data}
+                                        onEmojiSelect={(e) => {
+                                        setPost(post + e.native);
+                                        }}
+                                    />
+                                    </div>
+                                }
+                                >
+                                <Button
+                                    variant="ghost"
+                                    onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}
+                                >
+                                    <FaceIcon /> 
+                                </Button>
+                            </Popover>
+                            <Tooltip content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]" style="light">
+                                <Button variant="ghost" onClick={() => insertMarkupTags('[url]theurl[/url]')}>
+                                <Link2Icon/>
+                                </Button>
+                            </Tooltip>
+                            <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
+                                <Button variant="ghost" onClick={() => insertMarkupTags('[img]imageurl[/img]')}>
+                                <ImageIcon/>
+                                </Button>
+                            </Tooltip>
+                            <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=1234[/yt]" style="light">
+                                <Button variant="ghost" onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}>
+                                    <YoutubeIcon/>
+                                </Button>
+                            </Tooltip>
+                            <Tooltip content="e.g. [twt]https://x.com/yourid/status/1234[/twt]" style="light">
+                                <Button variant="ghost" onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}>
+                                <UITwitterIcon/>
+                                </Button>
+                            </Tooltip>
                         </div>
                         {/* well this is post button*/}
                         <Button

@@ -21,4 +21,6 @@ export const appConfig = {
     blockExplorerUrl: 'https://explorer.e.cash',
     historyRefreshInterval: 60000,
     tokenIconsUrl: 'https://icons.etokens.cash',
+    vercelKvParam: 'article1',
+    localArticlesParam: 'localArticles',
 };

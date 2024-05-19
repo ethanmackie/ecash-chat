@@ -8,6 +8,18 @@ import { getStackArray } from 'ecash-script';
 import { BN } from 'slp-mdm';
 import { toast } from 'react-toastify';
 import localforage from 'localforage';
+import { kv } from '@vercel/kv';
+
+// Retrieves all articles from API and share via local storage
+export const getArticleListing = async () => {
+    let articles = await kv.get(appConfig.vercelKvParam);
+    console.log('articles retrieved from vercel: ', articles);
+
+    if (!Array.isArray(articles)) {
+        articles = [];
+    }
+    await localforage.setItem(appConfig.localArticlesParam, articles);
+};
 
 /**
  * Refreshes the app's utxos, XEC balance and NFT collection
@@ -464,6 +476,59 @@ export const getChildNftsFromParent = (
 };
 
 /**
+ * Subscribes to a given address and listens for new websocket events related to article postings
+ *
+ * @param {string} chronik the chronik-client instance
+ * @param {string} address the eCash address of the active wallet
+ * @param {@vercel/kv} kv the Vercel KV database client instance
+ * @param {array} updatedArticles an array of article object including the newly posted article
+ * @throws {error} err chronik websocket subscription errors
+ */
+export const articleTxListener = async (
+    chronik,
+    address,
+    kv,
+    updatedArticles,
+) => {
+    // Get type and hash
+    const { type, hash } = cashaddr.decode(address, true);
+
+    try {
+        const ws = chronik.ws({
+            onMessage: msg => {
+                if (msg.msgType === 'TX_ADDED_TO_MEMPOOL') {
+
+                    console.log('articleTxListener detected: updatedArticles is: ', updatedArticles);
+
+                    (async () => {
+                        console.log('Storing article content offchain.');
+                        await localforage.setItem(appConfig.localArticlesParam, updatedArticles);
+                        await kv.set(appConfig.vercelKvParam, updatedArticles);
+                    })();
+
+                    // Notify user
+                    toast(`Article posted`);
+
+                    // Unsubscribe and close websocket
+                    ws.unsubscribeFromScript(type, hash);
+                    ws.close();
+                }
+            },
+        });
+
+        // Wait for WS to be connected:
+        await ws.waitForOpen();
+
+        // Subscript to script
+        ws.subscribeToScript(type, hash);
+    } catch (err) {
+        console.log(
+            'articleTxListener: Error in chronik websocket subscription: ' + err,
+        );
+    }
+};
+
+/**
  * Subscribes to a given address and listens for new websocket events
  *
  * @param {string} chronik the chronik-client instance
@@ -675,6 +740,66 @@ export const getTxHistory = async (chronik, address, page = 0) => {
     }
 };
 
+// Retrieves article listing tx history via chronik, parses the response into formatted
+// objects and filter out eToken or non-msg txs
+export const getArticleHistory = async (chronik, address, page = 0) => {
+    if (
+        chronik === undefined ||
+        !cashaddr.isValidCashAddress(address, 'ecash')
+    ) {
+        return;
+    }
+
+
+    try {
+        const lokadIdHistory = await chronik.lokadId(
+            opreturnConfig.appPrefixesHex.eCashChat,
+        ).history(
+            page,
+            chronikConfig.txHistoryPageSize,
+        );
+        console.log('getArticleHistory.lokadIdHistory: ', lokadIdHistory);
+
+        const localArticles = await localforage.getItem(appConfig.localArticlesParam);
+        console.log('getArticleHistory.localArticles: ', localArticles);
+
+        const parsedTxs = [];
+        const replyTxs = [];
+        for (let i = 0; i < lokadIdHistory.txs.length; i += 1) {
+            const parsedTx = parseChronikTx(
+                lokadIdHistory.txs[i],
+                address,
+            );
+
+            // Separate out the replies so they can be rendered underneath the main posts
+            if (parsedTx.isArticleReply) {
+                // populate with additional article info with matching entry from localArticles
+                parsedTx.articleObject = localArticles.find((article) => article.hash === parsedTx.opReturnMessage);
+                replyTxs.push(parsedTx);
+            } else {
+                // populate with additional article info with matching entry from localArticles
+                parsedTx.articleObject = localArticles.find((article) => article.hash === parsedTx.opReturnMessage);
+                parsedTxs.push(parsedTx);
+            }
+        }
+
+        // Filter out non-article txs
+        const parsedAndFilteredTxs = parsedTxs.filter(function (el) {
+            return el.isArticle === true ||
+                el.isArticleReply === true
+        });
+
+        console.log('parsedAndFilteredTxs: ', parsedAndFilteredTxs);
+        return {
+            txs: parsedAndFilteredTxs,
+            replies: replyTxs,
+            numPages: parsedAndFilteredTxs.length,
+        };
+    } catch (err) {
+        console.log(`Error in getArticleHistory(${address})`, err);
+    }
+};
+
 /**
  * Parse opReturn output for image src, twitter ID or youtube ID
  *
@@ -781,6 +906,9 @@ export const parseChronikTx = (tx, address) => {
     let isEcashChatEncrypted = false;
     let isXecTip = false;
     let nftShowcaseId = false;
+    let articleTxid = false;
+    let isArticle = false;
+    let isArticleReply = false;
 
     if (tx.isCoinbase) {
         // Note that coinbase inputs have `undefined` for `thisInput.outputScript`
@@ -955,6 +1083,13 @@ export const parseChronikTx = (tx, address) => {
                             nftShowcaseId = stackArray[2];
                             opReturnMessage = Buffer.from(stackArray[3], 'hex');
                             iseCashChatPost = true;
+                        } else if (stackArray[1] === opreturnConfig.articlePrefixHex) {
+                            opReturnMessage = Buffer.from(stackArray[2], 'hex');
+                            isArticle = true;
+                        } else if (stackArray[1] === opreturnConfig.articleReplyPrefixHex) {
+                            articleTxid = stackArray[2];
+                            opReturnMessage = Buffer.from(stackArray[3], 'hex');
+                            isArticleReply = true;
                         } else if (stackArray[1] === opreturnConfig.xecTipPrefixHex) {
                             // This is an XEC tip tx
                             iseCashChatMessage = true;
@@ -1079,19 +1214,21 @@ export const parseChronikTx = (tx, address) => {
     }
     etokenAmount = etokenAmount.toString();
 
-    // Parse the opReturn message output for media tags
-    const {
-        updatedOpReturn,
-        updatedImageSrc,
-        updatedVideoId,
-        updatedTweetId,
-        updatedUrl,
-    } = parseMediaTags(opReturnMessage);
-    opReturnMessage = updatedOpReturn;
-    imageSrc = updatedImageSrc;
-    videoId = updatedVideoId;
-    tweetId = updatedTweetId;
-    url = updatedUrl;
+    if (!isArticle && !isArticleReply) {
+        // Parse the opReturn message output for media tags
+        const {
+            updatedOpReturn,
+            updatedImageSrc,
+            updatedVideoId,
+            updatedTweetId,
+            updatedUrl,
+        } = parseMediaTags(opReturnMessage);
+        opReturnMessage = updatedOpReturn;
+        imageSrc = updatedImageSrc;
+        videoId = updatedVideoId;
+        tweetId = updatedTweetId;
+        url = updatedUrl;
+    }
 
     // Parse the tx's date and time
     let txDate, txTime;
@@ -1145,6 +1282,9 @@ export const parseChronikTx = (tx, address) => {
             url,
             isXecTip,
             nftShowcaseId,
+            articleTxid,
+            isArticle,
+            isArticleReply,
         };
     }
     // Otherwise do not include these fields
@@ -1173,5 +1313,8 @@ export const parseChronikTx = (tx, address) => {
         url,
         isXecTip,
         nftShowcaseId,
+        articleTxid,
+        isArticle,
+        isArticleReply,
     };
 };

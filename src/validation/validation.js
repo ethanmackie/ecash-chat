@@ -64,6 +64,60 @@ export const postHasErrors = post => {
     return errorMessage;
 };
 
+// Validates the article
+export const articleHasErrors = article => {
+    let errorMessage = false;
+
+    // Check validity of any img tags
+    if (
+        article.includes('[img]') &&
+        article.includes('[/img]')
+    ) {
+        let imageLink = article.substring(
+            article.indexOf('[img]') + 5,
+            article.lastIndexOf('[/img]')
+        );
+        let dotIndex = imageLink.lastIndexOf('.');
+        let extension = imageLink.substring(dotIndex);
+        const validExtensions = ['.jpg', '.jpeg', 'png', 'gif'];
+        if (!validExtensions.some(substring => extension.includes(substring))) {
+            errorMessage = "Image link needs to be a direct link to the image ending in .jpg, .jpeg, .png or .gif";
+        }
+    }
+
+    if (Buffer.from(article, 'utf8').length > opreturnConfig.articleByteLimit) {
+        errorMessage = `article must be between 0 - ${opreturnConfig.articleByteLimit} bytes`;
+    }
+    return errorMessage;
+};
+
+// Validates the article reply
+export const articleReplyHasErrors = articleReply => {
+    let errorMessage = false;
+
+    // Check validity of any img tags
+    if (
+        articleReply.includes('[img]') &&
+        articleReply.includes('[/img]')
+    ) {
+        let imageLink = articleReply.substring(
+            articleReply.indexOf('[img]') + 5,
+            articleReply.lastIndexOf('[/img]')
+        );
+        let dotIndex = imageLink.lastIndexOf('.');
+        let extension = imageLink.substring(dotIndex);
+        const validExtensions = ['.jpg', '.jpeg', 'png', 'gif'];
+        if (!validExtensions.some(substring => extension.includes(substring))) {
+            errorMessage = "Image link needs to be a direct link to the image ending in .jpg, .jpeg, .png or .gif";
+        }
+    }
+
+    if (Buffer.from(articleReply, 'utf8').length > opreturnConfig.articleReplyByteLimit) {
+        errorMessage = `articleReply must be between 0 - ${opreturnConfig.articleReplyByteLimit} bytes`;
+    }
+    return errorMessage;
+};
+
 // Validates the townhall reply post
 export const replyHasErrors = post => {
     let errorMessage = false;

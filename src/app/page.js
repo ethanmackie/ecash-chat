@@ -5,21 +5,19 @@ import Image from "next/image";
 import TxHistory from './txhistory';
 import Townhall from './townhall';
 import Nft from './nft';
+import Article from './article';
 import cashaddr from 'ecashaddrjs';
 import { queryAliasServer } from '../alias/alias-server';
 import { encodeBip21Message, getTweetId, toXec } from '../utils/utils';
 import { isMobileDevice } from '../utils/mobileCheck';
-import { txListener, refreshUtxos, txListenerOngoing } from '../chronik/chronik';
+import { txListener, refreshUtxos, txListenerOngoing, getArticleListing } from '../chronik/chronik';
 import { appConfig } from '../config/app';
 import { isValidRecipient, messageHasErrors } from '../validation/validation';
-import { opReturn as opreturnConfig } from '../config/opreturn';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -36,7 +34,7 @@ import QRCode from "react-qr-code";
 import copy from 'copy-to-clipboard';
 import { Tooltip, Tabs, Alert, Modal, Popover } from "flowbite-react";
 import { HiOutlineMail, HiOutlineNewspaper, HiInformationCircle, HiOutlinePhotograph } from "react-icons/hi";
-import { IoMdInformationCircleOutline } from "react-icons/io";
+import { BiSolidNews } from "react-icons/bi";
 import { GiDiscussion, GiAbstract010 } from "react-icons/gi";
 import { ToastContainer, toast } from 'react-toastify';
 import { PersonIcon, FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon } from '@radix-ui/react-icons';
@@ -45,7 +43,6 @@ import { YoutubeIcon, DefaultavatarIcon, EcashchatIcon } from "@/components/ui/s
 import {
     SendIcon,
     LogoutIcon,
-    AliasIcon,
     EncryptionIcon,
 } from "@/components/ui/social";
 const crypto = require('crypto');
@@ -57,7 +54,6 @@ import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
 import { Tweet } from 'react-tweet';
 const packageJson = require('../../package.json');
-
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -82,7 +78,7 @@ export default function Home() {
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
-        setTimeout(confirmCashtabProviderStatus, 750);
+        setTimeout(confirmCashtabProviderStatus, 400);
 
         (async () => {
             if (await isMobileDevice() === true) {
@@ -91,6 +87,10 @@ export default function Home() {
             } else {
                 console.log('Desktop detected');
             }
+        })();
+
+        (async () => {
+            await getArticleListing();
         })();
         // Listen for cashtab extension messages on load
         window.addEventListener('message', handleMessage);
@@ -423,41 +423,40 @@ export default function Home() {
         );
     };
 
-  /* Placeholder UI for now until the Tailwind UI set is ready for implementation */
   return (
     <>
-    <ToastContainer />
-    <div className="sm:flex flex-col items-center justify-center p-5 relative z-10 mt-4">
-    <div className="background_content"></div>
-    </div>
-    <div className="relative isolate px-6 pt-14 lg:px-8">
-<div
-  className="absolute inset-x-0 -top-10 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-40"
-  aria-hidden="true"
->
-  <div
-    className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#a1c0ff] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
-    style={{
-      clipPath:
-        'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-    }}
-  />
-</div>
-<div
-  className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%+20rem)]"
-  aria-hidden="true"
->
-  <div
-    className="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
-    style={{
-      clipPath:
-        'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-    }}
-  />
-</div>
-</div>
+        <ToastContainer />
+        <div className="sm:flex flex-col items-center justify-center p-5 relative z-10 mt-4">
+        <div className="background_content"></div>
+        </div>
+        <div className="relative isolate px-6 pt-14 lg:px-8">
+        <div
+        className="absolute inset-x-0 -top-10 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-40"
+        aria-hidden="true"
+        >
+        <div
+            className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#a1c0ff] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
+            style={{
+            clipPath:
+                'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
+            }}
+        />
+        </div>
+        <div
+        className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%+20rem)]"
+        aria-hidden="true"
+        >
+        <div
+            className="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
+            style={{
+            clipPath:
+                'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
+            }}
+        />
+        </div>
+        </div>
 
-<header className="fixed mt-4 flex top-0 z-50 w-full justify-center ">       
+        <header className="fixed mt-4 flex top-0 z-50 w-full justify-center ">
           <div className="container flex items-center justify-between rounded-lg flex bg-black w-full h-14 mx-4 md:mx-auto md:max-w-xl lg:max-w-3xl border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/40">
             <div className="sm:flex">
               <a className="flex items-center space-x-2" href="#">
@@ -506,17 +505,13 @@ export default function Home() {
     </a>
       <div className="hidden sm:mb-8 sm:flex sm:justify-center">
         <div className="relative flex gap-1 items-center rounded-full px-3 py-1 text-sm leading-6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/40">
-        <RocketIcon/> Version: 1.1.1{' '}
+        <RocketIcon/> Version: {packageJson.version}{' '}
         </div>
       </div>
       <div className="text-center">
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
         Chat on the eCash blockchain
         </h1>
-        <p className="leading-7 [&:not(:first-child)]:mt-6">
-        eCash Chat is an on-chain messaging platform 
-        on the eCash blockchain.
-        </p>
       </div>
     </div>
    
@@ -781,12 +776,16 @@ export default function Home() {
                   <Townhall address={address} isMobile={isMobile} />
               </Tabs.Item>
 
+              <Tabs.Item title="Articles" icon={BiSolidNews} >
+                <Article chronik={chronik} address={address} isMobile={isMobile} />
+              </Tabs.Item>
+
               <Tabs.Item title="NFTs" icon={HiOutlinePhotograph} >
                   <Nft chronik={chronik} address={address} isMobile={isMobile} />
               </Tabs.Item>
 
-              <Tabs.Item title="About" icon={IoMdInformationCircleOutline} >
-              <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
+              <Tabs.Item title="About" icon={GiAbstract010}>
+                  <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
                       <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">What is eCash Chat?</h2>
                       eCash Chat is an on-chain messaging platform on the eCash blockchain.
                       <br />It filters for specific messaging transactions for a seamless social experience.
@@ -871,36 +870,7 @@ export default function Home() {
                           </li>
                       </ul>
                   </div>
-              </Tabs.Item>
 
-              <Tabs.Item title="Settings" icon={GiAbstract010}>
-                  <div className="flex min-h-full flex-1 flex-col items-center justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
-                    <Alert color="info" className="w-96">Version: {packageJson.version}</Alert><br />
-                    <Button
-                        type="button"
-                        className="bg-blue-500 w-96 hover:bg-blue-300"
-                        onClick={() => {
-                        setIsLoggedIn(false);
-                        toast(`Logged out of ${address}`);
-                        }}
-                    >
-                        <LogoutIcon />&nbsp;Log Out
-                    </Button>
-                    <br />
-                    <Button
-                        type="button"
-                        className="bg-blue-500 w-96 hover:bg-blue-300"
-                    >
-                        <ImageIcon />&nbsp;Set NFT Profile (Coming soon)
-                    </Button>
-                    <br />
-                    <Button
-                        type="button"
-                        className="bg-blue-500 w-96 hover:bg-blue-300"
-                    >
-                        <AliasIcon />&nbsp;Link eCash Alias (Coming soon)
-                    </Button>
-                  </div>
               </Tabs.Item>
               </Tabs>
               </>
