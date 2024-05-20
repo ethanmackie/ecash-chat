@@ -3,7 +3,6 @@ import  React, { useState, useEffect } from 'react';
 import { appConfig } from '../config/app';
 import { Tooltip, Avatar, Popover, Accordion, Alert, Modal } from "flowbite-react";
 import { Textarea } from "@/components/ui/textarea";
-import { opReturn as opreturnConfig } from '../config/opreturn';
 import { postHasErrors, replyHasErrors } from '../validation/validation';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator"

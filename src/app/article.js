@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { appConfig } from '../config/app';
+import { opReturn as opreturnConfig } from '../config/opreturn';
 import {
     Accordion,
     AccordionContent,
@@ -10,7 +11,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Tooltip, Popover, Modal } from "flowbite-react";
-import { articleHasErrors, articleReplyHasErrors } from '../validation/validation';
+import { replyHasErrors } from '../validation/validation';
 import { Button } from "@/components/ui/button";
 import {
     TwitterShareButton,
@@ -35,7 +36,7 @@ import YouTubeVideoId from 'youtube-video-id';
 import {
     encodeBip21Article,
     encodeBip2XecTip,
-    encodeBip21ReplyArticle,
+    encodeBip21ReplyPost,
     getTweetId,
 } from '../utils/utils';
 import { CrossIcon, AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, YoutubeIcon, AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon } from "@/components/ui/social";
@@ -365,19 +366,42 @@ export default function Article( { chronik, address, isMobile } ) {
                 <Modal.Body>
                     {/* Article content */}
                     <div className="space-y-2 flex flex-col max-w-xl gap-2 break-words w-full leading-1.5 p-6">
-                        <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                            {(
-                                <p className="text-sm font-normal text-gray-900 dark:text-white text-ellipsis break-words min-w-0">
-                                    <RenderArticle content={fullArticle.content} />
-                                </p>
-                            )}
-                        </p>
+                        <RenderArticle content={fullArticle.content} />
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
                     <div className="flex gap-5">
                         {/* Tipping action to an article */}
                         <RenderTipping address={tx.replyAddress} />
+
+                        {/* Reply action to an article */}
+                        <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
+                            <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
+                                <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Reply to {tx.replyAddress}</h3>
+                            </div>
+                            <div className="px-3 py-2">
+                                {/* Reply input field */}
+                                <Textarea
+                                    id="reply-post"
+                                    defaultValue={replyArticle}
+                                    placeholder="Post your reply..."
+                                    className="bg-gray-50"
+                                    onBlur={e => setReplyArticle(e.target.value)}
+                                    maxLength={opreturnConfig.articleReplyByteLimit}
+                                    rows={4}
+                                />
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="bg-blue-500 hover:bg-blue-300"
+                                    onClick={e => {
+                                        replytoArticle(tx.txid, replyArticle)
+                                    }}
+                                >
+                                    Post Reply
+                                </Button>
+                            </div>
+                        </div>
 
                         <Button onClick={() => setShowArticleModal(false)}>
                             Close
