@@ -67,16 +67,6 @@ export default function Article( { chronik, address, isMobile } ) {
     const [showArticleModal, setShowArticleModal] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [maxPagesToShow, setMaxPagesToShow] = useState(7);
-    const md = require('markdown-it')({
-        html: true,
-        linkify: true,
-        typography: true
-    }).use(require('markdown-it-video'), {
-        youtube: { width: 500, height: 281 },
-        vimeo: { width: 500, height: 281 },
-        vine: { width: 500, height: 281, embed: 'simple' },
-        prezi: { width: 500, height: 281 }
-    });
 
     useEffect(() => {
         const handleResize = () => {
@@ -271,7 +261,7 @@ export default function Article( { chronik, address, isMobile } ) {
 
     // Render the full article contents
     const RenderArticle = ({ content }) => {
-        const renderedArticle = md.render(content);
+        const renderedArticle = content;
         return (<div dangerouslySetInnerHTML={{ __html: renderedArticle }} />);
     };
 
