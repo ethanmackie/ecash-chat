@@ -11,7 +11,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Tooltip, Popover, Modal } from "flowbite-react";
-import { replyHasErrors } from '../validation/validation';
 import { Button } from "@/components/ui/button";
 import {
     TwitterShareButton,
@@ -31,13 +30,10 @@ import {
     getTxDetails,
     articleTxListener,
 } from '../chronik/chronik';
-import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
-import YouTubeVideoId from 'youtube-video-id';
 import {
     encodeBip21Article,
     encodeBip2XecTip,
-    encodeBip21ReplyPost,
-    getTweetId,
+    encodeBip21ReplyArticle,
 } from '../utils/utils';
 import { CrossIcon, AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, YoutubeIcon, AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon } from "@/components/ui/social";
 import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon, ChatBubbleIcon, Share1Icon } from '@radix-ui/react-icons';
@@ -53,7 +49,6 @@ import {
     PaginationPrevious,
   } from "@/components/ui/pagination";
 import Yamde from 'yamde';
-import { Tweet } from 'react-tweet';
 import { Badge } from "@/components/ui/badge";
 import { kv } from '@vercel/kv';
 import localforage from 'localforage';
@@ -65,7 +60,7 @@ export default function Article( { chronik, address, isMobile } ) {
     const [articleTitle, setArticleTitle] = useState(''); // title of the article being drafted
     const [article, setArticle] = useState(''); // the article being drafted
     const [articleCategory, setArticleCategory] = useState(''); // category of the article being drafted
-    const [fullArticle, setFullArticle] = useState(''); // the full article being viewed
+    const [currentArticleTxObj, setCurrentArticleTxObj] = useState(false); // the tx object containing the full article / tx being viewed
     const [articleError, setArticleError] = useState(false);
     const [replyArticle, setReplyArticle] = useState('');
     const [replyArticleError, setReplyArticleError] = useState(false);
@@ -183,7 +178,7 @@ export default function Article( { chronik, address, isMobile } ) {
     // Pass a reply to article tx BIP21 query string to cashtab extensions
     const replytoArticle = (replyTxid, replyMsg) => {
         // Encode the op_return message script
-        const opReturnRaw = encodeBip21ReplyPost(replyMsg, replyTxid);
+        const opReturnRaw = encodeBip21ReplyArticle(replyMsg, replyTxid);
         const bip21Str = `${address}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`;
 
         if (isMobile) {
@@ -236,8 +231,7 @@ export default function Article( { chronik, address, isMobile } ) {
 
     // Lookup and render any corresponding replies
     const RenderReplies = ( { txid, replies } ) => {
-        const foundReplies = replies.filter(replyTx => replyTx.replyTxid === txid);
-
+        const foundReplies = replies.filter(replyTx => replyTx.articleTxid === txid);
         // If this article (i.e. txid) has no reply, don't bother rendering a reply component
         if (foundReplies.length === 0) {
             return;
@@ -359,25 +353,29 @@ export default function Article( { chronik, address, isMobile } ) {
         );
     };
 
-    const FullArticleModal = ({ tx }) => {
+    const FullArticleModal = () => {
         return (
             <Modal show={showArticleModal} onClose={() => setShowArticleModal(false)}>
-                <Modal.Header>{fullArticle.title}</Modal.Header>
+                <Modal.Header>{currentArticleTxObj.articleObject.title}</Modal.Header>
                 <Modal.Body>
                     {/* Article content */}
                     <div className="space-y-2 flex flex-col max-w-xl gap-2 break-words w-full leading-1.5 p-6">
-                        <RenderArticle content={fullArticle.content} />
+                        <RenderArticle content={currentArticleTxObj.articleObject.content} />
+                    </div>
+                    {/* Render corresponding replies for this article */}
+                    <div>
+                        <RenderReplies txid={currentArticleTxObj.txid} replies={articleHistory.replies} />
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
                     <div className="flex gap-5">
                         {/* Tipping action to an article */}
-                        <RenderTipping address={tx.replyAddress} />
+                        <RenderTipping address={currentArticleTxObj.replyAddress} />
 
                         {/* Reply action to an article */}
                         <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
                             <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
-                                <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Reply to {tx.replyAddress}</h3>
+                                <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Reply to article ...{currentArticleTxObj.txid.slice(-10)}</h3>
                             </div>
                             <div className="px-3 py-2">
                                 {/* Reply input field */}
@@ -395,7 +393,7 @@ export default function Article( { chronik, address, isMobile } ) {
                                     variant="outline"
                                     className="bg-blue-500 hover:bg-blue-300"
                                     onClick={e => {
-                                        replytoArticle(tx.txid, replyArticle)
+                                        replytoArticle(currentArticleTxObj.txid, replyArticle)
                                     }}
                                 >
                                     Post Reply
@@ -414,6 +412,9 @@ export default function Article( { chronik, address, isMobile } ) {
 
     return (
         <>
+            {showArticleModal && (
+                <FullArticleModal />
+            )}
             <div>
                 {/* Dropdown to render article editor */}
                 <Accordion type="single" collapsible>
@@ -563,7 +564,7 @@ export default function Article( { chronik, address, isMobile } ) {
                                                 <div className="group relative">
                                                     <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
                                                         <a href={'#'}  onClick={() => {
-                                                            setFullArticle(tx.articleObject);
+                                                            setCurrentArticleTxObj(tx);
                                                             setShowArticleModal(true);
                                                         }}>
                                                             <span className="absolute inset-0" />
@@ -593,15 +594,6 @@ export default function Article( { chronik, address, isMobile } ) {
                                                 </div>
                                             </article>
                                         )}
-
-                                        {showArticleModal && (
-                                            <FullArticleModal tx={tx} />
-                                        )}
-
-                                        {/* Render corresponding replies for this article */}
-                                        <div>
-                                            {<RenderReplies txid={tx.txid} replies={articleHistory.replies} />}
-                                        </div>
                                     </>
                                 ),
                             )
