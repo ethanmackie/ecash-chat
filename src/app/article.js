@@ -128,14 +128,6 @@ export default function Article( { chronik, address, isMobile } ) {
         }
     };
 
-    // Validate the reply to an article
-    // Note: at some point this function will diverge in functionality with handleArticleChange()
-    const handleReplyArticleChange = e => {
-        const { value } = e.target;
-        setReplyArticleError(articleReplyHasErrors(value));
-        setReplyArticle(value);
-    };
-
     // Pass an article tx BIP21 query string to cashtab extensions
     const sendArticle = async () => {
         const crypto = require('crypto');
@@ -210,7 +202,7 @@ export default function Article( { chronik, address, isMobile } ) {
                 '*',
             );
         }
-        setReplyPost('');
+        setReplyArticle('');
         txListener(chronik, address, "Article reply sent", getArticleHistoryByPage);
     };
 
@@ -366,11 +358,12 @@ export default function Article( { chronik, address, isMobile } ) {
         );
     };
 
-    const FullArticleModal = () => {
+    const FullArticleModal = ({ tx }) => {
         return (
             <Modal show={showArticleModal} onClose={() => setShowArticleModal(false)}>
                 <Modal.Header>{fullArticle.title}</Modal.Header>
                 <Modal.Body>
+                    {/* Article content */}
                     <div className="space-y-2 flex flex-col max-w-xl gap-2 break-words w-full leading-1.5 p-6">
                         <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
                             {(
@@ -378,15 +371,18 @@ export default function Article( { chronik, address, isMobile } ) {
                                     <RenderArticle content={fullArticle.content} />
                                 </p>
                             )}
-                            <br />
-                            <RenderTipping address={address} />
                         </p>
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button onClick={() => setShowArticleModal(false)}>
-                        Close
-                    </Button>
+                    <div className="flex gap-5">
+                        {/* Tipping action to an article */}
+                        <RenderTipping address={tx.replyAddress} />
+
+                        <Button onClick={() => setShowArticleModal(false)}>
+                            Close
+                        </Button>
+                    </div>
                 </Modal.Footer>
             </Modal>
         );
@@ -395,8 +391,6 @@ export default function Article( { chronik, address, isMobile } ) {
     return (
         <>
             <div>
-                <FullArticleModal />
-
                 {/* Dropdown to render article editor */}
                 <Accordion type="single" collapsible>
                 <AccordionItem value="item-1">
@@ -531,6 +525,7 @@ export default function Article( { chronik, address, isMobile } ) {
                                         {/* Render a summary of the article */}
                                         {tx.articleObject && (
                                             <article key={index} className="flex max-w-xl flex-col items-start justify-between py-8">
+                                                {/* Article date and category */}
                                                 <div className="flex items-center gap-x-4 text-xs">
                                                     <time dateTime={tx.txTime} className="text-gray-500">
                                                         {tx.txDate}
@@ -555,6 +550,7 @@ export default function Article( { chronik, address, isMobile } ) {
                                                         <RenderArticle content={tx.articleObject.content} />
                                                     </p>
                                                 </div>
+                                                {/* Article author */}
                                                 <div className="relative mt-2 flex items-center gap-x-4">
                                                     <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
                                                     <div className="text-sm leading-6">
@@ -573,6 +569,15 @@ export default function Article( { chronik, address, isMobile } ) {
                                                 </div>
                                             </article>
                                         )}
+
+                                        {showArticleModal && (
+                                            <FullArticleModal tx={tx} />
+                                        )}
+
+                                        {/* Render corresponding replies for this article */}
+                                        <div>
+                                            {<RenderReplies txid={tx.txid} replies={articleHistory.replies} />}
+                                        </div>
                                     </>
                                 ),
                             )

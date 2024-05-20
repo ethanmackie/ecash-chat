@@ -509,8 +509,8 @@ export default function Home() {
         </div>
       </div>
       <div className="text-center">
-        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-        Chat on the eCash blockchain
+        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-4xl">
+        {'Socialize, monetize and earn on the eCash blockchain'}
         </h1>
       </div>
     </div>

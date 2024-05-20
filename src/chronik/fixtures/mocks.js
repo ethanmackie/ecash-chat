@@ -65,6 +65,9 @@ export const mockParsedXecEncryptedSendTxWithOpReturn = {
     "tweetId": false,
     "replyTxid": false,
     "url": false,
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
     "nftShowcaseId": false
 };
 
@@ -134,6 +137,9 @@ export const mockParsedXecSendTxWithOpReturnTweet = {
     "txDate": "27 Mar 2024",
     "txTime": "23:36:40",
     "tweetId": "1766304430423515170",
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
     "nftShowcaseId": false
 };
 
@@ -199,6 +205,9 @@ export const mockParsedXecSendTxWithOpReturnEmoji = {
     "txid": "68f55677b4fcacff6a47a78976aa11238dab1f323e002416b26f3335cb387ee2",
     "txDate": "Mar 26, 2024",
     "txTime": "12:08:18 pm",
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
     "nftShowcaseId": false
 };
 
@@ -264,6 +273,9 @@ export const mockParsedXecSendTxWithOpReturnVideo = {
     "videoId": "5RuYKxKCAOA",
     "txDate": "Mar 26, 2024",
     "txTime": "12:06:47 pm",
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
     "nftShowcaseId": false
 };
 
@@ -329,6 +341,9 @@ export const mockParsedXecSendTxWithOpReturnImage = {
     "url": false,
     "txDate": "Mar 26, 2024",
     "txTime": "12:04:00 pm",
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
     "nftShowcaseId": false
 };
 
@@ -394,6 +409,9 @@ export const mockParsedXecSendTxWithOpReturn = {
     "txid": "e78a0053cc4914c5b114f8d45b08afb738bca2acfc6644fefc262f043eb03cb2",
     "txDate": "Mar 26, 2024",
     "txTime": "12:01:49 pm",
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
     "nftShowcaseId": false
 };
 
@@ -464,6 +482,9 @@ export const mockParsedXecSendTxWithOpReturnTownhallPost = {
     "txDate": "Apr 4, 2024",
     "txTime": "2:20:04 pm",
     "tweetId": false,
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
     "nftShowcaseId": false
 };
 
@@ -534,6 +555,9 @@ export const mockParsedXecSendTxWithOpReturnTownhallReplyPost = {
     "tweetId": false,
     "url": false,
     "replyTxid": "0729318a128ee8f11d18b28237c8ae7ffa4e95c88ec69ebce716758e1973c5d4",
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
     "nftShowcaseId": false
 };
 
@@ -604,5 +628,8 @@ export const mockParsedXecSendTxWithOpReturnNftShowcase = {
     "replyTxid": false,
     "url": false,
     "isXecTip": false,
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
     "nftShowcaseId": "076fc97838cea01911b1b83e26f5ec5c040e4aed039f24df6e3d076737c43482"
 };

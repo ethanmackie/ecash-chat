@@ -94,24 +94,6 @@ export const articleHasErrors = article => {
 // Validates the article reply
 export const articleReplyHasErrors = articleReply => {
     let errorMessage = false;
-
-    // Check validity of any img tags
-    if (
-        articleReply.includes('[img]') &&
-        articleReply.includes('[/img]')
-    ) {
-        let imageLink = articleReply.substring(
-            articleReply.indexOf('[img]') + 5,
-            articleReply.lastIndexOf('[/img]')
-        );
-        let dotIndex = imageLink.lastIndexOf('.');
-        let extension = imageLink.substring(dotIndex);
-        const validExtensions = ['.jpg', '.jpeg', 'png', 'gif'];
-        if (!validExtensions.some(substring => extension.includes(substring))) {
-            errorMessage = "Image link needs to be a direct link to the image ending in .jpg, .jpeg, .png or .gif";
-        }
-    }
-
     if (Buffer.from(articleReply, 'utf8').length > opreturnConfig.articleReplyByteLimit) {
         errorMessage = `articleReply must be between 0 - ${opreturnConfig.articleReplyByteLimit} bytes`;
     }

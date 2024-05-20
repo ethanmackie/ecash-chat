@@ -758,10 +758,7 @@ export const getArticleHistory = async (chronik, address, page = 0) => {
             page,
             chronikConfig.txHistoryPageSize,
         );
-        console.log('getArticleHistory.lokadIdHistory: ', lokadIdHistory);
-
         const localArticles = await localforage.getItem(appConfig.localArticlesParam);
-        console.log('getArticleHistory.localArticles: ', localArticles);
 
         const parsedTxs = [];
         const replyTxs = [];
@@ -789,7 +786,6 @@ export const getArticleHistory = async (chronik, address, page = 0) => {
                 el.isArticleReply === true
         });
 
-        console.log('parsedAndFilteredTxs: ', parsedAndFilteredTxs);
         return {
             txs: parsedAndFilteredTxs,
             replies: replyTxs,
