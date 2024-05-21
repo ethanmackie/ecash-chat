@@ -67,25 +67,6 @@ export default function Article( { chronik, address, isMobile } ) {
     const [showArticleModal, setShowArticleModal] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [maxPagesToShow, setMaxPagesToShow] = useState(7);
-<<<<<<< HEAD
-  
-    const md = require('markdown-it')({
-        html: true,
-        linkify: true,
-        typography: true
-    }).use(require('markdown-it-video'), {
-        youtube: { width: '100%', height: 281, embedClass: 'video-embed youtube' },
-        vimeo: { width: '100%', height: 281, embedClass: 'video-embed vimeo' },
-        vine: { width: '100%', height: 281, embedClass: 'video-embed vine', embed: 'simple' },
-        prezi: { width: '100%', height: 281, embedClass: 'video-embed prezi' }
-    });
-    
-    // Apply Tailwind CSS classes
-    document.querySelectorAll('.video-embed').forEach(embed => {
-        embed.classList.add('w-full', 'md:w-[500px]', 'md:h-[281px]');
-    });
-=======
->>>>>>> origin/sandbox
 
     useEffect(() => {
         const handleResize = () => {
