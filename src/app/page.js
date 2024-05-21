@@ -792,72 +792,26 @@ export default function Home() {
                       <br /><br />
                       <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Key features:</h2>
                       <ul className="space-y-1 list-disc list-inside">
-                          <li>
-                              One-click metamask-like login experience
-                          </li>
-                          <li>
-                              Direct wallet to wallet and an all-in townhall forum
-                          </li>
-                          <li>
-                              Message encryption option via AES 256 CBC algorithm
-                          </li>
-                          <li>
-                              NFT Showcases
-                          </li>
-                          <li>
-                              Displays only messaging transactions
-                          </li>
-                          <li>
-                              Real time address specific filtering
-                          </li>
-                          <li>
-                              XEC Tipping on addresses
-                          </li>
-                          <li>
-                              Enables embedding of images, videos, tweets and emojis in messages
-                          </li>
-                          <li>
-                              Powered by In-Node Chronik and Cashtab Extensions
-                          </li>
-                          <li>
-                              Integrated with the eCash Alias protocol (coming soon)
-                          </li>
+                          <li>One-click metamask-like login experience</li>
+                          <li>Direct wallet to wallet and an all-in townhall forum</li>
+                          <li>Message encryption option via AES 256 CBC algorithm</li>
+                          <li>Full length blogging facility</li>
+                          <li>NFT Showcases</li>
+                          <li>Displays only messaging transactions</li>
+                          <li>Real time address specific filtering</li>
+                          <li>XEC Tipping on addresses</li>
+                          <li>Enables embedding of images, videos, tweets and emojis in messages</li>
+                          <li>Powered by In-Node Chronik and Cashtab Extensions</li>
+                          <li>Integration with the eCash Alias protocol (coming soon)</li>
                       </ul>
                       <br />
                       <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">User guide:</h2>
                       <ul className="space-y-1 list-disc list-inside">
-                          <li>
-                              <b>Inbox</b>: a direct wallet to wallet messaging history.
-                          </li>
-                          <li>
-                              <b>Send Message</b>: send public messages to another wallet
-                          </li>
-                          <li>
-                              <b>Townhall</b>: public onchain discussion forum
-                          </li>
-                          <li>
-                              <b>Settings</b>: logout and profile configuration
-                          </li>
-                      </ul>
-                      <br />
-                      <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Embedding media:</h2>
-                      <ul className="space-y-1 list-disc list-inside">
-                          <li>
-                              <b>Urls</b>: Click "Embed Url" to insert the [url]https://www..[/url] tag.<br />
-                              Replace the hyperlink with the url you're embedding.
-                          </li>
-                          <li>
-                              <b>Images</b>: Click "Embed Image" to insert the [img]image-url[/img] tag.<br />
-                              Replace it with the url of the image you're embedding.
-                          </li>
-                          <li>
-                              <b>Videos</b>: Click "Embed Youtube" to insert the [yt]youtube-url[/yt] tag.<br />
-                              Replace it with the url of the youtube video you're embedding.<br />
-                          </li>
-                          <li>
-                              <b>Tweets</b>: Click "Embed Tweet" to insert the [twt]tweet-url[/twt] tag.<br />
-                              Replace it with the url of the tweet you're embedding.<br />
-                          </li>
+                          <li><b>Inbox</b>: a direct wallet to wallet messaging history.</li>
+                          <li><b>Send Message</b>: send public messages to another wallet</li>
+                          <li><b>Townhall</b>: public onchain discussion forum</li>
+                          <li><b>Articles</b>: full length blogging facility</li>
+                          <li><b>NFTs</b>: browser and showcase your NFTs</li>
                       </ul>
                       <br />
                       <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Support:</h2>

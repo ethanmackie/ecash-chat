@@ -67,6 +67,7 @@ export default function Article( { chronik, address, isMobile } ) {
     const [showArticleModal, setShowArticleModal] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [maxPagesToShow, setMaxPagesToShow] = useState(7);
+<<<<<<< HEAD
   
     const md = require('markdown-it')({
         html: true,
@@ -83,6 +84,8 @@ export default function Article( { chronik, address, isMobile } ) {
     document.querySelectorAll('.video-embed').forEach(embed => {
         embed.classList.add('w-full', 'md:w-[500px]', 'md:h-[281px]');
     });
+=======
+>>>>>>> origin/sandbox
 
     useEffect(() => {
         const handleResize = () => {
@@ -277,7 +280,7 @@ export default function Article( { chronik, address, isMobile } ) {
 
     // Render the full article contents
     const RenderArticle = ({ content }) => {
-        const renderedArticle = md.render(content);
+        const renderedArticle = content;
         return (<div dangerouslySetInnerHTML={{ __html: renderedArticle }} />);
     };
 
