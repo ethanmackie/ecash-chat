@@ -369,7 +369,7 @@ export default function Article( { chronik, address, isMobile } ) {
                         <RenderTipping address={currentArticleTxObj.replyAddress} />
 
                         {/* Reply action to an article */}
-                        <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
                             <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
                                 <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Reply to article ...{currentArticleTxObj.txid.slice(-10)}</h3>
                             </div>
