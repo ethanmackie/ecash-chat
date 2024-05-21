@@ -54,6 +54,7 @@ import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
 import { Tweet } from 'react-tweet';
 const packageJson = require('../../package.json');
+import localforage from 'localforage';
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -87,10 +88,8 @@ export default function Home() {
             } else {
                 console.log('Desktop detected');
             }
-        })();
-
-        (async () => {
-            await getArticleListing();
+            const latestArticles = await getArticleListing();
+            await localforage.setItem(appConfig.localArticlesParam, latestArticles);
         })();
         // Listen for cashtab extension messages on load
         window.addEventListener('message', handleMessage);

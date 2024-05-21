@@ -18,7 +18,8 @@ export const getArticleListing = async () => {
     if (!Array.isArray(articles)) {
         articles = [];
     }
-    await localforage.setItem(appConfig.localArticlesParam, articles);
+
+    return articles;
 };
 
 /**

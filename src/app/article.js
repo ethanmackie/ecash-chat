@@ -48,12 +48,13 @@ import {
     PaginationNext,
     PaginationPrevious,
   } from "@/components/ui/pagination";
-import Yamde from 'yamde';
 import { Badge } from "@/components/ui/badge";
 import { kv } from '@vercel/kv';
 import localforage from 'localforage';
 import copy from 'copy-to-clipboard';
 import { Skeleton } from "@/components/ui/skeleton";
+import DOMPurify from 'dompurify';
+import MarkdownEditor from '@uiw/react-markdown-editor';
 
 export default function Article( { chronik, address, isMobile } ) {
     const [articleHistory, setArticleHistory] = useState('');
@@ -219,6 +220,11 @@ export default function Article( { chronik, address, isMobile } ) {
         txListener(chronik, address, "Article XEC tip sent", getArticleHistoryByPage);
     };
 
+    const insertMarkupTags = tooltipStr => {
+        const updatedArticle = String(article).concat(tooltipStr);
+        setArticle(updatedArticle);
+    };
+
     // Lookup and render any corresponding replies
     const RenderReplies = ( { txid, replies } ) => {
         const foundReplies = replies.filter(replyTx => replyTx.articleTxid === txid);
@@ -261,8 +267,8 @@ export default function Article( { chronik, address, isMobile } ) {
 
     // Render the full article contents
     const RenderArticle = ({ content }) => {
-        const renderedArticle = content;
-        return (<div dangerouslySetInnerHTML={{ __html: renderedArticle }} />);
+        const renderedArticle = DOMPurify.sanitize(content);
+        return (<MarkdownEditor.Markdown source={renderedArticle} />);
     };
 
     // Render the tipping button popover
@@ -446,13 +452,19 @@ export default function Article( { chronik, address, isMobile } ) {
                                 <option>Technical</option>
                             </select>
 
-                            <Yamde value={article} handler={setArticle} theme="light" />
+                            <MarkdownEditor
+                                value={article}
+                                onChange={(value, viewUpdate) => {
+                                    setArticle(value)
+                                }}
+                                height="400px"
+                            />
                             <p className="text-sm text-red-600 dark:text-red-500">{articleError !== false && articleError}</p>
                             <div className="flex flex-col sm:flex-row justify-between items-center mt-2">
                                 {/* Write article button*/}
                                 <Button
                                 type="button"
-                                disabled={article === '' || articleError}
+                                disabled={article === '' || articleError || articleTitle === ''}
                                 className="bg-blue-500 hover:bg-blue-300"
                                 onClick={() => sendArticle()}
                                 >
@@ -551,7 +563,7 @@ export default function Article( { chronik, address, isMobile } ) {
                                                         {typeof tx.articleObject.category !== 'undefined' && tx.articleObject.category ? tx.articleObject.category : 'General'}
                                                     </div>
                                                 </div>
-                                                <div className="group relative">
+                                                <div className="group relative w-full">
                                                     <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
                                                         <a href={'#'}  onClick={() => {
                                                             setCurrentArticleTxObj(tx);
