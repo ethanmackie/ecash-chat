@@ -67,15 +67,21 @@ export default function Article( { chronik, address, isMobile } ) {
     const [showArticleModal, setShowArticleModal] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [maxPagesToShow, setMaxPagesToShow] = useState(7);
+  
     const md = require('markdown-it')({
         html: true,
         linkify: true,
         typography: true
     }).use(require('markdown-it-video'), {
-        youtube: { width: 500, height: 281 },
-        vimeo: { width: 500, height: 281 },
-        vine: { width: 500, height: 281, embed: 'simple' },
-        prezi: { width: 500, height: 281 }
+        youtube: { width: '100%', height: 281, embedClass: 'video-embed youtube' },
+        vimeo: { width: '100%', height: 281, embedClass: 'video-embed vimeo' },
+        vine: { width: '100%', height: 281, embedClass: 'video-embed vine', embed: 'simple' },
+        prezi: { width: '100%', height: 281, embedClass: 'video-embed prezi' }
+    });
+    
+    // Apply Tailwind CSS classes
+    document.querySelectorAll('.video-embed').forEach(embed => {
+        embed.classList.add('w-full', 'md:w-[500px]', 'md:h-[281px]');
     });
 
     useEffect(() => {
@@ -561,7 +567,7 @@ export default function Article( { chronik, address, isMobile } ) {
                                                         {typeof tx.articleObject.category !== 'undefined' && tx.articleObject.category ? tx.articleObject.category : 'General'}
                                                     </div>
                                                 </div>
-                                                <div className="group relative">
+                                                <div className="group relative w-full">
                                                     <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
                                                         <a href={'#'}  onClick={() => {
                                                             setCurrentArticleTxObj(tx);
