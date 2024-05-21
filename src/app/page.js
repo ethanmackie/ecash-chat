@@ -810,7 +810,7 @@ export default function Home() {
                           <li><b>Send Message</b>: send public messages to another wallet</li>
                           <li><b>Townhall</b>: public onchain discussion forum</li>
                           <li><b>Articles</b>: full length blogging facility</li>
-                          <li><b>NFTs</b>: browser and showcase your NFTs</li>
+                          <li><b>NFTs</b>: browse and showcase your NFTs</li>
                       </ul>
                       <br />
                       <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Support:</h2>
