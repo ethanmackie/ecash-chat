@@ -38,6 +38,7 @@ export const opReturn = {
     encryptedMessagePrefixHex: '70617373',
     encryptedMessageByteLimit: 95,
     xecTipPrefixHex: '74697073',
+    paywallPaymentPrefixHex: '70617977',
     nftShowcasePrefixHex: '6e667473',
     nftShowcaseMessageByteLimit: 177,
     // Airdrop spec is <OP_RETURN> <Airdrop protocol identifier> <tokenId> <optionalMsg>

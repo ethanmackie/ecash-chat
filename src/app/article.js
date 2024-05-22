@@ -23,6 +23,12 @@ import {
     TelegramIcon,
 } from 'next-share';
 import {
+    Alert,
+    AlertDescription,
+    AlertTitle,
+} from "@/components/ui/alert"
+import { Label } from "@/components/ui/label";
+import {
     getArticleHistory,
     getReplyTxDetails,
     parseChronikTx,
@@ -66,6 +72,8 @@ export default function Article( { chronik, address, isMobile } ) {
     const [replyArticle, setReplyArticle] = useState('');
     const [replyArticleError, setReplyArticleError] = useState(false);
     const [showArticleModal, setShowArticleModal] = useState(false);
+    const [paywallAmountXec, setPaywallAmountXec] = useState(0);
+    const [paywallAmountXecError, setPaywallAmountXecError] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [maxPagesToShow, setMaxPagesToShow] = useState(7);
 
@@ -141,14 +149,13 @@ export default function Article( { chronik, address, isMobile } ) {
                 '*',
             );
         }
-        setArticle('');
-        setArticleTitle('');
 
         const articleObject = {
             hash: articleHash,
             title: articleTitle,
             content: article,
             category: articleCategory,
+            paywallPrice: paywallAmountXec,
             date: Date.now(),
         };
 
@@ -163,6 +170,8 @@ export default function Article( { chronik, address, isMobile } ) {
         }
         updatedArticles.push(articleObject);
 
+        setArticle('');
+        setArticleTitle('');
         articleTxListener(chronik, address, kv, updatedArticles);
     };
 
@@ -266,6 +275,17 @@ export default function Article( { chronik, address, isMobile } ) {
         return (<MarkdownEditor.Markdown source={renderedArticle} />);
     };
 
+    // Validate the paywall price input
+    const handlePaywallAmountChange = e => {
+        const { value } = e.target;
+        if (value >= appConfig.dustXec) {
+            setPaywallAmountXecError(false);
+        } else {
+            setPaywallAmountXecError(`Paywall amount must be at minimum ${appConfig.dustXec} XEC`);
+        }
+        setPaywallAmountXec(value);
+    };
+
     // Render the tipping button popover
     const RenderTipping = ( { address } ) => {
         return (
@@ -351,6 +371,10 @@ export default function Article( { chronik, address, isMobile } ) {
                 <Modal.Body>
                     {/* Article content */}
                     <div className="space-y-2 flex flex-col max-w-xl gap-2 break-words w-full leading-1.5 p-6">
+                        <time dateTime={currentArticleTxObj.txTime} className="text-gray-500">
+                            By: {currentArticleTxObj.replyAddress}<br />
+                            {currentArticleTxObj.txDate}
+                        </time>
                         <RenderArticle content={currentArticleTxObj.articleObject.content} />
                     </div>
                     {/* Render corresponding replies for this article */}
@@ -447,6 +471,17 @@ export default function Article( { chronik, address, isMobile } ) {
                                 <option>Technical</option>
                             </select>
 
+                            <div className="grid w-1/2 items-center gap-1.5 mt-4">
+                                <Label htmlFor="value-input">One-off paywall fee in XEC (optional):</Label>
+                                <Input
+                                    type="number"
+                                    id="value-input"
+                                    aria-describedby="helper-text-explanation" className="bg-gray-50"
+                                    value={paywallAmountXec}
+                                    onChange={e => handlePaywallAmountChange(e)}
+                                />
+                            </div>
+                            <p className="mt-1 text-sm text-red-600 dark:text-red-500">{paywallAmountXecError !== false && paywallAmountXecError}</p>
                             <MarkdownEditor
                                 value={article}
                                 onChange={(value, viewUpdate) => {
@@ -459,7 +494,7 @@ export default function Article( { chronik, address, isMobile } ) {
                                 {/* Write article button*/}
                                 <Button
                                 type="button"
-                                disabled={article === '' || articleError || articleTitle === ''}
+                                disabled={article === '' || articleError || articleTitle === '' || paywallAmountXecError}
                                 className="bg-blue-500 hover:bg-blue-300"
                                 onClick={() => sendArticle()}
                                 >
@@ -559,6 +594,13 @@ export default function Article( { chronik, address, isMobile } ) {
                                                     </div>
                                                 </div>
                                                 <div className="group relative w-full">
+                                                    {tx.articleObject.paywallPrice > 0 && (
+                                                        <Alert variant="destructive">
+                                                            <AlertDescription>
+                                                                This article costs {tx.articleObject.paywallPrice} XEC to view
+                                                            </AlertDescription>
+                                                        </Alert>
+                                                    )}
                                                     <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
                                                         <a href={'#'}  onClick={() => {
                                                             setCurrentArticleTxObj(tx);

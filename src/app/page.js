@@ -88,9 +88,13 @@ export default function Home() {
             } else {
                 console.log('Desktop detected');
             }
+        })();
+
+        (async () => {
             const latestArticles = await getArticleListing();
             await localforage.setItem(appConfig.localArticlesParam, latestArticles);
         })();
+
         // Listen for cashtab extension messages on load
         window.addEventListener('message', handleMessage);
     }, []);
