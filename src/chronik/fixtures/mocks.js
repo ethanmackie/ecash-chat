@@ -68,6 +68,9 @@ export const mockParsedXecEncryptedSendTxWithOpReturn = {
     "articleTxid": false,
     "isArticle": false,
     "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPayment": false,
+    "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false
 };
 
@@ -140,6 +143,9 @@ export const mockParsedXecSendTxWithOpReturnTweet = {
     "articleTxid": false,
     "isArticle": false,
     "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPayment": false,
+    "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false
 };
 
@@ -208,6 +214,9 @@ export const mockParsedXecSendTxWithOpReturnEmoji = {
     "articleTxid": false,
     "isArticle": false,
     "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPayment": false,
+    "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false
 };
 
@@ -276,6 +285,9 @@ export const mockParsedXecSendTxWithOpReturnVideo = {
     "articleTxid": false,
     "isArticle": false,
     "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPayment": false,
+    "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false
 };
 
@@ -344,6 +356,9 @@ export const mockParsedXecSendTxWithOpReturnImage = {
     "articleTxid": false,
     "isArticle": false,
     "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPayment": false,
+    "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false
 };
 
@@ -412,6 +427,9 @@ export const mockParsedXecSendTxWithOpReturn = {
     "articleTxid": false,
     "isArticle": false,
     "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPayment": false,
+    "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false
 };
 
@@ -485,6 +503,9 @@ export const mockParsedXecSendTxWithOpReturnTownhallPost = {
     "articleTxid": false,
     "isArticle": false,
     "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPayment": false,
+    "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false
 };
 
@@ -558,6 +579,9 @@ export const mockParsedXecSendTxWithOpReturnTownhallReplyPost = {
     "articleTxid": false,
     "isArticle": false,
     "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPayment": false,
+    "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false
 };
 
@@ -631,5 +655,8 @@ export const mockParsedXecSendTxWithOpReturnNftShowcase = {
     "articleTxid": false,
     "isArticle": false,
     "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPayment": false,
+    "paywallPaymentArticleTxid": false,
     "nftShowcaseId": "076fc97838cea01911b1b83e26f5ec5c040e4aed039f24df6e3d076737c43482"
 };

@@ -40,6 +40,7 @@ import {
     encodeBip21Article,
     encodeBip2XecTip,
     encodeBip21ReplyArticle,
+    encodeBip21PaywallPayment,
 } from '../utils/utils';
 import { CrossIcon, AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, YoutubeIcon, AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon } from "@/components/ui/social";
 import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon, ChatBubbleIcon, Share1Icon } from '@radix-ui/react-icons';
@@ -72,6 +73,7 @@ export default function Article( { chronik, address, isMobile } ) {
     const [replyArticle, setReplyArticle] = useState('');
     const [replyArticleError, setReplyArticleError] = useState(false);
     const [showArticleModal, setShowArticleModal] = useState(false);
+    const [showPaywallPaymentModal, setShowPaywallPaymentModal] = useState(false);
     const [paywallAmountXec, setPaywallAmountXec] = useState(0);
     const [paywallAmountXecError, setPaywallAmountXecError] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
@@ -229,6 +231,35 @@ export default function Article( { chronik, address, isMobile } ) {
         txListener(chronik, address, "Article XEC tip sent", getArticleHistoryByPage);
     };
 
+    // Pass a paywall payment tx BIP21 query string to cashtab extensions
+    const sendPaywallPayment = (recipient, articleTxid, paywallPrice) => {
+        // Encode the op_return message script
+        const opReturnRaw = encodeBip21PaywallPayment(articleTxid);
+        const bip21Str = `${recipient}?amount=${paywallPrice}&op_return_raw=${opReturnRaw}`;
+
+        if (isMobile) {
+            window.open(
+                `https://cashtab.com/#/send?bip21=${bip21Str}`,
+                '_blank',
+            );
+        }
+
+        window.postMessage(
+            {
+                type: 'FROM_PAGE',
+                text: 'Cashtab',
+                txInfo: {
+                    bip21: `${recipient}?amount=${paywallPrice}&op_return_raw=${opReturnRaw}`,
+                },
+            },
+            '*',
+        );
+
+        txListener(chronik, address, "Paywall payment", getArticleHistoryByPage);
+
+        setShowPaywallPaymentModal(false);
+    };
+
     // Lookup and render any corresponding replies
     const RenderReplies = ( { txid, replies } ) => {
         const foundReplies = replies.filter(replyTx => replyTx.articleTxid === txid);
@@ -284,6 +315,29 @@ export default function Article( { chronik, address, isMobile } ) {
             setPaywallAmountXecError(`Paywall amount must be at minimum ${appConfig.dustXec} XEC`);
         }
         setPaywallAmountXec(value);
+    };
+
+    // Check whether the paywall price for the article has been paid by this address
+    const checkPaywallPayment = (paywalledArticleTxId, paywallPrice) => {
+        let paywallPaid = false;
+
+        for (const thisPaywallPayment of articleHistory.paywallTxs) {
+            if (
+                thisPaywallPayment.paywallPaymentArticleTxid === paywalledArticleTxId &&
+                thisPaywallPayment.replyAddress === address &&
+                parseInt(thisPaywallPayment.paywallPayment) === parseInt(paywallPrice)
+            ) {
+                paywallPaid = true;
+                break;
+            }
+        }
+
+        console.log('Paid paywall fee? ', paywallPaid);
+        if (paywallPaid) {
+            setShowArticleModal(true);
+        } else {
+            setShowPaywallPaymentModal(true);
+        }
     };
 
     // Render the tipping button popover
@@ -364,6 +418,41 @@ export default function Article( { chronik, address, isMobile } ) {
         );
     };
 
+    const PaywallPaymentModal = () => {
+        return (
+            <Modal show={showPaywallPaymentModal} onClose={() => setShowPaywallPaymentModal(false)}>
+                <Modal.Header>Paywall payment{currentArticleTxObj.articleObject.title}</Modal.Header>
+                <Modal.Body>
+                    This article costs a one-off {currentArticleTxObj.articleObject.paywallPrice} XEC to access.<br />
+                    <br />
+                    <button
+                        type="button"
+                        className="pointer-events-none inline-block rounded bg-primary px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-primary-3 transition duration-150 ease-in-out hover:bg-primary-accent-300 hover:shadow-primary-2 focus:bg-primary-accent-300 focus:shadow-primary-2 focus:outline-none focus:ring-0 active:bg-primary-600 active:shadow-primary-2 disabled:opacity-70 dark:shadow-black/30 dark:hover:shadow-dark-strong dark:focus:shadow-dark-strong dark:active:shadow-dark-strong"
+                        disabled>
+                        <div
+                            className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-e-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                            role="status" />
+                        <span>&nbsp;&nbsp;Awaiting payment...</span>
+                    </button>
+                </Modal.Body>
+                <Modal.Footer>
+                    <div className="flex gap-5">
+                        <Button onClick={() => sendPaywallPayment(
+                            currentArticleTxObj.replyAddress,
+                            currentArticleTxObj.txid,
+                            currentArticleTxObj.articleObject.paywallPrice)
+                        }>
+                            Pay
+                        </Button>
+                        <Button onClick={() => setShowPaywallPaymentModal(false)}>
+                            Close
+                        </Button>
+                    </div>
+                </Modal.Footer>
+            </Modal>
+        );
+    };
+
     const FullArticleModal = () => {
         return (
             <Modal show={showArticleModal} onClose={() => setShowArticleModal(false)}>
@@ -429,6 +518,10 @@ export default function Article( { chronik, address, isMobile } ) {
         <>
             {showArticleModal && (
                 <FullArticleModal />
+            )}
+
+            {showPaywallPaymentModal && (
+                <PaywallPaymentModal />
             )}
             <div>
                 {/* Dropdown to render article editor */}
@@ -595,13 +688,26 @@ export default function Article( { chronik, address, isMobile } ) {
                                                 </div>
                                                 <div className="group relative w-full">
                                                     {tx.articleObject.paywallPrice > 0 && (
-                                                        <Alert variant="destructive">
+                                                        <Alert variant="destructive" onClick={() => {
+                                                            setCurrentArticleTxObj(tx);
+                                                            checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice)
+                                                        }}>
                                                             <AlertDescription>
                                                                 This article costs {tx.articleObject.paywallPrice} XEC to view
                                                             </AlertDescription>
                                                         </Alert>
                                                     )}
                                                     <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
+                                                    {/* Render the paywall or article content depending on the presence of a paywall price */}
+                                                    {tx.articleObject.paywallPrice > 0 ? (
+                                                        <a href={'#'}  onClick={() => {
+                                                            setCurrentArticleTxObj(tx);
+                                                            checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice);
+                                                        }}>
+                                                            <span className="absolute inset-0" />
+                                                            {tx.articleObject.title}
+                                                        </a>
+                                                    ) : (
                                                         <a href={'#'}  onClick={() => {
                                                             setCurrentArticleTxObj(tx);
                                                             setShowArticleModal(true);
@@ -609,6 +715,7 @@ export default function Article( { chronik, address, isMobile } ) {
                                                             <span className="absolute inset-0" />
                                                             {tx.articleObject.title}
                                                         </a>
+                                                    )}
                                                     </h3>
                                                     <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600 break-words">
                                                         <RenderArticle content={tx.articleObject.content} />

@@ -82,6 +82,24 @@ export const encodeBip2XecTip = () => {
     }
 };
 
+// Encodes the op_return script for an XEC paywall payment
+export const encodeBip21PaywallPayment = replyTxid => {
+    try {
+        let script = [];
+
+        // Push eCash Chat protocol identifier
+        script.push(Buffer.from(opreturnConfig.appPrefixesHex.paywallPaymentPrefixHex, 'hex'));
+
+        // Push txid of paywalled article
+        script.push(Buffer.from(replyTxid));
+
+        script = utxolib.script.compile(script).toString('hex');
+        return script;
+    } catch (err) {
+        console.log('Error encoding paywall payement: ', err);
+    }
+};
+
 // Encode the op_return post script
 export const encodeBip21Post = post => {
     if (typeof post !== 'string') {

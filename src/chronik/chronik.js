@@ -761,6 +761,14 @@ export const getArticleHistory = async (chronik, address, page = 0) => {
         );
         const localArticles = await localforage.getItem(appConfig.localArticlesParam);
 
+        const paywallPaymentsHistory = await chronik.lokadId(
+            opreturnConfig.appPrefixesHex.paywallPaymentPrefixHex,
+        ).history(
+            page,
+            chronikConfig.txHistoryPageSize,
+        );
+
+        // Parse standard eCash Chat actions
         const parsedTxs = [];
         const replyTxs = [];
         for (let i = 0; i < lokadIdHistory.txs.length; i += 1) {
@@ -787,9 +795,19 @@ export const getArticleHistory = async (chronik, address, page = 0) => {
                 el.isArticleReply === true
         });
 
+        // Parse paywall payments
+        const paywallTxs = [];
+        for (let i = 0; i < paywallPaymentsHistory.txs.length; i += 1) {
+            paywallTxs.push(parseChronikTx(
+                paywallPaymentsHistory.txs[i],
+                address,
+            ));
+        }
+
         return {
             txs: parsedAndFilteredTxs,
             replies: replyTxs,
+            paywallTxs: paywallTxs,
             numPages: parsedAndFilteredTxs.length,
         };
     } catch (err) {
@@ -906,6 +924,9 @@ export const parseChronikTx = (tx, address) => {
     let articleTxid = false;
     let isArticle = false;
     let isArticleReply = false;
+    let isPaywallPayment = false;
+    let paywallPaymentArticleTxid = false;
+    let paywallPayment = false;
 
     if (tx.isCoinbase) {
         // Note that coinbase inputs have `undefined` for `thisInput.outputScript`
@@ -970,6 +991,7 @@ export const parseChronikTx = (tx, address) => {
     }
 
     // Iterate over outputs to get the amount sent
+    let selfSentOutput;
     for (let i = 0; i < tx.outputs.length; i += 1) {
         const thisOutput = tx.outputs[i];
         const thisOutputReceivedAtHash160 = thisOutput.outputScript;
@@ -977,6 +999,7 @@ export const parseChronikTx = (tx, address) => {
         // Uses output[1] as the intended recipient address
         if (i === 1) {
             recipientAddress = cashaddr.encodeOutputScript(thisOutputReceivedAtHash160);
+            selfSentOutput = tx.outputs[i];
         }
 
         if (
@@ -1065,6 +1088,11 @@ export const parseChronikTx = (tx, address) => {
                             ? `: ${Buffer.from(dataHex, 'hex').toString()}`
                             : ''
                     }`;
+                    break;
+                }
+                case opreturnConfig.appPrefixesHex.paywallPaymentPrefixHex: {
+                    paywallPaymentArticleTxid = Buffer.from(stackArray[1], 'hex').toString();
+                    isPaywallPayment = true;
                     break;
                 }
                 case opreturnConfig.appPrefixesHex.eCashChat: {
@@ -1183,6 +1211,11 @@ export const parseChronikTx = (tx, address) => {
     // Convert from BigNumber to string
     xecAmount = xecAmount.toString();
 
+    if (isPaywallPayment) {
+        const thisOutputAmount = new BN(selfSentOutput.value);
+        paywallPayment = thisOutputAmount.shiftedBy(-1 * appConfig.cashDecimals).toString();
+    }
+
     // Get decimal info for correct etokenAmount
     let genesisInfo = {};
 
@@ -1282,6 +1315,9 @@ export const parseChronikTx = (tx, address) => {
             articleTxid,
             isArticle,
             isArticleReply,
+            isPaywallPayment,
+            paywallPaymentArticleTxid,
+            paywallPayment,
         };
     }
     // Otherwise do not include these fields
@@ -1313,5 +1349,8 @@ export const parseChronikTx = (tx, address) => {
         articleTxid,
         isArticle,
         isArticleReply,
+        isPaywallPayment,
+        paywallPaymentArticleTxid,
+        paywallPayment,
     };
 };
