@@ -68,6 +68,7 @@ export default function Article( { chronik, address, isMobile } ) {
     const [articleTitle, setArticleTitle] = useState(''); // title of the article being drafted
     const [article, setArticle] = useState(''); // the article being drafted
     const [articleCategory, setArticleCategory] = useState(''); // category of the article being drafted
+    const [disableArticleReplies, setDisableArticleReplies] = useState(false);
     const [currentArticleTxObj, setCurrentArticleTxObj] = useState(false); // the tx object containing the full article / tx being viewed
     const [articleError, setArticleError] = useState(false);
     const [replyArticle, setReplyArticle] = useState('');
@@ -158,6 +159,7 @@ export default function Article( { chronik, address, isMobile } ) {
             content: article,
             category: articleCategory,
             paywallPrice: paywallAmountXec,
+            disbleReplies: disableArticleReplies,
             date: Date.now(),
         };
 
@@ -201,7 +203,7 @@ export default function Article( { chronik, address, isMobile } ) {
             );
         }
         setReplyArticle('');
-        txListener(chronik, address, "Article reply sent", getArticleHistoryByPage);
+        txListener(chronik, address, "Article reply", getArticleHistoryByPage);
     };
 
     // Pass a XEC tip tx BIP21 query string to cashtab extensions
@@ -228,7 +230,7 @@ export default function Article( { chronik, address, isMobile } ) {
             '*',
         );
 
-        txListener(chronik, address, "Article XEC tip sent", getArticleHistoryByPage);
+        txListener(chronik, address, "Article XEC tip", getArticleHistoryByPage);
     };
 
     // Pass a paywall payment tx BIP21 query string to cashtab extensions
@@ -466,45 +468,46 @@ export default function Article( { chronik, address, isMobile } ) {
                         </time>
                         <RenderArticle content={currentArticleTxObj.articleObject.content} />
                     </div>
-                    {/* Render corresponding replies for this article */}
-                    <div>
-                        <RenderReplies txid={currentArticleTxObj.txid} replies={articleHistory.replies} />
-                    </div>
+                    {/* Render corresponding replies for this article, ignore if disablReplies is set to true */}
+                    {currentArticleTxObj.articleObject.disbleReplies !== true && (
+                        <div><RenderReplies txid={currentArticleTxObj.txid} replies={articleHistory.replies} /></div>
+                    )}
                 </Modal.Body>
                 <Modal.Footer>
                     <div className="flex gap-5">
                         {/* Tipping action to an article */}
                         <RenderTipping address={currentArticleTxObj.replyAddress} />
 
-                        {/* Reply action to an article */}
-                        <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
-                            <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
-                                <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Reply to article ...{currentArticleTxObj.txid.slice(-10)}</h3>
+                        {/* Reply action to an article, disable if disableReplies is set to true */}
+                        {currentArticleTxObj.articleObject.disbleReplies !== true && (
+                            <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
+                                <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
+                                    <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Reply to article ...{currentArticleTxObj.txid.slice(-10)}</h3>
+                                </div>
+                                <div className="px-3 py-2">
+                                    {/* Reply input field */}
+                                    <Textarea
+                                        id="reply-post"
+                                        defaultValue={replyArticle}
+                                        placeholder="Post your reply..."
+                                        className="bg-gray-50"
+                                        onBlur={e => setReplyArticle(e.target.value)}
+                                        maxLength={opreturnConfig.articleReplyByteLimit}
+                                        rows={4}
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="bg-blue-500 hover:bg-blue-300"
+                                        onClick={e => {
+                                            replytoArticle(currentArticleTxObj.txid, replyArticle)
+                                        }}
+                                    >
+                                        Post Reply
+                                    </Button>
+                                </div>
                             </div>
-                            <div className="px-3 py-2">
-                                {/* Reply input field */}
-                                <Textarea
-                                    id="reply-post"
-                                    defaultValue={replyArticle}
-                                    placeholder="Post your reply..."
-                                    className="bg-gray-50"
-                                    onBlur={e => setReplyArticle(e.target.value)}
-                                    maxLength={opreturnConfig.articleReplyByteLimit}
-                                    rows={4}
-                                />
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    className="bg-blue-500 hover:bg-blue-300"
-                                    onClick={e => {
-                                        replytoArticle(currentArticleTxObj.txid, replyArticle)
-                                    }}
-                                >
-                                    Post Reply
-                                </Button>
-                            </div>
-                        </div>
-
+                        )}
                         <Button onClick={() => setShowArticleModal(false)}>
                             Close
                         </Button>
@@ -575,6 +578,30 @@ export default function Article( { chronik, address, isMobile } ) {
                                 />
                             </div>
                             <p className="mt-1 text-sm text-red-600 dark:text-red-500">{paywallAmountXecError !== false && paywallAmountXecError}</p>
+
+                            {/* Option to disable comments */}
+                            <fieldset>
+                                <div className="space-y-5 py-2">
+                                    <div className="relative flex items-start">
+                                    <div className="flex h-6 items-center py-2">
+                                        <input
+                                        id="comments"
+                                        aria-describedby="comments-description"
+                                        name="comments"
+                                        type="checkbox"
+                                        onChange={() => setDisableArticleReplies(!disableArticleReplies)}
+                                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                        />
+                                    </div>
+                                    <div className="ml-3 text-sm leading-6">
+                                        <label htmlFor="comments" className="font-medium text-gray-900">
+                                            Disable replies to this article
+                                        </label>
+                                    </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+
                             <MarkdownEditor
                                 value={article}
                                 onChange={(value, viewUpdate) => {

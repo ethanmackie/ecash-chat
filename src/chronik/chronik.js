@@ -483,6 +483,7 @@ export const getChildNftsFromParent = (
  * @param {string} address the eCash address of the active wallet
  * @param {@vercel/kv} kv the Vercel KV database client instance
  * @param {array} updatedArticles an array of article object including the newly posted article
+ * @param {callback fn} refreshCallback a callback function to either article history
  * @throws {error} err chronik websocket subscription errors
  */
 export const articleTxListener = async (
@@ -490,6 +491,7 @@ export const articleTxListener = async (
     address,
     kv,
     updatedArticles,
+    refreshCallback = false,
 ) => {
     // Get type and hash
     const { type, hash } = cashaddr.decode(address, true);
@@ -513,6 +515,13 @@ export const articleTxListener = async (
                     // Unsubscribe and close websocket
                     ws.unsubscribeFromScript(type, hash);
                     ws.close();
+
+                    // Refresh history
+                    if (refreshCallback) {
+                        (async () => {
+                            await refreshCallback(0);
+                        })();
+                    }
                 }
             },
         });
@@ -620,10 +629,10 @@ export const txListenerOngoing = async (chronik, address, refreshCallback = fals
  * @param {string} chronik the chronik-client instance
  * @param {string} address the eCash address of the active wallet
  * @param {string} txType the descriptor of the nature of this tx
- * @param {callback fn} refreshCallback a callback function to either refresh inbox or townhall history
+ * @param {callback fn} refreshCallback a callback function to refresh NFT holdings
  * @throws {error} err chronik websocket subscription errors
  */
-export const nftTxListener = async (chronik, address, toastMsg) => {
+export const nftTxListener = async (chronik, address, toastMsg, refreshCallback = false) => {
     // Get type and hash
     const { type, hash } = cashaddr.decode(address, true);
 
@@ -638,6 +647,11 @@ export const nftTxListener = async (chronik, address, toastMsg) => {
                     // Unsubscribe and close websocket
                     ws.unsubscribeFromScript(type, hash);
                     ws.close();
+
+                    // Refresh history
+                    if (refreshCallback) {
+                        refreshCallback(0);
+                    }
                 }
             },
         });
