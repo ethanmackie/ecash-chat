@@ -6,6 +6,10 @@ const nextConfig = {
     // See https://stackoverflow.com/questions/71847778/why-my-nextjs-component-is-rendering-twice
     reactStrictMode: false,
 
+    experimental: {
+        missingSuspenseWithCSRBailout: false,
+    },
+
     env: {
         KV_URL: process.env.KV_URL,
         KV_REST_API_URL: process.env.KV_REST_API_URL,
