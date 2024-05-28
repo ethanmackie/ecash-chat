@@ -500,11 +500,7 @@ export const articleTxListener = async (
         const ws = chronik.ws({
             onMessage: msg => {
                 if (msg.msgType === 'TX_ADDED_TO_MEMPOOL') {
-
-                    console.log('articleTxListener detected: updatedArticles is: ', updatedArticles);
-
                     (async () => {
-                        console.log('Storing article content offchain.');
                         await localforage.setItem(appConfig.localArticlesParam, updatedArticles);
                         await kv.set(appConfig.vercelKvParam, updatedArticles);
                     })();
@@ -566,6 +562,70 @@ export const txListener = async (chronik, address, txType, refreshCallback = fal
                     // Refresh history
                     if (refreshCallback) {
                         refreshCallback(0);
+                    }
+                }
+            },
+        });
+
+        // Wait for WS to be connected:
+        await ws.waitForOpen();
+
+        // Subscript to script
+        ws.subscribeToScript(type, hash);
+    } catch (err) {
+        console.log(
+            'txListener: Error in chronik websocket subscription: ' + err,
+        );
+    }
+};
+
+/**
+ * Subscribes to a given address and listens for new websocket events specific to paywall payments
+ *
+ * @param {string} chronik the chronik-client instance
+ * @param {string} address the eCash address of the active wallet
+ * @param {string} txType the descriptor of the nature of this tx
+ * @param {callback fn} refreshCallback a callback function to refresh article listing
+ * @param {callback fn} modalCallback a callback function to re-render a paid paywall article
+ * @param {callback fn} paywallModalCallback a callback function to close the open paywall modal
+ * @throws {error} err chronik websocket subscription errors
+ */
+export const paywallTxListener = async (
+    chronik,
+    address,
+    txType,
+    refreshCallback = false,
+    modalCallback = false,
+    paywallModalCallback = false,
+) => {
+    // Get type and hash
+    const { type, hash } = cashaddr.decode(address, true);
+
+    try {
+        const ws = chronik.ws({
+            onMessage: msg => {
+                if (msg.msgType === 'TX_ADDED_TO_MEMPOOL') {
+
+                    // Notify user
+                    toast(`${txType} sent`);
+
+                    // Unsubscribe and close websocket
+                    ws.unsubscribeFromScript(type, hash);
+                    ws.close();
+
+                    // Refresh history
+                    if (refreshCallback) {
+                        refreshCallback(0);
+                    }
+
+                    // Re-render modal
+                    if (modalCallback) {
+                        modalCallback(true);
+                    }
+
+                    // Close the paywall dialog
+                    if (paywallModalCallback) {
+                        paywallModalCallback(false);
                     }
                 }
             },
@@ -764,7 +824,6 @@ export const getArticleHistory = async (chronik, address, page = 0) => {
     ) {
         return;
     }
-
 
     try {
         const lokadIdHistory = await chronik.lokadId(

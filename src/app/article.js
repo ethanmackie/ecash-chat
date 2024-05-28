@@ -32,9 +32,10 @@ import {
     getArticleHistory,
     getReplyTxDetails,
     parseChronikTx,
+    getArticleListing,
     txListener,
-    getTxDetails,
     articleTxListener,
+    paywallTxListener,
 } from '../chronik/chronik';
 import {
     encodeBip21Article,
@@ -62,8 +63,9 @@ import copy from 'copy-to-clipboard';
 import { Skeleton } from "@/components/ui/skeleton";
 import DOMPurify from 'dompurify';
 import MarkdownEditor from '@uiw/react-markdown-editor';
+import { getStackArray } from 'ecash-script';
 
-export default function Article( { chronik, address, isMobile } ) {
+export default function Article( { chronik, address, isMobile, sharedArticleTxid } ) {
     const [articleHistory, setArticleHistory] = useState('');
     const [articleTitle, setArticleTitle] = useState(''); // title of the article being drafted
     const [article, setArticle] = useState(''); // the article being drafted
@@ -93,9 +95,54 @@ export default function Article( { chronik, address, isMobile } ) {
     const halfMaxPages = Math.floor(maxPagesToShow / 2);
   
     useEffect(() => {
-        // Render the first page by default upon initial load
         (async () => {
-            await getArticleHistoryByPage(0);
+            // Render the first page by default upon initial load
+            let localArticleHistoryResp = await getArticleHistoryByPage(0);
+
+            // If this app was triggered by a shared article link
+            if (sharedArticleTxid !== false) {
+                let articleTx;
+                let articleHash;
+
+                // Retrieve article hash from txid
+                try {
+                    articleTx = await chronik.tx(sharedArticleTxid);
+                    const stackArray = getStackArray(articleTx.outputs[0].outputScript);
+
+                    if (
+                        stackArray[0] === opreturnConfig.appPrefixesHex.eCashChat &&
+                        stackArray[1] === opreturnConfig.articlePrefixHex
+                    ) {
+                        articleHash = Buffer.from(stackArray[2], 'hex');
+                    } else {
+                        throw new Error('Invalid article txid');
+                    }
+                } catch (err) {
+                    console.log(`Error retrieving tx details for ${sharedArticleTxid}`, err);
+                    toast(err.message);
+                }
+
+                // Retrieve full artcle info via content hash
+                const latestArticles = await getArticleListing();
+                const sharedArticleObject = latestArticles.find((article) => { return article.hash == articleHash; });
+                if (sharedArticleObject) {
+                    // Update the article object for rendering modal
+                    articleTx = parseChronikTx(articleTx, address);
+                    articleTx.articleObject = sharedArticleObject;
+                    setCurrentArticleTxObj(articleTx);
+
+                    if (sharedArticleObject.paywallPrice > 0) {
+                        // If this article exists, and is a paywalled article, check paywall payment and render accordingly
+                        checkPaywallPayment(
+                            sharedArticleTxid,
+                            sharedArticleObject.paywallPrice,
+                            localArticleHistoryResp,
+                        );
+                    }
+                } else {
+                    toast('No article found for this article txid');
+                }
+            }
         })();
         initializeArticleRefresh();
     }, []);
@@ -124,6 +171,7 @@ export default function Article( { chronik, address, isMobile } ) {
         if (txHistoryResp && Array.isArray(txHistoryResp.txs)) {
             setArticleHistory(txHistoryResp);
         }
+        return txHistoryResp;
     };
 
     // Pass an article tx BIP21 query string to cashtab extensions
@@ -256,10 +304,14 @@ export default function Article( { chronik, address, isMobile } ) {
             },
             '*',
         );
-
-        txListener(chronik, address, "Paywall payment", getArticleHistoryByPage);
-
-        setShowPaywallPaymentModal(false);
+        paywallTxListener(
+            chronik,
+            address,
+            "Paywall payment",
+            getArticleHistoryByPage,
+            setShowArticleModal,
+            setShowPaywallPaymentModal,
+        );
     };
 
     // Lookup and render any corresponding replies
@@ -320,10 +372,14 @@ export default function Article( { chronik, address, isMobile } ) {
     };
 
     // Check whether the paywall price for the article has been paid by this address
-    const checkPaywallPayment = (paywalledArticleTxId, paywallPrice) => {
+    const checkPaywallPayment = (paywalledArticleTxId, paywallPrice, localArticleHistoryResp = false) => {
         let paywallPaid = false;
+        let localArticleHistory = articleHistory;
+        if (localArticleHistoryResp) {
+            localArticleHistory = localArticleHistoryResp;
+        }
 
-        for (const thisPaywallPayment of articleHistory.paywallTxs) {
+        for (const thisPaywallPayment of localArticleHistory.paywallTxs) {
             if (
                 thisPaywallPayment.paywallPaymentArticleTxid === paywalledArticleTxId &&
                 thisPaywallPayment.replyAddress === address &&
@@ -478,6 +534,52 @@ export default function Article( { chronik, address, isMobile } ) {
                         {/* Tipping action to an article */}
                         <RenderTipping address={currentArticleTxObj.replyAddress} />
 
+                        {/* Sharing options */}
+                        <Popover
+                            aria-labelledby="default-popover"
+                            placement="top"
+                            content={
+                            <div className="w-30 text-sm text-gray-500 dark:text-gray-400">
+                                <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
+                                <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Platform</h3>
+                                </div>
+                                <div className="px-3 py-2">
+                                    <TwitterShareButton
+                                        url={`https://${window.location.host}/?sharedArticleTxid=${currentArticleTxObj.txid}`}
+                                        title={`[Shared from eCashChat.com] - "${currentArticleTxObj.articleObject.title}"`}
+                                    >
+                                    <TwitterIcon size={25} round />
+                                    </TwitterShareButton>
+                                    &nbsp;
+                                    <FacebookShareButton
+                                        url={`https://${window.location.host}/?sharedArticleTxid=${currentArticleTxObj.txid}`}
+                                        quote={`[Shared from eCashChat.com] - "${currentArticleTxObj.articleObject.title}"`}
+                                    >
+                                    <FacebookIcon  size={25} round />
+                                    </FacebookShareButton>
+                                    &nbsp;
+                                    <RedditShareButton
+                                        url={`https://${window.location.host}/?sharedArticleTxid=${currentArticleTxObj.txid}`}
+                                        title={`[Shared from eCashChat.com] - "${currentArticleTxObj.articleObject.title}"`}
+                                    >
+                                    <RedditIcon size={25} round />
+                                    </RedditShareButton>
+                                    &nbsp;
+                                    <TelegramShareButton
+                                        url={`https://${window.location.host}/?sharedArticleTxid=${currentArticleTxObj.txid}`}
+                                        title={`[Shared from eCashChat.com] - "${currentArticleTxObj.articleObject.title}"`}
+                                    >
+                                    <TelegramIcon  size={25} round />
+                                    </TelegramShareButton>
+                                </div>
+                            </div>
+                            }
+                        >
+                            <Button variant="outline" size="icon">
+                            <Share1Icon className="h-4 w-4" />
+                            </Button>
+                        </Popover>
+
                         {/* Reply action to an article, disable if disableReplies is set to true */}
                         {currentArticleTxObj.articleObject.disbleReplies !== true && (
                             <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
@@ -499,6 +601,7 @@ export default function Article( { chronik, address, isMobile } ) {
                                         type="button"
                                         variant="outline"
                                         className="bg-blue-500 hover:bg-blue-300"
+                                        disabled={replyArticle === ''}
                                         onClick={e => {
                                             replytoArticle(currentArticleTxObj.txid, replyArticle)
                                         }}
@@ -526,6 +629,7 @@ export default function Article( { chronik, address, isMobile } ) {
             {showPaywallPaymentModal && (
                 <PaywallPaymentModal />
             )}
+
             <div>
                 {/* Dropdown to render article editor */}
                 <Accordion type="single" collapsible>

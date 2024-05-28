@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import TxHistory from './txhistory';
 import Townhall from './townhall';
@@ -8,7 +8,7 @@ import Nft from './nft';
 import Article from './article';
 import cashaddr from 'ecashaddrjs';
 import { queryAliasServer } from '../alias/alias-server';
-import { encodeBip21Message, getTweetId, toXec } from '../utils/utils';
+import { encodeBip21Message, getTweetId } from '../utils/utils';
 import { isMobileDevice } from '../utils/mobileCheck';
 import { txListener, refreshUtxos, txListenerOngoing, getArticleListing } from '../chronik/chronik';
 import { appConfig } from '../config/app';
@@ -19,17 +19,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-    DropdownMenuGroup,
-    DropdownMenuShortcut,
-    DropdownMenuSub,
-  } from "@/components/ui/dropdown-menu"
 import QRCode from "react-qr-code";
 import copy from 'copy-to-clipboard';
 import { Tooltip, Tabs, Alert, Modal, Popover } from "flowbite-react";
@@ -76,10 +65,12 @@ export default function Home() {
     const [xecBalance, setXecBalance] = useState('Loading...');
     const [encryptionMode, setEncryptionMode] = useState(false);
     const [showMessagePreview, setShowMessagePreview] = useState(false);
+    const [sharedArticleTxid, setSharedArticleTxid] = useState(false);
+    const searchParams = useSearchParams();
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
-        setTimeout(confirmCashtabProviderStatus, 400);
+        setTimeout(confirmCashtabProviderStatus, 300);
 
         (async () => {
             if (await isMobileDevice() === true) {
@@ -94,6 +85,12 @@ export default function Home() {
             const latestArticles = await getArticleListing();
             await localforage.setItem(appConfig.localArticlesParam, latestArticles);
         })();
+
+        // Check if this app is accessed via a shared article link
+        const sharedArticleParam = searchParams.get("sharedArticleTxid");
+        if (sharedArticleParam) {
+            setSharedArticleTxid(sharedArticleParam);
+        }
 
         // Listen for cashtab extension messages on load
         window.addEventListener('message', handleMessage);
@@ -780,7 +777,7 @@ export default function Home() {
               </Tabs.Item>
 
               <Tabs.Item title="Articles" icon={BiSolidNews} >
-                <Article chronik={chronik} address={address} isMobile={isMobile} />
+                <Article chronik={chronik} address={address} isMobile={isMobile} sharedArticleTxid={sharedArticleTxid} />
               </Tabs.Item>
 
               <Tabs.Item title="NFTs" icon={HiOutlinePhotograph} >
