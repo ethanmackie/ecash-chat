@@ -25,6 +25,7 @@ import { Tooltip, Tabs, Alert, Modal, Popover } from "flowbite-react";
 import { HiOutlineMail, HiOutlineNewspaper, HiInformationCircle, HiOutlinePhotograph } from "react-icons/hi";
 import { BiSolidNews } from "react-icons/bi";
 import { GiDiscussion, GiAbstract010 } from "react-icons/gi";
+import { IoMdInformationCircleOutline } from "react-icons/io";
 import { ToastContainer, toast } from 'react-toastify';
 import { PersonIcon, FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon } from '@radix-ui/react-icons';
 import 'react-toastify/dist/ReactToastify.css';
@@ -120,7 +121,7 @@ export default function Home() {
             event.data.type === 'FROM_CASHTAB'
         ) {
             if (event.data.address !== 'Address request denied by user') {
-                getAliasesByAddress(event.data.address);
+                //getAliasesByAddress(event.data.address);
                 setAddress(event.data.address);
                 setIsLoggedIn(true);
             }
@@ -486,55 +487,40 @@ export default function Home() {
         
       <main className="sm:flex flex-col items-center justify-center p-1 sm:px-5 relative z-10">
       {isLoggedIn === false && isMobile === false ? (
-  <>
-    <div className="mx-auto max-w-md mb-4 mt-4">
-    <a
-      className="flex justify-center"
-      href="https://e.cash/"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <Image
-        src="/ecash-chat-new-logo.svg"
-        alt="eCash Chat Logo"
-        className="dark:invert"
-        width={273}
-        height={75}
-        priority
-      />
-    </a>
-      <div className="hidden sm:mb-8 sm:flex sm:justify-center">
-        <div className="relative flex gap-1 items-center rounded-full px-3 py-1 text-sm leading-6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/40">
-        <RocketIcon/> Version: {packageJson.version}{' '}
+        <>
+            <div className="mx-auto max-w-xl mb-4 mt-8">
+            <div className="hidden sm:mb-8 sm:flex sm:justify-center">
+                <div className="relative flex gap-1 items-center rounded-full px-3 py-1 text-sm leading-6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/40">
+                <RocketIcon/> Version: {packageJson.version}{' '}
+                </div>
+            </div>
+            <div className="text-center">
+                <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-4xl">
+                {'Socialize, monetize and earn on the eCash blockchain'}
+                </h1>
+            </div>
+            </div>
+        
+        </>
+        ) : (
+            <div className="flex justify-center">
+        <Image
+            src="/ecash-chat-new-logo.svg"
+            alt="eCash Chat Logo"
+            className="dark:invert"
+            width={273}
+            height={75}
+            priority
+        />
         </div>
-      </div>
-      <div className="text-center">
-        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-4xl">
-        {'Socialize, monetize and earn on the eCash blockchain'}
-        </h1>
-      </div>
-    </div>
-   
-  </>
-) : (
-    <div className="flex justify-center">
-  <Image
-    src="/ecash-chat-new-logo.svg"
-    alt="eCash Chat Logo"
-    className="dark:invert"
-    width={273}
-    height={75}
-    priority
-  />
-  </div>
-)}
+        )}
  
       <div>
        {isLoggedIn === false && isMobile === false && step === 'fresh' && (
         <div className='flex justify-center'>
             <button
                type="button"
-               className="text-white transition-transform transform hover:scale-105 shadow-2xl bg-blue-500 hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55"               
+               className="text-white transition-transform transform hover:scale-105 bg-blue-500 hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55"               
                onClick={() => getAddress()}
             >
             Sign in with&emsp;
@@ -548,6 +534,20 @@ export default function Home() {
             </button>
         </div>
         )}
+
+    {isLoggedIn === false && isMobile === false && (
+        <div className='mx-auto mt-4 '>
+          <Image
+            src="/landingp1.png"
+            alt="groupchat"
+            width={800}
+            height={400}
+            priority
+          />
+        </div>
+    )}
+
+
 
         {/* Currently this app is not optimized for mobile use as Cashtab Extension is not available on non-desktop platforms */}
         {isMobile === true && isLoggedIn === false && (
@@ -784,38 +784,39 @@ export default function Home() {
                   <Nft chronik={chronik} address={address} isMobile={isMobile} />
               </Tabs.Item>
 
-              <Tabs.Item title="About" icon={GiAbstract010}>
-                  <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
-                      <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">What is eCash Chat?</h2>
-                      eCash Chat is an on-chain messaging platform on the eCash blockchain.
+              <Tabs.Item title="About" icon={IoMdInformationCircleOutline} >
+              <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
+                      <h2 className="mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">What is eCash Chat?</h2>
+                      <p className='leading-7 [&:not(:first-child)]:mt-6'>eCash Chat is an on-chain messaging platform on the eCash blockchain,
                       <br />It filters for specific messaging transactions for a seamless social experience.
-                      <br /><br />
-                      <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Key features:</h2>
-                      <ul className="space-y-1 list-disc list-inside">
-                          <li>One-click metamask-like login experience</li>
-                          <li>Direct wallet to wallet and an all-in townhall forum</li>
-                          <li>Message encryption option via AES 256 CBC algorithm</li>
-                          <li>Full length blogging facility</li>
-                          <li>NFT Showcases</li>
-                          <li>Displays only messaging transactions</li>
-                          <li>Real time address specific filtering</li>
-                          <li>XEC Tipping on addresses</li>
-                          <li>Enables embedding of images, videos, tweets and emojis in messages</li>
-                          <li>Powered by In-Node Chronik and Cashtab Extensions</li>
-                          <li>Integration with the eCash Alias protocol (coming soon)</li>
+                      </p>
+                      <br />
+                      <h2 className="mt-4 scroll-m-20 text-2xl font-semibold tracking-tight">Key features:</h2>
+                      <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
+                        <li>One-click metamask-like login experience</li>
+                        <li>Direct wallet to wallet and an all-in townhall forum</li>
+                        <li>Full length blogging facility with paywall option</li>
+                        <li>Message encryption option via AES 256 CBC algorithm</li>
+                        <li>NFT Showcases</li>
+                        <li>Displays only messaging transactions</li>
+                        <li>Real time address specific filtering</li>
+                        <li>XEC Tipping on addresses</li>
+                        <li>Enables embedding of images, videos, tweets and emojis in messages</li>
+                        <li>Powered by In-Node Chronik and Cashtab Extensions</li>
+                        <li>Integrated with the eCash Alias protocol (coming soon)</li>
                       </ul>
                       <br />
-                      <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">User guide:</h2>
-                      <ul className="space-y-1 list-disc list-inside">
+                      <h2 className="mt-4 scroll-m-20 text-2xl font-semibold tracking-tight">User guide:</h2>
+                      <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
                           <li><b>Inbox</b>: a direct wallet to wallet messaging history.</li>
                           <li><b>Send Message</b>: send public messages to another wallet</li>
                           <li><b>Townhall</b>: public onchain discussion forum</li>
-                          <li><b>Articles</b>: full length blogging facility</li>
+                          <li><b>Articles</b>: write full length articles with paywall option</li>
                           <li><b>NFTs</b>: browse and showcase your NFTs</li>
                       </ul>
                       <br />
-                      <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Support:</h2>
-                      <ul className="space-y-1 list-disc list-inside">
+                      <h2 className="mt-4 scroll-m-20 text-2xl font-semibold tracking-tight">Support:</h2>
+                      <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
                           <li>
                               For general support please visit the official <a href="https://t.me/ecash" target="_blank" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">eCash Telegram Channel</a>.
                           </li>
@@ -823,12 +824,20 @@ export default function Home() {
                               For technical references please refer to the <a href="https://github.com/ethanmackie/ecash-chat" target="_blank" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">github repository</a>.
                           </li>
                       </ul>
+                      <div className='mx-auto mb-4'>
+                      <Image
+                        src="/groupchat.svg"
+                        alt="groupchat"
+                        width={400}
+                        height={400}
+                        priority
+                        />
+                        </div>
                   </div>
-
-              </Tabs.Item>
-              </Tabs>
-              </>
-              )}
+                </Tabs.Item>
+            </Tabs>
+          </>
+        )}
         </div>
       </main>
   
