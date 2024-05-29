@@ -130,7 +130,7 @@ export default function Home() {
 
     // Parse for a manual address input on mobile and log in via view-only mode
     const viewAddress = async (address) => {
-        getAliasesByAddress(address);
+        //getAliasesByAddress(address);
         setAddress(address);
         setIsLoggedIn(true);
     };
@@ -424,8 +424,8 @@ export default function Home() {
         );
     };
 
-  return (
-    <>
+    return (
+        <>
         <ToastContainer />
         <div className="sm:flex flex-col items-center justify-center p-5 relative z-10 mt-4">
         <div className="background_content"></div>
@@ -535,19 +535,17 @@ export default function Home() {
         </div>
         )}
 
-    {isLoggedIn === false && isMobile === false && (
-        <div className='mx-auto mt-4 '>
-          <Image
-            src="/landingp1.png"
-            alt="groupchat"
-            width={800}
-            height={400}
-            priority
-          />
-        </div>
-    )}
-
-
+        {isLoggedIn === false && isMobile === false && (
+            <div className='mx-auto mt-4 '>
+            <Image
+                src="/landingp1.png"
+                alt="groupchat"
+                width={800}
+                height={400}
+                priority
+            />
+            </div>
+        )}
 
         {/* Currently this app is not optimized for mobile use as Cashtab Extension is not available on non-desktop platforms */}
         {isMobile === true && isLoggedIn === false && (
@@ -772,11 +770,11 @@ export default function Home() {
                   </Tabs.Item>
               )}
 
-              <Tabs.Item title="Town Hall" active icon={GiDiscussion} >
+              <Tabs.Item title="Town Hall" icon={GiDiscussion} >
                   <Townhall address={address} isMobile={isMobile} />
               </Tabs.Item>
 
-              <Tabs.Item title="Articles" icon={BiSolidNews} >
+              <Tabs.Item title="Articles" active icon={BiSolidNews} >
                 <Article chronik={chronik} address={address} isMobile={isMobile} sharedArticleTxid={sharedArticleTxid} />
               </Tabs.Item>
 

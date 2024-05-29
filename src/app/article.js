@@ -110,10 +110,9 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                     const stackArray = getStackArray(articleTx.outputs[0].outputScript);
 
                     if (
-                        stackArray[0] === opreturnConfig.appPrefixesHex.eCashChat &&
-                        stackArray[1] === opreturnConfig.articlePrefixHex
+                        stackArray[0] === opreturnConfig.articlePrefixHex
                     ) {
-                        articleHash = Buffer.from(stackArray[2], 'hex');
+                        articleHash = Buffer.from(stackArray[1], 'hex');
                     } else {
                         throw new Error('Invalid article txid');
                     }
@@ -874,13 +873,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     </>
                                 ),
                             )
-                        : <div className="flex flex-col space-y-3">
-                        <div className="space-y-2">
-                        <Skeleton className="h-4 w-[400px]" />
-                        <Skeleton className="h-4 w-[350px]" />
-                        <Skeleton className="h-4 w-[300px]" />
-                        </div>
-                    </div>
+                        : ''
                     }
                 </div>
             </div>

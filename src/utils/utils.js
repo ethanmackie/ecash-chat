@@ -132,9 +132,6 @@ export const encodeBip21Article = article => {
     try {
         let script = [];
 
-        // Push eCash Chat protocol identifier
-        script.push(Buffer.from(opreturnConfig.appPrefixesHex.eCashChat, 'hex'));
-
         // Push eCash Chat blog identifier
         script.push(Buffer.from(opreturnConfig.articlePrefixHex, 'hex'));
 
@@ -160,7 +157,7 @@ export const encodeBip21ReplyArticle = (articleReply, replyTxid) => {
         let script = [];
 
         // Push eCash Chat protocol identifier
-        script.push(Buffer.from(opreturnConfig.appPrefixesHex.eCashChat, 'hex'));
+        script.push(Buffer.from(opreturnConfig.articlePrefixHex, 'hex'));
 
         // Push eCash Chat reply article identifier
         script.push(Buffer.from(opreturnConfig.articleReplyPrefixHex, 'hex'));

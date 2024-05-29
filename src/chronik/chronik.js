@@ -827,10 +827,10 @@ export const getArticleHistory = async (chronik, address, page = 0) => {
 
     try {
         const lokadIdHistory = await chronik.lokadId(
-            opreturnConfig.appPrefixesHex.eCashChat,
+            opreturnConfig.articlePrefixHex,
         ).history(
             page,
-            chronikConfig.txHistoryPageSize,
+            chronikConfig.articleHistoryPageSize,
         );
         const localArticles = await localforage.getItem(appConfig.localArticlesParam);
 
@@ -881,7 +881,7 @@ export const getArticleHistory = async (chronik, address, page = 0) => {
             txs: parsedAndFilteredTxs,
             replies: replyTxs,
             paywallTxs: paywallTxs,
-            numPages: parsedAndFilteredTxs.length,
+            numPages: parsedAndFilteredTxs.length/chronikConfig.txHistoryPageSize,
         };
     } catch (err) {
         console.log(`Error in getArticleHistory(${address})`, err);
@@ -1168,6 +1168,17 @@ export const parseChronikTx = (tx, address) => {
                     isPaywallPayment = true;
                     break;
                 }
+                case opreturnConfig.articlePrefixHex: {
+                    if (stackArray[1] === opreturnConfig.articleReplyPrefixHex) {
+                        articleTxid = stackArray[2];
+                        opReturnMessage = Buffer.from(stackArray[3], 'hex');
+                        isArticleReply = true;
+                    } else {
+                        opReturnMessage = Buffer.from(stackArray[1], 'hex');
+                        isArticle = true;
+                    }
+                    break;
+                }
                 case opreturnConfig.appPrefixesHex.eCashChat: {
                     if (stackArray.length >= 2) {
                         if (stackArray[1] === opreturnConfig.townhallPostPrefixHex) {
@@ -1181,13 +1192,6 @@ export const parseChronikTx = (tx, address) => {
                             nftShowcaseId = stackArray[2];
                             opReturnMessage = Buffer.from(stackArray[3], 'hex');
                             iseCashChatPost = true;
-                        } else if (stackArray[1] === opreturnConfig.articlePrefixHex) {
-                            opReturnMessage = Buffer.from(stackArray[2], 'hex');
-                            isArticle = true;
-                        } else if (stackArray[1] === opreturnConfig.articleReplyPrefixHex) {
-                            articleTxid = stackArray[2];
-                            opReturnMessage = Buffer.from(stackArray[3], 'hex');
-                            isArticleReply = true;
                         } else if (stackArray[1] === opreturnConfig.xecTipPrefixHex) {
                             // This is an XEC tip tx
                             iseCashChatMessage = true;
