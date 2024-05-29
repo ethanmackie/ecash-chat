@@ -77,7 +77,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const [replyArticleError, setReplyArticleError] = useState(false);
     const [showArticleModal, setShowArticleModal] = useState(false);
     const [showPaywallPaymentModal, setShowPaywallPaymentModal] = useState(false);
-    const [paywallAmountXec, setPaywallAmountXec] = useState(0);
+    const [paywallAmountXec, setPaywallAmountXec] = useState('');
     const [paywallAmountXecError, setPaywallAmountXecError] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [maxPagesToShow, setMaxPagesToShow] = useState(7);
@@ -364,7 +364,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     // Validate the paywall price input
     const handlePaywallAmountChange = e => {
         const { value } = e.target;
-        if (value >= appConfig.dustXec) {
+        if (value >= appConfig.dustXec || value === '') {
             setPaywallAmountXecError(false);
         } else {
             setPaywallAmountXecError(`Paywall amount must be at minimum ${appConfig.dustXec} XEC`);
