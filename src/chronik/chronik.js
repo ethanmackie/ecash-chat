@@ -922,7 +922,7 @@ export const getArticleHistory = async (chronik, address, page = 0) => {
             txs: parsedAndFilteredTxs,
             replies: replyTxs,
             paywallTxs: paywallTxs,
-            numPages: parsedAndFilteredTxs.length/chronikConfig.txHistoryPageSize,
+            numPages: lokadIdHistory.numPages,
         };
     } catch (err) {
         console.log(`Error in getArticleHistory(${address})`, err);
