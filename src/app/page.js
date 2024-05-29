@@ -306,7 +306,7 @@ export default function Home() {
         setRecipient('');
         setMessage('');
         setPassword('');
-        txListener(chronik, address, "Message", false);
+        txListener(chronik, address, "Message", sendAmountXec, recipient, false);
     };
 
     const MessagePreviewModal = () => {

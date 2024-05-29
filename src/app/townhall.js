@@ -260,7 +260,7 @@ export default function TownHall({ address, isMobile }) {
             );
         }
         setPost('');
-        txListener(chronik, address, "Townhall post sent", getTownhallHistoryByPage);
+        txListener(chronik, address, "Townhall post sent", appConfig.dustXec, appConfig.townhallAddress, getTownhallHistoryByPage);
     };
 
     // Pass a reply post tx BIP21 query string to cashtab extensions
@@ -287,7 +287,7 @@ export default function TownHall({ address, isMobile }) {
             );
         }
         setReplyPost('');
-        txListener(chronik, address, "Townhall reply sent", getTownhallHistoryByPage);
+        txListener(chronik, address, "Townhall reply sent", appConfig.dustXec, appConfig.townhallAddress, getTownhallHistoryByPage);
     };
 
     const MessagePreviewModal = () => {
@@ -363,7 +363,7 @@ export default function TownHall({ address, isMobile }) {
             '*',
         );
 
-        txListener(chronik, address, "Townhall XEC tip sent", getTownhallHistoryByPage);
+        txListener(chronik, address, "Townhall XEC tip sent", tipAmount, recipient, getTownhallHistoryByPage);
     };
 
     // Lookup and render any corresponding replies

@@ -307,6 +307,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             chronik,
             address,
             "Paywall payment",
+            paywallPrice,
+            recipient,
             getArticleHistoryByPage,
             setShowArticleModal,
             setShowPaywallPaymentModal,

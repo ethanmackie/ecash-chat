@@ -535,34 +535,57 @@ export const articleTxListener = async (
 };
 
 /**
- * Subscribes to a given address and listens for new websocket events
+ * Subscribes to a given address and listens for expected websocket events
  *
  * @param {string} chronik the chronik-client instance
  * @param {string} address the eCash address of the active wallet
  * @param {string} txType the descriptor of the nature of this tx
+ * @param {number} expectedSendValue the anticipated output value
+ * @param {string} recipient the eCash address of the transaction
  * @param {callback fn} refreshCallback a callback function to either refresh inbox or townhall history
  * @throws {error} err chronik websocket subscription errors
  */
-export const txListener = async (chronik, address, txType, refreshCallback = false) => {
-    // Get type and hash
+export const txListener = async (
+    chronik,
+    address,
+    txType,
+    expectedSendValue,
+    recipient,
+    refreshCallback = false,
+) => {
+    // Get type and hash of active wallet
     const { type, hash } = cashaddr.decode(address, true);
 
     try {
         const ws = chronik.ws({
             onMessage: msg => {
                 if (msg.msgType === 'TX_ADDED_TO_MEMPOOL') {
+                    (async () => {
+                        let mempoolTx;
+                        setTimeout(async() => {
+                            mempoolTx = await chronik.tx(msg.txid);
 
-                    // Notify user
-                    toast(`${txType} sent`);
+                            const actualSendValue = toXec(mempoolTx.outputs[1].value);
+                            const actualRecipient = cashaddr.encodeOutputScript(mempoolTx.outputs[1].outputScript);
 
-                    // Unsubscribe and close websocket
-                    ws.unsubscribeFromScript(type, hash);
-                    ws.close();
+                            if (
+                                Number(expectedSendValue) === Number(actualSendValue) &&
+                                recipient === actualRecipient
+                            ) {
+                                // Notify user
+                                toast(`${txType} sent`);
 
-                    // Refresh history
-                    if (refreshCallback) {
-                        refreshCallback(0);
-                    }
+                                // Unsubscribe and close websocket
+                                ws.unsubscribeFromScript(type, hash);
+                                ws.close();
+
+                                // Refresh history
+                                if (refreshCallback) {
+                                    refreshCallback(0);
+                                }
+                            }
+                        }, 500);
+                    })();
                 }
             },
         });
@@ -585,6 +608,8 @@ export const txListener = async (chronik, address, txType, refreshCallback = fal
  * @param {string} chronik the chronik-client instance
  * @param {string} address the eCash address of the active wallet
  * @param {string} txType the descriptor of the nature of this tx
+ * @param {number} paywallPrice the paywall price for the article
+ * @param {string} recipient the eCash address of the paywall payment
  * @param {callback fn} refreshCallback a callback function to refresh article listing
  * @param {callback fn} modalCallback a callback function to re-render a paid paywall article
  * @param {callback fn} paywallModalCallback a callback function to close the open paywall modal
@@ -594,6 +619,8 @@ export const paywallTxListener = async (
     chronik,
     address,
     txType,
+    paywallPrice,
+    recipient,
     refreshCallback = false,
     modalCallback = false,
     paywallModalCallback = false,
@@ -605,28 +632,42 @@ export const paywallTxListener = async (
         const ws = chronik.ws({
             onMessage: msg => {
                 if (msg.msgType === 'TX_ADDED_TO_MEMPOOL') {
+                    (async () => {
+                        let mempoolTx;
+                        setTimeout(async() => {
+                            mempoolTx = await chronik.tx(msg.txid);
 
-                    // Notify user
-                    toast(`${txType} sent`);
+                            const paywallPricePaid = toXec(mempoolTx.outputs[1].value);
+                            const paywallRecipient = cashaddr.encodeOutputScript(mempoolTx.outputs[1].outputScript);
 
-                    // Unsubscribe and close websocket
-                    ws.unsubscribeFromScript(type, hash);
-                    ws.close();
+                            if (
+                                Number(paywallPrice) === Number(paywallPricePaid) &&
+                                recipient === paywallRecipient
+                            ) {
+                                // Notify user
+                                toast(`${txType} sent`);
 
-                    // Refresh history
-                    if (refreshCallback) {
-                        refreshCallback(0);
-                    }
+                                // Unsubscribe and close websocket
+                                ws.unsubscribeFromScript(type, hash);
+                                ws.close();
 
-                    // Re-render modal
-                    if (modalCallback) {
-                        modalCallback(true);
-                    }
+                                // Refresh history
+                                if (refreshCallback) {
+                                    refreshCallback(0);
+                                }
 
-                    // Close the paywall dialog
-                    if (paywallModalCallback) {
-                        paywallModalCallback(false);
-                    }
+                                // Re-render modal
+                                if (modalCallback) {
+                                    modalCallback(true);
+                                }
+
+                                // Close the paywall dialog
+                                if (paywallModalCallback) {
+                                    paywallModalCallback(false);
+                                }
+                            }
+                        }, 500);
+                    })();
                 }
             },
         });
