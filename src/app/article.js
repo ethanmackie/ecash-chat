@@ -357,7 +357,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     // Render the full article contents
     const RenderArticle = ({ content }) => {
         const renderedArticle = DOMPurify.sanitize(content);
-        return (<MarkdownEditor.Markdown source={renderedArticle} />);
+        return (<MarkdownEditor.Markdown style={{ backgroundColor: 'transparent' }}  source={renderedArticle} />);
     };
 
     // Validate the paywall price input
@@ -643,7 +643,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                         </Button>
                     </AccordionTrigger>
                     <AccordionContent>
-                        <div className="max-w-xl w-full mx-auto">
+                        <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96 mt-2">
                             {/* article input fields */}
                             <Input
                                 className="bg-white"
