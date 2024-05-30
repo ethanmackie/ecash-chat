@@ -71,7 +71,7 @@ export default function Home() {
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
-        setTimeout(confirmCashtabProviderStatus, 300);
+        setTimeout(confirmCashtabProviderStatus, 400);
 
         (async () => {
             if (await isMobileDevice() === true) {

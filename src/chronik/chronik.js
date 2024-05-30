@@ -846,6 +846,16 @@ export const getTxHistory = async (chronik, address, page = 0) => {
           return el.isEtokenTx === false &&
                  el.opReturnMessage !== ''
         });
+
+        localforage.setItem(
+            'txHistory',
+            {
+                txs: parsedAndFilteredTxs,
+                replies: replyTxs,
+                numPages: txHistoryPage.numPages,
+            },
+        );
+
         return {
             txs: parsedAndFilteredTxs,
             replies: replyTxs,
