@@ -17,6 +17,14 @@ import {
     mockParsedXecEncryptedSendTxWithOpReturn,
     mockXecSendTxWithOpReturnNftShowcase,
     mockParsedXecSendTxWithOpReturnNftShowcase,
+    mockXecSendTxWithOpReturnArticle,
+    mockParsedXecSendTxWithOpReturnArticle,
+    mockXecSendTxWithOpReturnArticleReply,
+    mockParsedXecSendTxWithOpReturnArticleReply,
+    mockXecSendTxWithOpReturnPaywallPayment,
+    mockParsedXecSendTxWithOpReturnPaywallPayment,
+    mockXecSendTxWithOpReturnArticleXecTip,
+    mockParsedXecSendTxWithOpReturnArticleXecTip,
 } from '../fixtures/mocks';
 
 test('parseChronikTx() correctly parses a XEC send tx with OP_RETURN data retrieved from chronik', async () => {
@@ -79,5 +87,41 @@ test('parseChronikTx() correctly parses a XEC send tx with an NFT showcase embed
         mockParsedXecSendTxWithOpReturnNftShowcase.replyAddress,
     )).toEqual(
         mockParsedXecSendTxWithOpReturnNftShowcase,
+    );
+});
+
+test('parseChronikTx() correctly parses a XEC send tx with an article submission embedded OP_RETURN data retrieved from chronik', async () => {
+    await expect(parseChronikTx(
+        mockXecSendTxWithOpReturnArticle,
+        mockParsedXecSendTxWithOpReturnArticle.replyAddress,
+    )).toEqual(
+        mockParsedXecSendTxWithOpReturnArticle,
+    );
+});
+
+test('parseChronikTx() correctly parses a XEC send tx with an article reply embedded OP_RETURN data retrieved from chronik', async () => {
+    await expect(parseChronikTx(
+        mockXecSendTxWithOpReturnArticleReply,
+        mockParsedXecSendTxWithOpReturnArticleReply.replyAddress,
+    )).toEqual(
+        mockParsedXecSendTxWithOpReturnArticleReply,
+    );
+});
+
+test('parseChronikTx() correctly parses a XEC send tx with an article tip embedded OP_RETURN data retrieved from chronik', async () => {
+    await expect(parseChronikTx(
+        mockXecSendTxWithOpReturnArticleXecTip,
+        mockParsedXecSendTxWithOpReturnArticleXecTip.replyAddress,
+    )).toEqual(
+        mockParsedXecSendTxWithOpReturnArticleXecTip,
+    );
+});
+
+test('parseChronikTx() correctly parses a XEC send tx with an article paywall payment embedded OP_RETURN data retrieved from chronik', async () => {
+    await expect(parseChronikTx(
+        mockXecSendTxWithOpReturnPaywallPayment,
+        mockParsedXecSendTxWithOpReturnPaywallPayment.replyAddress,
+    )).toEqual(
+        mockParsedXecSendTxWithOpReturnPaywallPayment,
     );
 });

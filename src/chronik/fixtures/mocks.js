@@ -660,3 +660,316 @@ export const mockParsedXecSendTxWithOpReturnNftShowcase = {
     "paywallPaymentArticleTxid": false,
     "nftShowcaseId": "076fc97838cea01911b1b83e26f5ec5c040e4aed039f24df6e3d076737c43482"
 };
+
+export const mockXecSendTxWithOpReturnArticle = {
+    "txid": "af8688aea4afb91575fc19514f667f7240e1ff3e50e5780a980222baf1a2eabe",
+    "version": 2,
+    "inputs": [
+        {
+            "prevOut": {
+                "txid": "a21151ed26db77debdad5526520ac78e7169f2f737b10fb74a7f26dd9afe6f45",
+                "outIdx": 0
+            },
+            "inputScript": "483045022100b598c3458cd2ca296ec93f979c9f53405789566eb211fe48aff64384f55e61650220536c99e1319b6542c5d730966c6680d2a75cfe66e827d72e425f098c267084b1412103fb011a410a2f5b115d482f36feaaa06e4b89067705965fce04d94e302ed937b1",
+            "value": 29899,
+            "sequenceNo": 4294967295,
+            "outputScript": "76a9146d6ec5176ab7739c451865a8975dbe6c21e40ead88ac"
+        }
+    ],
+    "outputs": [
+        {
+            "value": 0,
+            "outputScript": "6a04746573312834396664623334663634626530613239616637376165373733373061373732333263336436633337"
+        },
+        {
+            "value": 550,
+            "outputScript": "76a9146d6ec5176ab7739c451865a8975dbe6c21e40ead88ac"
+        },
+        {
+            "value": 28782,
+            "outputScript": "76a9146d6ec5176ab7739c451865a8975dbe6c21e40ead88ac"
+        }
+    ],
+    "lockTime": 0,
+    "timeFirstSeen": 1716993776,
+    "size": 282,
+    "isCoinbase": false,
+    "tokenEntries": [],
+    "tokenFailedParsings": [],
+    "tokenStatus": "TOKEN_STATUS_NON_TOKEN",
+    "block": {
+        "height": 846748,
+        "hash": "00000000000000000e92e42dea35f14a43dff01ac52dbb9982c64f79b45f41dc",
+        "timestamp": 1716994167
+    }
+};
+
+export const mockParsedXecSendTxWithOpReturnArticle = {
+    "txid": "af8688aea4afb91575fc19514f667f7240e1ff3e50e5780a980222baf1a2eabe",
+    "incoming": false,
+    "xecAmount": "0",
+    "isEtokenTx": false,
+    "airdropFlag": false,
+    "airdropTokenId": "",
+    "opReturnMessage": "49fdb34f64be0a29af77ae77370a77232c3d6c37",
+    "isCashtabMessage": false,
+    "isCashtabEncryptedMessage": false,
+    "isEcashChatEncrypted": false,
+    "iseCashChatMessage": false,
+    "iseCashChatPost": false,
+    "replyAddress": "ecash:qpkka3ghd2mh88z9rpj6396ahekzreqw45l6qsg9qm",
+    "recipientAddress": "ecash:qpkka3ghd2mh88z9rpj6396ahekzreqw45l6qsg9qm",
+    "aliasFlag": false,
+    "imageSrc": false,
+    "videoId": false,
+    "txDate": "May 30, 2024",
+    "txTime": "12:42:56 am",
+    "tweetId": false,
+    "replyTxid": false,
+    "url": false,
+    "isXecTip": false,
+    "nftShowcaseId": false,
+    "articleTxid": false,
+    "isArticle": true,
+    "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPaymentArticleTxid": false,
+    "paywallPayment": false
+};
+
+export const mockXecSendTxWithOpReturnArticleReply = {
+    "txid": "ac1741d9e8275e736a631a2be8f55d2ac40df354c5f9072243e5e71902b90688",
+    "version": 2,
+    "inputs": [
+        {
+            "prevOut": {
+                "txid": "0b37245231317b4f9bf5d60bade559a09ffe1b92f2eaa26be7ce5a1f33ee5fe0",
+                "outIdx": 2
+            },
+            "inputScript": "483045022100f5a049251f2d5c297ec279ae88296c921350516e35c48c28de944dee3c40bc0402203b8980b7d776d5bd3a3ef11f3a4caceb7bd6588a13eaf9984bfcc1b4a992a1624121030a06dd7429d8fce700b702a55a012a1f9d1eaa46825bde2d31252ee9cb30e536",
+            "value": 8120,
+            "sequenceNo": 4294967295,
+            "outputScript": "76a91414582d09f61c6580b8a2b6c8af8d6a13c9128b6f88ac"
+        }
+    ],
+    "outputs": [
+        {
+            "value": 0,
+            "outputScript": "6a0474657331047465733220af8688aea4afb91575fc19514f667f7240e1ff3e50e5780a980222baf1a2eabe0e74657374207265706c7920313131"
+        },
+        {
+            "value": 550,
+            "outputScript": "76a91414582d09f61c6580b8a2b6c8af8d6a13c9128b6f88ac"
+        },
+        {
+            "value": 6979,
+            "outputScript": "76a91414582d09f61c6580b8a2b6c8af8d6a13c9128b6f88ac"
+        }
+    ],
+    "lockTime": 0,
+    "timeFirstSeen": 1717041898,
+    "size": 294,
+    "isCoinbase": false,
+    "tokenEntries": [],
+    "tokenFailedParsings": [],
+    "tokenStatus": "TOKEN_STATUS_NON_TOKEN"
+};
+
+export const mockParsedXecSendTxWithOpReturnArticleReply = {
+    "txid": "ac1741d9e8275e736a631a2be8f55d2ac40df354c5f9072243e5e71902b90688",
+    "incoming": false,
+    "xecAmount": "0",
+    "isEtokenTx": false,
+    "airdropFlag": false,
+    "airdropTokenId": "",
+    "opReturnMessage": "test reply 111",
+    "isCashtabMessage": false,
+    "isCashtabEncryptedMessage": false,
+    "isEcashChatEncrypted": false,
+    "iseCashChatMessage": false,
+    "iseCashChatPost": false,
+    "replyAddress": "ecash:qq29stgf7cwxtq9c52mv3tuddgfujy5tduaellf3wm",
+    "recipientAddress": "ecash:qq29stgf7cwxtq9c52mv3tuddgfujy5tduaellf3wm",
+    "aliasFlag": false,
+    "imageSrc": false,
+    "videoId": false,
+    "txDate": "May 30, 2024",
+    "txTime": "2:04:58 pm",
+    "tweetId": false,
+    "replyTxid": false,
+    "url": false,
+    "isXecTip": false,
+    "nftShowcaseId": false,
+    "articleTxid": "af8688aea4afb91575fc19514f667f7240e1ff3e50e5780a980222baf1a2eabe",
+    "isArticle": false,
+    "isArticleReply": true,
+    "isPaywallPayment": false,
+    "paywallPaymentArticleTxid": false,
+    "paywallPayment": false
+};
+
+export const mockXecSendTxWithOpReturnPaywallPayment = {
+    "txid": "6536ab20cf11e300b561fb0e31edc70076225c27773cf65e9fabfe8cd7cff6bf",
+    "version": 2,
+    "inputs": [
+        {
+            "prevOut": {
+                "txid": "6a01b88c4a63e385a3151093d5017368116d29880e9a843816960d38f8d907ec",
+                "outIdx": 1
+            },
+            "inputScript": "483045022100ead35e4ac8fe65608b839f185bffcb0a94a801e7ee6f6cee1ecbd9f23295b5d80220325874e6170e5d7df1fbe670c2d02556b3ff69fab5d9b13ad429871a5913c30b4121030a06dd7429d8fce700b702a55a012a1f9d1eaa46825bde2d31252ee9cb30e536",
+            "value": 1000,
+            "sequenceNo": 4294967295,
+            "outputScript": "76a91414582d09f61c6580b8a2b6c8af8d6a13c9128b6f88ac"
+        },
+        {
+            "prevOut": {
+                "txid": "6a01b88c4a63e385a3151093d5017368116d29880e9a843816960d38f8d907ec",
+                "outIdx": 2
+            },
+            "inputScript": "483045022100c138ef6da8b5ae8a97b0c7c23d4c4b61f8922237632575ad8a82087bcb84b1d9022019aeffa10d76655d500725277f57c92f16b0df34a05cd58f9b74b1fdfc9819104121030a06dd7429d8fce700b702a55a012a1f9d1eaa46825bde2d31252ee9cb30e536",
+            "value": 7458,
+            "sequenceNo": 4294967295,
+            "outputScript": "76a91414582d09f61c6580b8a2b6c8af8d6a13c9128b6f88ac"
+        }
+    ],
+    "outputs": [
+        {
+            "value": 0,
+            "outputScript": "6a04706179774036336137383534303639353934626332313162383461363764333734623237653038643038333865303137306230346336333134643864373639336161376438"
+        },
+        {
+            "value": 1000,
+            "outputScript": "76a91414582d09f61c6580b8a2b6c8af8d6a13c9128b6f88ac",
+            "spentBy": {
+                "txid": "a27167c806aab3beb24e1ded51f04dc6fec044d2e3c905fd4f5ec73d068e7d91",
+                "outIdx": 1
+            }
+        },
+        {
+            "value": 6545,
+            "outputScript": "76a91414582d09f61c6580b8a2b6c8af8d6a13c9128b6f88ac",
+            "spentBy": {
+                "txid": "0335eff02211506d1381d7d6ac5dcedf741a6569fd583534b615f5b8879d053c",
+                "outIdx": 0
+            }
+        }
+    ],
+    "lockTime": 0,
+    "timeFirstSeen": 1716984936,
+    "size": 454,
+    "isCoinbase": false,
+    "tokenEntries": [],
+    "tokenFailedParsings": [],
+    "tokenStatus": "TOKEN_STATUS_NON_TOKEN",
+    "block": {
+        "height": 846735,
+        "hash": "000000000000000000b448c450aeb1a152b400e2dbad09de84e1baab27d1b953",
+        "timestamp": 1716987086
+    }
+};
+
+export const mockParsedXecSendTxWithOpReturnPaywallPayment = {
+    "txid": "6536ab20cf11e300b561fb0e31edc70076225c27773cf65e9fabfe8cd7cff6bf",
+    "incoming": false,
+    "xecAmount": "0",
+    "isEtokenTx": false,
+    "airdropFlag": false,
+    "airdropTokenId": "",
+    "opReturnMessage": "",
+    "isCashtabMessage": false,
+    "isCashtabEncryptedMessage": false,
+    "isEcashChatEncrypted": false,
+    "iseCashChatMessage": false,
+    "iseCashChatPost": false,
+    "replyAddress": "ecash:qq29stgf7cwxtq9c52mv3tuddgfujy5tduaellf3wm",
+    "recipientAddress": "ecash:qq29stgf7cwxtq9c52mv3tuddgfujy5tduaellf3wm",
+    "aliasFlag": false,
+    "imageSrc": false,
+    "videoId": false,
+    "txDate": "May 29, 2024",
+    "txTime": "10:15:36 pm",
+    "tweetId": false,
+    "replyTxid": false,
+    "url": false,
+    "isXecTip": false,
+    "nftShowcaseId": false,
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
+    "isPaywallPayment": true,
+    "paywallPaymentArticleTxid": "63a7854069594bc211b84a67d374b27e08d0838e0170b04c6314d8d7693aa7d8",
+    "paywallPayment": "10"
+};
+
+export const mockXecSendTxWithOpReturnArticleXecTip = {
+    "txid": "34fb07a6d6debafe46e821bbdcbafe59d130ad64917a82a374c42a99420a2c4d",
+    "version": 2,
+    "inputs": [
+        {
+            "prevOut": {
+                "txid": "aa5f13474ca2fc020805c291a3053f12e4a006daaf15832007dd854f4337f154",
+                "outIdx": 2
+            },
+            "inputScript": "4830450221009a20069da36c6a2f11e9afe72eb1f92926110da57386ccb0abf5542efdd96bae0220577cb538be9d4793341dc9e3e43d066a8e5985955be0aa1e7fe62519091efcfb4121030a06dd7429d8fce700b702a55a012a1f9d1eaa46825bde2d31252ee9cb30e536",
+            "value": 46435,
+            "sequenceNo": 4294967295,
+            "outputScript": "76a91414582d09f61c6580b8a2b6c8af8d6a13c9128b6f88ac"
+        }
+    ],
+    "outputs": [
+        {
+            "value": 0,
+            "outputScript": "6a046368617404746970730120"
+        },
+        {
+            "value": 10000,
+            "outputScript": "76a9146d6ec5176ab7739c451865a8975dbe6c21e40ead88ac"
+        },
+        {
+            "value": 35936,
+            "outputScript": "76a91414582d09f61c6580b8a2b6c8af8d6a13c9128b6f88ac"
+        }
+    ],
+    "lockTime": 0,
+    "timeFirstSeen": 1717042206,
+    "size": 248,
+    "isCoinbase": false,
+    "tokenEntries": [],
+    "tokenFailedParsings": [],
+    "tokenStatus": "TOKEN_STATUS_NON_TOKEN"
+};
+
+export const mockParsedXecSendTxWithOpReturnArticleXecTip = {
+    "txid": "34fb07a6d6debafe46e821bbdcbafe59d130ad64917a82a374c42a99420a2c4d",
+    "incoming": false,
+    "xecAmount": "100",
+    "isEtokenTx": false,
+    "airdropFlag": false,
+    "airdropTokenId": "",
+    "opReturnMessage": " ",
+    "isCashtabMessage": false,
+    "isCashtabEncryptedMessage": false,
+    "isEcashChatEncrypted": false,
+    "iseCashChatMessage": true,
+    "iseCashChatPost": false,
+    "replyAddress": "ecash:qq29stgf7cwxtq9c52mv3tuddgfujy5tduaellf3wm",
+    "recipientAddress": "ecash:qpkka3ghd2mh88z9rpj6396ahekzreqw45l6qsg9qm",
+    "aliasFlag": false,
+    "imageSrc": false,
+    "videoId": false,
+    "txDate": "May 30, 2024",
+    "txTime": "2:10:06 pm",
+    "tweetId": false,
+    "replyTxid": false,
+    "url": false,
+    "isXecTip": true,
+    "nftShowcaseId": false,
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPaymentArticleTxid": false,
+    "paywallPayment": false
+};
+
