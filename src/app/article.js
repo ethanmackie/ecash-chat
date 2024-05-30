@@ -277,7 +277,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             '*',
         );
 
-        txListener(chronik, address, "Article XEC tip", getArticleHistoryByPage);
+        txListener(chronik, address, "Article XEC tip", tipAmount, recipient, getArticleHistoryByPage);
     };
 
     // Pass a paywall payment tx BIP21 query string to cashtab extensions
@@ -480,7 +480,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const PaywallPaymentModal = () => {
         return (
             <Modal show={showPaywallPaymentModal} onClose={() => setShowPaywallPaymentModal(false)}>
-                <Modal.Header>Paywall payment{currentArticleTxObj.articleObject.title}</Modal.Header>
+                <Modal.Header>{currentArticleTxObj.articleObject.title}</Modal.Header>
                 <Modal.Body>
                     This article costs a one-off {currentArticleTxObj.articleObject.paywallPrice} XEC to access.<br />
                     <br />

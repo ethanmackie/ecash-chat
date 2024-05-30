@@ -785,9 +785,8 @@ export default function Home() {
               <Tabs.Item title="About" icon={IoMdInformationCircleOutline} >
               <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
                       <h2 className="mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">What is eCash Chat?</h2>
-                      <p className='leading-7 [&:not(:first-child)]:mt-6'>eCash Chat is an on-chain messaging platform on the eCash blockchain,
-                      <br />It filters for specific messaging transactions for a seamless social experience.
-                      </p>
+                      <p className='leading-7 [&:not(:first-child)]:mt-6'>eCash Chat is an on-chain web platform that enables anyone to socialize,
+                      <br />monetize and earn on the eCash blockchain.</p>
                       <br />
                       <h2 className="mt-4 scroll-m-20 text-2xl font-semibold tracking-tight">Key features:</h2>
                       <ul className="my-6 ml-6 list-disc [&>li]:mt-2">

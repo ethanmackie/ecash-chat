@@ -59,7 +59,6 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import { Skeleton } from "@/components/ui/skeleton";
-import localforage from 'localforage';
 
 export default function TownHall({ address, isMobile }) {
     const [townHallHistory, setTownHallHistory] = useState('');
@@ -87,13 +86,7 @@ export default function TownHall({ address, isMobile }) {
     useEffect(() => {
         // Render the first page by default upon initial load
         (async () => {
-            const txHistory = await localforage.getItem('txHistory');
-            // if use tx history from cache if exists, otherwise retrieve latest from chronik
-            if (txHistory) {
-                setTownHallHistory(txHistory);
-            } else {
-                await getTownhallHistoryByPage(0);
-            }
+            await getTownhallHistoryByPage(0);
         })();
         initializeTownHallRefresh();
     }, []);
