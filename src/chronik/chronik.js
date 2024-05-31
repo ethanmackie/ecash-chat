@@ -500,24 +500,34 @@ export const articleTxListener = async (
         const ws = chronik.ws({
             onMessage: msg => {
                 if (msg.msgType === 'TX_ADDED_TO_MEMPOOL') {
-                    (async () => {
-                        await localforage.setItem(appConfig.localArticlesParam, updatedArticles);
-                        await kv.set(appConfig.vercelKvParam, updatedArticles);
-                    })();
+                    let mempoolTx;
+                    setTimeout(async() => { // temporary until Extension is refactored to allow direct passing of callback functions
+                        mempoolTx = await chronik.tx(msg.txid);
+                        const actualRecipient = cashaddr.encodeOutputScript(mempoolTx.outputs[1].outputScript);
+                        const actualSender = cashaddr.encodeOutputScript(mempoolTx.inputs[0].outputScript);
 
-                    // Notify user
-                    toast(`Article posted`);
+                        if (
+                            address === actualRecipient &&
+                            address === actualSender
+                        ) {
+                            await localforage.setItem(appConfig.localArticlesParam, updatedArticles);
+                            await kv.set(appConfig.vercelKvParam, updatedArticles);
 
-                    // Unsubscribe and close websocket
-                    ws.unsubscribeFromScript(type, hash);
-                    ws.close();
+                            // Notify user
+                            toast(`Article posted`);
 
-                    // Refresh history
-                    if (refreshCallback) {
-                        (async () => {
-                            await refreshCallback(0);
-                        })();
-                    }
+                            // Unsubscribe and close websocket
+                            ws.unsubscribeFromScript(type, hash);
+                            ws.close();
+
+                            // Refresh history
+                            if (refreshCallback) {
+                                (async () => {
+                                    await refreshCallback(0);
+                                })();
+                            }
+                        }
+                    }, 500);
                 }
             },
         });
@@ -560,32 +570,30 @@ export const txListener = async (
         const ws = chronik.ws({
             onMessage: msg => {
                 if (msg.msgType === 'TX_ADDED_TO_MEMPOOL') {
-                    (async () => {
-                        let mempoolTx;
-                        setTimeout(async() => {
-                            mempoolTx = await chronik.tx(msg.txid);
+                    let mempoolTx;
+                    setTimeout(async() => { // temporary until Extension is refactored to allow direct passing of callback functions
+                        mempoolTx = await chronik.tx(msg.txid);
 
-                            const actualSendValue = toXec(mempoolTx.outputs[1].value);
-                            const actualRecipient = cashaddr.encodeOutputScript(mempoolTx.outputs[1].outputScript);
+                        const actualRecipient = cashaddr.encodeOutputScript(mempoolTx.outputs[1].outputScript);
+                        const actualSender = cashaddr.encodeOutputScript(mempoolTx.inputs[0].outputScript);
 
-                            if (
-                                Number(expectedSendValue) === Number(actualSendValue) &&
-                                recipient === actualRecipient
-                            ) {
-                                // Notify user
-                                toast(`${txType} sent`);
+                        if (
+                            recipient === actualRecipient &&
+                            address === actualSender
+                        ) {
+                            // Notify user
+                            toast(`${txType} sent`);
 
-                                // Unsubscribe and close websocket
-                                ws.unsubscribeFromScript(type, hash);
-                                ws.close();
+                            // Unsubscribe and close websocket
+                            ws.unsubscribeFromScript(type, hash);
+                            ws.close();
 
-                                // Refresh history
-                                if (refreshCallback) {
-                                    refreshCallback(0);
-                                }
+                            // Refresh history
+                            if (refreshCallback) {
+                                refreshCallback(0);
                             }
-                        }, 500);
-                    })();
+                        }
+                    }, 500);
                 }
             },
         });
@@ -632,42 +640,42 @@ export const paywallTxListener = async (
         const ws = chronik.ws({
             onMessage: msg => {
                 if (msg.msgType === 'TX_ADDED_TO_MEMPOOL') {
-                    (async () => {
-                        let mempoolTx;
-                        setTimeout(async() => {
-                            mempoolTx = await chronik.tx(msg.txid);
+                    let mempoolTx;
+                    setTimeout(async() => { // temporary until Extension is refactored to allow direct passing of callback functions
+                        mempoolTx = await chronik.tx(msg.txid);
 
-                            const paywallPricePaid = toXec(mempoolTx.outputs[1].value);
-                            const paywallRecipient = cashaddr.encodeOutputScript(mempoolTx.outputs[1].outputScript);
+                        const paywallPricePaid = toXec(mempoolTx.outputs[1].value);
+                        const paywallRecipient = cashaddr.encodeOutputScript(mempoolTx.outputs[1].outputScript);
+                        const paywallPayer = cashaddr.encodeOutputScript(mempoolTx.inputs[0].outputScript);
 
-                            if (
-                                Number(paywallPrice) === Number(paywallPricePaid) &&
-                                recipient === paywallRecipient
-                            ) {
-                                // Notify user
-                                toast(`${txType} sent`);
+                        if (
+                            Number(paywallPrice) === Number(paywallPricePaid) &&
+                            recipient === paywallRecipient &&
+                            address === paywallPayer
+                        ) {
+                            // Notify user
+                            toast(`${txType} sent`);
 
-                                // Unsubscribe and close websocket
-                                ws.unsubscribeFromScript(type, hash);
-                                ws.close();
+                            // Unsubscribe and close websocket
+                            ws.unsubscribeFromScript(type, hash);
+                            ws.close();
 
-                                // Refresh history
-                                if (refreshCallback) {
-                                    refreshCallback(0);
-                                }
-
-                                // Re-render modal
-                                if (modalCallback) {
-                                    modalCallback(true);
-                                }
-
-                                // Close the paywall dialog
-                                if (paywallModalCallback) {
-                                    paywallModalCallback(false);
-                                }
+                            // Refresh history
+                            if (refreshCallback) {
+                                refreshCallback(0);
                             }
-                        }, 500);
-                    })();
+
+                            // Re-render modal
+                            if (modalCallback) {
+                                modalCallback(true);
+                            }
+
+                            // Close the paywall dialog
+                            if (paywallModalCallback) {
+                                paywallModalCallback(false);
+                            }
+                        }
+                    }, 500);
                 }
             },
         });
@@ -701,7 +709,7 @@ export const txListenerOngoing = async (chronik, address, refreshCallback = fals
         const ws = chronik.ws({
             onMessage: msg => {
                 if (msg.msgType === 'TX_ADDED_TO_MEMPOOL') {
-                    // Refresh history
+                    // Refresh balance
                     if (refreshCallback) {
                         (async () => {
                             const updatedCache = await refreshUtxos(chronik, address);
