@@ -612,7 +612,7 @@ export default function Home() {
           <CreditCardHeader />
 
           {/* Tab navigation */}
-          <Tabs aria-label="eCash Chat" style="default" className='z-10 relative mt-4 justify-center'>
+          <Tabs aria-label="eCash Chat" style="default" className='z-10 focus:ring-0 relative mt-4 justify-center'>
               {isMobile === false && (
                   <Tabs.Item title="Inbox" icon={HiOutlineMail}>
                       {cashaddr.isValidCashAddress(address, 'ecash') &&
@@ -622,7 +622,7 @@ export default function Home() {
               )}
 
               {isMobile === false && (
-                  <Tabs.Item title="Send Message" icon={HiOutlineNewspaper} >
+                  <Tabs.Item title="Send Message" className='focus:ring-0' f icon={HiOutlineNewspaper} >
                       <div style={{ display: (isLoggedIn ? 'block' : 'none') }}>
                           <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
                                 <MessagePreviewModal />

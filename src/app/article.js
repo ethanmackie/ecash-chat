@@ -1,4 +1,5 @@
 "use client";
+import "./globals.css";
 import React, { useState, useEffect } from 'react';
 import { appConfig } from '../config/app';
 import { opReturn as opreturnConfig } from '../config/opreturn';
@@ -12,6 +13,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Tooltip, Popover, Modal } from "flowbite-react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+  } from "@/components/ui/select"
 import {
     TwitterShareButton,
     TwitterIcon,
@@ -633,17 +642,12 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
             <div>
                 {/* Dropdown to render article editor */}
-                <Accordion type="single" collapsible>
-                <AccordionItem value="item-1">
-                    <AccordionTrigger className="items-center justify-center">
-                        <Button
-                            type="button"
-                            className="bg-blue-500 hover:bg-blue-300"
-                        >
-                            <b>Write an article</b>
-                        </Button>
+                <Accordion type="single"  collapsible>
+                <AccordionItem value="item-1" className="border-b-0">
+                    <AccordionTrigger className="flex-none mx-auto inline-flex mb-2 items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-primary-foreground shadow h-9 px-4 py-2 bg-blue-500 hover:bg-blue-300">
+                            Write an article
                     </AccordionTrigger>
-                    <AccordionContent>
+                    <AccordionContent className="border-b-0">
                         <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96 mt-2">
                             {/* article input fields */}
                             <Input
@@ -657,55 +661,63 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             />
 
                             {/* Article category dropdown */}
-                            <select
-                                id="article-category"
-                                name="article-category"
-                                className="mt-2 rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                defaultValue="General"
-                                value={articleCategory}
-                                onChange={e => setArticleCategory(e.target.value)}
-                                maxLength={5000}
-                            >
-                                <option>General</option>
-                                <option>News</option>
-                                <option>Opinion</option>
-                                <option>Technical</option>
-                            </select>
+                <div className="flex flex-col mt-2 sm:flex-row sm:gap-4">
+                    <div className="flex flex-col gap-1.5 mt-2 sm:mt-0 ">
+                        <Label htmlFor="article-category">Categories</Label>
+                        <Select
+                        id="article-category"
+                        name="article-category"
+                        value={articleCategory}
+                        onValueChange={setArticleCategory}
+                        >
+                        <SelectTrigger className="bg-white w-[180px]">
+                            <SelectValue placeholder="General" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="General">General</SelectItem>
+                            <SelectItem value="News">News</SelectItem>
+                            <SelectItem value="Opinion">Opinion</SelectItem>
+                            <SelectItem value="Technical">Technical</SelectItem>
+                        </SelectContent>
+                        </Select>
+                    </div>
 
-                            <div className="grid w-1/2 items-center gap-1.5 mt-4">
-                                <Label htmlFor="value-input">One-off paywall fee in XEC (optional):</Label>
-                                <Input
-                                    type="number"
-                                    id="value-input"
-                                    aria-describedby="helper-text-explanation" className="bg-gray-50"
-                                    value={paywallAmountXec}
-                                    onChange={e => handlePaywallAmountChange(e)}
-                                />
-                            </div>
-                            <p className="mt-1 text-sm text-red-600 dark:text-red-500">{paywallAmountXecError !== false && paywallAmountXecError}</p>
+                    <div className="flex flex-col gap-1.5 mt-2 sm:mt-0">
+                        <Label htmlFor="value-input">Pay-to-read price in XEC - optional:</Label>
+                        <Input
+                        type="number"
+                        id="value-input"
+                        aria-describedby="helper-text-explanation"
+                        className="bg-white w-[240px]"
+                        value={paywallAmountXec}
+                        onChange={e => handlePaywallAmountChange(e)}
+                        />
+                    </div>
+                    </div>
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-500">
+                        {paywallAmountXecError !== false && paywallAmountXecError}
+                    </p>
 
                             {/* Option to disable comments */}
-                            <fieldset>
+                        <fieldset>
                                 <div className="space-y-5 py-2">
                                     <div className="relative flex items-start">
                                     <div className="flex h-6 items-center py-2">
-                                        <input
+                                        <Checkbox
                                         id="comments"
-                                        aria-describedby="comments-description"
-                                        name="comments"
-                                        type="checkbox"
-                                        onChange={() => setDisableArticleReplies(!disableArticleReplies)}
-                                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                        checked={disableArticleReplies}
+                                        onCheckedChange={() => setDisableArticleReplies(!disableArticleReplies)}
+                                        className="rounded"
                                         />
                                     </div>
                                     <div className="ml-3 text-sm leading-6">
-                                        <label htmlFor="comments" className="font-medium text-gray-900">
-                                            Disable replies to this article
-                                        </label>
+                                        <Label htmlFor="comments" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                        Disable replies to this article
+                                        </Label>
                                     </div>
                                     </div>
                                 </div>
-                            </fieldset>
+                        </fieldset>
 
                             <MarkdownEditor
                                 value={article}
@@ -713,6 +725,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     setArticle(value)
                                 }}
                                 height="400px"
+                                className=" px-2 py-2 rounded-xl border bg-card text-card-foreground shadow"
                             />
                             <p className="text-sm text-red-600 dark:text-red-500">{articleError !== false && articleError}</p>
                             <div className="flex flex-col sm:flex-row justify-between items-center mt-2">

@@ -96,3 +96,45 @@
   padding-top: 0.1875rem; 
   padding-bottom: 0.1875rem; 
 }
+
+.md-editor.wmde-markdown-var {
+  border-radius: 8px !important; 
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+  background-color: white !important;
+}
+
+.md-editor-toolbar-warp:not(.md-editor-toolbar-bottom) {
+  border-bottom: 0px !important;
+}
+
+.cm-gutters {
+  border-right: 0px !important;
+ 
+}
+
+.cm-scroller{
+  font-family: inter !important;
+  line-height: 1.75rem !important;
+  background-color: white !important;
+}
+
+.md-editor-toolbar button {
+  height: 24px !important;
+    width: 24px !important;
+}
+
+.md-editor-content-editor.cm-theme.md-editor-inner.cm-editor {
+  background-color: white !important;
+}
+
+.cm-activeLine  {
+  background-color: rgb(248 250 252) !important;
+}
+
+.cm-gutters {
+  background-color: rgb(248 250 252) !important;
+}
+
+.focus\:ring-cyan-300:focus{
+  --tw-ring-color: #00000000 !important;
+}
