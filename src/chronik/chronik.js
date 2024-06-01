@@ -522,9 +522,7 @@ export const articleTxListener = async (
 
                             // Refresh history
                             if (refreshCallback) {
-                                (async () => {
-                                    await refreshCallback(0);
-                                })();
+                                refreshCallback(0);
                             }
                         }
                     }, 500);

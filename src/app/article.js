@@ -13,7 +13,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Tooltip, Popover, Modal } from "flowbite-react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox"
+import { Checkbox } from "@/components/ui/checkbox";
+import { MagnifyingGlassIcon, ResetIcon, Share1Icon } from "@radix-ui/react-icons";
 import {
     Select,
     SelectContent,
@@ -53,7 +54,6 @@ import {
     encodeBip21PaywallPayment,
 } from '../utils/utils';
 import { CrossIcon, AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, YoutubeIcon, AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon } from "@/components/ui/social";
-import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon, ChatBubbleIcon, Share1Icon } from '@radix-ui/react-icons';
 import { toast } from 'react-toastify';
 import { BiSolidNews } from "react-icons/bi";
 import {
@@ -65,6 +65,7 @@ import {
     PaginationNext,
     PaginationPrevious,
   } from "@/components/ui/pagination";
+import { isValidRecipient } from '../validation/validation';
 import { Badge } from "@/components/ui/badge";
 import { kv } from '@vercel/kv';
 import localforage from 'localforage';
@@ -90,6 +91,9 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const [paywallAmountXecError, setPaywallAmountXecError] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [maxPagesToShow, setMaxPagesToShow] = useState(7);
+    const [addressToSearch, setAddressToSearch] = useState('');
+    const [addressToSearchError, setAddressToSearchError] = useState(false);
+    const [txHistoryByAddress, setTxHistoryByAddress] = useState(false);
 
     useEffect(() => {
         const handleResize = () => {
@@ -381,6 +385,38 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         setPaywallAmountXec(value);
     };
 
+    // Validates the author address being filtered for
+    const handleAddressChange = e => {
+        const { value } = e.target;
+        if (
+            isValidRecipient(value) === true &&
+            value.trim() !== ''
+        ) {
+            setAddressToSearch(value);
+            setAddressToSearchError(false);
+        } else {
+            setAddressToSearchError('Invalid eCash address');
+        }
+    };
+
+   // Filters articleHistory for txs where the author address matches
+   const getTxHistoryByAddress = () => {
+        if (
+            Array.isArray(articleHistory.txs) &&
+            articleHistory.txs.length > 0
+        ) {
+            const filteredArticleHistory = [];
+            for (const tx of articleHistory.txs) {
+                if (
+                    tx.replyAddress === addressToSearch
+                ) {
+                    filteredArticleHistory.push(tx);
+                }
+            }
+            setTxHistoryByAddress(filteredArticleHistory);
+        }
+    };
+
     // Check whether the paywall price for the article has been paid by this address
     const checkPaywallPayment = (paywalledArticleTxId, paywallPrice, localArticleHistoryResp = false) => {
         let paywallPaid = false;
@@ -630,6 +666,103 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         );
     };
 
+    const RenderArticleListing = () => {
+        let latestArticleHistory;
+
+        if (
+            Array.isArray(txHistoryByAddress) &&
+            txHistoryByAddress.length > 0
+        ) {
+            latestArticleHistory = { txs: txHistoryByAddress };
+        } else {
+            latestArticleHistory = articleHistory;
+        }
+
+        return (
+            <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px]">
+                {latestArticleHistory &&
+                    latestArticleHistory.txs &&
+                    latestArticleHistory.txs.length > 0
+                        ? latestArticleHistory.txs.map(
+                            (tx, index) => (
+                                <>
+                                    {/* Render a summary of the article */}
+                                    {tx.articleObject && (
+                                        <article key={index} className="flex max-w-xl flex-col items-start justify-between py-8">
+                                            {/* Article date and category */}
+                                            <div className="flex items-center gap-x-4 text-xs">
+                                                <time dateTime={tx.txTime} className="text-gray-500">
+                                                    {tx.txDate}
+                                                </time>
+                                                <div
+                                                    className="relative z-10 rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100"
+                                                >
+                                                    {typeof tx.articleObject.category !== 'undefined' && tx.articleObject.category ? tx.articleObject.category : 'General'}
+                                                </div>
+                                            </div>
+                                            <div className="group relative w-full">
+                                                {tx.articleObject.paywallPrice > 0 && (
+                                                    <Alert variant="destructive" onClick={() => {
+                                                        setCurrentArticleTxObj(tx);
+                                                        checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice)
+                                                    }}>
+                                                        <AlertDescription>
+                                                            This article costs {tx.articleObject.paywallPrice} XEC to view
+                                                        </AlertDescription>
+                                                    </Alert>
+                                                )}
+                                                <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
+                                                {/* Render the paywall or article content depending on the presence of a paywall price */}
+                                                {tx.articleObject.paywallPrice > 0 ? (
+                                                    <a href={'#'}  onClick={() => {
+                                                        setCurrentArticleTxObj(tx);
+                                                        checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice);
+                                                    }}>
+                                                        <span className="absolute inset-0" />
+                                                        {tx.articleObject.title}
+                                                    </a>
+                                                ) : (
+                                                    <a href={'#'}  onClick={() => {
+                                                        setCurrentArticleTxObj(tx);
+                                                        setShowArticleModal(true);
+                                                    }}>
+                                                        <span className="absolute inset-0" />
+                                                        {tx.articleObject.title}
+                                                    </a>
+                                                )}
+                                                </h3>
+                                                <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600 break-words">
+                                                    <RenderArticle content={tx.articleObject.content} />
+                                                </p>
+                                            </div>
+                                            {/* Article author */}
+                                            <div className="relative mt-2 flex items-center gap-x-4">
+                                                <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
+                                                <div className="text-sm leading-6">
+                                                    <p className="font-semibold text-gray-900">
+                                                        <span className="absolute inset-0" />
+                                                        <Badge variant="outline" className="py-3px">
+                                                            <div className="leading-7 [&:not(:first-child)]:mt-6" onClick={() => {
+                                                                copy(tx.replyAddress);
+                                                                toast(`${tx.replyAddress} copied to clipboard`);
+                                                            }}>
+                                                                {tx.replyAddress.substring(0,10)}...{tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                                            </div>
+                                                        </Badge>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </article>
+                                    )}
+                                </>
+                            ),
+                        )
+                    : ''
+                }
+            </div>
+        );
+    };
+
     return (
         <>
             {showArticleModal && (
@@ -809,88 +942,53 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                     </Pagination>
                 </span>
                 
+                {/* Filter by artichle author */}
+                <form className="space-y-6" action="#" method="POST">
+                    <div>
+                        <div className="max-w-xl mt-10 w-full mx-auto">
+                            <div className="flex items-center space-x-2">
+                                <Input
+                                id="address"
+                                name="address"
+                                type="text"
+                                value={addressToSearch}
+                                required
+                                className="bg-gray-50"
+                                placeholder='Search By Author Address'
+                                onChange={e => handleAddressChange(e)}
+                                />
+
+                                <Button
+                                type="button"
+                                variant="outline"
+                                disabled={addressToSearchError}
+                                onClick={e => {
+                                    getTxHistoryByAddress(e);
+                                }}
+                                >
+                                <MagnifyingGlassIcon className="h-4 w-4" />
+                                </Button>
+
+                                <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                    setTxHistoryByAddress('');
+                                    setAddressToSearch('');
+                                }}
+                                >
+                                <ResetIcon />
+                                </Button>
+                            </div>
+                            <p className="mt-2 text-sm text-red-600 dark:text-red-500">
+                                {addressToSearchError !== false && addressToSearchError}
+                            </p>
+                        </div>
+                    </div>
+                </form>
+
                 {/* Render article listings */}
-                <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px]">
-                    {articleHistory &&
-                        articleHistory.txs &&
-                            articleHistory.txs.length > 0
-                            ? articleHistory.txs.map(
-                                (tx, index) => (
-                                    <>
-                                        {/* Render a summary of the article */}
-                                        {tx.articleObject && (
-                                            <article key={index} className="flex max-w-xl flex-col items-start justify-between py-8">
-                                                {/* Article date and category */}
-                                                <div className="flex items-center gap-x-4 text-xs">
-                                                    <time dateTime={tx.txTime} className="text-gray-500">
-                                                        {tx.txDate}
-                                                    </time>
-                                                    <div
-                                                        className="relative z-10 rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100"
-                                                    >
-                                                        {typeof tx.articleObject.category !== 'undefined' && tx.articleObject.category ? tx.articleObject.category : 'General'}
-                                                    </div>
-                                                </div>
-                                                <div className="group relative w-full">
-                                                    {tx.articleObject.paywallPrice > 0 && (
-                                                        <Alert variant="destructive" onClick={() => {
-                                                            setCurrentArticleTxObj(tx);
-                                                            checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice)
-                                                        }}>
-                                                            <AlertDescription>
-                                                                This article costs {tx.articleObject.paywallPrice} XEC to view
-                                                            </AlertDescription>
-                                                        </Alert>
-                                                    )}
-                                                    <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
-                                                    {/* Render the paywall or article content depending on the presence of a paywall price */}
-                                                    {tx.articleObject.paywallPrice > 0 ? (
-                                                        <a href={'#'}  onClick={() => {
-                                                            setCurrentArticleTxObj(tx);
-                                                            checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice);
-                                                        }}>
-                                                            <span className="absolute inset-0" />
-                                                            {tx.articleObject.title}
-                                                        </a>
-                                                    ) : (
-                                                        <a href={'#'}  onClick={() => {
-                                                            setCurrentArticleTxObj(tx);
-                                                            setShowArticleModal(true);
-                                                        }}>
-                                                            <span className="absolute inset-0" />
-                                                            {tx.articleObject.title}
-                                                        </a>
-                                                    )}
-                                                    </h3>
-                                                    <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600 break-words">
-                                                        <RenderArticle content={tx.articleObject.content} />
-                                                    </p>
-                                                </div>
-                                                {/* Article author */}
-                                                <div className="relative mt-2 flex items-center gap-x-4">
-                                                    <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
-                                                    <div className="text-sm leading-6">
-                                                        <p className="font-semibold text-gray-900">
-                                                            <span className="absolute inset-0" />
-                                                            <Badge variant="outline" className="py-3px">
-                                                                <div className="leading-7 [&:not(:first-child)]:mt-6" onClick={() => {
-                                                                    copy(tx.replyAddress);
-                                                                    toast(`${tx.replyAddress} copied to clipboard`);
-                                                                }}>
-                                                                    {tx.replyAddress.substring(0,10)}...{tx.replyAddress.substring(tx.replyAddress.length - 5)}
-                                                                </div>
-                                                            </Badge>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </article>
-                                        )}
-                                    </>
-                                ),
-                            )
-                        : ''
-                    }
-                </div>
+                <RenderArticleListing />
             </div>
         </>
     );

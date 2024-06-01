@@ -655,106 +655,105 @@ export default function TxHistory({ address }) {
          <>
          <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
          {txHistory && txHistory !== '' ? (
-             <>
-             {/*Set up pagination menu*/}
-  
-             <span>
-                  <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              href="#"
-              onClick={(e) => {
-                setCurrentPage((old) => Math.max(0, old - 1));
-                getTxHistoryByPage(Math.max(0, currentPage - 1));
-              }}
-              disabled={currentPage === 0}
-            />
-          </PaginationItem>
+            <>
+            {/*Set up pagination menu*/}
 
-          {Array.from({ length: txHistory.numPages }, (_, i) => i)
-            .filter(i => {
-            
-              if (txHistory.numPages <= maxPagesToShow) return true;
-              if (currentPage <= halfMaxPages) return i < maxPagesToShow;
-              if (currentPage >= txHistory.numPages - halfMaxPages) return i >= txHistory.numPages - maxPagesToShow;
-              return i >= currentPage - halfMaxPages && i <= currentPage + halfMaxPages;
-            })
-            .map(i => (
-              <PaginationItem key={i}>
-                <PaginationLink
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    getTxHistoryByPage(i);
-                    setCurrentPage(i);
-                  }}
-                  isActive={currentPage === i}
-                >
-                  {i + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
+            <span>
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        href="#"
+                        onClick={(e) => {
+                          setCurrentPage((old) => Math.max(0, old - 1));
+                          getTxHistoryByPage(Math.max(0, currentPage - 1));
+                        }}
+                        disabled={currentPage === 0}
+                      />
+                    </PaginationItem>
 
-          <PaginationItem>
-            <PaginationNext
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setCurrentPage((old) => Math.min(txHistory.numPages - 1, old + 1));
-                getTxHistoryByPage(Math.min(txHistory.numPages - 1, currentPage + 1));
-              }}
-              disabled={currentPage === txHistory.numPages - 1}
-            />
-          </PaginationItem>
-        </PaginationContent>
-             </Pagination>
-               </span>
-             <form className="space-y-6" action="#" method="POST">
-          <div>
-      <div className="max-w-xl mt-10 w-full mx-auto">
-        <div className="flex items-center space-x-2">
-          <Input
-            id="address"
-            name="address"
-            type="text"
-            value={addressToSearch}
-            required
-            className="bg-gray-50"
-            placeholder='Search By Address'
-            onChange={e => handleAddressChange(e)}
-          />
+                    {Array.from({ length: txHistory.numPages }, (_, i) => i)
+                      .filter(i => {
+                        if (txHistory.numPages <= maxPagesToShow) return true;
+                        if (currentPage <= halfMaxPages) return i < maxPagesToShow;
+                        if (currentPage >= txHistory.numPages - halfMaxPages) return i >= txHistory.numPages - maxPagesToShow;
+                        return i >= currentPage - halfMaxPages && i <= currentPage + halfMaxPages;
+                      })
+                      .map(i => (
+                        <PaginationItem key={i}>
+                          <PaginationLink
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              getTxHistoryByPage(i);
+                              setCurrentPage(i);
+                            }}
+                            isActive={currentPage === i}
+                          >
+                            {i + 1}
+                          </PaginationLink>
+                        </PaginationItem>
+                      ))}
 
-          <Button
-            type="button"
-            variant="outline"
-            disabled={addressToSearchError}
-            onClick={e => {
-              getTxHistoryByAddress(e);
-            }}
-          >
-            <MagnifyingGlassIcon className="h-4 w-4" />
-          </Button>
+                    <PaginationItem>
+                      <PaginationNext
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage((old) => Math.min(txHistory.numPages - 1, old + 1));
+                          getTxHistoryByPage(Math.min(txHistory.numPages - 1, currentPage + 1));
+                        }}
+                        disabled={currentPage === txHistory.numPages - 1}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+            </span>
+            <form className="space-y-6" action="#" method="POST">
+              <div>
+                <div className="max-w-xl mt-10 w-full mx-auto">
+                  <div className="flex items-center space-x-2">
+                    <Input
+                      id="address"
+                      name="address"
+                      type="text"
+                      value={addressToSearch}
+                      required
+                      className="bg-gray-50"
+                      placeholder='Search By Address'
+                      onChange={e => handleAddressChange(e)}
+                    />
 
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              setTxHistoryByAddress('');
-              setAddressToSearch('');
-            }}
-          >
-            <ResetIcon />
-          </Button>
-        </div>
-          <p className="mt-2 text-sm text-red-600 dark:text-red-500">
-            {addressToSearchError !== false && addressToSearchError}
-          </p>
-        </div>
-          </div>
-        </form>
-             <RenderTxHistory />
-             </>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={addressToSearchError}
+                      onClick={e => {
+                        getTxHistoryByAddress(e);
+                      }}
+                    >
+                      <MagnifyingGlassIcon className="h-4 w-4" />
+                    </Button>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setTxHistoryByAddress('');
+                        setAddressToSearch('');
+                      }}
+                    >
+                      <ResetIcon />
+                    </Button>
+                  </div>
+                    <p className="mt-2 text-sm text-red-600 dark:text-red-500">
+                      {addressToSearchError !== false && addressToSearchError}
+                    </p>
+                  </div>
+              </div>
+            </form>
+          <RenderTxHistory />
+          </>
            ) : 
            <div className="flex flex-col space-y-3">
            <div className="space-y-2">
