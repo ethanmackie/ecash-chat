@@ -138,3 +138,16 @@
 .focus\:ring-cyan-300:focus{
   --tw-ring-color: #00000000 !important;
 }
+
+@media (min-width: 1536px) {
+  .module-large-py {
+    padding-top: 5rem; 
+    padding-bottom: 5rem;
+  }
+}
+
+.md-editor {
+  padding-top: clamp(0px, 15% - 100px, 70px) !important;
+}
+
+

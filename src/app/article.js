@@ -65,6 +65,14 @@ import {
     PaginationNext,
     PaginationPrevious,
   } from "@/components/ui/pagination";
+  import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+  } from "@/components/ui/card"
 import { isValidRecipient } from '../validation/validation';
 import { Badge } from "@/components/ui/badge";
 import { kv } from '@vercel/kv';
@@ -680,91 +688,86 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
         return (
             <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px]">
-                {latestArticleHistory &&
-                    latestArticleHistory.txs &&
-                    latestArticleHistory.txs.length > 0
-                        ? latestArticleHistory.txs.map(
-                            (tx, index) => (
-                                <>
-                                    {/* Render a summary of the article */}
-                                    {tx.articleObject && (
-                                        <article key={index} className="flex max-w-xl flex-col items-start justify-between py-8">
-                                            {/* Article date and category */}
-                                            <div className="flex items-center gap-x-4 text-xs">
-                                                <time dateTime={tx.txTime} className="text-gray-500">
-                                                    {tx.txDate}
-                                                </time>
-                                                <div
-                                                    className="relative z-10 rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100"
-                                                >
-                                                    {typeof tx.articleObject.category !== 'undefined' && tx.articleObject.category ? tx.articleObject.category : 'General'}
-                                                </div>
-                                            </div>
-                                            <div className="group relative w-full">
-                                                {tx.articleObject.paywallPrice > 0 && (
-                                                    <Alert variant="destructive" onClick={() => {
-                                                        setCurrentArticleTxObj(tx);
-                                                        checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice)
-                                                    }}>
-                                                        <AlertDescription>
-                                                            This article costs {tx.articleObject.paywallPrice} XEC to view
-                                                        </AlertDescription>
-                                                    </Alert>
-                                                )}
-                                                <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
-                                                {/* Render the paywall or article content depending on the presence of a paywall price */}
-                                                {tx.articleObject.paywallPrice > 0 ? (
-                                                    <a href={'#'}  onClick={() => {
-                                                        setCurrentArticleTxObj(tx);
-                                                        checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice);
-                                                    }}>
-                                                        <span className="absolute inset-0" />
-                                                        {tx.articleObject.title}
-                                                    </a>
-                                                ) : (
-                                                    <a href={'#'}  onClick={() => {
-                                                        setCurrentArticleTxObj(tx);
-                                                        setShowArticleModal(true);
-                                                    }}>
-                                                        <span className="absolute inset-0" />
-                                                        {tx.articleObject.title}
-                                                    </a>
-                                                )}
-                                                </h3>
-                                                <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600 break-words">
-                                                    <RenderArticle content={tx.articleObject.content} />
-                                                </p>
-                                            </div>
-                                            {/* Article author */}
-                                            <div className="relative mt-2 flex items-center gap-x-4">
-                                                <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
-                                                <div className="text-sm leading-6">
-                                                    <p className="font-semibold text-gray-900">
-                                                        <span className="absolute inset-0" />
-                                                        <Badge variant="outline" className="py-3px">
-                                                            <div className="leading-7 [&:not(:first-child)]:mt-6" onClick={() => {
-                                                                copy(tx.replyAddress);
-                                                                toast(`${tx.replyAddress} copied to clipboard`);
-                                                            }}>
-                                                                {tx.replyAddress.substring(0,10)}...{tx.replyAddress.substring(tx.replyAddress.length - 5)}
-                                                            </div>
-                                                        </Badge>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </article>
-                                    )}
-                                </>
-                            ),
-                        )
-                    : ''
-                }
-            </div>
+                    {latestArticleHistory &&
+                        latestArticleHistory.txs &&
+                        latestArticleHistory.txs.length > 0 ? (
+                        latestArticleHistory.txs.map((tx, index) => (
+                        tx.articleObject && (
+                            <Card key={index} className="max-w-xl w-full mt-2">
+                            <CardHeader>
+                                <div className="flex items-center gap-x-4 text-xs">
+                                <time dateTime={tx.txTime} className="text-gray-500">
+                                    {tx.txDate}
+                                </time>
+                                <Badge variant="secondary">
+                                {tx.articleObject.category || 'General'}
+                                    </Badge>
+                                </div>
+                                <CardTitle>
+                                {tx.articleObject.paywallPrice > 0 ? (
+                                    <a href={'#'} onClick={() => {
+                                    setCurrentArticleTxObj(tx);
+                                    checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice);
+                                    }}>
+                                    {tx.articleObject.title}
+                                    </a>
+                                ) : (
+                                    <a href={'#'} onClick={() => {
+                                    setCurrentArticleTxObj(tx);
+                                    setShowArticleModal(true);
+                                    }}>
+                                    {tx.articleObject.title}
+                                    </a>
+                                )}
+                                </CardTitle>
+                                <CardDescription>
+                                {tx.articleObject.paywallPrice > 0 && (
+                                    <Alert variant="destructive" onClick={() => {
+                                    setCurrentArticleTxObj(tx);
+                                    checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice);
+                                    }}>
+                                    <AlertDescription>
+                                        This article costs {tx.articleObject.paywallPrice} XEC to view
+                                    </AlertDescription>
+                                    </Alert>
+                                )}
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600 break-words">
+                                <RenderArticle content={tx.articleObject.content} />
+                                </p>
+                            </CardContent>
+                            <CardFooter>
+                                <div className="relative mt-2 flex items-center gap-x-4">
+                                <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
+                                <div className="text-sm leading-6">
+                                    <p className="font-semibold text-gray-900">
+                                    <Badge variant="outline" className="py-3px">
+                                        <div className="leading-7 [&:not(:first-child)]:mt-6" onClick={() => {
+                                        copy(tx.replyAddress);
+                                        toast(`${tx.replyAddress} copied to clipboard`);
+                                        }}>
+                                        {tx.replyAddress.substring(0,10)}...{tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                        </div>
+                                    </Badge>
+                                    </p>
+                                </div>
+                                </div>
+                            </CardFooter>
+                            </Card>
+      )
+    ))
+  ) : (
+    ''
+  )}
+</div>
         );
     };
 
     return (
         <>
+         <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px]">
             {showArticleModal && (
                 <FullArticleModal />
             )}
@@ -989,6 +992,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
                 {/* Render article listings */}
                 <RenderArticleListing />
+            </div>
             </div>
         </>
     );
