@@ -151,3 +151,7 @@
 }
 
 
+.text-cyan-600 {
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0);
+}
