@@ -164,6 +164,9 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             sharedArticleObject.paywallPrice,
                             localArticleHistoryResp,
                         );
+                    } else {
+                        // If this article exists as a non-paywalled article, render directly
+                        setShowArticleModal(true);
                     }
                 } else {
                     toast('No article found for this article txid');
