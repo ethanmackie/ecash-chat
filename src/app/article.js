@@ -687,7 +687,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         }
 
         return (
-            <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px]">
+            <div className="max-w-xl w-full mx-auto">
                     {latestArticleHistory &&
                         latestArticleHistory.txs &&
                         latestArticleHistory.txs.length > 0 ? (
@@ -802,7 +802,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             Write an article
                     </AccordionTrigger>
                     <AccordionContent className="border-b-0">
-                        <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96 mt-2">
+                        <div className="max-w-xl w-full mt-2 mx-auto">
                             {/* article input fields */}
                             <Input
                                 className="bg-white"
@@ -879,7 +879,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     setArticle(value)
                                 }}
                                 height="400px"
-                                className=" px-2 py-2 rounded-xl border bg-card text-card-foreground shadow"
+                                className=" px-2 py-2 rounded-xl border max-w-xl bg-card text-card-foreground break-words shadow"
                             />
                             <p className="text-sm text-red-600 dark:text-red-500">{articleError !== false && articleError}</p>
                             <div className="flex flex-col sm:flex-row justify-between items-center mt-2">
