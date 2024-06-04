@@ -405,11 +405,11 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             isValidRecipient(value) === true &&
             value.trim() !== ''
         ) {
-            setAddressToSearch(value);
             setAddressToSearchError(false);
         } else {
             setAddressToSearchError('Invalid eCash address');
         }
+        setAddressToSearch(value);
     };
 
    // Filters articleHistory for txs where the author address matches
