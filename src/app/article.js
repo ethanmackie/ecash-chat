@@ -283,7 +283,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             );
         }
         setReplyArticle('');
-        txListener(chronik, address, "Article reply", getArticleHistoryByPage);
+        txListener(chronik, address, "Article reply", appConfig.dustXec, address, getArticleHistoryByPage);
     };
 
     // Pass a XEC tip tx BIP21 query string to cashtab extensions
