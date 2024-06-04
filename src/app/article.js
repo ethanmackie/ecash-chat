@@ -19,6 +19,7 @@ import {
     SendIcon,
     LogoutIcon,
     EncryptionIcon,
+    UnlockIcon,
 } from "@/components/ui/social";
 import {
     Select,
@@ -727,32 +728,32 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 <CardDescription></CardDescription>
                             </CardHeader>
                             <CardContent className="relative">
-                            {tx.articleObject.paywallPrice > 0 && !paidArticles.has(tx.txid) && (
-                                <Alert
-                                    className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-auto z-10 flex items-center justify-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/5"
-                                >
-                                    <AlertDescription className="flex items-center justify-center">
-                                    <EncryptionIcon />
-                                    This article costs {tx.articleObject.paywallPrice} XEC to view
-                                    </AlertDescription>
-                                </Alert>
-                                )}
-                                <p
-                                className={`mt-0 line-clamp-3 text-sm leading-6 text-gray-600 break-words ${
-                                    tx.articleObject.paywallPrice > 0 ? 'blur-sm pt-6' : ''
-                                }`}
-                                >
-                                {tx.articleObject.paywallPrice > 0 && !paidArticles.has(tx.txid) ? (
-                                    <>
-                                    <Skeleton className="h-4 mt-2 w-full" />
-                                    <Skeleton className="h-4 mt-2 w-2/3" />
-                                    <Skeleton className="h-4 mt-2 w-1/2" />
-                                    </>
-                                ) : (
-                                    <RenderArticle content={tx.articleObject.content} />
-                                )}
-                                </p>
-                            </CardContent>
+                        {tx.articleObject.paywallPrice > 0 && !paidArticles.has(tx.txid) && (
+                            <Alert
+                            className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-auto z-10 flex items-center justify-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/5"
+                            >
+                            <AlertDescription className="flex items-center justify-center">
+                                <EncryptionIcon />
+                                This article costs {tx.articleObject.paywallPrice} XEC to view
+                            </AlertDescription>
+                            </Alert>
+                        )}
+                        <p
+                            className={`mt-0 line-clamp-3 text-sm leading-6 text-gray-600 break-words ${
+                            tx.articleObject.paywallPrice > 0 && !paidArticles.has(tx.txid) ? 'blur-sm pt-6' : ''
+                            }`}
+                        >
+                            {tx.articleObject.paywallPrice > 0 && !paidArticles.has(tx.txid) ? (
+                            <>
+                                <Skeleton className="h-4 mt-2 w-full" />
+                                <Skeleton className="h-4 mt-2 w-2/3" />
+                                <Skeleton className="h-4 mt-2 w-1/2" />
+                            </>
+                            ) : (
+                            <RenderArticle content={tx.articleObject.content} />
+                            )}
+                        </p>
+                        </CardContent>
                             <CardFooter>
                                 <div className="relative mt-2 flex items-center gap-x-4">
                                 <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
@@ -773,6 +774,9 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     </Badge>
                                     </p>
                                 </div>
+                                  {tx.articleObject.paywallPrice > 0 && paidArticles.has(tx.txid) && (
+                                     <UnlockIcon />
+                                  )}
                                 </div>
                             </CardFooter>
                             </Card>
