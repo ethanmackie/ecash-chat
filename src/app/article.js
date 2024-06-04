@@ -107,6 +107,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const [addressToSearch, setAddressToSearch] = useState('');
     const [addressToSearchError, setAddressToSearchError] = useState(false);
     const [txHistoryByAddress, setTxHistoryByAddress] = useState(false);
+    const [paidArticles, setPaidArticles] = useState(new Set());
 
     useEffect(() => {
         const handleResize = () => {
@@ -437,7 +438,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         if (localArticleHistoryResp) {
             localArticleHistory = localArticleHistoryResp;
         }
-
+    
         for (const thisPaywallPayment of localArticleHistory.paywallTxs) {
             if (
                 thisPaywallPayment.paywallPaymentArticleTxid === paywalledArticleTxId &&
@@ -448,14 +449,16 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 break;
             }
         }
-
+    
         console.log('Paid paywall fee? ', paywallPaid);
         if (paywallPaid) {
+            setPaidArticles(prev => new Set(prev).add(paywalledArticleTxId));
             setShowArticleModal(true);
         } else {
             setShowPaywallPaymentModal(true);
         }
     };
+
 
     // Render the tipping button popover
     const RenderTipping = ( { address } ) => {
@@ -689,86 +692,83 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         }
 
         return (
-            <div className="max-w-xl w-full mx-auto">
+                    <div className="max-w-xl w-full mx-auto">
                     {latestArticleHistory &&
-                        latestArticleHistory.txs &&
-                        latestArticleHistory.txs.length > 0 ? (
-                        latestArticleHistory.txs.map((tx, index) => (
+                    latestArticleHistory.txs &&
+                    latestArticleHistory.txs.length > 0 ? (
+                    latestArticleHistory.txs.map((tx, index) => (
                         tx.articleObject && (
-                            <Card key={index} className="max-w-xl w-full mt-2">
+                        <a
+                            key={index}
+                            href="#"
+                            onClick={(e) => {
+                            e.preventDefault();
+                            setCurrentArticleTxObj(tx);
+                            if (tx.articleObject.paywallPrice > 0) {
+                                checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice);
+                            } else {
+                                setShowArticleModal(true);
+                            }
+                            }}
+                        >
+                            <Card className="max-w-xl w-full mt-2">
                             <CardHeader>
                                 <div className="flex items-center gap-x-4 text-xs">
                                 <time dateTime={tx.txTime} className="text-gray-500">
                                     {tx.txDate}
                                 </time>
                                 <Badge variant="secondary">
-                                {tx.articleObject.category || 'General'}
-                                    </Badge>
+                                    {tx.articleObject.category || 'General'}
+                                </Badge>
                                 </div>
                                 <CardTitle>
-                                {tx.articleObject.paywallPrice > 0 ? (
-                                    <a href={'#'} onClick={() => {
-                                    setCurrentArticleTxObj(tx);
-                                    checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice);
-                                    }}>
-                                    {tx.articleObject.title}
-                                    </a>
-                                ) : (
-                                    <a href={'#'} onClick={() => {
-                                    setCurrentArticleTxObj(tx);
-                                    setShowArticleModal(true);
-                                    }}>
-                                    {tx.articleObject.title}
-                                    </a>
-                                )}
+                                {tx.articleObject.title}
                                 </CardTitle>
-                                <CardDescription>
-                    
-                    </CardDescription>
-                    </CardHeader>
-                 <CardContent className="relative ">
-                    {tx.articleObject.paywallPrice > 0 && (
-                        <Alert
-                        className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-auto z-10 flex items-center justify-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/5"
-                        onClick={() => {
-                            setCurrentArticleTxObj(tx);
-                            checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice);
-                        }}
-                        >
-                        <AlertDescription className="flex items-center justify-center">
-                        <EncryptionIcon />
-                            This article costs {tx.articleObject.paywallPrice} XEC to view
-                        </AlertDescription>
-                        </Alert>
-                    )}
-                    <p
-                        className={`mt-0 line-clamp-3 text-sm leading-6 text-gray-600 break-words ${
-                        tx.articleObject.paywallPrice > 0 ? 'blur-sm pt-6' : ''
-                        }`}
-                    >
-                        {tx.articleObject.paywallPrice > 0 ? (
-                     <>
-                     <Skeleton className="h-4 mt-2 w-full" />
-                     <Skeleton className="h-4 mt-2 w-2/3" />
-                     <Skeleton className="h-4 mt-2 w-1/2" />
-                   </>
-                        
-                        ) : (
-                        <RenderArticle content={tx.articleObject.content} />
-                        )}
-                    </p>
-                    </CardContent>
+                                <CardDescription></CardDescription>
+                            </CardHeader>
+                            <CardContent className="relative">
+                            {tx.articleObject.paywallPrice > 0 && !paidArticles.has(tx.txid) && (
+                                <Alert
+                                    className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-auto z-10 flex items-center justify-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/5"
+                                >
+                                    <AlertDescription className="flex items-center justify-center">
+                                    <EncryptionIcon />
+                                    This article costs {tx.articleObject.paywallPrice} XEC to view
+                                    </AlertDescription>
+                                </Alert>
+                                )}
+                                <p
+                                className={`mt-0 line-clamp-3 text-sm leading-6 text-gray-600 break-words ${
+                                    tx.articleObject.paywallPrice > 0 ? 'blur-sm pt-6' : ''
+                                }`}
+                                >
+                                {tx.articleObject.paywallPrice > 0 && !paidArticles.has(tx.txid) ? (
+                                    <>
+                                    <Skeleton className="h-4 mt-2 w-full" />
+                                    <Skeleton className="h-4 mt-2 w-2/3" />
+                                    <Skeleton className="h-4 mt-2 w-1/2" />
+                                    </>
+                                ) : (
+                                    <RenderArticle content={tx.articleObject.content} />
+                                )}
+                                </p>
+                            </CardContent>
                             <CardFooter>
                                 <div className="relative mt-2 flex items-center gap-x-4">
                                 <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
                                 <div className="text-sm leading-6">
                                     <p className="font-semibold text-gray-900">
                                     <Badge variant="outline" className="py-3px">
-                                        <div className="leading-7 [&:not(:first-child)]:mt-6" onClick={() => {
-                                        copy(tx.replyAddress);
-                                        toast(`${tx.replyAddress} copied to clipboard`);
-                                        }}>
-                                        {tx.replyAddress.substring(0,10)}...{tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                        <div
+                                        className="leading-7 [&:not(:first-child)]:mt-6"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            copy(tx.replyAddress);
+                                            toast(`${tx.replyAddress} copied to clipboard`);
+                                        }}
+                                        >
+                                        {tx.replyAddress.substring(0, 10)}...
+                                        {tx.replyAddress.substring(tx.replyAddress.length - 5)}
                                         </div>
                                     </Badge>
                                     </p>
@@ -776,12 +776,13 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 </div>
                             </CardFooter>
                             </Card>
-                            )
-                            ))
-                        ) : (
-                            ''
-                        )}
-                        </div>
+                        </a>
+                        )
+                    ))
+                    ) : (
+                    ''
+                    )}
+                </div>
                         );
                     };
 
@@ -868,8 +869,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 }}
                                 height="400px"
                                 className=" px-2 py-2 rounded-xl mx-auto border max-w-3xl max-h-85vh my-auto bg-card text-card-foreground break-words shadow"
-                            />
-                         
+                            /> 
                             <p className="text-sm text-red-600 dark:text-red-500">{articleError !== false && articleError}</p>
                             <div className="flex flex-col sm:flex-row justify-between items-center mt-2">
                                 {/* Write article button*/}
