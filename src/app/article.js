@@ -857,21 +857,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             {/* Option to disable comments */}
                         <fieldset>
                                 <div className="space-y-5 py-2">
-                                    <div className="relative flex items-start">
-                                    <div className="flex h-6 items-center py-2">
-                                        <Checkbox
-                                        id="comments"
-                                        checked={disableArticleReplies}
-                                        onCheckedChange={() => setDisableArticleReplies(!disableArticleReplies)}
-                                        className="rounded"
-                                        />
-                                    </div>
-                                    <div className="ml-3 text-sm leading-6">
-                                        <Label htmlFor="comments" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                        Disable replies to this article
-                                        </Label>
-                                    </div>
-                                    </div>
+                                    
                                 </div>
                         </fieldset>
                    
@@ -895,6 +881,21 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 >
                                 <BiSolidNews />&nbsp;Post Article
                                 </Button>
+                                <div className="relative flex items-start">
+                                    <div className="flex h-6 items-center py-2">
+                                        <Checkbox
+                                        id="comments"
+                                        checked={disableArticleReplies}
+                                        onCheckedChange={() => setDisableArticleReplies(!disableArticleReplies)}
+                                        className="rounded"
+                                        />
+                                    </div>
+                                    <div className="ml-3 text-sm leading-6">
+                                        <Label htmlFor="comments" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                        Disable replies to this article
+                                        </Label>
+                                    </div>
+                                    </div>
                             </div>
                         </div>
                     </AccordionContent>
