@@ -583,8 +583,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                         <div><RenderReplies txid={currentArticleTxObj.txid} replies={articleHistory.replies} /></div>
                     )}
                 </Modal.Body>
-                <Modal.Footer>
-                    <div className="flex gap-5">
+                <Modal.Footer className="flex flex-col items-start space-x-0 space-y-2 rounded-b border-gray-200 p-6 dark:border-gray-600 border-t">
+                    <div className="flex gap-2">
                         {/* Tipping action to an article */}
                         <RenderTipping address={currentArticleTxObj.replyAddress} />
 
@@ -633,14 +633,17 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             <Share1Icon className="h-4 w-4" />
                             </Button>
                         </Popover>
-
                         {/* Reply action to an article, disable if disableReplies is set to true */}
                         {currentArticleTxObj.articleObject.disbleReplies !== true && (
                             <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
-                                <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
-                                    <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Reply to article ...{currentArticleTxObj.txid.slice(-10)}</h3>
-                                </div>
-                                <div className="px-3 py-2">
+                                <Badge className="leading-7 shadow-sm py-3px" variant="outline">Reply to article ...{currentArticleTxObj.txid.slice(-10)}</Badge>
+                            </div>
+                        )}
+                       
+                    </div>
+
+                    {currentArticleTxObj.articleObject.disbleReplies !== true && (
+                    <div className="w-full ml-0">
                                     {/* Reply input field */}
                                     <Textarea
                                         id="reply-post"
@@ -653,8 +656,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     />
                                     <Button
                                         type="button"
-                                        variant="outline"
-                                        className="bg-blue-500 hover:bg-blue-300"
+                                        className="bg-blue-500 mt-2 hover:bg-blue-300"
                                         disabled={replyArticle === ''}
                                         onClick={e => {
                                             replytoArticle(currentArticleTxObj.txid, replyArticle)
@@ -662,13 +664,13 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     >
                                         Post Reply
                                     </Button>
+                                    <Button 
+                                    className="ml-2"
+                                    variant="ghost" onClick={() => setShowArticleModal(false)}>
+                                    Close
+                                </Button>
                                 </div>
-                            </div>
-                        )}
-                        <Button onClick={() => setShowArticleModal(false)}>
-                            Close
-                        </Button>
-                    </div>
+                                )}
                 </Modal.Footer>
             </Modal>
         );
