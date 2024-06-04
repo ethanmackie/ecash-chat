@@ -108,7 +108,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const [addressToSearch, setAddressToSearch] = useState('');
     const [addressToSearchError, setAddressToSearchError] = useState(false);
     const [txHistoryByAddress, setTxHistoryByAddress] = useState(false);
-    const [paidArticles, setPaidArticles] = useState(new Set());
 
     useEffect(() => {
         const handleResize = () => {
@@ -160,7 +159,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
                     if (sharedArticleObject.paywallPrice > 0) {
                         // If this article exists, and is a paywalled article, check paywall payment and render accordingly
-                        checkPaywallPayment(
+                        handlePaywallStatus(
                             sharedArticleTxid,
                             sharedArticleObject.paywallPrice,
                             localArticleHistoryResp,
@@ -450,16 +449,20 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 break;
             }
         }
-    
+
+        return paywallPaid;
+    };
+
+    // Conditionally renders the appropriate modal based on paywall payment status
+    const handlePaywallStatus = (paywalledArticleTxId, paywallPrice, localArticleHistoryResp = false) => {
+        const paywallPaid = checkPaywallPayment(paywalledArticleTxId, paywallPrice, localArticleHistoryResp );
         console.log('Paid paywall fee? ', paywallPaid);
         if (paywallPaid) {
-            setPaidArticles(prev => new Set(prev).add(paywalledArticleTxId));
             setShowArticleModal(true);
         } else {
             setShowPaywallPaymentModal(true);
         }
     };
-
 
     // Render the tipping button popover
     const RenderTipping = ( { address } ) => {
@@ -706,7 +709,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             e.preventDefault();
                             setCurrentArticleTxObj(tx);
                             if (tx.articleObject.paywallPrice > 0) {
-                                checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice);
+                                handlePaywallStatus(tx.txid, tx.articleObject.paywallPrice);
                             } else {
                                 setShowArticleModal(true);
                             }
@@ -728,7 +731,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 <CardDescription></CardDescription>
                             </CardHeader>
                             <CardContent className="relative">
-                        {tx.articleObject.paywallPrice > 0 && !paidArticles.has(tx.txid) && (
+                        {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (
                             <Alert
                             className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-auto z-10 flex items-center justify-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/5"
                             >
@@ -740,10 +743,10 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                         )}
                         <p
                             className={`mt-0 line-clamp-3 text-sm leading-6 text-gray-600 break-words ${
-                            tx.articleObject.paywallPrice > 0 && !paidArticles.has(tx.txid) ? 'blur-sm pt-6' : ''
+                            tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) ? 'blur-sm pt-6' : ''
                             }`}
                         >
-                            {tx.articleObject.paywallPrice > 0 && !paidArticles.has(tx.txid) ? (
+                            {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) ? (
                             <>
                                 <Skeleton className="h-4 mt-2 w-full" />
                                 <Skeleton className="h-4 mt-2 w-2/3" />
@@ -774,7 +777,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     </Badge>
                                     </p>
                                 </div>
-                                  {tx.articleObject.paywallPrice > 0 && paidArticles.has(tx.txid) && (
+                                  {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (
                                      <UnlockIcon />
                                   )}
                                 </div>
