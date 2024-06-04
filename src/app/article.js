@@ -108,6 +108,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const [addressToSearch, setAddressToSearch] = useState('');
     const [addressToSearchError, setAddressToSearchError] = useState(false);
     const [txHistoryByAddress, setTxHistoryByAddress] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const handleResize = () => {
@@ -190,16 +191,19 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
     // Retrieves the article listing
     const getArticleHistoryByPage = async (page) => {
+        setIsLoading(true); // 开始加载数据时设置为true
         if (
             typeof page !== "number" ||
             chronik === undefined
         ) {
+            setIsLoading(false);
             return;
         }
         const txHistoryResp = await getArticleHistory(chronik, appConfig.townhallAddress, page);
         if (txHistoryResp && Array.isArray(txHistoryResp.txs)) {
             setArticleHistory(txHistoryResp);
         }
+        setIsLoading(false); // 数据加载完成时设置为false
         return txHistoryResp;
     };
 
@@ -696,6 +700,16 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             latestArticleHistory = { txs: txHistoryByAddress };
         } else {
             latestArticleHistory = articleHistory;
+        }
+
+        if (isLoading) {
+            return (
+                <div className="max-w-xl w-full mx-auto">
+                    <Skeleton className="h-4 mt-2 w-full" />
+                    <Skeleton className="h-4 mt-2 w-2/3" />
+                    <Skeleton className="h-4 mt-2 w-1/2" />
+                </div>
+            );
         }
 
         return (
