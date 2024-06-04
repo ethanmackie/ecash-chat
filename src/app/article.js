@@ -124,6 +124,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
   
     useEffect(() => {
         (async () => {
+            setIsLoading(true);
             // Render the first page by default upon initial load
             let localArticleHistoryResp = await getArticleHistoryByPage(0);
 
@@ -173,6 +174,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                     toast('No article found for this article txid');
                 }
             }
+            setIsLoading(false);
         })();
         initializeArticleRefresh();
     }, []);
@@ -191,19 +193,16 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
     // Retrieves the article listing
     const getArticleHistoryByPage = async (page) => {
-        setIsLoading(true); // 开始加载数据时设置为true
         if (
             typeof page !== "number" ||
             chronik === undefined
         ) {
-            setIsLoading(false);
             return;
         }
         const txHistoryResp = await getArticleHistory(chronik, appConfig.townhallAddress, page);
         if (txHistoryResp && Array.isArray(txHistoryResp.txs)) {
             setArticleHistory(txHistoryResp);
         }
-        setIsLoading(false); // 数据加载完成时设置为false
         return txHistoryResp;
     };
 
