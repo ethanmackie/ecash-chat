@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Tooltip, Popover, Modal } from "flowbite-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon } from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon, Pencil1Icon } from "@radix-ui/react-icons";
 import {
     SendIcon,
     LogoutIcon,
@@ -800,8 +800,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 {/* Dropdown to render article editor */}
                 <Accordion type="single"  collapsible>
                 <AccordionItem value="item-1" className="border-b-0">
-                    <AccordionTrigger className="flex-none mx-auto inline-flex mb-2 items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-primary-foreground shadow h-9 px-4 py-2 bg-blue-500 hover:bg-blue-300">
-                            Write an article
+                    <AccordionTrigger className="flex-none hover:no-underline  mx-auto inline-flex mb-2 items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-primary-foreground shadow h-9 px-4 py-2 bg-blue-500 hover:bg-blue-300">
+                           <Pencil1Icon className="mr-1"/> Write an article
                     </AccordionTrigger>
                     <AccordionContent className="border-b-0">
                         <div className="max-w-xl w-full mt-2 mx-auto">
