@@ -101,6 +101,7 @@
   border-radius: 8px !important; 
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
   background-color: white !important;
+  
 }
 
 .md-editor-toolbar-warp:not(.md-editor-toolbar-bottom) {
@@ -146,9 +147,6 @@
   }
 }
 
-.md-editor {
-  padding-top: clamp(0px, 15% - 100px, 70px) !important;
-}
 
 
 .text-cyan-600 {

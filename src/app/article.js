@@ -774,14 +774,14 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 </div>
                             </CardFooter>
                             </Card>
-        )
-        ))
-    ) : (
-        ''
-    )}
-    </div>
-            );
-        };
+                            )
+                            ))
+                        ) : (
+                            ''
+                        )}
+                        </div>
+                        );
+                    };
 
     return (
         <>
@@ -872,15 +872,16 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     </div>
                                 </div>
                         </fieldset>
-
+                   
                             <MarkdownEditor
                                 value={article}
                                 onChange={(value, viewUpdate) => {
                                     setArticle(value)
                                 }}
                                 height="400px"
-                                className=" px-2 py-2 rounded-xl border max-w-xl bg-card text-card-foreground break-words shadow"
+                                className=" px-2 py-2 rounded-xl mx-auto border max-w-3xl max-h-85vh my-auto bg-card text-card-foreground break-words shadow"
                             />
+                         
                             <p className="text-sm text-red-600 dark:text-red-500">{articleError !== false && articleError}</p>
                             <div className="flex flex-col sm:flex-row justify-between items-center mt-2">
                                 {/* Write article button*/}
