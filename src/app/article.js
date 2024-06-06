@@ -758,7 +758,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             </Alert>
                         )}
                         <p
-                            className={`mt-0 line-clamp-3 text-sm leading-6 text-gray-600 break-words ${
+                            className={`mt-0 line-clamp-3 text-sm leading-6 text-gray-600 break-words max-h-80 ${
                             tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) ? 'blur-sm pt-6' : ''
                             }`}
                         >
