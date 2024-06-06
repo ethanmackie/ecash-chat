@@ -6,11 +6,12 @@ import TxHistory from './txhistory';
 import Townhall from './townhall';
 import Nft from './nft';
 import Article from './article';
+import ProfilePanel from './profile';
 import cashaddr from 'ecashaddrjs';
 import { queryAliasServer } from '../alias/alias-server';
 import { encodeBip21Message, getTweetId } from '../utils/utils';
 import { isMobileDevice } from '../utils/mobileCheck';
-import { txListener, refreshUtxos, txListenerOngoing, getArticleListing } from '../chronik/chronik';
+import { txListener, refreshUtxos, txListenerOngoing, getArticleListing, getAllFollows } from '../chronik/chronik';
 import { appConfig } from '../config/app';
 import { isValidRecipient, messageHasErrors } from '../validation/validation';
 import data from '@emoji-mart/data';
@@ -88,6 +89,11 @@ export default function Home() {
         (async () => {
             const latestArticles = await getArticleListing();
             await localforage.setItem(appConfig.localArticlesParam, latestArticles);
+        })();
+
+        (async () => {
+            const latestFollows = await getAllFollows();
+            await localforage.setItem(appConfig.vercelFollowsParam, latestFollows);
         })();
 
         // Check if this app is accessed via a shared article link
@@ -495,6 +501,11 @@ export default function Home() {
             <nav className="flex items-center gap-6 text-sm">
               </nav>
               </div>
+
+                {isLoggedIn && (
+                    <ProfilePanel address={address} />
+                )}
+
               {!isMobile && ( 
                     <div>
                         <Button onClick={isLoggedIn ? () => {
