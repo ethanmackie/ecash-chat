@@ -6,6 +6,7 @@
 - One-click metamask-like login experience
 - Direct wallet to wallet and an all-in townhall forum
 - Message encryption option via AES 256 CBC algorithm
+- Full length articles with paywall functionality
 - NFT showcase
 - Displays only messaging transactions
 - Real time address specific filtering
@@ -20,6 +21,9 @@ The eCash Chat protocol adopts the following onchain hex prefixes:
 - Send a wallet to wallet message = 63686174 (chat) + [utf-8 message]
 - Send an encrypted wallet to wallet message = 63686174 (chat) + 70617373 (pass) + [utf-8 message]
 - Tipping XEC to another wallet = 63686174 (chat) + 74697073 (tips) + [optional utf-8 message]
+- Post an article = 626c6f67 (blog) + [utf-8 article]
+- Reply to an article = 626c6f67 (blog) + 726c6f67 (reply to article) + [txid of original article] + [utf-8 reply message]
+- Paywall payment = 70617977 (payw) + [txid of paywalled article]
 - Post to townhall = 63686174 (chat) + 706f7374 (post) + [utf-8 message]
 - Reply to a townhall post = 63686174 (chat) + 68617368 (reply) + [txid of original post] + [utf-8 reply message]
 - Showcase an NFT to townhall = 63686174 (chat) + 6e667473 (nfts) + [txid of nft] + [utf-8 reply message]

@@ -65,6 +65,12 @@ export const mockParsedXecEncryptedSendTxWithOpReturn = {
     "tweetId": false,
     "replyTxid": false,
     "url": false,
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPayment": false,
+    "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false
 };
 
@@ -134,6 +140,12 @@ export const mockParsedXecSendTxWithOpReturnTweet = {
     "txDate": "27 Mar 2024",
     "txTime": "23:36:40",
     "tweetId": "1766304430423515170",
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPayment": false,
+    "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false
 };
 
@@ -199,6 +211,12 @@ export const mockParsedXecSendTxWithOpReturnEmoji = {
     "txid": "68f55677b4fcacff6a47a78976aa11238dab1f323e002416b26f3335cb387ee2",
     "txDate": "Mar 26, 2024",
     "txTime": "12:08:18 pm",
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPayment": false,
+    "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false
 };
 
@@ -264,6 +282,12 @@ export const mockParsedXecSendTxWithOpReturnVideo = {
     "videoId": "5RuYKxKCAOA",
     "txDate": "Mar 26, 2024",
     "txTime": "12:06:47 pm",
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPayment": false,
+    "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false
 };
 
@@ -329,6 +353,12 @@ export const mockParsedXecSendTxWithOpReturnImage = {
     "url": false,
     "txDate": "Mar 26, 2024",
     "txTime": "12:04:00 pm",
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPayment": false,
+    "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false
 };
 
@@ -394,6 +424,12 @@ export const mockParsedXecSendTxWithOpReturn = {
     "txid": "e78a0053cc4914c5b114f8d45b08afb738bca2acfc6644fefc262f043eb03cb2",
     "txDate": "Mar 26, 2024",
     "txTime": "12:01:49 pm",
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPayment": false,
+    "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false
 };
 
@@ -464,6 +500,12 @@ export const mockParsedXecSendTxWithOpReturnTownhallPost = {
     "txDate": "Apr 4, 2024",
     "txTime": "2:20:04 pm",
     "tweetId": false,
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPayment": false,
+    "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false
 };
 
@@ -534,6 +576,12 @@ export const mockParsedXecSendTxWithOpReturnTownhallReplyPost = {
     "tweetId": false,
     "url": false,
     "replyTxid": "0729318a128ee8f11d18b28237c8ae7ffa4e95c88ec69ebce716758e1973c5d4",
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPayment": false,
+    "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false
 };
 
@@ -604,5 +652,325 @@ export const mockParsedXecSendTxWithOpReturnNftShowcase = {
     "replyTxid": false,
     "url": false,
     "isXecTip": false,
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPayment": false,
+    "paywallPaymentArticleTxid": false,
     "nftShowcaseId": "076fc97838cea01911b1b83e26f5ec5c040e4aed039f24df6e3d076737c43482"
 };
+
+export const mockXecSendTxWithOpReturnArticle = {
+    "txid": "4d9d7b99f9e763604486250def78543b8fdae632b19c31d3f697dbba7d846d6d",
+    "version": 2,
+    "inputs": [
+        {
+            "prevOut": {
+                "txid": "fa134b6f5e9ae666daef1d813cc7b12a1bfaec4179a596d3fb9524c2c6987e3e",
+                "outIdx": 1
+            },
+            "inputScript": "413984c173f543c159acc8d8bbf61bbdde8d27fd79f40b39000b75b25edb147093b6a9a1a155a28aa2bfe14597f075ef14b79917a362d51512d609cd6437592e3d4121030a06dd7429d8fce700b702a55a012a1f9d1eaa46825bde2d31252ee9cb30e536",
+            "value": 700,
+            "sequenceNo": 4294967295,
+            "outputScript": "76a91414582d09f61c6580b8a2b6c8af8d6a13c9128b6f88ac"
+        },
+        {
+            "prevOut": {
+                "txid": "4120dffc42af226143ceab639b247e5ba1e571314b203ace3323eff862cfa647",
+                "outIdx": 2
+            },
+            "inputScript": "4153963afe069c280a189c5893d1ea155231ca362dc24918bc16a8839aa2a83010ed2dbb4c0b8a30378891d22e88545fb7bc4003429541d7f033fbb05bab5db6544121030a06dd7429d8fce700b702a55a012a1f9d1eaa46825bde2d31252ee9cb30e536",
+            "value": 4733,
+            "sequenceNo": 4294967295,
+            "outputScript": "76a91414582d09f61c6580b8a2b6c8af8d6a13c9128b6f88ac"
+        }
+    ],
+    "outputs": [
+        {
+            "value": 0,
+            "outputScript": "6a04626c6f672862623865646536313562363838333539333733343262353331643463663035313865336363353562"
+        },
+        {
+            "value": 550,
+            "outputScript": "76a91414582d09f61c6580b8a2b6c8af8d6a13c9128b6f88ac"
+        },
+        {
+            "value": 4046,
+            "outputScript": "76a91414582d09f61c6580b8a2b6c8af8d6a13c9128b6f88ac"
+        }
+    ],
+    "lockTime": 0,
+    "timeFirstSeen": 1717642255,
+    "size": 416,
+    "isCoinbase": false,
+    "tokenEntries": [],
+    "tokenFailedParsings": [],
+    "tokenStatus": "TOKEN_STATUS_NON_TOKEN"
+};
+
+export const mockParsedXecSendTxWithOpReturnArticle = {
+    "txid": "4d9d7b99f9e763604486250def78543b8fdae632b19c31d3f697dbba7d846d6d",
+    "incoming": false,
+    "xecAmount": "0",
+    "isEtokenTx": false,
+    "airdropFlag": false,
+    "airdropTokenId": "",
+    "opReturnMessage": "bb8ede615b68835937342b531d4cf0518e3cc55b",
+    "isCashtabMessage": false,
+    "isCashtabEncryptedMessage": false,
+    "isEcashChatEncrypted": false,
+    "iseCashChatMessage": false,
+    "iseCashChatPost": false,
+    "replyAddress": "ecash:qq29stgf7cwxtq9c52mv3tuddgfujy5tduaellf3wm",
+    "recipientAddress": "ecash:qq29stgf7cwxtq9c52mv3tuddgfujy5tduaellf3wm",
+    "aliasFlag": false,
+    "imageSrc": false,
+    "videoId": false,
+    "txDate": "Jun 6, 2024",
+    "txTime": "12:50:55 pm",
+    "tweetId": false,
+    "replyTxid": false,
+    "url": false,
+    "isXecTip": false,
+    "nftShowcaseId": false,
+    "articleTxid": false,
+    "isArticle": true,
+    "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPaymentArticleTxid": false,
+    "paywallPayment": false
+};
+
+export const mockXecSendTxWithOpReturnArticleReply = {
+    "txid": "d47805f376c10d308fa9114ee99b244a7732ec1fdd8187e1b933e1c54c7fca63",
+    "version": 2,
+    "inputs": [
+        {
+            "prevOut": {
+                "txid": "9a3ab27c47995698f881981cec920331fb1da00bc6eeaa8a48321997e086b1d3",
+                "outIdx": 2
+            },
+            "inputScript": "41c9fc835ae81e38ae54802a6639d7d1a4752ea6716c66c9547e814df768e213b24059b06ac6b2e4e2fc6c63aac1bd4d98b47f26d5e9f5bbe236e7232fd99328564121030a06dd7429d8fce700b702a55a012a1f9d1eaa46825bde2d31252ee9cb30e536",
+            "value": 1734,
+            "sequenceNo": 4294967295,
+            "outputScript": "76a91414582d09f61c6580b8a2b6c8af8d6a13c9128b6f88ac"
+        }
+    ],
+    "outputs": [
+        {
+            "value": 0,
+            "outputScript": "6a04626c6f6704726c6f67204d9d7b99f9e763604486250def78543b8fdae632b19c31d3f697dbba7d846d6d4caa456d696c79204469636b696e736f6e206973206f6e65206f6620416d6572696361e280997320677265617465737420616e64206d6f7374206f726967696e616c20706f657473206f6620616c6c2074696d652e2053686520746f6f6b20646566696e6974696f6e206173206865722070726f76696e636520616e64206368616c6c656e67656420746865206578697374696e6720646566696e6974696f6e73206f6620706f657472792e"
+        },
+        {
+            "value": 550,
+            "outputScript": "76a91414582d09f61c6580b8a2b6c8af8d6a13c9128b6f88ac"
+        }
+    ],
+    "lockTime": 0,
+    "timeFirstSeen": 1717642506,
+    "size": 410,
+    "isCoinbase": false,
+    "tokenEntries": [],
+    "tokenFailedParsings": [],
+    "tokenStatus": "TOKEN_STATUS_NON_TOKEN"
+};
+
+export const mockParsedXecSendTxWithOpReturnArticleReply = {
+    "txid": "d47805f376c10d308fa9114ee99b244a7732ec1fdd8187e1b933e1c54c7fca63",
+    "incoming": false,
+    "xecAmount": "0",
+    "isEtokenTx": false,
+    "airdropFlag": false,
+    "airdropTokenId": "",
+    "opReturnMessage": "Emily Dickinson is one of America’s greatest and most original poets of all time. She took definition as her province and challenged the existing definitions of poetry.",
+    "isCashtabMessage": false,
+    "isCashtabEncryptedMessage": false,
+    "isEcashChatEncrypted": false,
+    "iseCashChatMessage": false,
+    "iseCashChatPost": false,
+    "replyAddress": "ecash:qq29stgf7cwxtq9c52mv3tuddgfujy5tduaellf3wm",
+    "recipientAddress": "ecash:qq29stgf7cwxtq9c52mv3tuddgfujy5tduaellf3wm",
+    "aliasFlag": false,
+    "imageSrc": false,
+    "videoId": false,
+    "txDate": "Jun 6, 2024",
+    "txTime": "12:55:06 pm",
+    "tweetId": false,
+    "replyTxid": false,
+    "url": false,
+    "isXecTip": false,
+    "nftShowcaseId": false,
+    "articleTxid": "4d9d7b99f9e763604486250def78543b8fdae632b19c31d3f697dbba7d846d6d",
+    "isArticle": false,
+    "isArticleReply": true,
+    "isPaywallPayment": false,
+    "paywallPaymentArticleTxid": false,
+    "paywallPayment": false
+};
+
+export const mockXecSendTxWithOpReturnPaywallPayment = {
+    "txid": "6536ab20cf11e300b561fb0e31edc70076225c27773cf65e9fabfe8cd7cff6bf",
+    "version": 2,
+    "inputs": [
+        {
+            "prevOut": {
+                "txid": "6a01b88c4a63e385a3151093d5017368116d29880e9a843816960d38f8d907ec",
+                "outIdx": 1
+            },
+            "inputScript": "483045022100ead35e4ac8fe65608b839f185bffcb0a94a801e7ee6f6cee1ecbd9f23295b5d80220325874e6170e5d7df1fbe670c2d02556b3ff69fab5d9b13ad429871a5913c30b4121030a06dd7429d8fce700b702a55a012a1f9d1eaa46825bde2d31252ee9cb30e536",
+            "value": 1000,
+            "sequenceNo": 4294967295,
+            "outputScript": "76a91414582d09f61c6580b8a2b6c8af8d6a13c9128b6f88ac"
+        },
+        {
+            "prevOut": {
+                "txid": "6a01b88c4a63e385a3151093d5017368116d29880e9a843816960d38f8d907ec",
+                "outIdx": 2
+            },
+            "inputScript": "483045022100c138ef6da8b5ae8a97b0c7c23d4c4b61f8922237632575ad8a82087bcb84b1d9022019aeffa10d76655d500725277f57c92f16b0df34a05cd58f9b74b1fdfc9819104121030a06dd7429d8fce700b702a55a012a1f9d1eaa46825bde2d31252ee9cb30e536",
+            "value": 7458,
+            "sequenceNo": 4294967295,
+            "outputScript": "76a91414582d09f61c6580b8a2b6c8af8d6a13c9128b6f88ac"
+        }
+    ],
+    "outputs": [
+        {
+            "value": 0,
+            "outputScript": "6a04706179774036336137383534303639353934626332313162383461363764333734623237653038643038333865303137306230346336333134643864373639336161376438"
+        },
+        {
+            "value": 1000,
+            "outputScript": "76a91414582d09f61c6580b8a2b6c8af8d6a13c9128b6f88ac",
+            "spentBy": {
+                "txid": "a27167c806aab3beb24e1ded51f04dc6fec044d2e3c905fd4f5ec73d068e7d91",
+                "outIdx": 1
+            }
+        },
+        {
+            "value": 6545,
+            "outputScript": "76a91414582d09f61c6580b8a2b6c8af8d6a13c9128b6f88ac",
+            "spentBy": {
+                "txid": "0335eff02211506d1381d7d6ac5dcedf741a6569fd583534b615f5b8879d053c",
+                "outIdx": 0
+            }
+        }
+    ],
+    "lockTime": 0,
+    "timeFirstSeen": 1716984936,
+    "size": 454,
+    "isCoinbase": false,
+    "tokenEntries": [],
+    "tokenFailedParsings": [],
+    "tokenStatus": "TOKEN_STATUS_NON_TOKEN",
+    "block": {
+        "height": 846735,
+        "hash": "000000000000000000b448c450aeb1a152b400e2dbad09de84e1baab27d1b953",
+        "timestamp": 1716987086
+    }
+};
+
+export const mockParsedXecSendTxWithOpReturnPaywallPayment = {
+    "txid": "6536ab20cf11e300b561fb0e31edc70076225c27773cf65e9fabfe8cd7cff6bf",
+    "incoming": false,
+    "xecAmount": "0",
+    "isEtokenTx": false,
+    "airdropFlag": false,
+    "airdropTokenId": "",
+    "opReturnMessage": "",
+    "isCashtabMessage": false,
+    "isCashtabEncryptedMessage": false,
+    "isEcashChatEncrypted": false,
+    "iseCashChatMessage": false,
+    "iseCashChatPost": false,
+    "replyAddress": "ecash:qq29stgf7cwxtq9c52mv3tuddgfujy5tduaellf3wm",
+    "recipientAddress": "ecash:qq29stgf7cwxtq9c52mv3tuddgfujy5tduaellf3wm",
+    "aliasFlag": false,
+    "imageSrc": false,
+    "videoId": false,
+    "txDate": "May 29, 2024",
+    "txTime": "10:15:36 pm",
+    "tweetId": false,
+    "replyTxid": false,
+    "url": false,
+    "isXecTip": false,
+    "nftShowcaseId": false,
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
+    "isPaywallPayment": true,
+    "paywallPaymentArticleTxid": "63a7854069594bc211b84a67d374b27e08d0838e0170b04c6314d8d7693aa7d8",
+    "paywallPayment": "10"
+};
+
+export const mockXecSendTxWithOpReturnArticleXecTip = {
+    "txid": "34fb07a6d6debafe46e821bbdcbafe59d130ad64917a82a374c42a99420a2c4d",
+    "version": 2,
+    "inputs": [
+        {
+            "prevOut": {
+                "txid": "aa5f13474ca2fc020805c291a3053f12e4a006daaf15832007dd854f4337f154",
+                "outIdx": 2
+            },
+            "inputScript": "4830450221009a20069da36c6a2f11e9afe72eb1f92926110da57386ccb0abf5542efdd96bae0220577cb538be9d4793341dc9e3e43d066a8e5985955be0aa1e7fe62519091efcfb4121030a06dd7429d8fce700b702a55a012a1f9d1eaa46825bde2d31252ee9cb30e536",
+            "value": 46435,
+            "sequenceNo": 4294967295,
+            "outputScript": "76a91414582d09f61c6580b8a2b6c8af8d6a13c9128b6f88ac"
+        }
+    ],
+    "outputs": [
+        {
+            "value": 0,
+            "outputScript": "6a046368617404746970730120"
+        },
+        {
+            "value": 10000,
+            "outputScript": "76a9146d6ec5176ab7739c451865a8975dbe6c21e40ead88ac"
+        },
+        {
+            "value": 35936,
+            "outputScript": "76a91414582d09f61c6580b8a2b6c8af8d6a13c9128b6f88ac"
+        }
+    ],
+    "lockTime": 0,
+    "timeFirstSeen": 1717042206,
+    "size": 248,
+    "isCoinbase": false,
+    "tokenEntries": [],
+    "tokenFailedParsings": [],
+    "tokenStatus": "TOKEN_STATUS_NON_TOKEN"
+};
+
+export const mockParsedXecSendTxWithOpReturnArticleXecTip = {
+    "txid": "34fb07a6d6debafe46e821bbdcbafe59d130ad64917a82a374c42a99420a2c4d",
+    "incoming": false,
+    "xecAmount": "100",
+    "isEtokenTx": false,
+    "airdropFlag": false,
+    "airdropTokenId": "",
+    "opReturnMessage": " ",
+    "isCashtabMessage": false,
+    "isCashtabEncryptedMessage": false,
+    "isEcashChatEncrypted": false,
+    "iseCashChatMessage": true,
+    "iseCashChatPost": false,
+    "replyAddress": "ecash:qq29stgf7cwxtq9c52mv3tuddgfujy5tduaellf3wm",
+    "recipientAddress": "ecash:qpkka3ghd2mh88z9rpj6396ahekzreqw45l6qsg9qm",
+    "aliasFlag": false,
+    "imageSrc": false,
+    "videoId": false,
+    "txDate": "May 30, 2024",
+    "txTime": "2:10:06 pm",
+    "tweetId": false,
+    "replyTxid": false,
+    "url": false,
+    "isXecTip": true,
+    "nftShowcaseId": false,
+    "articleTxid": false,
+    "isArticle": false,
+    "isArticleReply": false,
+    "isPaywallPayment": false,
+    "paywallPaymentArticleTxid": false,
+    "paywallPayment": false
+};
+

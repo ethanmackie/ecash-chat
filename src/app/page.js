@@ -1,43 +1,31 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import TxHistory from './txhistory';
 import Townhall from './townhall';
 import Nft from './nft';
+import Article from './article';
 import cashaddr from 'ecashaddrjs';
 import { queryAliasServer } from '../alias/alias-server';
-import { encodeBip21Message, getTweetId, toXec } from '../utils/utils';
+import { encodeBip21Message, getTweetId } from '../utils/utils';
 import { isMobileDevice } from '../utils/mobileCheck';
-import { txListener, refreshUtxos, txListenerOngoing } from '../chronik/chronik';
+import { txListener, refreshUtxos, txListenerOngoing, getArticleListing } from '../chronik/chronik';
 import { appConfig } from '../config/app';
 import { isValidRecipient, messageHasErrors } from '../validation/validation';
-import { opReturn as opreturnConfig } from '../config/opreturn';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-    DropdownMenuGroup,
-    DropdownMenuShortcut,
-    DropdownMenuSub,
-  } from "@/components/ui/dropdown-menu"
 import QRCode from "react-qr-code";
 import copy from 'copy-to-clipboard';
 import { Tooltip, Tabs, Alert, Modal, Popover } from "flowbite-react";
 import { HiOutlineMail, HiOutlineNewspaper, HiInformationCircle, HiOutlinePhotograph } from "react-icons/hi";
-import { IoMdInformationCircleOutline } from "react-icons/io";
+import { BiSolidNews } from "react-icons/bi";
 import { GiDiscussion, GiAbstract010 } from "react-icons/gi";
+import { IoMdInformationCircleOutline } from "react-icons/io";
 import { ToastContainer, toast } from 'react-toastify';
 import { PersonIcon, FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon } from '@radix-ui/react-icons';
 import 'react-toastify/dist/ReactToastify.css';
@@ -45,7 +33,6 @@ import { YoutubeIcon, DefaultavatarIcon, EcashchatIcon } from "@/components/ui/s
 import {
     SendIcon,
     LogoutIcon,
-    AliasIcon,
     EncryptionIcon,
 } from "@/components/ui/social";
 const crypto = require('crypto');
@@ -57,7 +44,7 @@ import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
 import { Tweet } from 'react-tweet';
 const packageJson = require('../../package.json');
-
+import localforage from 'localforage';
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -79,6 +66,8 @@ export default function Home() {
     const [xecBalance, setXecBalance] = useState('Loading...');
     const [encryptionMode, setEncryptionMode] = useState(false);
     const [showMessagePreview, setShowMessagePreview] = useState(false);
+    const [sharedArticleTxid, setSharedArticleTxid] = useState(false);
+    const searchParams = useSearchParams();
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
@@ -92,6 +81,18 @@ export default function Home() {
                 console.log('Desktop detected');
             }
         })();
+
+        (async () => {
+            const latestArticles = await getArticleListing();
+            await localforage.setItem(appConfig.localArticlesParam, latestArticles);
+        })();
+
+        // Check if this app is accessed via a shared article link
+        const sharedArticleParam = searchParams.get("sharedArticleTxid");
+        if (sharedArticleParam) {
+            setSharedArticleTxid(sharedArticleParam);
+        }
+
         // Listen for cashtab extension messages on load
         window.addEventListener('message', handleMessage);
     }, []);
@@ -120,7 +121,7 @@ export default function Home() {
             event.data.type === 'FROM_CASHTAB'
         ) {
             if (event.data.address !== 'Address request denied by user') {
-                getAliasesByAddress(event.data.address);
+                //getAliasesByAddress(event.data.address);
                 setAddress(event.data.address);
                 setIsLoggedIn(true);
             }
@@ -129,7 +130,7 @@ export default function Home() {
 
     // Parse for a manual address input on mobile and log in via view-only mode
     const viewAddress = async (address) => {
-        getAliasesByAddress(address);
+        //getAliasesByAddress(address);
         setAddress(address);
         setIsLoggedIn(true);
     };
@@ -305,7 +306,7 @@ export default function Home() {
         setRecipient('');
         setMessage('');
         setPassword('');
-        txListener(chronik, address, "Message", false);
+        txListener(chronik, address, "Message", sendAmountXec, recipient, false);
     };
 
     const MessagePreviewModal = () => {
@@ -423,41 +424,40 @@ export default function Home() {
         );
     };
 
-  /* Placeholder UI for now until the Tailwind UI set is ready for implementation */
-  return (
-    <>
-    <ToastContainer />
-    <div className="sm:flex flex-col items-center justify-center p-5 relative z-10 mt-4">
-    <div className="background_content"></div>
-    </div>
-    <div className="relative isolate px-6 pt-14 lg:px-8">
-<div
-  className="absolute inset-x-0 -top-10 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-40"
-  aria-hidden="true"
->
-  <div
-    className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#a1c0ff] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
-    style={{
-      clipPath:
-        'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-    }}
-  />
-</div>
-<div
-  className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%+20rem)]"
-  aria-hidden="true"
->
-  <div
-    className="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
-    style={{
-      clipPath:
-        'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-    }}
-  />
-</div>
-</div>
+    return (
+        <>
+        <ToastContainer />
+        <div className="sm:flex flex-col items-center justify-center p-5 relative z-10 mt-4">
+        <div className="background_content"></div>
+        </div>
+        <div className="relative isolate px-6 pt-14 lg:px-8">
+        <div
+        className="absolute inset-x-0 -top-10 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-40"
+        aria-hidden="true"
+        >
+        <div
+            className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#a1c0ff] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
+            style={{
+            clipPath:
+                'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
+            }}
+        />
+        </div>
+        <div
+        className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%+20rem)]"
+        aria-hidden="true"
+        >
+        <div
+            className="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
+            style={{
+            clipPath:
+                'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
+            }}
+        />
+        </div>
+        </div>
 
-<header className="fixed mt-4 flex top-0 z-50 w-full justify-center ">       
+        <header className="fixed mt-4 flex top-0 z-50 w-full justify-center ">
           <div className="container flex items-center justify-between rounded-lg flex bg-black w-full h-14 mx-4 md:mx-auto md:max-w-xl lg:max-w-3xl border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/40">
             <div className="sm:flex">
               <a className="flex items-center space-x-2" href="#">
@@ -487,37 +487,33 @@ export default function Home() {
         
       <main className="sm:flex flex-col items-center justify-center p-1 sm:px-5 relative z-10">
       {isLoggedIn === false && isMobile === false ? (
-  <>
-    <div className="mx-auto max-w-xl mb-4 mt-8">
-      <div className="hidden sm:mb-8 sm:flex sm:justify-center">
-        <div className="relative flex gap-1 items-center rounded-full px-3 py-1 text-sm leading-6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/40">
-        <RocketIcon/> Version: 1.1.1{' '}
+        <>
+            <div className="mx-auto max-w-xl mb-4 mt-8">
+            <div className="hidden sm:mb-8 sm:flex sm:justify-center">
+                <div className="relative flex gap-1 items-center rounded-full px-3 py-1 text-sm leading-6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/40">
+                <RocketIcon/> Version: {packageJson.version}{' '}
+                </div>
+            </div>
+            <div className="text-center">
+                <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-4xl">
+                {'Socialize, monetize and earn on the eCash blockchain'}
+                </h1>
+            </div>
+            </div>
+        
+        </>
+        ) : (
+            <div className="flex justify-center">
+        <Image
+            src="/ecash-chat-new-logo.svg"
+            alt="eCash Chat Logo"
+            className="dark:invert"
+            width={273}
+            height={75}
+            priority
+        />
         </div>
-      </div>
-      <div className="text-center">
-        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-        Chat on the eCash blockchain
-        </h1>
-        <p className="leading-7 [&:not(:first-child)]:mt-6">
-        eCash Chat is an on-chain messaging platform 
-        on the eCash blockchain.
-        </p>
-      </div>
-    </div>
-   
-  </>
-) : (
-    <div className="flex justify-center">
-  <Image
-    src="/ecash-chat-new-logo.svg"
-    alt="eCash Chat Logo"
-    className="dark:invert"
-    width={273}
-    height={75}
-    priority
-  />
-  </div>
-)}
+        )}
  
       <div>
        {isLoggedIn === false && isMobile === false && step === 'fresh' && (
@@ -539,19 +535,17 @@ export default function Home() {
         </div>
         )}
 
-{isLoggedIn === false && isMobile === false && (
-        <div className='mx-auto mt-4 '>
-          <Image
-            src="/landingp1.png"
-            alt="groupchat"
-            width={800}
-            height={400}
-            priority
-          />
-        </div>
-      )}
-
-
+        {isLoggedIn === false && isMobile === false && (
+            <div className='mx-auto mt-4 '>
+            <Image
+                src="/landingp1.png"
+                alt="groupchat"
+                width={800}
+                height={400}
+                priority
+            />
+            </div>
+        )}
 
         {/* Currently this app is not optimized for mobile use as Cashtab Extension is not available on non-desktop platforms */}
         {isMobile === true && isLoggedIn === false && (
@@ -618,7 +612,7 @@ export default function Home() {
           <CreditCardHeader />
 
           {/* Tab navigation */}
-          <Tabs aria-label="eCash Chat" style="default" className='z-10 relative mt-4 justify-center'>
+          <Tabs aria-label="eCash Chat" style="default" className='z-10 focus:ring-0 relative mt-4 justify-center'>
               {isMobile === false && (
                   <Tabs.Item title="Inbox" icon={HiOutlineMail}>
                       {cashaddr.isValidCashAddress(address, 'ecash') &&
@@ -628,7 +622,7 @@ export default function Home() {
               )}
 
               {isMobile === false && (
-                  <Tabs.Item title="Send Message" icon={HiOutlineNewspaper} >
+                  <Tabs.Item title="Send Message" className='focus:ring-0' f icon={HiOutlineNewspaper} >
                       <div style={{ display: (isLoggedIn ? 'block' : 'none') }}>
                           <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
                                 <MessagePreviewModal />
@@ -776,8 +770,12 @@ export default function Home() {
                   </Tabs.Item>
               )}
 
-              <Tabs.Item title="Town Hall" active icon={GiDiscussion} >
+              <Tabs.Item title="Town Hall" icon={GiDiscussion} >
                   <Townhall address={address} isMobile={isMobile} />
+              </Tabs.Item>
+
+              <Tabs.Item title="Articles" active icon={BiSolidNews} >
+                <Article chronik={chronik} address={address} isMobile={isMobile} sharedArticleTxid={sharedArticleTxid} />
               </Tabs.Item>
 
               <Tabs.Item title="NFTs" icon={HiOutlinePhotograph} >
@@ -787,14 +785,14 @@ export default function Home() {
               <Tabs.Item title="About" icon={IoMdInformationCircleOutline} >
               <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
                       <h2 className="mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">What is eCash Chat?</h2>
-                      <p className='leading-7 [&:not(:first-child)]:mt-6'>eCash Chat is an on-chain messaging platform on the eCash blockchain,
-                      <br />It filters for specific messaging transactions for a seamless social experience.
-                      </p>
-                      <br /><br />
+                      <p className='leading-7 [&:not(:first-child)]:mt-6'>eCash Chat is an on-chain web platform that enables anyone to socialize,
+                      <br />monetize and earn on the eCash blockchain.</p>
+                      <br />
                       <h2 className="mt-4 scroll-m-20 text-2xl font-semibold tracking-tight">Key features:</h2>
                       <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
                         <li>One-click metamask-like login experience</li>
                         <li>Direct wallet to wallet and an all-in townhall forum</li>
+                        <li>Full length blogging facility with paywall option</li>
                         <li>Message encryption option via AES 256 CBC algorithm</li>
                         <li>NFT Showcases</li>
                         <li>Displays only messaging transactions</li>
@@ -810,27 +808,8 @@ export default function Home() {
                           <li><b>Inbox</b>: a direct wallet to wallet messaging history.</li>
                           <li><b>Send Message</b>: send public messages to another wallet</li>
                           <li><b>Townhall</b>: public onchain discussion forum</li>
-                          <li> <b>Settings</b>: logout and profile configuration</li>
-                      </ul>
-                      <br />
-                      <h2 className="mt-4 scroll-m-20 text-2xl font-semibold tracking-tight">Embedding media:</h2>
-                      <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-                          <li>
-                              <b>Urls</b>: Click "Embed Url" to insert the [url]https://www..[/url] tag.<br />
-                              Replace the hyperlink with the url you're embedding.
-                          </li>
-                          <li>
-                              <b>Images</b>: Click "Embed Image" to insert the [img]image-url[/img] tag.<br />
-                              Replace it with the url of the image you're embedding.
-                          </li>
-                          <li>
-                              <b>Videos</b>: Click "Embed Youtube" to insert the [yt]youtube-url[/yt] tag.<br />
-                              Replace it with the url of the youtube video you're embedding.<br />
-                          </li>
-                          <li>
-                              <b>Tweets</b>: Click "Embed Tweet" to insert the [twt]tweet-url[/twt] tag.<br />
-                              Replace it with the url of the tweet you're embedding.<br />
-                          </li>
+                          <li><b>Articles</b>: write full length articles with paywall option</li>
+                          <li><b>NFTs</b>: browse and showcase your NFTs</li>
                       </ul>
                       <br />
                       <h2 className="mt-4 scroll-m-20 text-2xl font-semibold tracking-tight">Support:</h2>
@@ -852,41 +831,10 @@ export default function Home() {
                         />
                         </div>
                   </div>
-                  
-              </Tabs.Item>
-
-              <Tabs.Item title="Settings" icon={GiAbstract010}>
-                  <div className="flex min-h-full flex-1 flex-col items-center justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
-                    <Alert color="info" className="w-96">Version: {packageJson.version}</Alert><br />
-                    <Button
-                        type="button"
-                        className="bg-blue-500 w-96 hover:bg-blue-300"
-                        onClick={() => {
-                        setIsLoggedIn(false);
-                        toast(`Logged out of ${address}`);
-                        }}
-                    >
-                        <LogoutIcon />&nbsp;Log Out
-                    </Button>
-                    <br />
-                    <Button
-                        type="button"
-                        className="bg-blue-500 w-96 hover:bg-blue-300"
-                    >
-                        <ImageIcon />&nbsp;Set NFT Profile (Coming soon)
-                    </Button>
-                    <br />
-                    <Button
-                        type="button"
-                        className="bg-blue-500 w-96 hover:bg-blue-300"
-                    >
-                        <AliasIcon />&nbsp;Link eCash Alias (Coming soon)
-                    </Button>
-                  </div>
-              </Tabs.Item>
-              </Tabs>
-              </>
-              )}
+                </Tabs.Item>
+            </Tabs>
+          </>
+        )}
         </div>
       </main>
   

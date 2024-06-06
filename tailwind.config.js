@@ -27,6 +27,12 @@ module.exports = {
       padding: {
         '10p': '10%',  
       },
+      maxHeight: {
+        '90vh': '90vh',
+        '85vh': '85vh',
+        '80vh': '80vh',
+        '70vh': '70vh',
+      },
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
       },
@@ -87,5 +93,8 @@ module.exports = {
      
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    require('@tailwindcss/forms'),
+  ],
 }

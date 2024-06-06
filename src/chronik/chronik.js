@@ -8,6 +8,18 @@ import { getStackArray } from 'ecash-script';
 import { BN } from 'slp-mdm';
 import { toast } from 'react-toastify';
 import localforage from 'localforage';
+import { kv } from '@vercel/kv';
+
+// Retrieves all articles from API and share via local storage
+export const getArticleListing = async () => {
+    let articles = await kv.get(appConfig.vercelKvParam);
+
+    if (!Array.isArray(articles)) {
+        articles = [];
+    }
+
+    return articles;
+};
 
 /**
  * Refreshes the app's utxos, XEC balance and NFT collection
@@ -464,15 +476,22 @@ export const getChildNftsFromParent = (
 };
 
 /**
- * Subscribes to a given address and listens for new websocket events
+ * Subscribes to a given address and listens for new websocket events related to article postings
  *
  * @param {string} chronik the chronik-client instance
  * @param {string} address the eCash address of the active wallet
- * @param {string} txType the descriptor of the nature of this tx
- * @param {callback fn} refreshCallback a callback function to either refresh inbox or townhall history
+ * @param {@vercel/kv} kv the Vercel KV database client instance
+ * @param {array} updatedArticles an array of article object including the newly posted article
+ * @param {callback fn} refreshCallback a callback function to either article history
  * @throws {error} err chronik websocket subscription errors
  */
-export const txListener = async (chronik, address, txType, refreshCallback = false) => {
+export const articleTxListener = async (
+    chronik,
+    address,
+    kv,
+    updatedArticles,
+    refreshCallback = false,
+) => {
     // Get type and hash
     const { type, hash } = cashaddr.decode(address, true);
 
@@ -480,18 +499,180 @@ export const txListener = async (chronik, address, txType, refreshCallback = fal
         const ws = chronik.ws({
             onMessage: msg => {
                 if (msg.msgType === 'TX_ADDED_TO_MEMPOOL') {
+                    let mempoolTx;
+                    setTimeout(async() => { // temporary until Extension is refactored to allow direct passing of callback functions
+                        mempoolTx = await chronik.tx(msg.txid);
+                        const actualRecipient = cashaddr.encodeOutputScript(mempoolTx.outputs[1].outputScript);
+                        const actualSender = cashaddr.encodeOutputScript(mempoolTx.inputs[0].outputScript);
 
-                    // Notify user
-                    toast(`${txType} sent`);
+                        if (
+                            address === actualRecipient &&
+                            address === actualSender
+                        ) {
+                            await localforage.setItem(appConfig.localArticlesParam, updatedArticles);
+                            await kv.set(appConfig.vercelKvParam, updatedArticles);
 
-                    // Unsubscribe and close websocket
-                    ws.unsubscribeFromScript(type, hash);
-                    ws.close();
+                            // Notify user
+                            toast(`Article posted`);
 
-                    // Refresh history
-                    if (refreshCallback) {
-                        refreshCallback(0);
-                    }
+                            // Unsubscribe and close websocket
+                            ws.unsubscribeFromScript(type, hash);
+                            ws.close();
+
+                            // Refresh history
+                            if (refreshCallback) {
+                                refreshCallback(0);
+                            }
+                        }
+                    }, 500);
+                }
+            },
+        });
+
+        // Wait for WS to be connected:
+        await ws.waitForOpen();
+
+        // Subscript to script
+        ws.subscribeToScript(type, hash);
+    } catch (err) {
+        console.log(
+            'articleTxListener: Error in chronik websocket subscription: ' + err,
+        );
+    }
+};
+
+/**
+ * Subscribes to a given address and listens for expected websocket events
+ *
+ * @param {string} chronik the chronik-client instance
+ * @param {string} address the eCash address of the active wallet
+ * @param {string} txType the descriptor of the nature of this tx
+ * @param {number} expectedSendValue the anticipated output value
+ * @param {string} recipient the eCash address of the transaction
+ * @param {callback fn} refreshCallback a callback function to either refresh inbox or townhall history
+ * @throws {error} err chronik websocket subscription errors
+ */
+export const txListener = async (
+    chronik,
+    address,
+    txType,
+    expectedSendValue,
+    recipient,
+    refreshCallback = false,
+) => {
+    // Get type and hash of active wallet
+    const { type, hash } = cashaddr.decode(address, true);
+
+    try {
+        const ws = chronik.ws({
+            onMessage: msg => {
+                if (msg.msgType === 'TX_ADDED_TO_MEMPOOL') {
+                    let mempoolTx;
+                    setTimeout(async() => { // temporary until Extension is refactored to allow direct passing of callback functions
+                        mempoolTx = await chronik.tx(msg.txid);
+
+                        const actualRecipient = cashaddr.encodeOutputScript(mempoolTx.outputs[1].outputScript);
+                        const actualSender = cashaddr.encodeOutputScript(mempoolTx.inputs[0].outputScript);
+
+                        if (
+                            recipient === actualRecipient &&
+                            address === actualSender
+                        ) {
+                            // Notify user
+                            toast(`${txType} sent`);
+
+                            // Unsubscribe and close websocket
+                            ws.unsubscribeFromScript(type, hash);
+                            ws.close();
+
+                            // Refresh history
+                            if (refreshCallback) {
+                                refreshCallback(0);
+                            }
+                        }
+                    }, 500);
+                }
+            },
+        });
+
+        // Wait for WS to be connected:
+        await ws.waitForOpen();
+
+        // Subscript to script
+        ws.subscribeToScript(type, hash);
+    } catch (err) {
+        console.log(
+            'txListener: Error in chronik websocket subscription: ' + err,
+        );
+    }
+};
+
+/**
+ * Subscribes to a given address and listens for new websocket events specific to paywall payments
+ *
+ * @param {string} chronik the chronik-client instance
+ * @param {string} address the eCash address of the active wallet
+ * @param {string} txType the descriptor of the nature of this tx
+ * @param {number} paywallPrice the paywall price for the article
+ * @param {string} recipient the eCash address of the paywall payment
+ * @param {callback fn} refreshCallback a callback function to refresh article listing
+ * @param {callback fn} modalCallback a callback function to re-render a paid paywall article
+ * @param {callback fn} paywallModalCallback a callback function to close the open paywall modal
+ * @throws {error} err chronik websocket subscription errors
+ */
+export const paywallTxListener = async (
+    chronik,
+    address,
+    txType,
+    paywallPrice,
+    recipient,
+    refreshCallback = false,
+    modalCallback = false,
+    paywallModalCallback = false,
+) => {
+    // Get type and hash
+    const { type, hash } = cashaddr.decode(address, true);
+
+    try {
+        const ws = chronik.ws({
+            onMessage: msg => {
+                if (msg.msgType === 'TX_ADDED_TO_MEMPOOL') {
+                    let mempoolTx;
+                    setTimeout(async() => { // temporary until Extension is refactored to allow direct passing of callback functions
+                        mempoolTx = await chronik.tx(msg.txid);
+
+                        const paywallPricePaid = toXec(mempoolTx.outputs[1].value);
+                        const paywallRecipient = cashaddr.encodeOutputScript(mempoolTx.outputs[1].outputScript);
+                        const paywallPayer = cashaddr.encodeOutputScript(mempoolTx.inputs[0].outputScript);
+
+                        if (
+                            Number(paywallPrice) === Number(paywallPricePaid) &&
+                            recipient === paywallRecipient &&
+                            address === paywallPayer
+                        ) {
+                            // Notify user
+                            toast(`${txType} sent`);
+
+                            // Unsubscribe and close websocket
+                            ws.unsubscribeFromScript(type, hash);
+                            ws.close();
+
+                            // Refresh history
+                            if (refreshCallback) {
+                                refreshCallback(0);
+                            }
+
+                            // Re-render modal
+                            if (modalCallback) {
+                                modalCallback(true);
+                            }
+
+                            // Close the paywall dialog
+                            if (paywallModalCallback) {
+                                paywallModalCallback(false);
+                            }
+                        }
+                    }, 500);
                 }
             },
         });
@@ -525,7 +706,7 @@ export const txListenerOngoing = async (chronik, address, refreshCallback = fals
         const ws = chronik.ws({
             onMessage: msg => {
                 if (msg.msgType === 'TX_ADDED_TO_MEMPOOL') {
-                    // Refresh history
+                    // Refresh balance
                     if (refreshCallback) {
                         (async () => {
                             const updatedCache = await refreshUtxos(chronik, address);
@@ -554,10 +735,10 @@ export const txListenerOngoing = async (chronik, address, refreshCallback = fals
  * @param {string} chronik the chronik-client instance
  * @param {string} address the eCash address of the active wallet
  * @param {string} txType the descriptor of the nature of this tx
- * @param {callback fn} refreshCallback a callback function to either refresh inbox or townhall history
+ * @param {callback fn} refreshCallback a callback function to refresh NFT holdings
  * @throws {error} err chronik websocket subscription errors
  */
-export const nftTxListener = async (chronik, address, toastMsg) => {
+export const nftTxListener = async (chronik, address, toastMsg, refreshCallback = false) => {
     // Get type and hash
     const { type, hash } = cashaddr.decode(address, true);
 
@@ -572,6 +753,11 @@ export const nftTxListener = async (chronik, address, toastMsg) => {
                     // Unsubscribe and close websocket
                     ws.unsubscribeFromScript(type, hash);
                     ws.close();
+
+                    // Refresh history
+                    if (refreshCallback) {
+                        refreshCallback(0);
+                    }
                 }
             },
         });
@@ -665,6 +851,16 @@ export const getTxHistory = async (chronik, address, page = 0) => {
           return el.isEtokenTx === false &&
                  el.opReturnMessage !== ''
         });
+
+        localforage.setItem(
+            'txHistory',
+            {
+                txs: parsedAndFilteredTxs,
+                replies: replyTxs,
+                numPages: txHistoryPage.numPages,
+            },
+        );
+
         return {
             txs: parsedAndFilteredTxs,
             replies: replyTxs,
@@ -672,6 +868,79 @@ export const getTxHistory = async (chronik, address, page = 0) => {
         };
     } catch (err) {
         console.log(`Error in getTxHistory(${address})`, err);
+    }
+};
+
+// Retrieves article listing tx history via chronik, parses the response into formatted
+// objects and filter out eToken or non-msg txs
+export const getArticleHistory = async (chronik, address, page = 0) => {
+    if (
+        chronik === undefined ||
+        !cashaddr.isValidCashAddress(address, 'ecash')
+    ) {
+        return;
+    }
+
+    try {
+        const lokadIdHistory = await chronik.lokadId(
+            opreturnConfig.articlePrefixHex,
+        ).history(
+            page,
+            chronikConfig.articleHistoryPageSize,
+        );
+        const localArticles = await localforage.getItem(appConfig.localArticlesParam);
+
+        const paywallPaymentsHistory = await chronik.lokadId(
+            opreturnConfig.appPrefixesHex.paywallPaymentPrefixHex,
+        ).history(
+            page,
+            chronikConfig.txHistoryPageSize,
+        );
+
+        // Parse standard eCash Chat actions
+        const parsedTxs = [];
+        const replyTxs = [];
+        for (let i = 0; i < lokadIdHistory.txs.length; i += 1) {
+            const parsedTx = parseChronikTx(
+                lokadIdHistory.txs[i],
+                address,
+            );
+
+            // Separate out the replies so they can be rendered underneath the main posts
+            if (parsedTx.isArticleReply) {
+                // populate with additional article info with matching entry from localArticles
+                parsedTx.articleObject = localArticles.find((article) => article.hash === parsedTx.opReturnMessage);
+                replyTxs.push(parsedTx);
+            } else {
+                // populate with additional article info with matching entry from localArticles
+                parsedTx.articleObject = localArticles.find((article) => article.hash === parsedTx.opReturnMessage);
+                parsedTxs.push(parsedTx);
+            }
+        }
+
+        // Filter out non-article txs
+        const parsedAndFilteredTxs = parsedTxs.filter(function (el) {
+            return el.isArticle === true ||
+                el.isArticleReply === true
+        });
+
+        // Parse paywall payments
+        const paywallTxs = [];
+        for (let i = 0; i < paywallPaymentsHistory.txs.length; i += 1) {
+            paywallTxs.push(parseChronikTx(
+                paywallPaymentsHistory.txs[i],
+                address,
+            ));
+        }
+
+        return {
+            txs: parsedAndFilteredTxs,
+            replies: replyTxs,
+            paywallTxs: paywallTxs,
+            numPages: lokadIdHistory.numPages,
+        };
+    } catch (err) {
+        console.log(`Error in getArticleHistory(${address})`, err);
     }
 };
 
@@ -781,6 +1050,12 @@ export const parseChronikTx = (tx, address) => {
     let isEcashChatEncrypted = false;
     let isXecTip = false;
     let nftShowcaseId = false;
+    let articleTxid = false;
+    let isArticle = false;
+    let isArticleReply = false;
+    let isPaywallPayment = false;
+    let paywallPaymentArticleTxid = false;
+    let paywallPayment = false;
 
     if (tx.isCoinbase) {
         // Note that coinbase inputs have `undefined` for `thisInput.outputScript`
@@ -845,6 +1120,7 @@ export const parseChronikTx = (tx, address) => {
     }
 
     // Iterate over outputs to get the amount sent
+    let selfSentOutput;
     for (let i = 0; i < tx.outputs.length; i += 1) {
         const thisOutput = tx.outputs[i];
         const thisOutputReceivedAtHash160 = thisOutput.outputScript;
@@ -852,6 +1128,7 @@ export const parseChronikTx = (tx, address) => {
         // Uses output[1] as the intended recipient address
         if (i === 1) {
             recipientAddress = cashaddr.encodeOutputScript(thisOutputReceivedAtHash160);
+            selfSentOutput = tx.outputs[i];
         }
 
         if (
@@ -940,6 +1217,22 @@ export const parseChronikTx = (tx, address) => {
                             ? `: ${Buffer.from(dataHex, 'hex').toString()}`
                             : ''
                     }`;
+                    break;
+                }
+                case opreturnConfig.appPrefixesHex.paywallPaymentPrefixHex: {
+                    paywallPaymentArticleTxid = Buffer.from(stackArray[1], 'hex').toString();
+                    isPaywallPayment = true;
+                    break;
+                }
+                case opreturnConfig.articlePrefixHex: {
+                    if (stackArray[1] === opreturnConfig.articleReplyPrefixHex) {
+                        articleTxid = stackArray[2];
+                        opReturnMessage = Buffer.from(stackArray[3], 'hex');
+                        isArticleReply = true;
+                    } else {
+                        opReturnMessage = Buffer.from(stackArray[1], 'hex');
+                        isArticle = true;
+                    }
                     break;
                 }
                 case opreturnConfig.appPrefixesHex.eCashChat: {
@@ -1051,6 +1344,11 @@ export const parseChronikTx = (tx, address) => {
     // Convert from BigNumber to string
     xecAmount = xecAmount.toString();
 
+    if (isPaywallPayment) {
+        const thisOutputAmount = new BN(selfSentOutput.value);
+        paywallPayment = thisOutputAmount.shiftedBy(-1 * appConfig.cashDecimals).toString();
+    }
+
     // Get decimal info for correct etokenAmount
     let genesisInfo = {};
 
@@ -1079,19 +1377,21 @@ export const parseChronikTx = (tx, address) => {
     }
     etokenAmount = etokenAmount.toString();
 
-    // Parse the opReturn message output for media tags
-    const {
-        updatedOpReturn,
-        updatedImageSrc,
-        updatedVideoId,
-        updatedTweetId,
-        updatedUrl,
-    } = parseMediaTags(opReturnMessage);
-    opReturnMessage = updatedOpReturn;
-    imageSrc = updatedImageSrc;
-    videoId = updatedVideoId;
-    tweetId = updatedTweetId;
-    url = updatedUrl;
+    if (!isArticle && !isArticleReply) {
+        // Parse the opReturn message output for media tags
+        const {
+            updatedOpReturn,
+            updatedImageSrc,
+            updatedVideoId,
+            updatedTweetId,
+            updatedUrl,
+        } = parseMediaTags(opReturnMessage);
+        opReturnMessage = updatedOpReturn;
+        imageSrc = updatedImageSrc;
+        videoId = updatedVideoId;
+        tweetId = updatedTweetId;
+        url = updatedUrl;
+    }
 
     // Parse the tx's date and time
     let txDate, txTime;
@@ -1145,6 +1445,12 @@ export const parseChronikTx = (tx, address) => {
             url,
             isXecTip,
             nftShowcaseId,
+            articleTxid,
+            isArticle,
+            isArticleReply,
+            isPaywallPayment,
+            paywallPaymentArticleTxid,
+            paywallPayment,
         };
     }
     // Otherwise do not include these fields
@@ -1173,5 +1479,11 @@ export const parseChronikTx = (tx, address) => {
         url,
         isXecTip,
         nftShowcaseId,
+        articleTxid,
+        isArticle,
+        isArticleReply,
+        isPaywallPayment,
+        paywallPaymentArticleTxid,
+        paywallPayment,
     };
 };
