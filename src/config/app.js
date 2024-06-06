@@ -23,4 +23,5 @@ export const appConfig = {
     tokenIconsUrl: 'https://icons.etokens.cash',
     vercelKvParam: 'article1',
     localArticlesParam: 'localArticles',
+    vercelFollowsParam: 'follows1',
 };

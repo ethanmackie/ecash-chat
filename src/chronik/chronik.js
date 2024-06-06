@@ -10,6 +10,16 @@ import { toast } from 'react-toastify';
 import localforage from 'localforage';
 import { kv } from '@vercel/kv';
 
+// Retrieves all follows from API and share via local storage
+export const getAllFollows = async () => {
+    let allFollows = await kv.get(appConfig.vercelFollowsParam);
+    if (!Array.isArray(allFollows)) {
+        allFollows = [];
+    }
+    console.log('follows retrieved from vercel: ', allFollows);
+    return allFollows;
+};
+
 // Retrieves all articles from API and share via local storage
 export const getArticleListing = async () => {
     let articles = await kv.get(appConfig.vercelKvParam);
