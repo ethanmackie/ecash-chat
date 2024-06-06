@@ -58,13 +58,13 @@ it(`encodeBip21ReplyPost() correctly returns empty string for no message inputs`
 it(`encodeBip21Article() correctly encodes a valid article for use in a BIP21 querystring`, () => {
     expect(encodeBip21Article(
         'This is a test article',
-    )).toStrictEqual('04746573311654686973206973206120746573742061727469636c65');
+    )).toStrictEqual('04626c6f671654686973206973206120746573742061727469636c65');
 });
 it(`encodeBip21ReplyArticle() correctly encodes a valid article reply for use in a BIP21 querystring`, () => {
     expect(encodeBip21ReplyArticle(
         'This is a test reply to an existing article',
         '0729318a128ee8f11d18b28237c8ae7ffa4e95c88ec69ebce716758e1973c5d4',
-    )).toStrictEqual('04746573310474657332200729318a128ee8f11d18b28237c8ae7ffa4e95c88ec69ebce716758e1973c5d42b5468697320697320612074657374207265706c7920746f20616e206578697374696e672061727469636c65');
+    )).toStrictEqual('04626c6f6704726c6f67200729318a128ee8f11d18b28237c8ae7ffa4e95c88ec69ebce716758e1973c5d42b5468697320697320612074657374207265706c7920746f20616e206578697374696e672061727469636c65');
 });
 it(`encodeBip2XecTip() correctly encodes a valid XEC tip for use in a BIP21 querystring`, () => {
     expect(encodeBip2XecTip()).toStrictEqual('046368617404746970730120');

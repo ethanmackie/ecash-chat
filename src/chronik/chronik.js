@@ -13,7 +13,6 @@ import { kv } from '@vercel/kv';
 // Retrieves all articles from API and share via local storage
 export const getArticleListing = async () => {
     let articles = await kv.get(appConfig.vercelKvParam);
-    console.log('articles retrieved from vercel: ', articles);
 
     if (!Array.isArray(articles)) {
         articles = [];

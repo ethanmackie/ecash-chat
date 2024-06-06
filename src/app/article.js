@@ -256,7 +256,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
         setArticle('');
         setArticleTitle('');
-        articleTxListener(chronik, address, kv, updatedArticles);
+        articleTxListener(chronik, address, kv, updatedArticles, getArticleHistoryByPage);
     };
 
     // Pass a reply to article tx BIP21 query string to cashtab extensions
