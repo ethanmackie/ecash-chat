@@ -142,10 +142,6 @@ export default function Home() {
     const verifySignature = () => {
         let verification;
 
-        console.log('recipient: ', recipient);
-        console.log('signature: ', signature);
-        console.log('utxolib.networks.ecash.messagePrefix: ', utxolib.networks.ecash.messagePrefix);
-
         try {
             verification = xecMessage.verify(
                 'ecashchat',
