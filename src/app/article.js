@@ -15,6 +15,8 @@ import { Tooltip, Popover, Modal } from "flowbite-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon, Pencil1Icon } from "@radix-ui/react-icons";
+import { ImDownload3 } from "react-icons/im";
+import { RiSave3Fill } from "react-icons/ri";
 import {
     SendIcon,
     LogoutIcon,
@@ -434,6 +436,27 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 }
             }
             setTxHistoryByAddress(filteredArticleHistory);
+        }
+    };
+
+    // Saves the current article draft into local storage
+    const savedDraftArticleToLocalStorage = async () => {
+        try {
+            await localforage.setItem('draftArticle', article);
+            toast('Draft article saved');
+        } catch (err) {
+            toast('Failed to save draft article to local storage');
+        }
+    };
+
+    // Loads the article draft from local storage
+    const loadDraftArticleFromLocalStorage = async () => {
+        try {
+            const draftArticle = await localforage.getItem('draftArticle');
+            setArticle(draftArticle);
+            toast('Draft article loaded');
+        } catch (err) {
+            toast('Failed to load draft article from local storage');
         }
     };
 
@@ -904,7 +927,25 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 >
                                 <BiSolidNews />&nbsp;Post Article
                                 </Button>
-                                <div className="relative flex items-start">
+                                <br />
+                                <div className="sm:flex">
+                                <Button
+                                type="button"
+                                className="bg-blue-500 hover:bg-blue-300"
+                                onClick={() => savedDraftArticleToLocalStorage()}
+                                >
+                                <RiSave3Fill />&nbsp;Save
+                                </Button>
+                                &nbsp;
+                                <Button
+                                type="button"
+                                className="bg-blue-500 hover:bg-blue-300"
+                                onClick={() => loadDraftArticleFromLocalStorage()}
+                                >
+                                <ImDownload3 />&nbsp;Load
+                                </Button>
+                                </div>
+                                <div className="relative flex items-start mt-2">
                                     <div className="flex h-6 items-center py-2">
                                         <Checkbox
                                         id="comments"
@@ -990,7 +1031,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                     </Pagination>
                 </span>
                 
-                {/* Filter by artichle author */}
+                {/* Filter by article author */}
                 <form className="space-y-6" action="#" method="POST">
                     <div>
                         <div className="max-w-xl mt-10 w-full mx-auto">
