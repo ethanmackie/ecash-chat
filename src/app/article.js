@@ -453,8 +453,10 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const loadDraftArticleFromLocalStorage = async () => {
         try {
             const draftArticle = await localforage.getItem('draftArticle');
-            setArticle(draftArticle);
-            toast('Draft article loaded');
+            if (draftArticle) {
+                setArticle(draftArticle);
+                toast('Draft article loaded');
+            }
         } catch (err) {
             toast('Failed to load draft article from local storage');
         }
