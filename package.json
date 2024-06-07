@@ -10,7 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@bitgo/utxo-lib": "^9.34.0",
+    "@bitgo/utxo-lib": "^9.37.0",
     "@emoji-mart/data": "^1.1.2",
     "@emoji-mart/react": "^1.1.1",
     "@radix-ui/react-accordion": "^1.1.2",
@@ -34,6 +34,7 @@
     "@uiw/react-markdown-editor": "^6.1.1",
     "@vercel/analytics": "^1.2.2",
     "@vercel/kv": "^1.0.1",
+    "bitcoinjs-message": "^2.2.0",
     "chronik-client": "^0.28.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",

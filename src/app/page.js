@@ -45,6 +45,8 @@ import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
 import { Tweet } from 'react-tweet';
 const packageJson = require('../../package.json');
 import localforage from 'localforage';
+import xecMessage from 'bitcoinjs-message';
+import * as utxolib from '@bitgo/utxo-lib';
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -57,6 +59,7 @@ export default function Home() {
         });
     const [recipient, setRecipient] = useState('');
     const [recipientError, setRecipientError] = useState(false);
+    const [signature, setSignature] = useState('');
     const [message, setMessage] = useState('');
     const [password, setPassword] = useState('');
     const [messageError, setMessageError] = useState(false);
@@ -133,6 +136,31 @@ export default function Home() {
         //getAliasesByAddress(address);
         setAddress(address);
         setIsLoggedIn(true);
+    };
+
+    // Checks whether the mobile user's address matches their signature
+    const verifySignature = () => {
+        let verification;
+
+        console.log('recipient: ', recipient);
+        console.log('signature: ', signature);
+        console.log('utxolib.networks.ecash.messagePrefix: ', utxolib.networks.ecash.messagePrefix);
+
+        try {
+            verification = xecMessage.verify(
+                'ecashchat',
+                cashaddr.toLegacy(recipient),
+                signature,
+                utxolib.networks.ecash.messagePrefix,
+            );
+        } catch (err) {
+            toast.error(`${err}`);
+        }
+        if (verification) {
+            viewAddress(recipient);
+        } else {
+            toast.error(`Signature does not match address`);
+        }
     };
 
     // Retrieves the aliases associated with this address
@@ -552,9 +580,9 @@ export default function Home() {
             <><br />
             <div className="px-4">
                 <Alert color="info">
+                    <br />
                     <p><b>Mobile device detected </b></p>
-                    <p>Please note eCash Chat is optimized for desktop browsers as it is integrated with Cashtab Extensions.</p><br />
-                    <p>Mobile users can access the public townhall with limited functionality.</p>
+                    <p>Please use your wallet to sign an <b>'ecashchat'</b> message via <a href='https://cashtab.com/#/signverifymsg' target='_blank'>Cashtab</a> and input the signature below for verification.</p><br />
                 </Alert>
                 <form className="space-y-6" action="#" method="POST">
                     <div>
@@ -570,17 +598,27 @@ export default function Home() {
                           />
                         </div>
                         <p className="mt-2 text-sm text-red-600 dark:text-red-500">{recipientError !== false && recipientError}</p>
-
+                        <div className="mt-2">
+                          <Input
+                            id="viewSignature"
+                            name="viewSignature"
+                            type="text"
+                            placeholder="Enter your signature..."
+                            value={signature}
+                            required
+                            onChange={e => setSignature(e.target.value)}
+                          />
+                        </div>
                         <div>
                           <Button
                             type="button"
-                            disabled={recipientError || recipient === ''}
+                            disabled={recipientError || recipient === '' || signature === ''}
                             className="flex w-full"
                             onClick={() => {
-                                viewAddress(recipient);
+                                verifySignature();
                             }}
                           >
-                            View
+                            Login
                           </Button>
                         </div>
                   </div>
