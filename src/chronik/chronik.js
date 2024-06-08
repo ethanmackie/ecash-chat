@@ -499,9 +499,15 @@ export const articleTxListener = async (
         const ws = chronik.ws({
             onMessage: msg => {
                 if (msg.msgType === 'TX_ADDED_TO_MEMPOOL') {
+                    console.log('articleTxListener: TX_ADDED_TO_MEMPOOL: ', msg);
                     let mempoolTx;
                     setTimeout(async() => { // temporary until Extension is refactored to allow direct passing of callback functions
                         mempoolTx = await chronik.tx(msg.txid);
+                        if (!mempoolTx || typeof mempoolTx === 'undefined') {
+                            toast('Error parsing article tx details, please try again');
+                            console.log(`articleTxListener: error in chronik.tx(${msg.txid}) call: `, mempoolTx);
+                            return;
+                        }
                         const actualRecipient = cashaddr.encodeOutputScript(mempoolTx.outputs[1].outputScript);
                         const actualSender = cashaddr.encodeOutputScript(mempoolTx.inputs[0].outputScript);
 
@@ -509,22 +515,28 @@ export const articleTxListener = async (
                             address === actualRecipient &&
                             address === actualSender
                         ) {
-                            await localforage.setItem(appConfig.localArticlesParam, updatedArticles);
-                            await kv.set(appConfig.vercelKvParam, updatedArticles);
-
-                            // Notify user
-                            toast(`Article posted`);
+                            console.log('articleTxListener: tx sender and recipient matches');
+                            try {
+                                await kv.set(appConfig.vercelKvParam, updatedArticles);
+                                await localforage.setItem(appConfig.localArticlesParam, updatedArticles);
+                                toast(`Article posted`);
+                            } catch (err) {
+                                toast(`Error committing article, please try again`);
+                                console.log('articleTxListener: error committing article to DB', err);
+                            }
 
                             // Unsubscribe and close websocket
                             ws.unsubscribeFromScript(type, hash);
                             ws.close();
 
-                            // Refresh history
+                            // Refresh article listing history
                             if (refreshCallback) {
                                 refreshCallback(0);
                             }
+                        } else {
+                            console.log('Detected mempool event is not an article tx, skipping: ', mempoolTx);
                         }
-                    }, 500);
+                    }, 750);
                 }
             },
         });
