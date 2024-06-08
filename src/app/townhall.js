@@ -558,7 +558,7 @@ export default function TownHall({ address, isMobile }) {
                         </div>
                     </div>
                 </>
-             <Separator className="my-4" />
+             <Separator className="my-2" />
             {/* Townhall Post History */}
             {/*Set up pagination menu*/}
             <span>
@@ -678,7 +678,7 @@ export default function TownHall({ address, isMobile }) {
                                    </div>
 
                                    {/* Render the op_return message */}
-                                <div className={(tx.opReturnMessage.trim() && tx.opReturnMessage !== '\0') ? "my-4" : "my-0"}>
+                                <div className={(tx.opReturnMessage.trim() && tx.opReturnMessage !== '\0') ? "my-2" : "hidden"}>
                                     <p className="leading-7" key={index}>
                                         {(tx.opReturnMessage.trim() && tx.opReturnMessage !== '\0') ? tx.opReturnMessage : ' '}
                                     </p>
@@ -737,8 +737,7 @@ export default function TownHall({ address, isMobile }) {
                                    </span>
 
                                    {/* Reply action to a townhall post */}
-                                   <div>
-                                       <br />
+                                   <div>    
                                        {/* Reply popover to input the reply content */}
                                        <Popover
                                          aria-labelledby="default-popover"
@@ -774,13 +773,12 @@ export default function TownHall({ address, isMobile }) {
                                            </div>
                                          }
                                        >
-                                          <Button variant="outline" size="icon">
+                                          <Button variant="outline" size="icon" className="mr-2">
                                              <ChatBubbleIcon className="h-4 w-4" />
                                          </Button>
                                        </Popover>
 
                                        {/* Share buttons with other social platforms */}
-                                       &emsp;
 
                                        <Popover
                                          aria-labelledby="default-popover"
@@ -846,7 +844,6 @@ export default function TownHall({ address, isMobile }) {
                                           <Share1Icon className="h-4 w-4" />
                                          </Button>
                                        </Popover>
-                                       <br /><br />
                                             {/* Render corresponding replies for this post */}
                                             {<RenderReplies txid={tx.txid} replies={townHallHistory.replies} />}
                                    </div>

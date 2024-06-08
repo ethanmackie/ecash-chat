@@ -457,13 +457,20 @@ export default function TxHistory({ address }) {
                                 </Alert>
                             </>
                             ) : (
-                                <p className="leading-7 my-4 break-words" key={index}>{tx.opReturnMessage ? `${tx.opReturnMessage}` : ' '}</p>
+                              <>
+                              <div className={(tx.opReturnMessage.trim() && tx.opReturnMessage !== '\0') ? "my-2" : "hidden"}>
+                              <p className="leading-7" key={index}>
+                                  {(tx.opReturnMessage.trim() && tx.opReturnMessage !== '\0') ? tx.opReturnMessage : ' '}
+                              </p>
+                          </div>
+                               
+                                </>
                             )
                         }
 
                         {/* XEC Tip rendering */}
                         {tx.isXecTip && (
-                          <Alert className="leading-7 my-4" color="success">
+                          <Alert className="leading-7 my-2" color="success">
                               <div className="flex items-center space-x-2">
                                   <MoneyIcon className="h-5 w-5 text-blue-500" />
                                   <span>
@@ -512,7 +519,7 @@ export default function TxHistory({ address }) {
                         {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
                         {tx.url !== false && (<Alert color="info"><a href={tx.url} target="_blank" >{tx.url}</a></Alert>)}
 
-                        <div className="flex my-4 h-5 items-center space-x-4 text-sm text-muted-foreground">
+                        <div className="flex my-2 h-5 items-center space-x-4 text-sm text-muted-foreground">
                         <div>{tx.isCashtabMessage ? 'Cashtab Message' :
                                 tx.iseCashChatMessage ? 'eCash Chat Message' :
                                     tx.iseCashChatPost ? 'eCash Townhall Post' :
@@ -526,7 +533,7 @@ export default function TxHistory({ address }) {
                       
         
 
-                        <div className="flex py-3">
+                        <div className="flex">
                             {/* Decryption and share buttons */}
                             <br />
                             {tx.isEcashChatEncrypted && (
