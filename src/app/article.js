@@ -188,7 +188,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const initializeArticleRefresh = async () => {
         const intervalId = setInterval(async function () {
             await getArticleHistoryByPage(0);
-        }, appConfig.historyRefreshInterval);
+        }, appConfig.articleRefreshInterval);
         // Clear the interval when page unmounts
         return () => clearInterval(intervalId);
     };

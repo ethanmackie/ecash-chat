@@ -902,12 +902,46 @@ export const getArticleHistory = async (chronik, address, page = 0) => {
         );
         const localArticles = await localforage.getItem(appConfig.localArticlesParam);
 
-        const paywallPaymentsHistory = await chronik.lokadId(
+        // Retrieve first chronik page of paywall txs
+        let paywallPaymentsHistory = await chronik.lokadId(
             opreturnConfig.appPrefixesHex.paywallPaymentPrefixHex,
         ).history(
-            page,
-            chronikConfig.txHistoryPageSize,
+            0,
+            200,
         );
+        let totalPaywallHistoryTxs = paywallPaymentsHistory.txs;
+
+        // Retrieve subsequent chronik pages of paywall txs (if exists)
+        const paywallPaymentHistoryPromises = [];
+        if (paywallPaymentsHistory && paywallPaymentsHistory.numPages > 1) {
+            for (let i = 1; i < paywallPaymentsHistory.numPages; i += 1) {
+                const thisPaywallHistoryPromise = new Promise((resolve, reject) => {
+                    chronik
+                    .lokadId(
+                        opreturnConfig.appPrefixesHex.paywallPaymentPrefixHex,
+                    ).history(
+                        i,
+                        200,
+                    ).then(
+                        result => {
+                            resolve(result);
+                        },
+                        err => {
+                            reject(err);
+                        },
+                    );
+                });
+                paywallPaymentHistoryPromises.push(thisPaywallHistoryPromise);
+            }
+
+            // Execution of all subsequent paywall lokad history page retrievals
+            const executedPaywallPaymentHistoryPromises = await Promise.all(paywallPaymentHistoryPromises);
+
+            // Merge all subsequent paywall lokad history pages into totalPaywallHistoryTxs
+            for (let i = 0; i < executedPaywallPaymentHistoryPromises.length; i += 1) {
+                totalPaywallHistoryTxs = totalPaywallHistoryTxs.concat(executedPaywallPaymentHistoryPromises[i].txs);
+            }
+        }
 
         // Parse standard eCash Chat actions
         const parsedTxs = [];
@@ -938,9 +972,9 @@ export const getArticleHistory = async (chronik, address, page = 0) => {
 
         // Parse paywall payments
         const paywallTxs = [];
-        for (let i = 0; i < paywallPaymentsHistory.txs.length; i += 1) {
+        for (let i = 0; i < totalPaywallHistoryTxs.length; i += 1) {
             paywallTxs.push(parseChronikTx(
-                paywallPaymentsHistory.txs[i],
+                totalPaywallHistoryTxs[i],
                 address,
             ));
         }

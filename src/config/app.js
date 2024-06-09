@@ -20,6 +20,7 @@ export const appConfig = {
     townhallAddress: 'ecash:qpc20prr862zklsun9rj2kgseqfjvgezts4ah8wh7h',
     blockExplorerUrl: 'https://explorer.e.cash',
     historyRefreshInterval: 60000,
+    articleRefreshInterval: 120000,
     tokenIconsUrl: 'https://icons.etokens.cash',
     vercelKvParam: 'article1',
     localArticlesParam: 'localArticles',
