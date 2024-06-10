@@ -379,7 +379,7 @@ export default function TownHall({ address, isMobile }) {
             foundReplies.map(
                 (foundReply, index) => (
                     <>
-                    <div className="flex flex-col break-words space-y-1.5 gap-2 mt-2 w-full leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                    <div className="flex flex-col break-words space-y-1.5 hover:shadow-md border gap-2 mt-2 w-full leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                         <div className="flex justify-between items-center w-full" key={"townhallReply"+index}>
                             <div className="flex items-center gap-2">
                                 <ReplieduseravatarIcon/>
@@ -634,7 +634,7 @@ export default function TownHall({ address, isMobile }) {
                           (tx, index) => (
                             <>
                                 <div className="flex flex-col items-center mt-2" key={"townhallTxHistory"+index}>
-                                   <div className="flex flex-col max-w-xl gap-2 break-words w-full leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                                   <div className="flex flex-col max-w-xl gap-2 break-words hover:shadow-md w-full leading-1.5 p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                                    <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
                                       <span>
                                          {tx.replyAddress === address ? (
@@ -657,7 +657,7 @@ export default function TownHall({ address, isMobile }) {
                                              <span>
                                                 <div className="flex items-center gap-2">
                                                     <DefaultavatarIcon/>
-                                                    <Badge variant="outline" className="py-3px">
+                                                    <Badge variant="outline" className="py-3px shadow-sm hover:bg-accent">
                                                     <div className="leading-7 [&:not(:first-child)]:mt-6">
                                                         <div onClick={() => {
                                                             copy(tx.replyAddress);
