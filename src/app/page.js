@@ -480,7 +480,8 @@ export default function Home() {
                 <Modal.Header>Save login details?</Modal.Header>
                 <Modal.Body>
                     <div className="space-y-6">
-                    If you're the only person who uses this device, saving login details will reduce the login process.
+                    Saving login details will reduce the number of times you're asked to login.<br />
+                    Please ensure you're the only person who uses this device.
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
