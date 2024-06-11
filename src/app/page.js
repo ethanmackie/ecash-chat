@@ -506,17 +506,33 @@ export default function Home() {
                     <ProfilePanel address={address} />
                 )}
 
-              {!isMobile && ( 
-                    <div>
-                        <Button onClick={isLoggedIn ? () => {
-                        setIsLoggedIn(false);
-                        toast(`Logged out of ${address}`);
-                        } : () => getAddress()}
-                        variant="outline">
-                        {isLoggedIn ? 'Logout' : 'Signin'}
-                        </Button>
-                    </div>
-                    )}
+{(isMobile && isLoggedIn) ? (
+  <div>
+    <Button
+      onClick={() => {
+        setIsLoggedIn(false);
+        toast(`Logged out of ${address}`);
+      }}
+      variant="outline"
+    >
+      Logout
+    </Button>
+  </div>
+) : (
+  !isMobile && (
+    <div>
+      <Button
+        onClick={isLoggedIn ? () => {
+          setIsLoggedIn(false);
+          toast(`Logged out of ${address}`);
+        } : () => getAddress()}
+        variant="outline"
+      >
+        {isLoggedIn ? 'Logout' : 'Signin'}
+      </Button>
+    </div>
+  )
+)}
                 </div>
         </header>
         
