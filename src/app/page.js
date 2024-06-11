@@ -30,7 +30,7 @@ import { IoMdInformationCircleOutline } from "react-icons/io";
 import { ToastContainer, toast } from 'react-toastify';
 import { PersonIcon, FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon } from '@radix-ui/react-icons';
 import 'react-toastify/dist/ReactToastify.css';
-import { YoutubeIcon, DefaultavatarIcon, EcashchatIcon } from "@/components/ui/social";
+import { YoutubeIcon, DefaultavatarIcon, EcashchatIcon, Home3Icon } from "@/components/ui/social";
 import {
     SendIcon,
     LogoutIcon,
@@ -539,14 +539,7 @@ export default function Home() {
         </>
         ) : (
             <div className="flex justify-center">
-        <Image
-            src="/ecash-chat-new-logo.svg"
-            alt="eCash Chat Logo"
-            className="dark:invert"
-            width={273}
-            height={75}
-            priority
-        />
+      
         </div>
         )}
  
@@ -815,7 +808,7 @@ export default function Home() {
                   </Tabs.Item>
               )}
 
-              <Tabs.Item title="Town Hall" icon={GiDiscussion} >
+              <Tabs.Item title="Town Hall" icon={Home3Icon} >
                   <Townhall address={address} isMobile={isMobile} />
               </Tabs.Item>
 
