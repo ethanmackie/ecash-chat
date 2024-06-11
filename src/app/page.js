@@ -30,7 +30,7 @@ import { IoMdInformationCircleOutline } from "react-icons/io";
 import { ToastContainer, toast } from 'react-toastify';
 import { PersonIcon, FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon } from '@radix-ui/react-icons';
 import 'react-toastify/dist/ReactToastify.css';
-import { YoutubeIcon, DefaultavatarIcon, EcashchatIcon, Home3Icon, File3Icon, Nft3Icon, Inbox3Icon, Send3Icon, Info3icon } from "@/components/ui/social";
+import { YoutubeIcon, DefaultavatarIcon, EcashchatIcon, Home3Icon, LoadingSpinner, File3Icon, Nft3Icon, Inbox3Icon, Send3Icon, Info3icon } from "@/components/ui/social";
 import {
     SendIcon,
     LogoutIcon,
@@ -506,33 +506,33 @@ export default function Home() {
                     <ProfilePanel address={address} />
                 )}
 
-{(isMobile && isLoggedIn) ? (
-  <div>
-    <Button
-      onClick={() => {
-        setIsLoggedIn(false);
-        toast(`Logged out of ${address}`);
-      }}
-      variant="outline"
-    >
-      Logout
-    </Button>
-  </div>
-) : (
-  !isMobile && (
-    <div>
-      <Button
-        onClick={isLoggedIn ? () => {
-          setIsLoggedIn(false);
-          toast(`Logged out of ${address}`);
-        } : () => getAddress()}
-        variant="outline"
-      >
-        {isLoggedIn ? 'Logout' : 'Signin'}
-      </Button>
-    </div>
-  )
-)}
+                {(isMobile && isLoggedIn) ? (
+                <div>
+                    <Button
+                    onClick={() => {
+                        setIsLoggedIn(false);
+                        toast(`Logged out of ${address}`);
+                    }}
+                    variant="outline"
+                    >
+                    Logout
+                    </Button>
+                </div>
+                ) : (
+                !isMobile && (
+                    <div>
+                    <Button
+                        onClick={isLoggedIn ? () => {
+                        setIsLoggedIn(false);
+                        toast(`Logged out of ${address}`);
+                        } : () => getAddress()}
+                        variant="outline"
+                    >
+                        {isLoggedIn ? 'Logout' : 'Signin'}
+                    </Button>
+                    </div>
+                )
+                )}
                 </div>
         </header>
         
