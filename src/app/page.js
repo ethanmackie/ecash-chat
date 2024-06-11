@@ -556,23 +556,42 @@ export default function Home() {
               </a>
             </div>
             <div className="sm:flex">
-            <nav className="flex items-center gap-6 text-sm">
-              </nav>
-              </div>
-              {!isMobile && ( 
-                    <div>
-                        <Button onClick={isLoggedIn ? async () => {
-                        setIsLoggedIn(false);
-                        setSavedLogin(false);
-                        await localforage.setItem('savedLoginAddress', false);
-                        toast(`Logged out of ${address}`);
-                        } : () => getAddress()}
-                        variant="outline">
-                        {isLoggedIn ? 'Logout' : 'Signin'}
-                        </Button>
-                    </div>
-                    )}
+                <nav className="flex items-center gap-6 text-sm">
+                </nav>
+            </div>
+
+            {(isMobile && isLoggedIn) ? (
+            <div>
+                <Button
+                onClick={async () => {
+                    setIsLoggedIn(false);
+                    setSavedLogin(false);
+                    await localforage.setItem('savedLoginAddress', false);
+                    toast(`Logged out of ${address}`);
+                }}
+                variant="outline"
+                >
+                Logout
+                </Button>
+            </div>
+            ) : (
+            !isMobile && (
+                <div>
+                <Button
+                    onClick={isLoggedIn ? async () => {
+                    setIsLoggedIn(false);
+                    setSavedLogin(false);
+                    await localforage.setItem('savedLoginAddress', false);
+                    toast(`Logged out of ${address}`);
+                    } : () => getAddress()}
+                    variant="outline"
+                >
+                    {isLoggedIn ? 'Logout' : 'Signin'}
+                </Button>
                 </div>
+            )
+            )}
+            </div>
         </header>
         
       <main className="sm:flex flex-col items-center justify-center p-1 sm:px-5 relative z-10">
