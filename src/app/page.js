@@ -30,7 +30,7 @@ import { IoMdInformationCircleOutline } from "react-icons/io";
 import { ToastContainer, toast } from 'react-toastify';
 import { PersonIcon, FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon } from '@radix-ui/react-icons';
 import 'react-toastify/dist/ReactToastify.css';
-import { YoutubeIcon, DefaultavatarIcon, EcashchatIcon, Home3Icon } from "@/components/ui/social";
+import { YoutubeIcon, DefaultavatarIcon, EcashchatIcon, Home3Icon, File3Icon, Nft3Icon, Inbox3Icon, Send3Icon, Info3icon } from "@/components/ui/social";
 import {
     SendIcon,
     LogoutIcon,
@@ -652,7 +652,7 @@ export default function Home() {
           {/* Tab navigation */}
           <Tabs aria-label="eCash Chat" style="default" className='z-10 focus:ring-0 relative mt-4 justify-center'>
               {isMobile === false && (
-                  <Tabs.Item title="Inbox" icon={HiOutlineMail}>
+                  <Tabs.Item title="Inbox" icon={Inbox3Icon}>
                       {cashaddr.isValidCashAddress(address, 'ecash') &&
                           <TxHistory address={address} />
                       }
@@ -660,7 +660,7 @@ export default function Home() {
               )}
 
               {isMobile === false && (
-                  <Tabs.Item title="Send Message" className='focus:ring-0' f icon={HiOutlineNewspaper} >
+                  <Tabs.Item title="Send" className='focus:ring-0' f icon={Send3Icon} >
                       <div style={{ display: (isLoggedIn ? 'block' : 'none') }}>
                           <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
                                 <MessagePreviewModal />
@@ -812,15 +812,15 @@ export default function Home() {
                   <Townhall address={address} isMobile={isMobile} />
               </Tabs.Item>
 
-              <Tabs.Item title="Articles" active icon={BiSolidNews} >
+              <Tabs.Item title="Articles" active icon={File3Icon} >
                 <Article chronik={chronik} address={address} isMobile={isMobile} sharedArticleTxid={sharedArticleTxid} />
               </Tabs.Item>
 
-              <Tabs.Item title="NFTs" icon={HiOutlinePhotograph} >
+              <Tabs.Item title="NFTs" icon={Nft3Icon} >
                   <Nft chronik={chronik} address={address} isMobile={isMobile} />
               </Tabs.Item>
 
-              <Tabs.Item title="About" icon={IoMdInformationCircleOutline} >
+              <Tabs.Item title="About" icon={Info3icon} >
               <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
                       <h2 className="mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">What is eCash Chat?</h2>
                       <p className='leading-7 [&:not(:first-child)]:mt-6'>eCash Chat is an on-chain web platform that enables anyone to socialize,
