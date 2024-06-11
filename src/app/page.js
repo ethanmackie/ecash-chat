@@ -29,7 +29,7 @@ import { IoMdInformationCircleOutline } from "react-icons/io";
 import { ToastContainer, toast } from 'react-toastify';
 import { PersonIcon, FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon } from '@radix-ui/react-icons';
 import 'react-toastify/dist/ReactToastify.css';
-import { YoutubeIcon, DefaultavatarIcon, EcashchatIcon } from "@/components/ui/social";
+import { YoutubeIcon, DefaultavatarIcon, EcashchatIcon, LoadingSpinner } from "@/components/ui/social";
 import {
     SendIcon,
     LogoutIcon,
@@ -71,6 +71,9 @@ export default function Home() {
     const [showMessagePreview, setShowMessagePreview] = useState(false);
     const [sharedArticleTxid, setSharedArticleTxid] = useState(false);
     const searchParams = useSearchParams();
+    const [openSaveLoginModal, setOpenSaveLoginModal] = useState(false);
+    const [savedLogin, setSavedLogin] = useState(false);
+    const [showLoadingSpinner, setShowLoadingSpinner] = useState(true);
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
@@ -86,6 +89,16 @@ export default function Home() {
         })();
 
         (async () => {
+            const savedLoginAddress = await localforage.getItem('savedLoginAddress');
+            if (isValidRecipient(savedLoginAddress)) {
+                setSavedLogin(savedLoginAddress);
+                setAddress(savedLoginAddress);
+                setIsLoggedIn(true);
+            }
+        })();
+        setShowLoadingSpinner(false);
+
+        (async () => {
             const latestArticles = await getArticleListing();
             await localforage.setItem(appConfig.localArticlesParam, latestArticles);
         })();
@@ -98,6 +111,7 @@ export default function Home() {
 
         // Listen for cashtab extension messages on load
         window.addEventListener('message', handleMessage);
+
     }, []);
 
     // Triggered upon change of address i.e. login
@@ -109,6 +123,10 @@ export default function Home() {
             const updatedCache = await refreshUtxos(chronik, address);
             setXecBalance(updatedCache.xecBalance);
         })();
+
+        if (!savedLogin) {
+            setOpenSaveLoginModal(true);
+        }
 
         // Listens for all mempool events for this address and silently
         // updates XEC balance in the background
@@ -153,11 +171,19 @@ export default function Home() {
             toast.error(`${err}`);
         }
         if (verification) {
+            setOpenSaveLoginModal(true);
             viewAddress(recipient);
         } else {
             toast.error(`Signature does not match address`);
         }
     };
+
+    // Saves the verified login address to local storage to avoid needing to login again
+    const saveLoginAddressToLocalStorage = async () => {
+        await localforage.setItem('savedLoginAddress', address);
+        toast(`Login info saved for ${address}`);
+        setOpenSaveLoginModal(false);
+    }
 
     // Retrieves the aliases associated with this address
     const getAliasesByAddress = async (thisAddress) => {
@@ -448,9 +474,47 @@ export default function Home() {
         );
     };
 
+    const RenderSaveLoginModal = () => {
+        return (
+            <Modal show={openSaveLoginModal} onClose={() => setOpenSaveLoginModal(false)}>
+                <Modal.Header>Save login details?</Modal.Header>
+                <Modal.Body>
+                    <div className="space-y-6">
+                    Saving login details will reduce the number of times you're asked to login.<br />
+                    Please ensure you're the only person who uses this device.
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
+                          <button
+                            type="button"
+                            className="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:col-start-2"
+                            onClick={() => saveLoginAddressToLocalStorage()}
+                          >
+                            Save login
+                          </button>
+                          <button
+                            type="button"
+                            className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0"
+                            onClick={() => setOpenSaveLoginModal(false)}
+                            data-autofocus
+                          >
+                            Don't save login
+                          </button>
+                        </div>
+                </Modal.Footer>
+            </Modal>
+          )
+    };
+
     return (
         <>
         <ToastContainer />
+
+        {openSaveLoginModal === true && (
+            <RenderSaveLoginModal />
+        )}
+
         <div className="sm:flex flex-col items-center justify-center p-5 relative z-10 mt-4">
         <div className="background_content"></div>
         </div>
@@ -492,21 +556,42 @@ export default function Home() {
               </a>
             </div>
             <div className="sm:flex">
-            <nav className="flex items-center gap-6 text-sm">
-              </nav>
-              </div>
-              {!isMobile && ( 
-                    <div>
-                        <Button onClick={isLoggedIn ? () => {
-                        setIsLoggedIn(false);
-                        toast(`Logged out of ${address}`);
-                        } : () => getAddress()}
-                        variant="outline">
-                        {isLoggedIn ? 'Logout' : 'Signin'}
-                        </Button>
-                    </div>
-                    )}
+                <nav className="flex items-center gap-6 text-sm">
+                </nav>
+            </div>
+
+            {(isMobile && isLoggedIn) ? (
+            <div>
+                <Button
+                onClick={async () => {
+                    setIsLoggedIn(false);
+                    setSavedLogin(false);
+                    await localforage.setItem('savedLoginAddress', false);
+                    toast(`Logged out of ${address}`);
+                }}
+                variant="outline"
+                >
+                Logout
+                </Button>
+            </div>
+            ) : (
+            !isMobile && (
+                <div>
+                <Button
+                    onClick={isLoggedIn ? async () => {
+                    setIsLoggedIn(false);
+                    setSavedLogin(false);
+                    await localforage.setItem('savedLoginAddress', false);
+                    toast(`Logged out of ${address}`);
+                    } : () => getAddress()}
+                    variant="outline"
+                >
+                    {isLoggedIn ? 'Logout' : 'Signin'}
+                </Button>
                 </div>
+            )
+            )}
+            </div>
         </header>
         
       <main className="sm:flex flex-col items-center justify-center p-1 sm:px-5 relative z-10">
@@ -528,17 +613,23 @@ export default function Home() {
         </>
         ) : (
             <div className="flex justify-center">
-        <Image
-            src="/ecash-chat-new-logo.svg"
-            alt="eCash Chat Logo"
-            className="dark:invert"
-            width={273}
-            height={75}
-            priority
-        />
-        </div>
+            <Image
+                src="/ecash-chat-new-logo.svg"
+                alt="eCash Chat Logo"
+                className="dark:invert"
+                width={273}
+                height={75}
+                priority
+            />
+            </div>
         )}
- 
+
+    {showLoadingSpinner && (
+        <div className="flex justify-center">
+        <LoadingSpinner className="mr-2 h-4 w-4 animate-spin" />
+        </div>
+    )}
+
       <div>
        {isLoggedIn === false && isMobile === false && step === 'fresh' && (
         <div className='flex justify-center'>
