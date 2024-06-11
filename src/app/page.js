@@ -593,19 +593,21 @@ export default function Home() {
         </>
         ) : (
             <div className="flex justify-center">
-        <Image
-            src="/ecash-chat-new-logo.svg"
-            alt="eCash Chat Logo"
-            className="dark:invert"
-            width={273}
-            height={75}
-            priority
-        />
-        </div>
+            <Image
+                src="/ecash-chat-new-logo.svg"
+                alt="eCash Chat Logo"
+                className="dark:invert"
+                width={273}
+                height={75}
+                priority
+            />
+            </div>
         )}
 
     {showLoadingSpinner && (
+        <div className="flex justify-center">
         <LoadingSpinner className="mr-2 h-4 w-4 animate-spin" />
+        </div>
     )}
 
       <div>
