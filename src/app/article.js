@@ -933,18 +933,18 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 <div className="sm:flex">
                                 <Button
                                 type="button"
-                                className="bg-blue-500 hover:bg-blue-300"
+                                variant="outline" size="icon"
                                 onClick={() => savedDraftArticleToLocalStorage()}
                                 >
-                                <RiSave3Fill />&nbsp;Save
+                                <RiSave3Fill />
                                 </Button>
                                 &nbsp;
                                 <Button
                                 type="button"
-                                className="bg-blue-500 hover:bg-blue-300"
+                                variant="outline" size="icon"
                                 onClick={() => loadDraftArticleFromLocalStorage()}
                                 >
-                                <ImDownload3 />&nbsp;Load
+                                <ImDownload3 />
                                 </Button>
                                 </div>
                                 <div className="relative flex items-start mt-2">
@@ -1036,7 +1036,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 {/* Filter by article author */}
                 <form className="space-y-6" action="#" method="POST">
                     <div>
-                        <div className="max-w-xl mt-10 w-full mx-auto">
+                        <div className="max-w-xl mt-2 w-full mx-auto">
                             <div className="flex items-center space-x-2">
                                 <Input
                                 id="address"
