@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
     <html className="h-full bg-white" lang="en">
       <head>
         <meta name="twitter:title" content="eCash Chat" />
-        <meta name="twitter:image" content="/preview-card.png" />
+        <meta name="twitter:image" content="https://ecash-chat-uat.vercel.app/preview-card.png" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
