@@ -12,6 +12,7 @@ const fontSans = FontSans({
 export const metadata = {
   title: "eCash Chat",
   description: "On chain social platform",
+  metadataBase: new URL("https://ecash-chat-uat.vercel.app"),
 };
 
 export default function RootLayout({ children }) {
