@@ -19,6 +19,17 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import QRCode from "react-qr-code";
 import copy from 'copy-to-clipboard';
 import { Tooltip, Tabs, Alert, Modal, Popover } from "flowbite-react";
@@ -476,30 +487,36 @@ export default function Home() {
 
     const RenderSaveLoginModal = () => {
         return (
-            <Modal show={openSaveLoginModal} onClose={() => setOpenSaveLoginModal(false)}>
-                <Modal.Header>Save login details?</Modal.Header>
-                <Modal.Body>
-                    <div className="space-y-6">
-                    Saving login details will reduce the number of times you're asked to login.<br />
-                    Please ensure you're the only person who uses this device.
-                    </div>
-                </Modal.Body>
-                <Modal.Footer>
-                    <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
-                          <Button   
-                            onClick={() => saveLoginAddressToLocalStorage()}
-                          >
-                            Save login
-                          </Button>
-                          <Button
-                            onClick={() => setOpenSaveLoginModal(false)}
-                            data-autofocus
-                          >
+            <AlertDialog open={openSaveLoginModal} onOpenChange={setOpenSaveLoginModal}>
+                <AlertDialogTrigger asChild>
+                    <button className="hidden">Open</button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Save login details?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Saving login details will reduce the number of times you're asked to login.<br />
+                        Please ensure you're the only person who uses this device.
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <Button
+                        onClick={() => setOpenSaveLoginModal(false)}
+                        variant="outline"
+                            >
                             Don't save login
-                          </Button>
-                        </div>
-                </Modal.Footer>
-            </Modal>
+                    </Button>
+                    <Button
+                        onClick={() => {
+                        saveLoginAddressToLocalStorage();
+                        }}
+                    >
+                        Save login
+                    </Button>
+                    
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+                </AlertDialog>
           )
     };
 
