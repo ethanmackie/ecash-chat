@@ -13,7 +13,9 @@ import {
     encodeBip21Article,
     encodeBip21ReplyArticle,
     encodeBip21PaywallPayment,
+    getPaginatedHistoryPage,
 } from '../utils';
+import { mockTxHistoryArray } from '../fixtures/mocks';
 
 it(`getTweetId() correctly extracts the tweet ID from a valid tweet url`, () => {
     const tweetUrl = '[twt]https://twitter.com/CashtabWallet/status/1784451748028944549[/twt]';
@@ -115,4 +117,14 @@ it(`toXec returns the correct XEC balance`, () => {
 });
 it(`toXec returns the correct XEC balance for larger numbers`, () => {
     expect(toXec(parseInt(137151110))).toBe(1371511.1);
+});
+it(`getPaginatedHistoryPage returns the correct paginated history for the first page`, () => {
+    expect(
+        getPaginatedHistoryPage(mockTxHistoryArray, 0),
+    ).toStrictEqual(mockTxHistoryArray.slice(0, 25));
+});
+it(`getPaginatedHistoryPage returns the correct paginated history for a custom page`, () => {
+    expect(
+        getPaginatedHistoryPage(mockTxHistoryArray, 1),
+    ).toStrictEqual(mockTxHistoryArray.slice(25, 28));
 });
