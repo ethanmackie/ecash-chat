@@ -1,7 +1,7 @@
 "use client";
 import  React, { useState, useEffect } from 'react';
 import { appConfig } from '../config/app';
-import { Tooltip, Avatar, Popover, Accordion, Alert, Modal } from "flowbite-react";
+import { Tooltip, Avatar, Popover, Alert, Modal } from "flowbite-react";
 import { Textarea } from "@/components/ui/textarea";
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import { postHasErrors, replyHasErrors } from '../validation/validation';
@@ -33,7 +33,13 @@ import {
     TelegramShareButton,
     TelegramIcon,
 } from 'next-share';
-import { encodeBip21Message, encodeBip21Post, encodeBip21ReplyPost, encodeBip2XecTip, getTweetId } from '../utils/utils';
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion";
+import { getPaginatedHistoryPage, encodeBip21Message, encodeBip21Post, encodeBip21ReplyPost, encodeBip2XecTip, getTweetId } from '../utils/utils';
 import {
     getTxHistory,
     getReplyTxDetails,
@@ -61,7 +67,8 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function TownHall({ address, isMobile }) {
-    const [townHallHistory, setTownHallHistory] = useState('');
+    const [townHallHistory, setTownHallHistory] = useState(''); // current history rendered on screen
+    const [fullTownHallHistory, setFullTownHallHistory] = useState(''); // full history array
     const [post, setPost] = useState('');
     const [postError, setPostError] = useState(false);
     const [replyPost, setReplyPost] = useState('');
@@ -88,33 +95,43 @@ export default function TownHall({ address, isMobile }) {
         (async () => {
             await getTownhallHistoryByPage(0);
         })();
-        initializeTownHallRefresh();
     }, []);
 
-    /**
-     * Set an interval to trigger regular townhall refresh
-     * @returns callback function to cleanup interval
-     */
-    const initializeTownHallRefresh = async () => {
-        const intervalId = setInterval(async function () {
-            await getTownhallHistoryByPage(0);
-        }, appConfig.historyRefreshInterval);
-        // Clear the interval when page unmounts
-        return () => clearInterval(intervalId);
-    };
-
-    // Retrieves the post history
-    const getTownhallHistoryByPage = async (page) => {
+    // Refreshes the post history via chronik
+    const getTownhallHistoryByPage = async (pageNum = 0, localLookup = false) => {
         if (
-            typeof page !== "number" ||
+            typeof pageNum !== "number" ||
             chronik === undefined
         ) {
             return;
         }
 
-        const txHistoryResp = await getTxHistory(chronik, appConfig.townhallAddress, page);
-        if (txHistoryResp && Array.isArray(txHistoryResp.txs)) {
-            setTownHallHistory(txHistoryResp);
+        if (localLookup) {
+            const selectedPageHistory = getPaginatedHistoryPage(
+                fullTownHallHistory.txs,
+                pageNum,
+            );
+
+            setTownHallHistory({
+                txs: selectedPageHistory,
+                numPages: fullTownHallHistory.numPages,
+                replies: fullTownHallHistory.replies,
+            });
+        } else {
+            const txHistoryResp = await getTxHistory(chronik, appConfig.townhallAddress, pageNum);
+            if (txHistoryResp && Array.isArray(txHistoryResp.txs)) {
+                const firstPageHistory = getPaginatedHistoryPage(
+                    txHistoryResp.txs,
+                    pageNum,
+                );
+
+                setTownHallHistory({
+                    txs: firstPageHistory,
+                    numPages: txHistoryResp.numPages,
+                    replies: txHistoryResp.replies,
+                });
+                setFullTownHallHistory(txHistoryResp);
+            }
         }
     };
 
@@ -376,34 +393,43 @@ export default function TownHall({ address, isMobile }) {
         }
 
         return (
-            foundReplies.map(
-                (foundReply, index) => (
-                    <>
-                    <div className="flex flex-col break-words space-y-1.5 hover:shadow-md border gap-2 mt-2 w-full leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
-                        <div className="flex justify-between items-center w-full" key={"townhallReply"+index}>
-                            <div className="flex items-center gap-2">
-                                <ReplieduseravatarIcon/>
-                                <div className="font-medium dark:text-white" onClick={() => {
-                                    copy(foundReply.replyAddress);
-                                    toast(`${foundReply.replyAddress} copied to clipboard`);
-                                }}>
-                                    <Badge className="leading-7 [&:not(:first-child)]:mt-6 py-3px" variant="outline">
-                                        {foundReply.replyAddress.substring(0,10) + '...' + foundReply.replyAddress.substring(foundReply.replyAddress.length - 5)}
-                                    </Badge>
+            <Accordion type="single"  collapsible>
+            <AccordionItem value="item-1" className="border-b-0">
+                <AccordionTrigger className="flex-none hover:no-underline mx-auto inline-flex mb-2 items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-primary-background shadow h-9 px-4 py-2">
+                    Show replies&nbsp;
+                </AccordionTrigger>
+                <AccordionContent className="border-b-0">
+                    {foundReplies.map(
+                        (foundReply, index) => (
+                            <>
+                                <div className="flex flex-col break-words space-y-1.5 hover:shadow-md border gap-2 mt-2 w-full leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                                    <div className="flex justify-between items-center w-full" key={"townhallReply"+index}>
+                                        <div className="flex items-center gap-2">
+                                            <ReplieduseravatarIcon/>
+                                            <div className="font-medium dark:text-white" onClick={() => {
+                                                copy(foundReply.replyAddress);
+                                                toast(`${foundReply.replyAddress} copied to clipboard`);
+                                            }}>
+                                                <Badge className="leading-7 [&:not(:first-child)]:mt-6 py-3px" variant="outline">
+                                                    {foundReply.replyAddress.substring(0,10) + '...' + foundReply.replyAddress.substring(foundReply.replyAddress.length - 5)}
+                                                </Badge>
+                                            </div>
+                                            <RenderTipping address={foundReply.replyAddress} />
+                                        </div>
+                                    </div>
+                                    <div className="py-2 leading-7">
+                                        {foundReply.opReturnMessage}
+                                    </div>
+                                    <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                                        {foundReply.txDate}&nbsp;at&nbsp;{foundReply.txTime}
+                                    </span>
                                 </div>
-                                <RenderTipping address={foundReply.replyAddress} />
-                            </div>
-                        </div>
-                        <div className="py-2 leading-7">
-                            {foundReply.opReturnMessage}
-                        </div>
-                        <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                            {foundReply.txDate}&nbsp;at&nbsp;{foundReply.txTime}
-                        </span>
-                    </div>
-                    </>
-                )
-            )
+                            </>
+                        )
+                    )}
+                </AccordionContent>
+            </AccordionItem>
+            </Accordion>
         );
     };
 
@@ -571,7 +597,7 @@ export default function TownHall({ address, isMobile }) {
                             onClick={(e) => {
                             e.preventDefault();
                             setCurrentPage(old => Math.max(0, old - 1));
-                            getTownhallHistoryByPage(Math.max(0, currentPage - 1));
+                            getTownhallHistoryByPage(Math.max(0, currentPage - 1), true);
                             }}
                             disabled={currentPage === 0}
                         />
@@ -591,7 +617,7 @@ export default function TownHall({ address, isMobile }) {
                                 href="#"
                                 onClick={(e) => {
                                 e.preventDefault();
-                                getTownhallHistoryByPage(i);
+                                getTownhallHistoryByPage(i, true);
                                 setCurrentPage(i);
                                 }}
                                 isActive={currentPage === i}
@@ -616,7 +642,7 @@ export default function TownHall({ address, isMobile }) {
                             onClick={(e) => {
                             e.preventDefault();
                             setCurrentPage(old => Math.min(townHallHistory.numPages - 1, old + 1));
-                            getTownhallHistoryByPage(Math.min(townHallHistory.numPages - 1, currentPage + 1));
+                            getTownhallHistoryByPage(Math.min(townHallHistory.numPages - 1, currentPage + 1), true);
                             }}
                             disabled={currentPage === townHallHistory.numPages - 1}
                         />

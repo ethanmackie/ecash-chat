@@ -1,7 +1,16 @@
 import * as utxolib from '@bitgo/utxo-lib';
 import { opReturn as opreturnConfig } from '../config/opreturn';
+import { chronik as chronikConfig } from '../config/chronik';
 import { BN } from 'slp-mdm';
 const SATOSHIS_PER_XEC = 100;
+
+// Slices the full history array based on custom pagination size
+export const getPaginatedHistoryPage = (fullHistoryArray, pageNumber) => {
+    return fullHistoryArray.slice(
+        pageNumber * chronikConfig.townhallHistoryPageSize,
+        pageNumber * chronikConfig.townhallHistoryPageSize + chronikConfig.townhallHistoryPageSize,
+    );
+};
 
 /**
  * Extracts a tweet ID from a twitter url

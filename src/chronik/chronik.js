@@ -21,6 +21,83 @@ export const getArticleListing = async () => {
     return articles;
 };
 
+// Retrieves tx history via chronik, parses the response into formatted
+// objects and filter out eToken or non-msg txs
+export const getTxHistory = async (chronik, address, page = 0) => {
+    if (
+        chronik === undefined ||
+        !cashaddr.isValidCashAddress(address, 'ecash')
+    ) {
+        return;
+    }
+
+    // Retrieve first chronik page of tx history txs
+    let firstTxHistoryPage = await chronik.address(address).history(page, chronikConfig.txHistoryPageSize);
+    let totalTxlHistoryTxs = firstTxHistoryPage.txs;
+
+    // Retrieve subsequent chronik pages of tx history txs (if exists)
+    const txHistoryPromises = [];
+    if (firstTxHistoryPage && firstTxHistoryPage.numPages > 1) {
+        for (let i = 1; i < firstTxHistoryPage.numPages; i += 1) {
+            const thisTxHistoryPromise = new Promise((resolve, reject) => {
+                chronik
+                .address(
+                    address,
+                ).history(
+                    i,
+                    chronikConfig.txHistoryPageSize,
+                ).then(
+                    result => {
+                        resolve(result);
+                    },
+                    err => {
+                        reject(err);
+                    },
+                );
+            });
+            txHistoryPromises.push(thisTxHistoryPromise);
+        }
+
+        // Execution of all subsequent tx history page retrievals
+        const executedTxHistoryPromises = await Promise.all(txHistoryPromises);
+
+        // Merge all subsequent tx history pages into totalTxlHistoryTxs
+        for (let i = 0; i < executedTxHistoryPromises.length; i += 1) {
+            totalTxlHistoryTxs = totalTxlHistoryTxs.concat(executedTxHistoryPromises[i].txs);
+        }
+    }
+
+    // Separate out the replies so they can be rendered underneath the main posts
+    const parsedTxs = [];
+    const replyTxs = [];
+    for (let i = 0; i < totalTxlHistoryTxs.length; i += 1) {
+        const parsedTx = parseChronikTx(
+            totalTxlHistoryTxs[i],
+            address,
+        );
+
+        if (parsedTx.replyTxid) {
+            replyTxs.push(parsedTx);
+        } else {
+            parsedTxs.push(parsedTx);
+        }
+    }
+
+    // Filter out eToken and non-message txs
+    const parsedAndFilteredTxHistory = parsedTxs.filter(function (el) {
+      return el.isEtokenTx === false &&
+             el.opReturnMessage !== ''
+    });
+
+    const slicedPageNum = Math.ceil(parsedAndFilteredTxHistory.length/chronikConfig.townhallHistoryPageSize);
+
+    return {
+        txs: parsedAndFilteredTxHistory,
+        replies: replyTxs,
+        numPages: slicedPageNum,
+    };
+};
+
 /**
  * Refreshes the app's utxos, XEC balance and NFT collection
  * @param {string} chronik the chronik-client instance
@@ -825,61 +902,6 @@ export const getBalance = async (chronik, address) => {
         });
     } catch (err) {
         console.log(`Error in getBalance(${address})`, err);
-    }
-};
-
-// Retrieves tx history via chronik, parses the response into formatted
-// objects and filter out eToken or non-msg txs
-export const getTxHistory = async (chronik, address, page = 0) => {
-    if (
-        chronik === undefined ||
-        !cashaddr.isValidCashAddress(address, 'ecash')
-    ) {
-        return;
-    }
-  
-    let txHistoryPage;
-    try {
-        txHistoryPage = await chronik.address(address).history(page, chronikConfig.txHistoryPageSize);
-
-        const parsedTxs = [];
-        const replyTxs = [];
-        for (let i = 0; i < txHistoryPage.txs.length; i += 1) {
-            const parsedTx = parseChronikTx(
-                txHistoryPage.txs[i],
-                address,
-            );
-
-            // Separate out the replies so they can be rendered underneath the main posts
-            if (parsedTx.replyTxid) {
-                replyTxs.push(parsedTx);
-            } else {
-                parsedTxs.push(parsedTx);
-            }
-        }
-
-        // Filter out eToken and non-message txs
-        const parsedAndFilteredTxs = parsedTxs.filter(function (el) {
-          return el.isEtokenTx === false &&
-                 el.opReturnMessage !== ''
-        });
-
-        localforage.setItem(
-            'txHistory',
-            {
-                txs: parsedAndFilteredTxs,
-                replies: replyTxs,
-                numPages: txHistoryPage.numPages,
-            },
-        );
-
-        return {
-            txs: parsedAndFilteredTxs,
-            replies: replyTxs,
-            numPages: txHistoryPage.numPages,
-        };
-    } catch (err) {
-        console.log(`Error in getTxHistory(${address})`, err);
     }
 };
 
