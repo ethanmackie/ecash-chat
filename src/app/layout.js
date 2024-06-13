@@ -11,7 +11,7 @@ const fontSans = FontSans({
 
 export const metadata = {
   title: "eCash Chat",
-  description: "On-chain web platform that enables anyone to socialize, monetize and earn on the eCash blockchain.",
+  description: "On chain social platform",
 };
 
 export default function RootLayout({ children }) {
@@ -29,7 +29,7 @@ export default function RootLayout({ children }) {
         <meta property="og:title" content="eCash Chat" />
         <meta property="og:description" content="On chain messaging platform" />
         <meta property="og:image" content="https://im.gurl.eu.org/file/a53a1ce61457c72ec55c7.jpg" />
-        <meta property="og:url" content={`https://${window.location.host}/ecash-chat-uat.vercel.app`} />
+        <meta property="og:url" content="https://ecash-chat-uat.vercel.app" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
