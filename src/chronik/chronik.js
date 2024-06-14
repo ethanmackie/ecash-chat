@@ -943,7 +943,7 @@ export const getArticleHistory = async (chronik, address, page = 0) => {
                         opreturnConfig.appPrefixesHex.paywallPaymentPrefixHex,
                     ).history(
                         i,
-                        200,
+                        chronikConfig.articleHistoryPageSize,
                     ).then(
                         result => {
                             resolve(result);

@@ -3,7 +3,6 @@ export const chronik = {
         'https://chronik-native.fabien.cash',
         'https://chronik.pay2stay.com/xec',
     ],
-    txHistoryPageSize: 200,
-    articleHistoryPageSize: 25,
-    townhallHistoryPageSize: 25,
+    txHistoryPageSize: 100,
+    articleHistoryPageSize: 100,
 };
