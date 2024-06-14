@@ -93,6 +93,7 @@ export default function Home() {
     const [openSaveLoginModal, setOpenSaveLoginModal] = useState(false);
     const [savedLogin, setSavedLogin] = useState(false);
     const [showLoadingSpinner, setShowLoadingSpinner] = useState(true);
+    const [showFullAddress, setShowFullAddress] = useState(false);
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
@@ -435,6 +436,8 @@ export default function Home() {
         );
     };
 
+    
+
     const CreditCardHeader = () => {
         const cardStyling = isMobile 
         ? "max-w-sm mx-auto rounded-2xl break-words gradient-outline !shadow-none relative transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s  " 
@@ -448,7 +451,7 @@ export default function Home() {
               toast(`${address} copied to clipboard`);
             }}
           >
-            <CardHeader className="flex flex-row !space-y-0 p-6 items-center justify-between">
+            <CardHeader className="flex flex-row !space-y-0 items-center justify-between">
               <div className="bg-white p-2 rounded-lg" style={{ maxWidth: "3.5rem", maxHeight: "3.5rem", boxShadow: "0px 0px 10px rgba(0,0,0,0.1)" }}>
                 {address !== '' && (
                   <QRCode
@@ -462,9 +465,9 @@ export default function Home() {
               <img className="w-14 h-14" src="/ecash-square-icon.svg" alt="eCash Icon" />
             </CardHeader>
             <CardContent>
-              <p className="font-medium tracking-wider text-sm">
-                {address}
-              </p>
+            <p className="font-medium tracking-wider text-sm" onClick={() => setShowFullAddress(!showFullAddress)}>
+          {showFullAddress ? address : `${address.substring(0, 10)} **** **** ${address.substring(address.length - 5)}`}
+        </p>
             </CardContent>
             <CardFooter>
               <div className="flex justify-between w-full">
