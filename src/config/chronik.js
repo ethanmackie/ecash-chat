@@ -4,5 +4,5 @@ export const chronik = {
         'https://chronik.pay2stay.com/xec',
     ],
     txHistoryPageSize: 100,
-    articleHistoryPageSize: 25,
+    articleHistoryPageSize: 100,
 };
