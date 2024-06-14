@@ -18,6 +18,7 @@ import Picker from '@emoji-mart/react';
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Skeleton } from "@/components/ui/skeleton";
 import {
     Card,
     CardContent,
@@ -85,7 +86,7 @@ export default function Home() {
     const [sendAmountXec, setSendAmountXec] = useState(5.5);
     const [sendAmountXecError, setSendAmountXecError] = useState(false);
     const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
-    const [xecBalance, setXecBalance] = useState('Loading...');
+    const [xecBalance, setXecBalance] = useState(null);
     const [encryptionMode, setEncryptionMode] = useState(false);
     const [showMessagePreview, setShowMessagePreview] = useState(false);
     const [sharedArticleTxid, setSharedArticleTxid] = useState(false);
@@ -446,10 +447,6 @@ export default function Home() {
         return (
             <Card
             className={cardStyling} 
-            onClick={() => {
-              copy(address);
-              toast(`${address} copied to clipboard`);
-            }}
           >
             <CardHeader className="flex flex-row !space-y-0 items-center justify-between">
               <div className="bg-white p-2 rounded-lg" style={{ maxWidth: "3.5rem", maxHeight: "3.5rem", boxShadow: "0px 0px 10px rgba(0,0,0,0.1)" }}>
@@ -465,7 +462,13 @@ export default function Home() {
               <img className="w-14 h-14" src="/ecash-square-icon.svg" alt="eCash Icon" />
             </CardHeader>
             <CardContent>
-            <p className="font-medium tracking-wider text-sm" onClick={() => setShowFullAddress(!showFullAddress)}>
+            <p className="font-medium tracking-wider text-sm" 
+            onClick={() => {
+                setShowFullAddress(!showFullAddress);
+                copy(address);
+                toast(`${address} copied to clipboard`);
+              }}
+            >
           {showFullAddress ? address : `${address.substring(0, 10)} **** **** ${address.substring(address.length - 5)}`}
         </p>
             </CardContent>
@@ -473,7 +476,19 @@ export default function Home() {
               <div className="flex justify-between w-full">
                 <div>
                   <p className="font-light text-xs">Balance</p>
-                  <p className="font-medium tracking-wider text-sm">{xecBalance} XEC</p>
+                  <p className="font-medium tracking-wider text-sm">
+                    {xecBalance !== null ? (
+                        `${xecBalance} XEC`
+                    ) : (
+                        <>
+                       <div className="flex space-x-1">
+                       <Skeleton className="h-4 w-[40px]" />
+                        <Skeleton className="h-4 w-[40px]" />
+                        <Skeleton className="h-4 w-[24.7px]" />
+                        </div>
+                      </>
+                    )}
+                    </p>
                 </div>
                 <div>
                   <p className="font-light text-xs">Aliases Registered</p>
