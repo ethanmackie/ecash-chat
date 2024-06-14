@@ -448,7 +448,6 @@ export default function TownHall({ address, isMobile }) {
                   <div className="px-3 py-4">
                       <Button
                         type="button"
-                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={e => {
                             sendXecTip(address, 100);
                         }}
@@ -458,7 +457,6 @@ export default function TownHall({ address, isMobile }) {
                       &nbsp;
                       <Button
                         type="button"
-                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={e => {
                             sendXecTip(address, 1000);
                         }}
@@ -468,7 +466,6 @@ export default function TownHall({ address, isMobile }) {
                       &nbsp;
                       <Button
                         type="button"
-                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={e => {
                             sendXecTip(address, 10000);
                         }}
@@ -478,7 +475,6 @@ export default function TownHall({ address, isMobile }) {
                       &nbsp;
                       <Button
                         type="button"
-                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={e => {
                             sendXecTip(address, 100000);
                         }}
@@ -488,7 +484,6 @@ export default function TownHall({ address, isMobile }) {
                       &nbsp;
                       <Button
                         type="button"
-                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={e => {
                             sendXecTip(address, 1000000);
                         }}
@@ -576,7 +571,6 @@ export default function TownHall({ address, isMobile }) {
                         <Button
                         type="button"
                         disabled={post === '' || postError}
-                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={() => { isMobile ? sendPost() : setShowMessagePreview(true) }}
                         >
                         <PostIcon />&nbsp;Post
@@ -788,7 +782,6 @@ export default function TownHall({ address, isMobile }) {
                                                  <Button
                                                    type="button"
                                                    disabled={replyPostError || replyPost === ''}
-                                                   className="bg-blue-500 hover:bg-blue-300"
                                                    onClick={e => {
                                                        replytoPost(tx.txid, replyPost)
                                                    }}

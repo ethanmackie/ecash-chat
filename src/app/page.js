@@ -888,7 +888,7 @@ export default function Home() {
                                         <Button
                                             type="button"
                                             disabled={recipientError || messageError || sendAmountXecError || recipient === '' || (encryptionMode && password === '')}
-                                            className="w-full bg-blue-500 hover:bg-blue-300 mt-2 mb-20"
+                                            className="w-full mt-2 mb-20"
                                             onClick={() => { setShowMessagePreview(true); }}
                                             >
                                             <SendIcon/>&nbsp;Send Message
