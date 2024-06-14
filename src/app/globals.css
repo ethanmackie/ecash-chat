@@ -152,4 +152,35 @@
 .text-cyan-600 {
   --tw-text-opacity: 1;
   color: rgb(0 0 0);
+  border-radius: 0.75em;
+ 
+}
+
+.hover\:text-gray-600:hover {
+  border-radius: 0.75em;
+}
+
+.rounded-t-lg {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0rem;
+  padding-bottom: 0rem;
+  height: 2.25rem;
+}
+
+.gradient-outline {
+  position: relative;
+}
+
+.gradient-outline::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  right: -12px;
+  bottom: -12px;
+  border-radius: 1.5rem;
+  background: linear-gradient(181deg, #629eff, #9cc1ff, #ffffff);
+  z-index: -1;
+  border-width:1px;
 }

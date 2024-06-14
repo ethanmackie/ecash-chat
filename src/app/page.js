@@ -18,6 +18,14 @@ import Picker from '@emoji-mart/react';
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+  } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
   AlertDialog,
@@ -429,59 +437,48 @@ export default function Home() {
 
     const CreditCardHeader = () => {
         const cardStyling = isMobile 
-        ? "w-94 h-56 max-w-md mx-auto break-words bg-blue-500 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105" 
-        : "w-96 h-56 max-w-md mx-auto break-words bg-blue-500 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105";
+        ? "max-w-sm mx-auto rounded-2xl break-words gradient-outline !shadow-none relative transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s  " 
+        : "max-w-sm mx-auto rounded-2xl break-words gradient-outline !shadow-none relative transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s ";
 
         return (
-            <div
-                className={cardStyling}
-                onClick={() => {
-                    copy(address);
-                    toast(`${address} copied to clipboard`);
-                }}
-            >
-                <div className="w-full px-8 absolute top-8">
-                <div className="flex justify-between items-start">
-                    <div className="bg-white p-2 rounded-lg" style={{ maxWidth: "3.5rem", maxHeight: "3.5rem", boxShadow: "0px 0px 10px rgba(0,0,0,0.1)" }}>
-                        {/*QR Code*/}
-                        {address !== '' && (
-                            <QRCode
-                                value={address}
-                                size={88} // Adjust QR code size to fit within 3.5rem x 3.5rem
-                                style={{ height: "auto", maxWidth: "100%", maxHeight: "100%" }}
-                                viewBox={`0 0 256 256`}
-                            />
-                        )}
-                    </div>
-                        <img className="w-14 h-14" src="/ecash-square-icon.svg"/>
-                    </div>
-                    <div className="pt-4">
-                        <p className="font-medium tracking-wider text-sm">
-                            {address}
-                        </p>
-                    </div>
-                    <div className="pt-6 pr-6">
-                        <div className="flex justify-between">
-                            <div className="">
-                                <p className="font-light text-xs">
-                                    Balance
-                                </p>
-                                <p className="font-medium tracking-wider text-sm">
-                                    {xecBalance} XEC
-                                </p>
-                            </div>
-                            <div className="">
-                                <p className="font-light text-xs text-xs">
-                                    Aliases Registered
-                                </p>
-                                <p className="font-medium tracking-wider text-sm">
-                                    {aliases.registered ? aliases.registered.length : 0}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+            <Card
+            className={cardStyling} 
+            onClick={() => {
+              copy(address);
+              toast(`${address} copied to clipboard`);
+            }}
+          >
+            <CardHeader className="flex flex-row !space-y-0 p-6 items-center justify-between">
+              <div className="bg-white p-2 rounded-lg" style={{ maxWidth: "3.5rem", maxHeight: "3.5rem", boxShadow: "0px 0px 10px rgba(0,0,0,0.1)" }}>
+                {address !== '' && (
+                  <QRCode
+                    value={address}
+                    size={88} 
+                    style={{ height: "auto", maxWidth: "100%", maxHeight: "100%" }}
+                    viewBox={`0 0 256 256`}
+                  />
+                )}
+              </div>
+              <img className="w-14 h-14" src="/ecash-square-icon.svg" alt="eCash Icon" />
+            </CardHeader>
+            <CardContent>
+              <p className="font-medium tracking-wider text-sm">
+                {address}
+              </p>
+            </CardContent>
+            <CardFooter>
+              <div className="flex justify-between w-full">
+                <div>
+                  <p className="font-light text-xs">Balance</p>
+                  <p className="font-medium tracking-wider text-sm">{xecBalance} XEC</p>
                 </div>
-            </div>
+                <div>
+                  <p className="font-light text-xs">Aliases Registered</p>
+                  <p className="font-medium tracking-wider text-sm">{aliases.registered ? aliases.registered.length : 0}</p>
+                </div>
+              </div>
+            </CardFooter>
+          </Card>
         );
     };
 
@@ -742,7 +739,7 @@ export default function Home() {
           <CreditCardHeader />
 
           {/* Tab navigation */}
-          <Tabs aria-label="eCash Chat" style="default" className='z-10 focus:ring-0 relative mt-4 justify-center'>
+          <Tabs aria-label="eCash Chat" style="default" className='z-10 !border-b-0 focus:ring-0 relative mt-4 justify-center'>
               {isMobile === false && (
                   <Tabs.Item title="Inbox" icon={Inbox3Icon}>
                       {cashaddr.isValidCashAddress(address, 'ecash') &&
