@@ -269,55 +269,50 @@ export default function TxHistory({ address }) {
                                               <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Tipping Amount</h3>
                                             </div>
                                             <div className="px-3 py-2">
-                                                <button
-                                                  type="button"
-                                                  className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                <Button
+                                                  type="button"                                              
                                                   onClick={e => {
                                                       sendXecTip(tx.replyAddress, 100);
                                                   }}
                                                 >
                                                   100
-                                                </button>
+                                                </Button>
                                                 &nbsp;
-                                                <button
+                                                <Button
                                                   type="button"
-                                                  className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                   onClick={e => {
                                                       sendXecTip(tx.replyAddress, 1000);
                                                   }}
                                                 >
                                                   1k
-                                                </button>
+                                                </Button>
                                                 &nbsp;
-                                                <button
+                                                <Button
                                                   type="button"
-                                                  className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                   onClick={e => {
                                                       sendXecTip(tx.replyAddress, 10000);
                                                   }}
                                                 >
                                                   10k
-                                                </button>
+                                                </Button>
                                                 &nbsp;
-                                                <button
+                                                <Button
                                                   type="button"
-                                                  className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                   onClick={e => {
                                                       sendXecTip(tx.replyAddress, 100000);
                                                   }}
                                                 >
                                                   100k
-                                                </button>
+                                                </Button>
                                                 &nbsp;
-                                                <button
+                                                <Button
                                                   type="button"
-                                                  className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                   onClick={e => {
                                                       sendXecTip(tx.replyAddress, 1000000);
                                                   }}
                                                 >
                                                   1M
-                                                </button>
+                                                </Button>
                                             </div>
                                           </div>
                                         }
@@ -566,7 +561,7 @@ export default function TxHistory({ address }) {
                                                   <Button disabled={decryptionInput === ''} onClick={() => {
                                                       decryptMessage(tx.opReturnMessage)
                                                       setOpenDecryptionModal(false)
-                                                  }} className="bg-blue-500 hover:bg-blue-300">
+                                                  }} >
                                                       Decrypt
                                                   </Button>
                                               </p>

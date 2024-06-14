@@ -151,7 +151,7 @@ export default function Nft( { chronik, address, isMobile } ) {
                                         />
                                     </CardContent>
                                     <CardFooter>
-                                        <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => { nftShowCasePost(childNftObj.tokenId, '') }}>
+                                        <Button onClick={() => { nftShowCasePost(childNftObj.tokenId, '') }}>
                                             Post to townhall
                                         </Button>
                                     </CardFooter>
@@ -159,7 +159,7 @@ export default function Nft( { chronik, address, isMobile } ) {
                             ))}
                         </div>
                         <div className="flex justify-end mt-10">
-                            <Button className="bg-blue-500 hover:bg-blue-300" onClick={() => { setShowNftModal(false) }}>
+                            <Button  onClick={() => { setShowNftModal(false) }}>
                                 Close
                             </Button>
                         </div>

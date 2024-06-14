@@ -510,7 +510,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                   <div className="px-3 py-4">
                       <Button
                         type="button"
-                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={e => {
                             sendXecTip(address, 100);
                         }}
@@ -520,7 +519,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                       &nbsp;
                       <Button
                         type="button"
-                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={e => {
                             sendXecTip(address, 1000);
                         }}
@@ -530,7 +528,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                       &nbsp;
                       <Button
                         type="button"
-                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={e => {
                             sendXecTip(address, 10000);
                         }}
@@ -540,7 +537,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                       &nbsp;
                       <Button
                         type="button"
-                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={e => {
                             sendXecTip(address, 100000);
                         }}
@@ -550,7 +546,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                       &nbsp;
                       <Button
                         type="button"
-                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={e => {
                             sendXecTip(address, 1000000);
                         }}
@@ -695,7 +690,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     />
                                     <Button
                                         type="button"
-                                        className="bg-blue-500 mt-2 hover:bg-blue-300"
+                                        className="mt-2"
                                         disabled={replyArticle === ''}
                                         onClick={e => {
                                             replytoArticle(currentArticleTxObj.txid, replyArticle)
@@ -851,8 +846,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 {/* Dropdown to render article editor */}
                 <Accordion type="single"  collapsible>
                 <AccordionItem value="item-1" className="border-b-0">
-                    <AccordionTrigger className="flex-none hover:no-underline  mx-auto inline-flex mb-2 items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-primary-foreground shadow h-9 px-4 py-2 bg-blue-500 hover:bg-blue-300">
-                           <Pencil1Icon className="mr-1"/> Write an article
+                    <AccordionTrigger className="flex-none hover:no-underline  mx-auto inline-flex mb-2 items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-primary-foreground shadow h-9 px-4 py-2 bg-black hover:bg-black/80">
+                           <Pencil1Icon className="mr-1"/> Write
                     </AccordionTrigger>
                     <AccordionContent className="border-b-0">
                         <div className="max-w-xl w-full mt-2 mx-auto">
@@ -925,8 +920,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 {/* Write article button*/}
                                 <Button
                                 type="button"
-                                disabled={article === '' || articleError || articleTitle === '' || paywallAmountXecError}
-                                className="bg-blue-500 hover:bg-blue-300"
+                                disabled={article === '' || articleError || articleTitle === '' || paywallAmountXecError}                            
                                 onClick={() => sendArticle()}
                                 >
                                 <BiSolidNews />&nbsp;Post Article
