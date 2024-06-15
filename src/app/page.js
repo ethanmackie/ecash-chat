@@ -484,7 +484,7 @@ export default function Home() {
             </PopoverShad>
             </CardHeader>
             <CardContent>
-            <p className="text-sm font-medium leading-none" 
+            <p className="text-sm font-medium leading-none h-10" 
             onClick={() => {
                 setShowFullAddress(!showFullAddress);
                 copy(address);
