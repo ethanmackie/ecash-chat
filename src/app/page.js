@@ -16,6 +16,7 @@ import { isValidRecipient, messageHasErrors } from '../validation/validation';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import {
@@ -54,7 +55,7 @@ import { IoMdInformationCircleOutline } from "react-icons/io";
 import { ToastContainer, toast } from 'react-toastify';
 import { PersonIcon, FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon } from '@radix-ui/react-icons';
 import 'react-toastify/dist/ReactToastify.css';
-import { YoutubeIcon, DefaultavatarIcon, EcashchatIcon, LoadingSpinner, Home3Icon, File3Icon, Nft3Icon, Inbox3Icon, Send3Icon, Info3icon, User3icon, QrcodeIcon } from "@/components/ui/social";
+import { YoutubeIcon, DefaultavatarIcon, EcashchatIcon, LoadingSpinner, Home3Icon, File3Icon, Nft3Icon, Inbox3Icon, Send3Icon, Info3icon, User3icon, QrcodeIcon, Logout3Icon } from "@/components/ui/social";
 import {
     SendIcon,
     LogoutIcon,
@@ -72,6 +73,7 @@ const packageJson = require('../../package.json');
 import localforage from 'localforage';
 import xecMessage from 'bitcoinjs-message';
 import * as utxolib from '@bitgo/utxo-lib';
+import { User2Icon } from 'lucide-react';
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -100,6 +102,8 @@ export default function Home() {
     const [savedLogin, setSavedLogin] = useState(false);
     const [showLoadingSpinner, setShowLoadingSpinner] = useState(true);
     const [showFullAddress, setShowFullAddress] = useState(false);
+    const [showCard, setShowCard] = useState(true);
+  
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
@@ -446,17 +450,19 @@ export default function Home() {
 
     const CreditCardHeader = () => {
         const cardStyling = isMobile 
-        ? "max-w-xs mx-auto rounded-2xl break-words gradient-outline !shadow-none relative transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s  " 
-        : "max-w-xs mx-auto rounded-2xl break-words gradient-outline !shadow-none relative transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s ";
+        ? "max-w-xs mx-auto rounded-2xl mt-14 break-words gradient-outline !shadow-none relative transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s  " 
+        : "max-w-xs mx-auto rounded-2xl mt-14 break-words gradient-outline !shadow-none relative transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s ";
 
         return (
+            <>
+            {showCard && (
             <Card
             className={cardStyling} 
           >
             <CardHeader className="flex flex-row !space-y-0 items-center justify-between">
-            <div className='p-2 rounded-md shadow-sm border'>
-            <User3icon/>
-            </div>
+            <Button variant="outline" size="icon" className='p-2 w-auto h-auto' onClick={() => setShowCard(false)}>
+            <User3icon className="h-4 w-4" />
+            </Button>
             <PopoverShad>
                 <PopoverTriggerShad className='p-2 rounded-md shadow-sm hover:outline-none hover:ring-2 hover:ring-offset-2 border'>
                 <div
@@ -519,6 +525,8 @@ export default function Home() {
               </div>
             </CardFooter>
           </Card>
+          )}
+          </>
         );
     };
 
@@ -568,7 +576,7 @@ export default function Home() {
         <div className="sm:flex flex-col items-center justify-center p-5 relative z-10 mt-4">
         <div className="background_content"></div>
         </div>
-        <div className="relative isolate px-6 pt-14 lg:px-8">
+        <div className="relative isolate px-6 lg:px-8">
         <div
         className="absolute inset-x-0 -top-10 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-40"
         aria-hidden="true"
@@ -605,11 +613,13 @@ export default function Home() {
                 </span>
               </a>
             </div>
-            <div className="sm:flex">
-                <nav className="flex items-center gap-6 text-sm">
-                </nav>
-            </div>
-
+            <div className="sm:flex">       
+            {!showCard && (
+                <Button variant="outline" size="icon" className='mr-2' onClick={() => setShowCard(true)}>
+                <User2Icon className="h-4 w-4" />
+                </Button>
+            )}
+     
             {(isMobile && isLoggedIn) ? (
             <div>
                 <Button
@@ -621,7 +631,7 @@ export default function Home() {
                 }}
                 variant="outline"
                 >
-                Logout
+               <Logout3Icon/>
                 </Button>
             </div>
             ) : (
@@ -636,11 +646,12 @@ export default function Home() {
                     } : () => getAddress()}
                     variant="outline"
                 >
-                    {isLoggedIn ? 'Logout' : 'Signin'}
+                    {isLoggedIn ? <Logout3Icon /> : 'Signin'}
                 </Button>
                 </div>
             )
             )}
+            </div>
             </div>
         </header>
         
@@ -742,7 +753,7 @@ export default function Home() {
                           <Button
                             type="button"
                             disabled={recipientError || recipient === '' || signature === ''}
-                            className="flex w-full"
+                            className="flex w-full mt-2"
                             onClick={() => {
                                 verifySignature();
                             }}
@@ -894,7 +905,7 @@ export default function Home() {
                                   </div>
                                  </div>
                                     </div>     
-                                    <div className="grid w-full items-center gap-1.5 mt-4">                       
+                                    <div className="grid w-full items-center gap-2 mt-4">                       
                                     <Label htmlFor="value-input">Send XEC amount (optional, 5.5 XEC by default):</Label>
                                     <Input
                                         type="number"
@@ -905,7 +916,7 @@ export default function Home() {
                                     />                
                                       </div>       
                                     {/* Encryption mode toggle */}
-                                    <label className="inline-flex items-center cursor-pointer mt-4">
+                                    <label className="inline-flex items-center cursor-pointer mt-2">
                                         <Input
                                             type="checkbox"
                                             value=""
@@ -928,7 +939,7 @@ export default function Home() {
                                                 id="password-input"
                                                 value={password}
                                                 maxlength="19"
-                                                aria-describedby="helper-text-explanation" className="bg-gray-50"
+                                                aria-describedby="helper-text-explanation" className="bg-white mt-2"
                                                 placeholder="Set an optional encryption password"
                                                 onChange={e => setPassword(e.target.value)}
                                             />
