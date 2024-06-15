@@ -197,3 +197,31 @@
               var(--tw-ring-shadow, 0 0 #0000), 
               var(--tw-shadow);
 }
+
+
+
+.gradient-outline-sm {
+  position: relative;
+}
+
+.gradient-outline-sm::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: 0.75rem;
+  background: linear-gradient(181deg, #dde8ff57, #c6d7fcad, #ffffff);
+  z-index: -1;
+  border-width: 1px;
+  transition: box-shadow 0.3s ease; /* 添加过渡效果 */
+}
+
+.gradient-outline-sm:hover::before {
+  --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), 
+              var(--tw-ring-shadow, 0 0 #0000), 
+              var(--tw-shadow);
+}
