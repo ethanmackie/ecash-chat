@@ -459,7 +459,7 @@ export default function Home() {
                 <div
                     className="p-2 rounded-md shadow-sm hover:outline-none hover:ring-2 hover:ring-offset-2 border"
                     style={{
-                    cursor: 'pointer', // 添加手型指针以表示可点击
+                    cursor: 'pointer', 
                     }}
                 >
                     {address !== '' && (
