@@ -446,14 +446,15 @@ export default function Home() {
 
     const CreditCardHeader = () => {
         const cardStyling = isMobile 
-        ? "max-w-sm mx-auto rounded-2xl break-words gradient-outline !shadow-none relative transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s  " 
-        : "max-w-sm mx-auto rounded-2xl break-words gradient-outline !shadow-none relative transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s ";
+        ? "max-w-xs mx-auto rounded-2xl break-words gradient-outline !shadow-none relative transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s  " 
+        : "max-w-xs mx-auto rounded-2xl break-words gradient-outline !shadow-none relative transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s ";
 
         return (
             <Card
             className={cardStyling} 
           >
             <CardHeader className="flex flex-row !space-y-0 items-center justify-between">
+            <img className="w-8 h-8" src="/ecash-logo-black.svg" alt="eCash Icon" />
             <PopoverShad>
                 <PopoverTriggerShad>
                 <div
@@ -487,10 +488,9 @@ export default function Home() {
                 </div>
                 </PopoverContentShad>
             </PopoverShad>
-              <img className="w-14 h-14" src="/ecash-square-icon.svg" alt="eCash Icon" />
             </CardHeader>
             <CardContent>
-            <p className="font-medium tracking-wider text-sm" 
+            <p className="text-sm font-medium leading-none" 
             onClick={() => {
                 setShowFullAddress(!showFullAddress);
                 copy(address);
