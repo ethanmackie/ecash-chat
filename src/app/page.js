@@ -18,6 +18,11 @@ import Picker from '@emoji-mart/react';
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import {
+    Popover as PopoverShad,
+    PopoverContent as PopoverContentShad,
+    PopoverTrigger as PopoverTriggerShad,
+  } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
     Card,
@@ -449,16 +454,42 @@ export default function Home() {
             className={cardStyling} 
           >
             <CardHeader className="flex flex-row !space-y-0 items-center justify-between">
-              <div className="bg-white p-2 rounded-lg" style={{ maxWidth: "3.5rem", maxHeight: "3.5rem", boxShadow: "0px 0px 10px rgba(0,0,0,0.1)" }}>
-                {address !== '' && (
-                  <QRCode
-                    value={address}
-                    size={88} 
-                    style={{ height: "auto", maxWidth: "100%", maxHeight: "100%" }}
-                    viewBox={`0 0 256 256`}
-                  />
-                )}
-              </div>
+            <PopoverShad>
+                <PopoverTriggerShad>
+                <div
+                    className="bg-white p-2 rounded-lg"
+                    style={{
+                    maxWidth: '3.5rem',
+                    maxHeight: '3.5rem',
+                    boxShadow: '0px 0px 10px rgba(0,0,0,0.1)',
+                    cursor: 'pointer', // 添加手型指针以表示可点击
+                    }}
+                >
+                    {address !== '' && (
+                    <QRCode
+                        value={address}
+                        size={88}
+                        style={{ height: 'auto', maxWidth: '100%', maxHeight: '100%' }}
+                        viewBox={`0 0 256 256`}
+                    />
+                    )}
+                </div>
+                </PopoverTriggerShad>
+                <PopoverContentShad className="p-4 w-auto bg-white rounded-lg shadow-lg">
+                <div
+                    className="bg-white p-2 rounded-lg flex justify-center items-center"
+                >
+                    {address !== '' && (
+                    <QRCode
+                        value={address}
+                        size={128} // 设置较大的尺寸
+                        style={{ height: 'auto', maxWidth: '100%', maxHeight: '100%' }}
+                        viewBox={`0 0 256 256`}
+                    />
+                    )}
+                </div>
+                </PopoverContentShad>
+            </PopoverShad>
               <img className="w-14 h-14" src="/ecash-square-icon.svg" alt="eCash Icon" />
             </CardHeader>
             <CardContent>
@@ -482,7 +513,7 @@ export default function Home() {
                     ) : (
                         <>
                        <div className="flex space-x-1">
-                       <Skeleton className="h-4 w-[40px]" />
+                        <Skeleton className="h-4 w-[40px]" />
                         <Skeleton className="h-4 w-[40px]" />
                         <Skeleton className="h-4 w-[24.7px]" />
                         </div>
