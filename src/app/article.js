@@ -60,6 +60,7 @@ import {
     encodeBip2XecTip,
     encodeBip21ReplyArticle,
     encodeBip21PaywallPayment,
+    getPaginatedHistoryPage,
 } from '../utils/utils';
 import { CrossIcon, AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, YoutubeIcon, AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon } from "@/components/ui/social";
 import { toast } from 'react-toastify';
@@ -92,7 +93,8 @@ import MarkdownEditor from '@uiw/react-markdown-editor';
 import { getStackArray } from 'ecash-script';
 
 export default function Article( { chronik, address, isMobile, sharedArticleTxid } ) {
-    const [articleHistory, setArticleHistory] = useState('');
+    const [articleHistory, setArticleHistory] = useState('');  // current article history page
+    const [fullArticleHistory, setFullArticleHistory] = useState('');  // current article history page
     const [articleTitle, setArticleTitle] = useState(''); // title of the article being drafted
     const [article, setArticle] = useState(''); // the article being drafted
     const [articleCategory, setArticleCategory] = useState(''); // category of the article being drafted
@@ -178,34 +180,50 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             }
             setIsLoading(false);
         })();
-        initializeArticleRefresh();
     }, []);
 
-    /**
-     * Set an interval to trigger regular article list refresh
-     * @returns callback function to cleanup interval
-     */
-    const initializeArticleRefresh = async () => {
-        const intervalId = setInterval(async function () {
-            await getArticleHistoryByPage(0);
-        }, appConfig.articleRefreshInterval);
-        // Clear the interval when page unmounts
-        return () => clearInterval(intervalId);
-    };
-
     // Retrieves the article listing
-    const getArticleHistoryByPage = async (page) => {
+    // Set localLookup to true to retrieve paginated data locally
+    const getArticleHistoryByPage = async (pageNum = 0, localLookup = false) => {
         if (
-            typeof page !== "number" ||
+            typeof pageNum !== "number" ||
             chronik === undefined
         ) {
             return;
         }
-        const txHistoryResp = await getArticleHistory(chronik, appConfig.townhallAddress, page);
-        if (txHistoryResp && Array.isArray(txHistoryResp.txs)) {
-            setArticleHistory(txHistoryResp);
+
+        if (localLookup) {
+            const selectedPageHistory = getPaginatedHistoryPage(
+                fullArticleHistory.txs,
+                pageNum,
+            );
+
+            setArticleHistory({
+                txs: selectedPageHistory,
+                numPages: fullArticleHistory.numPages,
+                replies: fullArticleHistory.replies,
+                paywallTxs: fullArticleHistory.paywallTxs,
+            });
+        } else {
+            const txHistoryResp = await getArticleHistory(chronik, appConfig.townhallAddress, pageNum);
+            if (txHistoryResp && Array.isArray(txHistoryResp.txs)) {
+                const firstPageHistory = getPaginatedHistoryPage(
+                    txHistoryResp.txs,
+                    pageNum,
+                );
+
+                const currentArticleHistoryPage = {
+                    txs: firstPageHistory,
+                    numPages: txHistoryResp.numPages,
+                    replies: txHistoryResp.replies,
+                    paywallTxs: txHistoryResp.paywallTxs,
+                };
+
+                setArticleHistory(currentArticleHistoryPage);
+                setFullArticleHistory(txHistoryResp);
+                return currentArticleHistoryPage;
+            }
         }
-        return txHistoryResp;
     };
 
     // Pass an article tx BIP21 query string to cashtab extensions
@@ -469,7 +487,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         if (localArticleHistoryResp) {
             localArticleHistory = localArticleHistoryResp;
         }
-    
         for (const thisPaywallPayment of localArticleHistory.paywallTxs) {
             if (
                 thisPaywallPayment.paywallPaymentArticleTxid === paywalledArticleTxId &&
@@ -975,7 +992,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 onClick={(e) => {
                                 e.preventDefault();
                                 setCurrentPage(old => Math.max(0, old - 1));
-                                getArticleHistoryByPage(Math.max(0, currentPage - 1));
+                                getArticleHistoryByPage(Math.max(0, currentPage - 1), true);
                                 }}
                                 disabled={currentPage === 0}
                             />
@@ -995,7 +1012,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     href="#"
                                     onClick={(e) => {
                                     e.preventDefault();
-                                    getArticleHistoryByPage(i);
+                                    getArticleHistoryByPage(i, true);
                                     setCurrentPage(i);
                                     }}
                                     isActive={currentPage === i}
@@ -1020,7 +1037,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 onClick={(e) => {
                                 e.preventDefault();
                                 setCurrentPage(old => Math.min(articleHistory.numPages - 1, old + 1));
-                                getArticleHistoryByPage(Math.min(articleHistory.numPages - 1, currentPage + 1));
+                                getArticleHistoryByPage(Math.min(articleHistory.numPages - 1, currentPage + 1), true);
                                 }}
                                 disabled={currentPage === articleHistory.numPages - 1}
                             />

@@ -24,7 +24,7 @@ import {
     ReplieduseravatarIcon,
     Arrowright2Icon,
 } from "@/components/ui/social";
-import { encodeBip21Message, encodeBip2XecTip } from '../utils/utils';
+import { encodeBip21Message, encodeBip2XecTip, getPaginatedHistoryPage } from '../utils/utils';
 import {
   Pagination,
   PaginationContent,
@@ -66,7 +66,8 @@ const chronik = new ChronikClientNode(chronikConfig.urls);
 import { PersonIcon } from '@radix-ui/react-icons';
 
 export default function TxHistory({ address }) {
-    const [txHistory, setTxHistory] = useState('');
+    const [txHistory, setTxHistory] = useState(''); // current inbox history page
+    const [fullTxHistory, setFullTxHistory] = useState(''); // full inbox history
     const [loadingMsg, setLoadingMsg] = useState('');
     const [txHistoryByAddress, setTxHistoryByAddress] = useState(false);
     const [addressToSearch, setAddressToSearch] = useState('');
@@ -96,7 +97,6 @@ export default function TxHistory({ address }) {
         (async () => {
             await getTxHistoryByPage(0);
         })();
-        initializeHistoryRefresh();
     }, []);
 
     // Filters txHistory for txs where the address matches either the sender or receiver outputs
@@ -119,32 +119,43 @@ export default function TxHistory({ address }) {
         }
     };
 
-    /**
-     * Set an interval to trigger regular history refresh
-     * @returns callback function to cleanup interval
-     */
-    const initializeHistoryRefresh = async () => {
-        const intervalId = setInterval(async function () {
-            await getTxHistoryByPage(0);
-        }, appConfig.historyRefreshInterval);
-        // Clear the interval when page unmounts
-        return () => clearInterval(intervalId);
-    };
-
     // Retrieves the tx history specific to OP_RETURN messages
-    const getTxHistoryByPage = async (page) => {
-        if (
-            typeof page !== "number" ||
-            chronik === undefined ||
-            !cashaddr.isValidCashAddress(address, 'ecash')
-        ) {
-            return;
-        }
+    const getTxHistoryByPage = async (pageNum = 0, localLookup = false) => {
+      if (
+          typeof pageNum !== "number" ||
+          chronik === undefined ||
+          !cashaddr.isValidCashAddress(address, 'ecash')
+      ) {
+          return;
+      }
 
-        const txHistoryResp = await getTxHistory(chronik, address, page);
+      if (localLookup) {
+        const selectedPageHistory = getPaginatedHistoryPage(
+            fullTxHistory.txs,
+            pageNum,
+        );
+
+        setTxHistory({
+            txs: selectedPageHistory,
+            numPages: fullTxHistory.numPages,
+            replies: fullTxHistory.replies,
+        });
+      } else {
+        const txHistoryResp = await getTxHistory(chronik, address, pageNum);
         if (txHistoryResp && Array.isArray(txHistoryResp.txs)) {
-            setTxHistory(txHistoryResp);
+            const firstPageHistory = getPaginatedHistoryPage(
+                txHistoryResp.txs,
+                pageNum,
+            );
+
+            setTxHistory({
+                txs: firstPageHistory,
+                numPages: txHistoryResp.numPages,
+                replies: txHistoryResp.replies,
+            });
+            setFullTxHistory(txHistoryResp);
         }
+      }
     };
 
     // Validates the address being filtered for
@@ -668,7 +679,7 @@ export default function TxHistory({ address }) {
                         href="#"
                         onClick={(e) => {
                           setCurrentPage((old) => Math.max(0, old - 1));
-                          getTxHistoryByPage(Math.max(0, currentPage - 1));
+                          getTxHistoryByPage(Math.max(0, currentPage - 1), true);
                         }}
                         disabled={currentPage === 0}
                       />
@@ -687,7 +698,7 @@ export default function TxHistory({ address }) {
                             href="#"
                             onClick={(e) => {
                               e.preventDefault();
-                              getTxHistoryByPage(i);
+                              getTxHistoryByPage(i, true);
                               setCurrentPage(i);
                             }}
                             isActive={currentPage === i}
@@ -703,7 +714,7 @@ export default function TxHistory({ address }) {
                         onClick={(e) => {
                           e.preventDefault();
                           setCurrentPage((old) => Math.min(txHistory.numPages - 1, old + 1));
-                          getTxHistoryByPage(Math.min(txHistory.numPages - 1, currentPage + 1));
+                          getTxHistoryByPage(Math.min(txHistory.numPages - 1, currentPage + 1), true);
                         }}
                         disabled={currentPage === txHistory.numPages - 1}
                       />
