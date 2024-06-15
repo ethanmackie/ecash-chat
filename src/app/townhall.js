@@ -521,7 +521,7 @@ export default function TownHall({ address, isMobile }) {
                           onChange={e => handlePostChange(e)}
                           rows={4}
                     />
-                    <p className="text-sm text-red-600 dark:text-red-500">{postError !== false && postError}</p>
+                    <p className="text-sm text-red-600 px-3 dark:text-red-500">{postError !== false && postError}</p>
                     <div className="flex flex-col sm:flex-row justify-between items-center mt-2 p-3 pt-0">
 
                         {/* this is icons, buttons on left */}
