@@ -817,19 +817,21 @@ export default function Home() {
                                   </div>
 
                                   <div>
-                                    <div className="mt-2">
+                                    <div className="mt-2 overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring">
                                         <Textarea
                                           id="message"
                                           rows="4"
                                           value={message}
                                           placeholder={encryptionMode ? 'Your message, Max. 95 bytes' : 'Your message, Max. 215 bytes'}
                                           required
-                                          className="bg-gray-50"
+                                          className="bg-white resize-none border-0 p-3 shadow-none focus-visible:ring-0"
                                           onChange={e => handleMessageChange(e)}
                                         />
-                                        <p className="mt-2 text-sm text-red-600 dark:text-red-500">{messageError !== false && messageError}</p>
+                                        <p className="mt-2 text-sm text-red-600 px-3 dark:text-red-500">{messageError !== false && messageError}</p>
                                         {/* Emoji picker and tooltip guide for embedding markups */}
-                                        <div className="flex py-1 gap-2">
+                                    
+                                        <div className="flex flex-col sm:flex-row justify-between items-center mt-2 p-3 pt-0">
+                                        <div className="flex gap-2 mb-2 sm:mb-0">
                                             {/* Emoji Picker */}
                                             <Popover
                                                 aria-labelledby="emoji-popover"
@@ -884,7 +886,19 @@ export default function Home() {
                                                     <UITwitterIcon/>
                                                 </Button>
                                             </Tooltip>
+                                          
                                         </div>
+                                        <div>
+                                        <Button
+                                            type="button"
+                                            disabled={recipientError || messageError || sendAmountXecError || recipient === '' || (encryptionMode && password === '')}
+                                            className="w-full"
+                                            onClick={() => { setShowMessagePreview(true); }}
+                                            >
+                                            <SendIcon/>&nbsp;Send Message
+                                        </Button>
+                                  </div>
+                                 </div>
                                     </div>     
                                     <div className="grid w-full items-center gap-1.5 mt-4">                       
                                     <Label htmlFor="value-input">Send XEC amount (optional, 5.5 XEC by default):</Label>
@@ -927,16 +941,7 @@ export default function Home() {
                                         </>
                                     )}
                                   </div>
-                                  <div>
-                                        <Button
-                                            type="button"
-                                            disabled={recipientError || messageError || sendAmountXecError || recipient === '' || (encryptionMode && password === '')}
-                                            className="w-full mt-2 mb-20"
-                                            onClick={() => { setShowMessagePreview(true); }}
-                                            >
-                                            <SendIcon/>&nbsp;Send Message
-                                        </Button>
-                                  </div>
+
                               </form>
                        </div>
                     </div>
