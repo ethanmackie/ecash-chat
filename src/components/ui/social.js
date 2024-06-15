@@ -304,3 +304,41 @@ export const Info3icon = () => {
 </svg>
    );
 };
+
+
+export const User3icon = () => {
+    return (
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path opacity="0.28" d="M2 14.5V11C2 8.19974 2 6.79961 2.54497 5.73005C3.02433 4.78924 3.78924 4.02433 4.73005 3.54497C5.79961 3 7.19974 3 10 3H13.5C14.8978 3 15.5967 3 16.1481 3.22836C16.8831 3.53284 17.4672 4.11687 17.7716 4.85195C17.979 5.35251 17.9981 5.97475 17.9998 7.1313" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M14 12H17M2 14.5C2 15.8297 2 16.9946 2.3806 17.9134C2.88807 19.1386 3.86144 20.1119 5.08658 20.6194C6.00544 21 7.17029 21 9.5 21H14.5C16.8297 21 17.9946 21 18.9134 20.6194C20.1386 20.1119 21.1119 19.1386 21.6194 17.9134C22 16.9946 22 15.8297 22 14.5C22 12.1703 22 11.0054 21.6194 10.0866C21.1119 8.86144 20.1386 7.88807 18.9134 7.3806C18.639 7.26693 18.3426 7.18721 17.9998 7.1313C17.1949 7 16.1339 7 14.5 7H9.5C7.17029 7 6.00544 7 5.08658 7.3806C3.86144 7.88807 2.88807 8.86144 2.3806 10.0866C2 11.0054 2 12.1703 2 14.5Z" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
+   );
+};
+
+
+export const QrcodeIcon = () => {
+    return (
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" data-reactroot="">
+<path stroke-linejoin="round" stroke-linecap="round" stroke-width="1" stroke="#221b38" fill="none" d="M9 14H4C3.44772 14 3 14.4477 3 15L3 20C3 20.5523 3.44772 21 4 21H9C9.55228 21 10 20.5523 10 20V15C10 14.4477 9.55228 14 9 14Z"></path>
+<path stroke-linecap="round" stroke-width="1" stroke="#221b38" d="M7 17H6V18H7V17Z"></path>
+<path stroke-linejoin="round" stroke-linecap="round" stroke-width="1" stroke="#221b38" fill="none" d="M20 3L15 3C14.4477 3 14 3.44772 14 4V9C14 9.55228 14.4477 10 15 10H20C20.5523 10 21 9.55228 21 9V4C21 3.44772 20.5523 3 20 3Z"></path>
+<path stroke-linecap="round" stroke-width="1" stroke="#221b38" d="M18 6H17V7H18V6Z"></path>
+<path stroke-linecap="round" stroke-width="1" stroke="#221b38" d="M7 6H6V7H7V6Z"></path>
+<path stroke-linecap="round" stroke-width="1" stroke="#221b38" d="M4 9H3V10H4V9Z"></path>
+<path stroke-linecap="round" stroke-width="1" stroke="#221b38" d="M10 9H9V10H10V9Z"></path>
+<path stroke-linecap="round" stroke-width="1" stroke="#221b38" d="M4 3H3V4H4V3Z"></path>
+<path stroke-linecap="round" stroke-width="1" stroke="#221b38" d="M10 3H9V4H10V3Z"></path>
+<path stroke-linecap="round" stroke-width="1" stroke="#221b38" d="M18 17H17V18H18V17Z"></path>
+<path stroke-linecap="round" stroke-width="1" stroke="#221b38" d="M15 20H14V21H15V20Z"></path>
+<path stroke-linecap="round" stroke-width="1" stroke="#221b38" d="M21 20H20V21H21V20Z"></path>
+<path stroke-linecap="round" stroke-width="1" stroke="#221b38" d="M15 14H14V15H15V14Z"></path>
+<path stroke-linecap="round" stroke-width="1" stroke="#221b38" d="M21 14H20V15H21V14Z"></path>
+</svg>
+
+   );
+};
+
+
+
+
