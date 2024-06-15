@@ -237,7 +237,7 @@ export default function TxHistory({ address }) {
                    (tx, index) => (
                      <>
                      <div className="flex flex-col items-center mt-2" key={"txHistory"+index}>
-                        <div className="flex flex-col w-full gap-2 max-w-xl leading-1.5 p-5 sm:p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                        <div className="flex flex-col w-full gap-2 max-w-xl break-words leading-1.5 p-5 sm:p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                         <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white break-words">
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
                               {tx.replyAddress === address ? (

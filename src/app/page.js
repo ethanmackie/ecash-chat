@@ -54,7 +54,7 @@ import { IoMdInformationCircleOutline } from "react-icons/io";
 import { ToastContainer, toast } from 'react-toastify';
 import { PersonIcon, FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon } from '@radix-ui/react-icons';
 import 'react-toastify/dist/ReactToastify.css';
-import { YoutubeIcon, DefaultavatarIcon, EcashchatIcon, LoadingSpinner, Home3Icon, File3Icon, Nft3Icon, Inbox3Icon, Send3Icon, Info3icon } from "@/components/ui/social";
+import { YoutubeIcon, DefaultavatarIcon, EcashchatIcon, LoadingSpinner, Home3Icon, File3Icon, Nft3Icon, Inbox3Icon, Send3Icon, Info3icon, User3icon, QrcodeIcon } from "@/components/ui/social";
 import {
     SendIcon,
     LogoutIcon,
@@ -454,23 +454,17 @@ export default function Home() {
             className={cardStyling} 
           >
             <CardHeader className="flex flex-row !space-y-0 items-center justify-between">
-            <img className="w-8 h-8" src="/ecash-logo-black.svg" alt="eCash Icon" />
+            <div className='p-2 rounded-md shadow-sm border'>
+            <User3icon/>
+            </div>
             <PopoverShad>
-                <PopoverTriggerShad>
+                <PopoverTriggerShad className='p-2 rounded-md shadow-sm hover:outline-none hover:ring-2 hover:ring-offset-2 border'>
                 <div
-                    className="p-2 rounded-md shadow-sm hover:outline-none hover:ring-2 hover:ring-offset-2 border"
                     style={{
                     cursor: 'pointer', 
                     }}
                 >
-                    {address !== '' && (
-                    <QRCode
-                        value={address}
-                        size={24}
-                        style={{ height: 'auto', maxWidth: '100%', maxHeight: '100%' }}
-                        viewBox={`0 0 256 256`}
-                    />
-                    )}
+                   <QrcodeIcon/>
                 </div>
                 </PopoverTriggerShad>
                 <PopoverContentShad className="p-4 w-auto bg-white rounded-lg shadow-lg">
