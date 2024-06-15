@@ -457,18 +457,15 @@ export default function Home() {
             <PopoverShad>
                 <PopoverTriggerShad>
                 <div
-                    className="bg-white p-2 rounded-lg"
+                    className="p-2 rounded-md shadow-sm hover:outline-none hover:ring-2 hover:ring-offset-2 border"
                     style={{
-                    maxWidth: '3.5rem',
-                    maxHeight: '3.5rem',
-                    boxShadow: '0px 0px 10px rgba(0,0,0,0.1)',
                     cursor: 'pointer', // 添加手型指针以表示可点击
                     }}
                 >
                     {address !== '' && (
                     <QRCode
                         value={address}
-                        size={88}
+                        size={24}
                         style={{ height: 'auto', maxWidth: '100%', maxHeight: '100%' }}
                         viewBox={`0 0 256 256`}
                     />
