@@ -510,10 +510,10 @@ export default function TownHall({ address, isMobile }) {
         <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px]">
             <MessagePreviewModal />
               <>
-                <div className="max-w-xl w-full mx-auto">
+                <div className="max-w-xl w-full mx-auto overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring">
                     {/* Post input field */}
                     <Textarea
-                      className="bg-white"
+                      className="bg-white resize-none border-0 p-3 shadow-none focus-visible:ring-0"
                           id="post"
                           value={post}
                           placeholder="Post your thoughts to the public town hall..."
@@ -522,7 +522,7 @@ export default function TownHall({ address, isMobile }) {
                           rows={4}
                     />
                     <p className="text-sm text-red-600 dark:text-red-500">{postError !== false && postError}</p>
-                    <div className="flex flex-col sm:flex-row justify-between items-center mt-2">
+                    <div className="flex flex-col sm:flex-row justify-between items-center mt-2 p-3 pt-0">
 
                         {/* this is icons, buttons on left */}
                         <div className="flex gap-2 mb-2 sm:mb-0">
