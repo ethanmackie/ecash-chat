@@ -5,4 +5,5 @@ export const chronik = {
     ],
     txHistoryPageSize: 100,
     articleHistoryPageSize: 100,
+    townhallHistoryPageSize: 25,
 };
