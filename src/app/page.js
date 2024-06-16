@@ -616,7 +616,7 @@ export default function Home() {
             <div className="flex">       
             {!showCard && (
                 <Button variant="outline" size="icon" className='mr-2' onClick={() => setShowCard(true)}>
-                <User2Icon className="h-4 w-4" />
+                <User3icon className="h-4 w-4" />
                 </Button>
             )}
      
