@@ -460,7 +460,7 @@ export default function Home() {
             className={cardStyling} 
           >
             <CardHeader className="flex flex-row !space-y-0 items-center justify-between">
-            <Button variant="outline" size="icon" className='p-2 w-auto h-auto' onClick={() => setShowCard(false)}>
+            <Button variant="outline" size="icon" className='p-3 w-auto h-auto' onClick={() => setShowCard(false)}>
             <User3icon className="h-4 w-4" />
             </Button>
             <PopoverShad>
