@@ -8,18 +8,16 @@ import { getStackArray } from 'ecash-script';
 import { BN } from 'slp-mdm';
 import { toast } from 'react-toastify';
 import localforage from 'localforage';
-import { kv } from '@vercel/kv';
-
-// Retrieves all articles from API and share via local storage
-export const getArticleListing = async () => {
-    let articles = await kv.get(appConfig.vercelKvParam);
-
-    if (!Array.isArray(articles)) {
-        articles = [];
-    }
-
-    return articles;
-};
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+const dbClient = new DynamoDBClient({
+    credentials: {
+        accessKeyId: process.env.DYNAMODB_ACCESS_KEY_ID,
+        secretAccessKey: process.env.DYNAMODB_SECRET_ACCESS_KEY,
+    },
+    region: process.env.AWS_REGION,
+});
+const docClient = DynamoDBDocumentClient.from(dbClient);
 
 // Retrieves tx history via chronik, parses the response into formatted
 // objects and filter out eToken or non-msg txs
@@ -702,16 +700,16 @@ export const getChildNftsFromParent = (
  *
  * @param {string} chronik the chronik-client instance
  * @param {string} address the eCash address of the active wallet
- * @param {@vercel/kv} kv the Vercel KV database client instance
  * @param {array} updatedArticles an array of article object including the newly posted article
+ * @param {object} articleObject the new article to be appending to the off-chain article map
  * @param {callback fn} refreshCallback a callback function to either article history
  * @throws {error} err chronik websocket subscription errors
  */
 export const articleTxListener = async (
     chronik,
     address,
-    kv,
     updatedArticles,
+    articleObject,
     refreshCallback = false,
 ) => {
     // Get type and hash
@@ -739,12 +737,26 @@ export const articleTxListener = async (
                         ) {
                             console.log('articleTxListener: tx sender and recipient matches');
                             try {
-                                await kv.set(appConfig.vercelKvParam, updatedArticles);
+                                const command = new UpdateCommand({
+                                    TableName: process.env.TABLE_NAME,
+                                    Key: {
+                                      hash: 'main'
+                                    },
+                                    UpdateExpression: "SET #article = list_append(#article, :article)",
+                                    ExpressionAttributeValues: {
+                                      ":article": [articleObject],
+                                    },
+                                    ExpressionAttributeNames: {
+                                        "#article": 'article',
+                                    },
+                                    ReturnValues: "ALL_NEW",
+                                })
+                                await docClient.send(command);
                                 await localforage.setItem(appConfig.localArticlesParam, updatedArticles);
                                 toast(`Article posted`);
                             } catch (err) {
                                 toast(`Error committing article, please try again`);
-                                console.log('articleTxListener: error committing article to DB', err);
+                                console.log('articleTxListener: error committing article to DB', err.message);
                             }
 
                             // Unsubscribe and close websocket
@@ -758,7 +770,7 @@ export const articleTxListener = async (
                         } else {
                             console.log('Detected mempool event is not an article tx, skipping: ', mempoolTx);
                         }
-                    }, 750);
+                    }, 500);
                 }
             },
         });
@@ -1592,4 +1604,26 @@ export const parseChronikTx = (tx, address) => {
         paywallPaymentArticleTxid,
         paywallPayment,
     };
+};
+
+// Retrieves all articles from API
+export const getArticleListing = async () => {
+    let articles;
+    const command = new GetCommand({
+        TableName: process.env.TABLE_NAME,
+        Key: {
+          hash: process.env.MAP_HASH
+        }
+    })
+    try {
+        const response = await docClient.send(command);
+        articles = response.Item.article;
+        if (!Array.isArray(articles)) {
+            articles = [];
+        }
+    } catch (err) {
+        console.log(`Error in getArticleListing: `, err);
+    }
+
+    return articles;
 };

@@ -84,7 +84,6 @@ import {
   } from "@/components/ui/card"
 import { isValidRecipient } from '../validation/validation';
 import { Badge } from "@/components/ui/badge";
-import { kv } from '@vercel/kv';
 import localforage from 'localforage';
 import copy from 'copy-to-clipboard';
 import { Skeleton } from "@/components/ui/skeleton";
@@ -276,7 +275,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
         setArticle('');
         setArticleTitle('');
-        articleTxListener(chronik, address, kv, updatedArticles, getArticleHistoryByPage);
+        articleTxListener(chronik, address, updatedArticles, articleObject, getArticleHistoryByPage);
     };
 
     // Pass a reply to article tx BIP21 query string to cashtab extensions

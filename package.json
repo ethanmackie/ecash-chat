@@ -10,6 +10,9 @@
     "test": "jest"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.598.0",
+    "@aws-sdk/lib-dynamodb": "^3.598.0",
+    "@aws-sdk/util-dynamodb": "^3.598.0",
     "@bitgo/utxo-lib": "^9.37.0",
     "@emoji-mart/data": "^1.1.2",
     "@emoji-mart/react": "^1.1.1",
@@ -35,7 +38,6 @@
     "@types/ua-parser-js": "^0.7.39",
     "@uiw/react-markdown-editor": "^6.1.1",
     "@vercel/analytics": "^1.2.2",
-    "@vercel/kv": "^1.0.1",
     "bitcoinjs-message": "^2.2.0",
     "chronik-client": "^0.28.0",
     "class-variance-authority": "^0.7.0",
@@ -51,7 +53,7 @@
     "jest-when": "^3.6.0",
     "localforage": "^1.10.0",
     "lucide-react": "^0.378.0",
-    "next": "14.1.0",
+    "next": "^14.1.0",
     "next-share": "^0.27.0",
     "react": "^18",
     "react-dom": "^18",

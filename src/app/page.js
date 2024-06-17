@@ -103,7 +103,6 @@ export default function Home() {
     const [showLoadingSpinner, setShowLoadingSpinner] = useState(true);
     const [showFullAddress, setShowFullAddress] = useState(false);
     const [showCard, setShowCard] = useState(true);
-  
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed

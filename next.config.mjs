@@ -15,6 +15,11 @@ const nextConfig = {
         KV_REST_API_URL: process.env.KV_REST_API_URL,
         KV_REST_API_TOKEN: process.env.KV_REST_API_TOKEN,
         KV_REST_API_READ_ONLY_TOKEN: process.env.KV_REST_API_READ_ONLY_TOKEN,
+        DYNAMODB_ACCESS_KEY_ID: process.env.DYNAMODB_ACCESS_KEY_ID,
+        DYNAMODB_SECRET_ACCESS_KEY: process.env.DYNAMODB_SECRET_ACCESS_KEY,
+        AWS_REGION: process.env.AWS_REGION,
+        TABLE_NAME: process.env.TABLE_NAME,
+        MAP_HASH: process.env.MAP_HASH,
     },
 };
 
