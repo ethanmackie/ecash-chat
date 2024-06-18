@@ -24,7 +24,7 @@ import {
     ReplieduseravatarIcon,
     Arrowright2Icon,
 } from "@/components/ui/social";
-import { encodeBip21Message, encodeBip2XecTip } from '../utils/utils';
+import { encodeBip21Message, encodeBip2XecTip, getPaginatedHistoryPage } from '../utils/utils';
 import {
   Pagination,
   PaginationContent,
@@ -66,7 +66,8 @@ const chronik = new ChronikClientNode(chronikConfig.urls);
 import { PersonIcon } from '@radix-ui/react-icons';
 
 export default function TxHistory({ address }) {
-    const [txHistory, setTxHistory] = useState('');
+    const [txHistory, setTxHistory] = useState(''); // current inbox history page
+    const [fullTxHistory, setFullTxHistory] = useState(''); // full inbox history
     const [loadingMsg, setLoadingMsg] = useState('');
     const [txHistoryByAddress, setTxHistoryByAddress] = useState(false);
     const [addressToSearch, setAddressToSearch] = useState('');
@@ -96,7 +97,6 @@ export default function TxHistory({ address }) {
         (async () => {
             await getTxHistoryByPage(0);
         })();
-        initializeHistoryRefresh();
     }, []);
 
     // Filters txHistory for txs where the address matches either the sender or receiver outputs
@@ -119,32 +119,43 @@ export default function TxHistory({ address }) {
         }
     };
 
-    /**
-     * Set an interval to trigger regular history refresh
-     * @returns callback function to cleanup interval
-     */
-    const initializeHistoryRefresh = async () => {
-        const intervalId = setInterval(async function () {
-            await getTxHistoryByPage(0);
-        }, appConfig.historyRefreshInterval);
-        // Clear the interval when page unmounts
-        return () => clearInterval(intervalId);
-    };
-
     // Retrieves the tx history specific to OP_RETURN messages
-    const getTxHistoryByPage = async (page) => {
-        if (
-            typeof page !== "number" ||
-            chronik === undefined ||
-            !cashaddr.isValidCashAddress(address, 'ecash')
-        ) {
-            return;
-        }
+    const getTxHistoryByPage = async (pageNum = 0, localLookup = false) => {
+      if (
+          typeof pageNum !== "number" ||
+          chronik === undefined ||
+          !cashaddr.isValidCashAddress(address, 'ecash')
+      ) {
+          return;
+      }
 
-        const txHistoryResp = await getTxHistory(chronik, address, page);
+      if (localLookup) {
+        const selectedPageHistory = getPaginatedHistoryPage(
+            fullTxHistory.txs,
+            pageNum,
+        );
+
+        setTxHistory({
+            txs: selectedPageHistory,
+            numPages: fullTxHistory.numPages,
+            replies: fullTxHistory.replies,
+        });
+      } else {
+        const txHistoryResp = await getTxHistory(chronik, address, pageNum);
         if (txHistoryResp && Array.isArray(txHistoryResp.txs)) {
-            setTxHistory(txHistoryResp);
+            const firstPageHistory = getPaginatedHistoryPage(
+                txHistoryResp.txs,
+                pageNum,
+            );
+
+            setTxHistory({
+                txs: firstPageHistory,
+                numPages: txHistoryResp.numPages,
+                replies: txHistoryResp.replies,
+            });
+            setFullTxHistory(txHistoryResp);
         }
+      }
     };
 
     // Validates the address being filtered for
@@ -226,7 +237,7 @@ export default function TxHistory({ address }) {
                    (tx, index) => (
                      <>
                      <div className="flex flex-col items-center mt-2" key={"txHistory"+index}>
-                        <div className="flex flex-col w-full gap-2 max-w-xl leading-1.5 p-5 sm:p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                        <div className="flex flex-col w-full gap-2 max-w-xl break-words leading-1.5 p-5 sm:p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                         <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white break-words">
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
                               {tx.replyAddress === address ? (
@@ -269,55 +280,50 @@ export default function TxHistory({ address }) {
                                               <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Tipping Amount</h3>
                                             </div>
                                             <div className="px-3 py-2">
-                                                <button
-                                                  type="button"
-                                                  className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                <Button
+                                                  type="button"                                              
                                                   onClick={e => {
                                                       sendXecTip(tx.replyAddress, 100);
                                                   }}
                                                 >
                                                   100
-                                                </button>
+                                                </Button>
                                                 &nbsp;
-                                                <button
+                                                <Button
                                                   type="button"
-                                                  className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                   onClick={e => {
                                                       sendXecTip(tx.replyAddress, 1000);
                                                   }}
                                                 >
                                                   1k
-                                                </button>
+                                                </Button>
                                                 &nbsp;
-                                                <button
+                                                <Button
                                                   type="button"
-                                                  className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                   onClick={e => {
                                                       sendXecTip(tx.replyAddress, 10000);
                                                   }}
                                                 >
                                                   10k
-                                                </button>
+                                                </Button>
                                                 &nbsp;
-                                                <button
+                                                <Button
                                                   type="button"
-                                                  className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                   onClick={e => {
                                                       sendXecTip(tx.replyAddress, 100000);
                                                   }}
                                                 >
                                                   100k
-                                                </button>
+                                                </Button>
                                                 &nbsp;
-                                                <button
+                                                <Button
                                                   type="button"
-                                                  className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                   onClick={e => {
                                                       sendXecTip(tx.replyAddress, 1000000);
                                                   }}
                                                 >
                                                   1M
-                                                </button>
+                                                </Button>
                                             </div>
                                           </div>
                                         }
@@ -566,7 +572,7 @@ export default function TxHistory({ address }) {
                                                   <Button disabled={decryptionInput === ''} onClick={() => {
                                                       decryptMessage(tx.opReturnMessage)
                                                       setOpenDecryptionModal(false)
-                                                  }} className="bg-blue-500 hover:bg-blue-300">
+                                                  }} >
                                                       Decrypt
                                                   </Button>
                                               </p>
@@ -673,7 +679,7 @@ export default function TxHistory({ address }) {
                         href="#"
                         onClick={(e) => {
                           setCurrentPage((old) => Math.max(0, old - 1));
-                          getTxHistoryByPage(Math.max(0, currentPage - 1));
+                          getTxHistoryByPage(Math.max(0, currentPage - 1), true);
                         }}
                         disabled={currentPage === 0}
                       />
@@ -692,7 +698,7 @@ export default function TxHistory({ address }) {
                             href="#"
                             onClick={(e) => {
                               e.preventDefault();
-                              getTxHistoryByPage(i);
+                              getTxHistoryByPage(i, true);
                               setCurrentPage(i);
                             }}
                             isActive={currentPage === i}
@@ -708,7 +714,7 @@ export default function TxHistory({ address }) {
                         onClick={(e) => {
                           e.preventDefault();
                           setCurrentPage((old) => Math.min(txHistory.numPages - 1, old + 1));
-                          getTxHistoryByPage(Math.min(txHistory.numPages - 1, currentPage + 1));
+                          getTxHistoryByPage(Math.min(txHistory.numPages - 1, currentPage + 1), true);
                         }}
                         disabled={currentPage === txHistory.numPages - 1}
                       />
@@ -718,7 +724,7 @@ export default function TxHistory({ address }) {
             </span>
             <form className="space-y-6" action="#" method="POST">
               <div>
-                <div className="max-w-xl mt-10 w-full mx-auto">
+                <div className="max-w-xl mt-2 w-full mx-auto">
                   <div className="flex items-center space-x-2">
                     <Input
                       id="address"

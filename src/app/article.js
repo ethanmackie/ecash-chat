@@ -60,9 +60,12 @@ import {
     encodeBip2XecTip,
     encodeBip21ReplyArticle,
     encodeBip21PaywallPayment,
+    getPaginatedHistoryPage,
 } from '../utils/utils';
 import { CrossIcon, AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, YoutubeIcon, AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon } from "@/components/ui/social";
 import { toast } from 'react-toastify';
+import { Bold } from "lucide-react";
+import { Toggle } from "@/components/ui/toggle";
 import { BiSolidNews } from "react-icons/bi";
 import {
     Pagination,
@@ -83,7 +86,6 @@ import {
   } from "@/components/ui/card"
 import { isValidRecipient } from '../validation/validation';
 import { Badge } from "@/components/ui/badge";
-import { kv } from '@vercel/kv';
 import localforage from 'localforage';
 import copy from 'copy-to-clipboard';
 import { Skeleton } from "@/components/ui/skeleton";
@@ -92,7 +94,8 @@ import MarkdownEditor from '@uiw/react-markdown-editor';
 import { getStackArray } from 'ecash-script';
 
 export default function Article( { chronik, address, isMobile, sharedArticleTxid } ) {
-    const [articleHistory, setArticleHistory] = useState('');
+    const [articleHistory, setArticleHistory] = useState('');  // current article history page
+    const [fullArticleHistory, setFullArticleHistory] = useState('');  // current article history page
     const [articleTitle, setArticleTitle] = useState(''); // title of the article being drafted
     const [article, setArticle] = useState(''); // the article being drafted
     const [articleCategory, setArticleCategory] = useState(''); // category of the article being drafted
@@ -111,6 +114,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const [addressToSearchError, setAddressToSearchError] = useState(false);
     const [txHistoryByAddress, setTxHistoryByAddress] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [showEditor, setshowEditor] = useState(false);
+    const [showSearchBar, setshowSearchBar] = useState(false);
 
     useEffect(() => {
         const handleResize = () => {
@@ -178,34 +183,50 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             }
             setIsLoading(false);
         })();
-        initializeArticleRefresh();
     }, []);
 
-    /**
-     * Set an interval to trigger regular article list refresh
-     * @returns callback function to cleanup interval
-     */
-    const initializeArticleRefresh = async () => {
-        const intervalId = setInterval(async function () {
-            await getArticleHistoryByPage(0);
-        }, appConfig.articleRefreshInterval);
-        // Clear the interval when page unmounts
-        return () => clearInterval(intervalId);
-    };
-
     // Retrieves the article listing
-    const getArticleHistoryByPage = async (page) => {
+    // Set localLookup to true to retrieve paginated data locally
+    const getArticleHistoryByPage = async (pageNum = 0, localLookup = false) => {
         if (
-            typeof page !== "number" ||
+            typeof pageNum !== "number" ||
             chronik === undefined
         ) {
             return;
         }
-        const txHistoryResp = await getArticleHistory(chronik, appConfig.townhallAddress, page);
-        if (txHistoryResp && Array.isArray(txHistoryResp.txs)) {
-            setArticleHistory(txHistoryResp);
+
+        if (localLookup) {
+            const selectedPageHistory = getPaginatedHistoryPage(
+                fullArticleHistory.txs,
+                pageNum,
+            );
+
+            setArticleHistory({
+                txs: selectedPageHistory,
+                numPages: fullArticleHistory.numPages,
+                replies: fullArticleHistory.replies,
+                paywallTxs: fullArticleHistory.paywallTxs,
+            });
+        } else {
+            const txHistoryResp = await getArticleHistory(chronik, appConfig.townhallAddress, pageNum);
+            if (txHistoryResp && Array.isArray(txHistoryResp.txs)) {
+                const firstPageHistory = getPaginatedHistoryPage(
+                    txHistoryResp.txs,
+                    pageNum,
+                );
+
+                const currentArticleHistoryPage = {
+                    txs: firstPageHistory,
+                    numPages: txHistoryResp.numPages,
+                    replies: txHistoryResp.replies,
+                    paywallTxs: txHistoryResp.paywallTxs,
+                };
+
+                setArticleHistory(currentArticleHistoryPage);
+                setFullArticleHistory(txHistoryResp);
+                return currentArticleHistoryPage;
+            }
         }
-        return txHistoryResp;
     };
 
     // Pass an article tx BIP21 query string to cashtab extensions
@@ -258,7 +279,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
         setArticle('');
         setArticleTitle('');
-        articleTxListener(chronik, address, kv, updatedArticles, getArticleHistoryByPage);
+        articleTxListener(chronik, address, updatedArticles, articleObject, getArticleHistoryByPage);
     };
 
     // Pass a reply to article tx BIP21 query string to cashtab extensions
@@ -469,7 +490,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         if (localArticleHistoryResp) {
             localArticleHistory = localArticleHistoryResp;
         }
-    
         for (const thisPaywallPayment of localArticleHistory.paywallTxs) {
             if (
                 thisPaywallPayment.paywallPaymentArticleTxid === paywalledArticleTxId &&
@@ -510,7 +530,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                   <div className="px-3 py-4">
                       <Button
                         type="button"
-                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={e => {
                             sendXecTip(address, 100);
                         }}
@@ -520,7 +539,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                       &nbsp;
                       <Button
                         type="button"
-                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={e => {
                             sendXecTip(address, 1000);
                         }}
@@ -530,7 +548,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                       &nbsp;
                       <Button
                         type="button"
-                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={e => {
                             sendXecTip(address, 10000);
                         }}
@@ -540,7 +557,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                       &nbsp;
                       <Button
                         type="button"
-                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={e => {
                             sendXecTip(address, 100000);
                         }}
@@ -550,7 +566,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                       &nbsp;
                       <Button
                         type="button"
-                        className="bg-blue-500 hover:bg-blue-300"
                         onClick={e => {
                             sendXecTip(address, 1000000);
                         }}
@@ -605,7 +620,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
     const FullArticleModal = () => {
         return (
-            <Modal show={showArticleModal} onClose={() => setShowArticleModal(false)}>
+            <Modal show={showArticleModal} onClose={() => setShowArticleModal(false)}  className="bg-background/90">
+                <div className="shadow-xl border rounded-lg">
                 <Modal.Header>{currentArticleTxObj.articleObject.title}</Modal.Header>
                 <Modal.Body>
                     {/* Article content */}
@@ -694,7 +710,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     />
                                     <Button
                                         type="button"
-                                        className="bg-blue-500 mt-2 hover:bg-blue-300"
+                                        className="mt-2"
                                         disabled={replyArticle === ''}
                                         onClick={e => {
                                             replytoArticle(currentArticleTxObj.txid, replyArticle)
@@ -710,6 +726,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 </div>
                                 )}
                 </Modal.Footer>
+                </div>
             </Modal>
         );
     };
@@ -846,14 +863,16 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             )}
 
             <div>
-                {/* Dropdown to render article editor */}
-                <Accordion type="single"  collapsible>
-                <AccordionItem value="item-1" className="border-b-0">
-                    <AccordionTrigger className="flex-none hover:no-underline  mx-auto inline-flex mb-2 items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-primary-foreground shadow h-9 px-4 py-2 bg-blue-500 hover:bg-blue-300">
-                           <Pencil1Icon className="mr-1"/> Write an article
-                    </AccordionTrigger>
-                    <AccordionContent className="border-b-0">
-                        <div className="max-w-xl w-full mt-2 mx-auto">
+            <div className="flex justify-center items-center space-x-2">
+            <Toggle variant="outline" className="bg-accent data-[state=on]:bg-white" aria-label="Toggle bold" onClick={() => setshowEditor(prevState => !prevState)}>
+                <Pencil1Icon className="h-4 w-4" />
+            </Toggle>
+            <Toggle variant="outline" className="bg-accent data-[state=on]:bg-white" aria-label="Toggle bold" onClick={() => setshowSearchBar(prevState => !prevState)}>
+                <MagnifyingGlassIcon className="h-4 w-4" />
+            </Toggle>
+            </div>
+                {showEditor && (
+                <div className="max-w-xl w-full mt-2 mx-auto">
                             {/* article input fields */}
                             <Input
                                 className="bg-white"
@@ -866,9 +885,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             />
 
                             {/* Article category dropdown */}
-                <div className="flex flex-col mt-2 sm:flex-row sm:gap-4">
+                <div className="flex flex-col mt-2 sm:flex-row sm:gap-2">
                     <div className="flex flex-col gap-1.5 mt-2 sm:mt-0 ">
-                        <Label htmlFor="article-category">Categories</Label>
                         <Select
                         id="article-category"
                         name="article-category"
@@ -887,17 +905,33 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                         </Select>
                     </div>
 
-                    <div className="flex flex-col gap-1.5 mt-2 sm:mt-0">
-                        <Label htmlFor="value-input">Pay-to-read price in XEC - optional:</Label>
+                    <div className="flex gap-1.5 mt-2 sm:mt-0">
+                       
                         <Input
                         type="number"
                         id="value-input"
                         aria-describedby="helper-text-explanation"
+                        placeholder="Pay-to-read in XEC -optional"
                         className="bg-white w-[240px]"
                         value={paywallAmountXec}
                         onChange={e => handlePaywallAmountChange(e)}
                         />
+                          <Button
+                                type="button"
+                                variant="outline" size="icon"
+                                onClick={() => savedDraftArticleToLocalStorage()}
+                                >
+                                <RiSave3Fill />
+                                </Button>
+                                <Button
+                                type="button"
+                                variant="outline" size="icon"
+                                onClick={() => loadDraftArticleFromLocalStorage()}
+                                >
+                                <ImDownload3 />
+                                </Button>
                     </div>
+                  
                     </div>
                     <p className="mt-1 text-sm text-red-600 dark:text-red-500">
                         {paywallAmountXecError !== false && paywallAmountXecError}
@@ -905,8 +939,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
                             {/* Option to disable comments */}
                         <fieldset>
-                                <div className="space-y-5 py-2">
-                                    
+                                <div className="space-y-5 py-1">     
                                 </div>
                         </fieldset>
                    
@@ -923,29 +956,14 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 {/* Write article button*/}
                                 <Button
                                 type="button"
-                                disabled={article === '' || articleError || articleTitle === '' || paywallAmountXecError}
-                                className="bg-blue-500 hover:bg-blue-300"
+                                disabled={article === '' || articleError || articleTitle === '' || paywallAmountXecError}                            
                                 onClick={() => sendArticle()}
                                 >
                                 <BiSolidNews />&nbsp;Post Article
                                 </Button>
                                 <br />
                                 <div className="sm:flex">
-                                <Button
-                                type="button"
-                                variant="outline" size="icon"
-                                onClick={() => savedDraftArticleToLocalStorage()}
-                                >
-                                <RiSave3Fill />
-                                </Button>
-                                &nbsp;
-                                <Button
-                                type="button"
-                                variant="outline" size="icon"
-                                onClick={() => loadDraftArticleFromLocalStorage()}
-                                >
-                                <ImDownload3 />
-                                </Button>
+                               
                                 </div>
                                 <div className="relative flex items-start mt-2">
                                     <div className="flex h-6 items-center py-2">
@@ -964,13 +982,12 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     </div>
                             </div>
                         </div>
-                    </AccordionContent>
-                </AccordionItem>
-                </Accordion>
+                )}
+               
 
                 {/*Set up pagination menu*/}
                 <span>
-                    <Pagination>
+                    <Pagination className='mt-2'>
                         <PaginationContent>
                             {/* Previous button */}
                             <PaginationItem>
@@ -979,7 +996,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 onClick={(e) => {
                                 e.preventDefault();
                                 setCurrentPage(old => Math.max(0, old - 1));
-                                getArticleHistoryByPage(Math.max(0, currentPage - 1));
+                                getArticleHistoryByPage(Math.max(0, currentPage - 1), true);
                                 }}
                                 disabled={currentPage === 0}
                             />
@@ -999,7 +1016,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     href="#"
                                     onClick={(e) => {
                                     e.preventDefault();
-                                    getArticleHistoryByPage(i);
+                                    getArticleHistoryByPage(i, true);
                                     setCurrentPage(i);
                                     }}
                                     isActive={currentPage === i}
@@ -1024,7 +1041,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 onClick={(e) => {
                                 e.preventDefault();
                                 setCurrentPage(old => Math.min(articleHistory.numPages - 1, old + 1));
-                                getArticleHistoryByPage(Math.min(articleHistory.numPages - 1, currentPage + 1));
+                                getArticleHistoryByPage(Math.min(articleHistory.numPages - 1, currentPage + 1), true);
                                 }}
                                 disabled={currentPage === articleHistory.numPages - 1}
                             />
@@ -1034,6 +1051,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 </span>
                 
                 {/* Filter by article author */}
+                {showSearchBar && (
                 <form className="space-y-6" action="#" method="POST">
                     <div>
                         <div className="max-w-xl mt-2 w-full mx-auto">
@@ -1077,6 +1095,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                         </div>
                     </div>
                 </form>
+                )}
 
                 {/* Render article listings */}
                 <RenderArticleListing />

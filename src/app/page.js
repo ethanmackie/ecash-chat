@@ -16,9 +16,35 @@ import { isValidRecipient, messageHasErrors } from '../validation/validation';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import {
+    Popover as PopoverShad,
+    PopoverContent as PopoverContentShad,
+    PopoverTrigger as PopoverTriggerShad,
+  } from "@/components/ui/popover";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+  } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import QRCode from "react-qr-code";
 import copy from 'copy-to-clipboard';
 import { Tooltip, Tabs, Alert, Modal, Popover } from "flowbite-react";
@@ -29,7 +55,7 @@ import { IoMdInformationCircleOutline } from "react-icons/io";
 import { ToastContainer, toast } from 'react-toastify';
 import { PersonIcon, FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon } from '@radix-ui/react-icons';
 import 'react-toastify/dist/ReactToastify.css';
-import { YoutubeIcon, DefaultavatarIcon, EcashchatIcon, LoadingSpinner, Home3Icon, File3Icon, Nft3Icon, Inbox3Icon, Send3Icon, Info3icon } from "@/components/ui/social";
+import { YoutubeIcon, DefaultavatarIcon, EcashchatIcon, LoadingSpinner, Home3Icon, File3Icon, Nft3Icon, Inbox3Icon, Send3Icon, Info3icon, User3icon, QrcodeIcon, Logout3Icon } from "@/components/ui/social";
 import {
     SendIcon,
     LogoutIcon,
@@ -47,6 +73,7 @@ const packageJson = require('../../package.json');
 import localforage from 'localforage';
 import xecMessage from 'bitcoinjs-message';
 import * as utxolib from '@bitgo/utxo-lib';
+import { User2Icon } from 'lucide-react';
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -66,7 +93,7 @@ export default function Home() {
     const [sendAmountXec, setSendAmountXec] = useState(5.5);
     const [sendAmountXecError, setSendAmountXecError] = useState(false);
     const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
-    const [xecBalance, setXecBalance] = useState('Loading...');
+    const [xecBalance, setXecBalance] = useState(null);
     const [encryptionMode, setEncryptionMode] = useState(false);
     const [showMessagePreview, setShowMessagePreview] = useState(false);
     const [sharedArticleTxid, setSharedArticleTxid] = useState(false);
@@ -74,6 +101,8 @@ export default function Home() {
     const [openSaveLoginModal, setOpenSaveLoginModal] = useState(false);
     const [savedLogin, setSavedLogin] = useState(false);
     const [showLoadingSpinner, setShowLoadingSpinner] = useState(true);
+    const [showFullAddress, setShowFullAddress] = useState(false);
+    const [showCard, setShowCard] = useState(true);
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
@@ -416,94 +445,122 @@ export default function Home() {
         );
     };
 
+    
+
     const CreditCardHeader = () => {
         const cardStyling = isMobile 
-        ? "w-94 h-56 max-w-md mx-auto break-words bg-blue-500 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105" 
-        : "w-96 h-56 max-w-md mx-auto break-words bg-blue-500 rounded-xl relative text-white shadow-2xl transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s hover:scale-105";
+        ? "max-w-xs mx-auto rounded-2xl mt-14 break-words gradient-outline !shadow-none relative transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s  " 
+        : "max-w-xs mx-auto rounded-2xl mt-14 break-words gradient-outline !shadow-none relative transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s ";
 
         return (
-            <div
-                className={cardStyling}
-                onClick={() => {
-                    copy(address);
-                    toast(`${address} copied to clipboard`);
-                }}
-            >
-                <div className="w-full px-8 absolute top-8">
-                <div className="flex justify-between items-start">
-                    <div className="bg-white p-2 rounded-lg" style={{ maxWidth: "3.5rem", maxHeight: "3.5rem", boxShadow: "0px 0px 10px rgba(0,0,0,0.1)" }}>
-                        {/*QR Code*/}
-                        {address !== '' && (
-                            <QRCode
-                                value={address}
-                                size={88} // Adjust QR code size to fit within 3.5rem x 3.5rem
-                                style={{ height: "auto", maxWidth: "100%", maxHeight: "100%" }}
-                                viewBox={`0 0 256 256`}
-                            />
-                        )}
-                    </div>
-                        <img className="w-14 h-14" src="/ecash-square-icon.svg"/>
-                    </div>
-                    <div className="pt-4">
-                        <p className="font-medium tracking-wider text-sm">
-                            {address}
-                        </p>
-                    </div>
-                    <div className="pt-6 pr-6">
-                        <div className="flex justify-between">
-                            <div className="">
-                                <p className="font-light text-xs">
-                                    Balance
-                                </p>
-                                <p className="font-medium tracking-wider text-sm">
-                                    {xecBalance} XEC
-                                </p>
-                            </div>
-                            <div className="">
-                                <p className="font-light text-xs text-xs">
-                                    Aliases Registered
-                                </p>
-                                <p className="font-medium tracking-wider text-sm">
-                                    {aliases.registered ? aliases.registered.length : 0}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+            <>
+            {showCard && (
+            <Card
+            className={cardStyling} 
+          >
+            <CardHeader className="flex flex-row !space-y-0 items-center justify-between">
+            <Button variant="outline" size="icon" className='p-3 w-auto h-auto' onClick={() => setShowCard(false)}>
+            <User3icon className="h-4 w-4" />
+            </Button>
+            <PopoverShad>
+                <PopoverTriggerShad className='p-2 rounded-md shadow-sm hover:outline-none hover:ring-2 hover:ring-offset-2 border'>
+                <div
+                    style={{
+                    cursor: 'pointer', 
+                    }}
+                >
+                   <QrcodeIcon/>
                 </div>
-            </div>
+                </PopoverTriggerShad>
+                <PopoverContentShad className="p-4 w-auto bg-white rounded-lg shadow-lg">
+                <div
+                    className="bg-white p-2 rounded-lg flex justify-center items-center"
+                >
+                    {address !== '' && (
+                    <QRCode
+                        value={address}
+                        size={128} // 设置较大的尺寸
+                        style={{ height: 'auto', maxWidth: '100%', maxHeight: '100%' }}
+                        viewBox={`0 0 256 256`}
+                    />
+                    )}
+                </div>
+                </PopoverContentShad>
+            </PopoverShad>
+            </CardHeader>
+            <CardContent>
+            <p className="text-sm font-medium leading-none h-10" 
+            onClick={() => {
+                setShowFullAddress(!showFullAddress);
+                copy(address);
+                toast(`${address} copied to clipboard`);
+              }}
+            >
+          {showFullAddress ? address : `${address.substring(0, 10)} **** **** ${address.substring(address.length - 5)}`}
+        </p>
+            </CardContent>
+            <CardFooter>
+              <div className="flex justify-between w-full">
+                <div>
+                  <p className="font-light text-xs">Balance</p>
+                  <p className="font-medium tracking-wider text-sm">
+                    {xecBalance !== null ? (
+                        `${xecBalance} XEC`
+                    ) : (
+                        <>
+                       <div className="flex space-x-1">
+                        <Skeleton className="h-4 w-[40px]" />
+                        <Skeleton className="h-4 w-[40px]" />
+                        <Skeleton className="h-4 w-[24.7px]" />
+                        </div>
+                      </>
+                    )}
+                    </p>
+                </div>
+                <div>
+                  <p className="font-light text-xs">Aliases Registered</p>
+                  <p className="font-medium tracking-wider text-sm">{aliases.registered ? aliases.registered.length : 0}</p>
+                </div>
+              </div>
+            </CardFooter>
+          </Card>
+          )}
+          </>
         );
     };
 
     const RenderSaveLoginModal = () => {
         return (
-            <Modal show={openSaveLoginModal} onClose={() => setOpenSaveLoginModal(false)}>
-                <Modal.Header>Save login details?</Modal.Header>
-                <Modal.Body>
-                    <div className="space-y-6">
-                    Saving login details will reduce the number of times you're asked to login.<br />
-                    Please ensure you're the only person who uses this device.
-                    </div>
-                </Modal.Body>
-                <Modal.Footer>
-                    <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
-                          <button
-                            type="button"
-                            className="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:col-start-2"
-                            onClick={() => saveLoginAddressToLocalStorage()}
-                          >
-                            Save login
-                          </button>
-                          <button
-                            type="button"
-                            className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0"
-                            onClick={() => setOpenSaveLoginModal(false)}
-                            data-autofocus
-                          >
+            <AlertDialog open={openSaveLoginModal} onOpenChange={setOpenSaveLoginModal}>
+                <AlertDialogTrigger asChild>
+                    <button className="hidden">Open</button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Save login details?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Saving login details will reduce the number of times you're asked to login.<br />
+                        Please ensure you're the only person who uses this device.
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <Button
+                        onClick={() => setOpenSaveLoginModal(false)}
+                        variant="outline"
+                            >
                             Don't save login
-                          </button>
-                        </div>
-                </Modal.Footer>
-            </Modal>
+                    </Button>
+                    <Button
+                        onClick={() => {
+                        saveLoginAddressToLocalStorage();
+                        }}
+                    >
+                        Save login
+                    </Button>
+                    
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+                </AlertDialog>
           )
     };
 
@@ -518,7 +575,7 @@ export default function Home() {
         <div className="sm:flex flex-col items-center justify-center p-5 relative z-10 mt-4">
         <div className="background_content"></div>
         </div>
-        <div className="relative isolate px-6 pt-14 lg:px-8">
+        <div className="relative isolate px-6 lg:px-8">
         <div
         className="absolute inset-x-0 -top-10 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-40"
         aria-hidden="true"
@@ -555,11 +612,13 @@ export default function Home() {
                 </span>
               </a>
             </div>
-            <div className="sm:flex">
-                <nav className="flex items-center gap-6 text-sm">
-                </nav>
-            </div>
-
+            <div className="flex">       
+            {!showCard && (
+                <Button variant="outline" size="icon" className='mr-2' onClick={() => setShowCard(true)}>
+                <User3icon className="h-4 w-4" />
+                </Button>
+            )}
+     
             {(isMobile && isLoggedIn) ? (
             <div>
                 <Button
@@ -571,7 +630,7 @@ export default function Home() {
                 }}
                 variant="outline"
                 >
-                Logout
+               <Logout3Icon/>
                 </Button>
             </div>
             ) : (
@@ -586,11 +645,12 @@ export default function Home() {
                     } : () => getAddress()}
                     variant="outline"
                 >
-                    {isLoggedIn ? 'Logout' : 'Signin'}
+                    {isLoggedIn ? <Logout3Icon /> : 'Signin'}
                 </Button>
                 </div>
             )
             )}
+            </div>
             </div>
         </header>
         
@@ -692,7 +752,7 @@ export default function Home() {
                           <Button
                             type="button"
                             disabled={recipientError || recipient === '' || signature === ''}
-                            className="flex w-full"
+                            className="flex w-full mt-2"
                             onClick={() => {
                                 verifySignature();
                             }}
@@ -729,7 +789,7 @@ export default function Home() {
           <CreditCardHeader />
 
           {/* Tab navigation */}
-          <Tabs aria-label="eCash Chat" style="default" className='z-10 focus:ring-0 relative mt-4 justify-center'>
+          <Tabs aria-label="eCash Chat" style="default" className='z-10 !border-b-0 focus:ring-0 relative mt-4 justify-center'>
               {isMobile === false && (
                   <Tabs.Item title="Inbox" icon={Inbox3Icon}>
                       {cashaddr.isValidCashAddress(address, 'ecash') &&
@@ -761,19 +821,21 @@ export default function Home() {
                                   </div>
 
                                   <div>
-                                    <div className="mt-2">
+                                    <div className="mt-2 overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring">
                                         <Textarea
                                           id="message"
                                           rows="4"
                                           value={message}
                                           placeholder={encryptionMode ? 'Your message, Max. 95 bytes' : 'Your message, Max. 215 bytes'}
                                           required
-                                          className="bg-gray-50"
+                                          className="bg-white resize-none border-0 p-3 shadow-none focus-visible:ring-0"
                                           onChange={e => handleMessageChange(e)}
                                         />
-                                        <p className="mt-2 text-sm text-red-600 dark:text-red-500">{messageError !== false && messageError}</p>
+                                        <p className="mt-2 text-sm text-red-600 px-3 dark:text-red-500">{messageError !== false && messageError}</p>
                                         {/* Emoji picker and tooltip guide for embedding markups */}
-                                        <div className="flex py-1 gap-2">
+                                    
+                                        <div className="flex flex-col sm:flex-row justify-between items-center mt-2 p-3 pt-0">
+                                        <div className="flex gap-2 mb-2 sm:mb-0">
                                             {/* Emoji Picker */}
                                             <Popover
                                                 aria-labelledby="emoji-popover"
@@ -828,9 +890,21 @@ export default function Home() {
                                                     <UITwitterIcon/>
                                                 </Button>
                                             </Tooltip>
+                                          
                                         </div>
+                                        <div>
+                                        <Button
+                                            type="button"
+                                            disabled={recipientError || messageError || sendAmountXecError || recipient === '' || (encryptionMode && password === '')}
+                                            className="w-full"
+                                            onClick={() => { setShowMessagePreview(true); }}
+                                            >
+                                            <SendIcon/>&nbsp;Send Message
+                                        </Button>
+                                  </div>
+                                 </div>
                                     </div>     
-                                    <div className="grid w-full items-center gap-1.5 mt-4">                       
+                                    <div className="grid w-full items-center gap-2 mt-4">                       
                                     <Label htmlFor="value-input">Send XEC amount (optional, 5.5 XEC by default):</Label>
                                     <Input
                                         type="number"
@@ -841,7 +915,7 @@ export default function Home() {
                                     />                
                                       </div>       
                                     {/* Encryption mode toggle */}
-                                    <label className="inline-flex items-center cursor-pointer mt-4">
+                                    <label className="inline-flex items-center cursor-pointer mt-2">
                                         <Input
                                             type="checkbox"
                                             value=""
@@ -864,23 +938,14 @@ export default function Home() {
                                                 id="password-input"
                                                 value={password}
                                                 maxlength="19"
-                                                aria-describedby="helper-text-explanation" className="bg-gray-50"
+                                                aria-describedby="helper-text-explanation" className="bg-white mt-2"
                                                 placeholder="Set an optional encryption password"
                                                 onChange={e => setPassword(e.target.value)}
                                             />
                                         </>
                                     )}
                                   </div>
-                                  <div>
-                                        <Button
-                                            type="button"
-                                            disabled={recipientError || messageError || sendAmountXecError || recipient === '' || (encryptionMode && password === '')}
-                                            className="w-full bg-blue-500 hover:bg-blue-300 mt-2 mb-20"
-                                            onClick={() => { setShowMessagePreview(true); }}
-                                            >
-                                            <SendIcon/>&nbsp;Send Message
-                                        </Button>
-                                  </div>
+
                               </form>
                        </div>
                     </div>

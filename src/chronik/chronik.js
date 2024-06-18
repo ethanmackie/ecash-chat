@@ -8,18 +8,238 @@ import { getStackArray } from 'ecash-script';
 import { BN } from 'slp-mdm';
 import { toast } from 'react-toastify';
 import localforage from 'localforage';
-import { kv } from '@vercel/kv';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+const dbClient = new DynamoDBClient({
+    credentials: {
+        accessKeyId: process.env.DYNAMODB_ACCESS_KEY_ID,
+        secretAccessKey: process.env.DYNAMODB_SECRET_ACCESS_KEY,
+    },
+    region: process.env.AWS_REGION,
+});
+const docClient = DynamoDBDocumentClient.from(dbClient);
 
-// Retrieves all articles from API and share via local storage
-export const getArticleListing = async () => {
-    let articles = await kv.get(appConfig.vercelKvParam);
-
-    if (!Array.isArray(articles)) {
-        articles = [];
+// Retrieves tx history via chronik, parses the response into formatted
+// objects and filter out eToken or non-msg txs
+export const getTxHistory = async (chronik, address, page = 0) => {
+    if (
+        chronik === undefined ||
+        !cashaddr.isValidCashAddress(address, 'ecash')
+    ) {
+        return;
     }
 
-    return articles;
+    // Retrieve first chronik page of tx history txs
+    let firstTxHistoryPage = await chronik.address(address).history(page, chronikConfig.txHistoryPageSize);
+    let totalTxlHistoryTxs = firstTxHistoryPage.txs;
+
+    // Retrieve subsequent chronik pages of tx history txs (if exists)
+    const txHistoryPromises = [];
+    if (firstTxHistoryPage && firstTxHistoryPage.numPages > 1) {
+        for (let i = 1; i < firstTxHistoryPage.numPages; i += 1) {
+            const thisTxHistoryPromise = new Promise((resolve, reject) => {
+                chronik
+                .address(
+                    address,
+                ).history(
+                    i,
+                    chronikConfig.txHistoryPageSize,
+                ).then(
+                    result => {
+                        resolve(result);
+                    },
+                    err => {
+                        reject(err);
+                    },
+                );
+            });
+            txHistoryPromises.push(thisTxHistoryPromise);
+        }
+
+        // Execution of all subsequent tx history page retrievals
+        const executedTxHistoryPromises = await Promise.all(txHistoryPromises);
+
+        // Merge all subsequent tx history pages into totalTxlHistoryTxs
+        for (let i = 0; i < executedTxHistoryPromises.length; i += 1) {
+            totalTxlHistoryTxs = totalTxlHistoryTxs.concat(executedTxHistoryPromises[i].txs);
+        }
+    }
+
+    // Separate out the replies so they can be rendered underneath the main posts
+    const parsedTxs = [];
+    const replyTxs = [];
+    for (let i = 0; i < totalTxlHistoryTxs.length; i += 1) {
+        const parsedTx = parseChronikTx(
+            totalTxlHistoryTxs[i],
+            address,
+        );
+
+        if (parsedTx.replyTxid) {
+            replyTxs.push(parsedTx);
+        } else {
+            parsedTxs.push(parsedTx);
+        }
+    }
+
+    // Filter out eToken and non-message txs
+    const parsedAndFilteredTxHistory = parsedTxs.filter(function (el) {
+      return el.isEtokenTx === false &&
+             el.opReturnMessage !== ''
+    });
+
+    const slicedPageNum = Math.ceil(parsedAndFilteredTxHistory.length/chronikConfig.townhallHistoryPageSize);
+
+    return {
+        txs: parsedAndFilteredTxHistory,
+        replies: replyTxs,
+        numPages: slicedPageNum,
+    };
 };
+
+// Retrieves article listing tx history via chronik, parses the response into formatted
+// objects and filter out eToken or non-msg txs
+export const getArticleHistory = async (chronik, address, page = 0) => {
+    if (
+        chronik === undefined ||
+        !cashaddr.isValidCashAddress(address, 'ecash')
+    ) {
+        return;
+    }
+
+    try {
+        // Retrieve first chronik page of tx history txs
+        let firstTxHistoryPage = await chronik.lokadId(
+            opreturnConfig.articlePrefixHex,
+        ).history(
+            page,
+            chronikConfig.txHistoryPageSize,
+        );
+        let totalTxlHistoryTxs = firstTxHistoryPage.txs;
+
+        // Retrieve subsequent chronik pages of tx history txs (if exists)
+        const txHistoryPromises = [];
+        if (firstTxHistoryPage && firstTxHistoryPage.numPages > 1) {
+            for (let i = 1; i < firstTxHistoryPage.numPages; i += 1) {
+                const thisTxHistoryPromise = new Promise((resolve, reject) => {
+                    chronik
+                    .lokadId(
+                        opreturnConfig.articlePrefixHex,
+                    ).history(
+                        i,
+                        chronikConfig.txHistoryPageSize,
+                    ).then(
+                        result => {
+                            resolve(result);
+                        },
+                        err => {
+                            reject(err);
+                        },
+                    );
+                });
+                txHistoryPromises.push(thisTxHistoryPromise);
+            }
+        }
+
+        // Execution of all subsequent tx history page retrievals
+        const executedTxHistoryPromises = await Promise.all(txHistoryPromises);
+
+        // Merge all subsequent tx history pages into totalTxlHistoryTxs
+        for (let i = 0; i < executedTxHistoryPromises.length; i += 1) {
+            totalTxlHistoryTxs = totalTxlHistoryTxs.concat(executedTxHistoryPromises[i].txs);
+        }
+
+        const localArticles = await localforage.getItem(appConfig.localArticlesParam);
+
+        // Retrieve first chronik page of paywall txs
+        let paywallPaymentsHistory = await chronik.lokadId(
+            opreturnConfig.appPrefixesHex.paywallPaymentPrefixHex,
+        ).history(
+            0,
+            chronikConfig.txHistoryPageSize,
+        );
+        let totalPaywallHistoryTxs = paywallPaymentsHistory.txs;
+
+        // Retrieve subsequent chronik pages of paywall txs (if exists)
+        const paywallPaymentHistoryPromises = [];
+        if (paywallPaymentsHistory && paywallPaymentsHistory.numPages > 1) {
+            for (let i = 1; i < paywallPaymentsHistory.numPages; i += 1) {
+                const thisPaywallHistoryPromise = new Promise((resolve, reject) => {
+                    chronik
+                    .lokadId(
+                        opreturnConfig.appPrefixesHex.paywallPaymentPrefixHex,
+                    ).history(
+                        i,
+                        chronikConfig.txHistoryPageSize,
+                    ).then(
+                        result => {
+                            resolve(result);
+                        },
+                        err => {
+                            reject(err);
+                        },
+                    );
+                });
+                paywallPaymentHistoryPromises.push(thisPaywallHistoryPromise);
+            }
+
+            // Execution of all subsequent paywall lokad history page retrievals
+            const executedPaywallPaymentHistoryPromises = await Promise.all(paywallPaymentHistoryPromises);
+
+            // Merge all subsequent paywall lokad history pages into totalPaywallHistoryTxs
+            for (let i = 0; i < executedPaywallPaymentHistoryPromises.length; i += 1) {
+                totalPaywallHistoryTxs = totalPaywallHistoryTxs.concat(executedPaywallPaymentHistoryPromises[i].txs);
+            }
+        }
+
+        // Parse standard eCash Chat actions
+        const parsedTxs = [];
+        const replyTxs = [];
+        for (let i = 0; i < totalTxlHistoryTxs.length; i += 1) {
+            const parsedTx = parseChronikTx(
+                totalTxlHistoryTxs[i],
+                address,
+            );
+
+            // Separate out the replies so they can be rendered underneath the main posts
+            if (parsedTx.isArticleReply) {
+                // populate with additional article info with matching entry from localArticles
+                parsedTx.articleObject = localArticles.find((article) => article.hash === parsedTx.opReturnMessage);
+                replyTxs.push(parsedTx);
+            } else {
+                // populate with additional article info with matching entry from localArticles
+                parsedTx.articleObject = localArticles.find((article) => article.hash === parsedTx.opReturnMessage);
+                parsedTxs.push(parsedTx);
+            }
+        }
+
+        // Filter out non-article txs
+        const parsedAndFilteredTxs = parsedTxs.filter(function (el) {
+            return el.isArticle === true && el.articleObject !== undefined||
+                el.isArticleReply === true && el.articleObject !== undefined
+        });
+
+        // Parse paywall payments
+        const paywallTxs = [];
+        for (let i = 0; i < totalPaywallHistoryTxs.length; i += 1) {
+            paywallTxs.push(parseChronikTx(
+                totalPaywallHistoryTxs[i],
+                address,
+            ));
+        }
+
+        const slicedPageNum = Math.ceil(parsedAndFilteredTxs.length/chronikConfig.articleHistoryPageSize);
+
+        return {
+            txs: parsedAndFilteredTxs,
+            replies: replyTxs,
+            paywallTxs: paywallTxs,
+            numPages: slicedPageNum,
+        };
+    } catch (err) {
+        console.log(`Error in getArticleHistory(${address})`, err);
+    }
+};
+
 
 /**
  * Refreshes the app's utxos, XEC balance and NFT collection
@@ -480,16 +700,16 @@ export const getChildNftsFromParent = (
  *
  * @param {string} chronik the chronik-client instance
  * @param {string} address the eCash address of the active wallet
- * @param {@vercel/kv} kv the Vercel KV database client instance
  * @param {array} updatedArticles an array of article object including the newly posted article
+ * @param {object} articleObject the new article to be appending to the off-chain article map
  * @param {callback fn} refreshCallback a callback function to either article history
  * @throws {error} err chronik websocket subscription errors
  */
 export const articleTxListener = async (
     chronik,
     address,
-    kv,
     updatedArticles,
+    articleObject,
     refreshCallback = false,
 ) => {
     // Get type and hash
@@ -517,12 +737,26 @@ export const articleTxListener = async (
                         ) {
                             console.log('articleTxListener: tx sender and recipient matches');
                             try {
-                                await kv.set(appConfig.vercelKvParam, updatedArticles);
+                                const command = new UpdateCommand({
+                                    TableName: process.env.TABLE_NAME,
+                                    Key: {
+                                      hash: 'main'
+                                    },
+                                    UpdateExpression: "SET #article = list_append(#article, :article)",
+                                    ExpressionAttributeValues: {
+                                      ":article": [articleObject],
+                                    },
+                                    ExpressionAttributeNames: {
+                                        "#article": 'article',
+                                    },
+                                    ReturnValues: "ALL_NEW",
+                                })
+                                await docClient.send(command);
                                 await localforage.setItem(appConfig.localArticlesParam, updatedArticles);
                                 toast(`Article posted`);
                             } catch (err) {
                                 toast(`Error committing article, please try again`);
-                                console.log('articleTxListener: error committing article to DB', err);
+                                console.log('articleTxListener: error committing article to DB', err.message);
                             }
 
                             // Unsubscribe and close websocket
@@ -536,7 +770,7 @@ export const articleTxListener = async (
                         } else {
                             console.log('Detected mempool event is not an article tx, skipping: ', mempoolTx);
                         }
-                    }, 750);
+                    }, 500);
                 }
             },
         });
@@ -825,168 +1059,6 @@ export const getBalance = async (chronik, address) => {
         });
     } catch (err) {
         console.log(`Error in getBalance(${address})`, err);
-    }
-};
-
-// Retrieves tx history via chronik, parses the response into formatted
-// objects and filter out eToken or non-msg txs
-export const getTxHistory = async (chronik, address, page = 0) => {
-    if (
-        chronik === undefined ||
-        !cashaddr.isValidCashAddress(address, 'ecash')
-    ) {
-        return;
-    }
-  
-    let txHistoryPage;
-    try {
-        txHistoryPage = await chronik.address(address).history(page, chronikConfig.txHistoryPageSize);
-
-        const parsedTxs = [];
-        const replyTxs = [];
-        for (let i = 0; i < txHistoryPage.txs.length; i += 1) {
-            const parsedTx = parseChronikTx(
-                txHistoryPage.txs[i],
-                address,
-            );
-
-            // Separate out the replies so they can be rendered underneath the main posts
-            if (parsedTx.replyTxid) {
-                replyTxs.push(parsedTx);
-            } else {
-                parsedTxs.push(parsedTx);
-            }
-        }
-
-        // Filter out eToken and non-message txs
-        const parsedAndFilteredTxs = parsedTxs.filter(function (el) {
-          return el.isEtokenTx === false &&
-                 el.opReturnMessage !== ''
-        });
-
-        localforage.setItem(
-            'txHistory',
-            {
-                txs: parsedAndFilteredTxs,
-                replies: replyTxs,
-                numPages: txHistoryPage.numPages,
-            },
-        );
-
-        return {
-            txs: parsedAndFilteredTxs,
-            replies: replyTxs,
-            numPages: txHistoryPage.numPages,
-        };
-    } catch (err) {
-        console.log(`Error in getTxHistory(${address})`, err);
-    }
-};
-
-// Retrieves article listing tx history via chronik, parses the response into formatted
-// objects and filter out eToken or non-msg txs
-export const getArticleHistory = async (chronik, address, page = 0) => {
-    if (
-        chronik === undefined ||
-        !cashaddr.isValidCashAddress(address, 'ecash')
-    ) {
-        return;
-    }
-
-    try {
-        const lokadIdHistory = await chronik.lokadId(
-            opreturnConfig.articlePrefixHex,
-        ).history(
-            page,
-            chronikConfig.articleHistoryPageSize,
-        );
-        const localArticles = await localforage.getItem(appConfig.localArticlesParam);
-
-        // Retrieve first chronik page of paywall txs
-        let paywallPaymentsHistory = await chronik.lokadId(
-            opreturnConfig.appPrefixesHex.paywallPaymentPrefixHex,
-        ).history(
-            0,
-            200,
-        );
-        let totalPaywallHistoryTxs = paywallPaymentsHistory.txs;
-
-        // Retrieve subsequent chronik pages of paywall txs (if exists)
-        const paywallPaymentHistoryPromises = [];
-        if (paywallPaymentsHistory && paywallPaymentsHistory.numPages > 1) {
-            for (let i = 1; i < paywallPaymentsHistory.numPages; i += 1) {
-                const thisPaywallHistoryPromise = new Promise((resolve, reject) => {
-                    chronik
-                    .lokadId(
-                        opreturnConfig.appPrefixesHex.paywallPaymentPrefixHex,
-                    ).history(
-                        i,
-                        chronikConfig.articleHistoryPageSize,
-                    ).then(
-                        result => {
-                            resolve(result);
-                        },
-                        err => {
-                            reject(err);
-                        },
-                    );
-                });
-                paywallPaymentHistoryPromises.push(thisPaywallHistoryPromise);
-            }
-
-            // Execution of all subsequent paywall lokad history page retrievals
-            const executedPaywallPaymentHistoryPromises = await Promise.all(paywallPaymentHistoryPromises);
-
-            // Merge all subsequent paywall lokad history pages into totalPaywallHistoryTxs
-            for (let i = 0; i < executedPaywallPaymentHistoryPromises.length; i += 1) {
-                totalPaywallHistoryTxs = totalPaywallHistoryTxs.concat(executedPaywallPaymentHistoryPromises[i].txs);
-            }
-        }
-
-        // Parse standard eCash Chat actions
-        const parsedTxs = [];
-        const replyTxs = [];
-        for (let i = 0; i < lokadIdHistory.txs.length; i += 1) {
-            const parsedTx = parseChronikTx(
-                lokadIdHistory.txs[i],
-                address,
-            );
-
-            // Separate out the replies so they can be rendered underneath the main posts
-            if (parsedTx.isArticleReply) {
-                // populate with additional article info with matching entry from localArticles
-                parsedTx.articleObject = localArticles.find((article) => article.hash === parsedTx.opReturnMessage);
-                replyTxs.push(parsedTx);
-            } else {
-                // populate with additional article info with matching entry from localArticles
-                parsedTx.articleObject = localArticles.find((article) => article.hash === parsedTx.opReturnMessage);
-                parsedTxs.push(parsedTx);
-            }
-        }
-
-        // Filter out non-article txs
-        const parsedAndFilteredTxs = parsedTxs.filter(function (el) {
-            return el.isArticle === true ||
-                el.isArticleReply === true
-        });
-
-        // Parse paywall payments
-        const paywallTxs = [];
-        for (let i = 0; i < totalPaywallHistoryTxs.length; i += 1) {
-            paywallTxs.push(parseChronikTx(
-                totalPaywallHistoryTxs[i],
-                address,
-            ));
-        }
-
-        return {
-            txs: parsedAndFilteredTxs,
-            replies: replyTxs,
-            paywallTxs: paywallTxs,
-            numPages: lokadIdHistory.numPages,
-        };
-    } catch (err) {
-        console.log(`Error in getArticleHistory(${address})`, err);
     }
 };
 
@@ -1532,4 +1604,26 @@ export const parseChronikTx = (tx, address) => {
         paywallPaymentArticleTxid,
         paywallPayment,
     };
+};
+
+// Retrieves all articles from API
+export const getArticleListing = async () => {
+    let articles;
+    const command = new GetCommand({
+        TableName: process.env.TABLE_NAME,
+        Key: {
+          hash: process.env.MAP_HASH
+        }
+    })
+    try {
+        const response = await docClient.send(command);
+        articles = response.Item.article;
+        if (!Array.isArray(articles)) {
+            articles = [];
+        }
+    } catch (err) {
+        console.log(`Error in getArticleListing: `, err);
+    }
+
+    return articles;
 };
