@@ -393,10 +393,10 @@ export default function TownHall({ address, isMobile }) {
         }
 
         return (
-            <Accordion type="single"  collapsible>
+            <Accordion type="single" defaultValue="item-1" collapsible>
             <AccordionItem value="item-1" className="border-b-0">
                 <AccordionTrigger className="flex-none hover:no-underline mx-auto inline-flex mb-2 items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-primary-background shadow h-9 px-4 py-2">
-                    Show replies&nbsp;
+                    Hide Replies&nbsp;
                 </AccordionTrigger>
                 <AccordionContent className="border-b-0">
                     {foundReplies.map(
