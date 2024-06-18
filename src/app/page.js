@@ -7,6 +7,7 @@ import Townhall from './townhall';
 import Nft from './nft';
 import Article from './article';
 import cashaddr from 'ecashaddrjs';
+import ProfilePanel from './profile';
 import { queryAliasServer } from '../alias/alias-server';
 import { encodeBip21Message, getTweetId } from '../utils/utils';
 import { isMobileDevice } from '../utils/mobileCheck';
@@ -618,7 +619,11 @@ export default function Home() {
                 <User3icon className="h-4 w-4" />
                 </Button>
             )}
-     
+
+            {isLoggedIn && (
+                <ProfilePanel address={address} />
+            )}
+
             {(isMobile && isLoggedIn) ? (
             <div>
                 <Button
