@@ -3,7 +3,6 @@ import  React, { useState, useEffect } from 'react';
 import { appConfig } from '../config/app';
 import { Tooltip, Avatar, Popover, Alert, Modal } from "flowbite-react";
 import { Textarea } from "@/components/ui/textarea";
-import { opReturn as opreturnConfig } from '../config/opreturn';
 import { postHasErrors, replyHasErrors } from '../validation/validation';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator"
@@ -12,7 +11,6 @@ import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitte
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
-import { HiInformationCircle } from "react-icons/hi";
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
 import {
@@ -39,7 +37,14 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion";
-import { getPaginatedHistoryPage, encodeBip21Message, encodeBip21Post, encodeBip21ReplyPost, encodeBip2XecTip, getTweetId } from '../utils/utils';
+import {
+    getPaginatedHistoryPage,
+    encodeBip21Message,
+    encodeBip21Post,
+    encodeBip21ReplyPost,
+    encodeBip2XecTip,
+    getTweetId,
+} from '../utils/utils';
 import {
     getTxHistory,
     getReplyTxDetails,
@@ -304,7 +309,7 @@ export default function TownHall({ address, isMobile }) {
             );
         }
         setReplyPost('');
-        txListener(chronik, address, "Townhall reply sent", appConfig.dustXec, appConfig.townhallAddress, getTownhallHistoryByPage);
+        txListener(chronik, address, "Townhall reply", appConfig.dustXec, appConfig.townhallAddress, getTownhallHistoryByPage);
     };
 
     const MessagePreviewModal = () => {
@@ -405,7 +410,11 @@ export default function TownHall({ address, isMobile }) {
                                 <div className="flex flex-col break-words space-y-1.5 hover:shadow-md border gap-2 mt-2 w-full leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                                     <div className="flex justify-between items-center w-full" key={"townhallReply"+index}>
                                         <div className="flex items-center gap-2">
-                                            <ReplieduseravatarIcon/>
+                                            {foundReply.senderAvatarLink === false ? (
+                                                <ReplieduseravatarIcon/>
+                                            ) : (
+                                                <img src={foundReply.senderAvatarLink}></img>
+                                            )}
                                             <div className="font-medium dark:text-white" onClick={() => {
                                                 copy(foundReply.replyAddress);
                                                 toast(`${foundReply.replyAddress} copied to clipboard`);
@@ -660,7 +669,11 @@ export default function TownHall({ address, isMobile }) {
                                          {tx.replyAddress === address ? (
                                              <>
                                              <div className="flex items-center gap-2">
-                                                 <DefaultavatarIcon/>
+                                                 {tx.senderAvatarLink === false ? (
+                                                    <DefaultavatarIcon/>
+                                                 ) : (
+                                                    <img src={tx.senderAvatarLink}></img>
+                                                 )}
                                                  <Badge variant="outline" className="py-3px">
                                                  <div className="font-medium dark:text-white">
                                                      <div onClick={() => {
@@ -676,7 +689,11 @@ export default function TownHall({ address, isMobile }) {
                                            (<>
                                              <span>
                                                 <div className="flex items-center gap-2">
-                                                    <DefaultavatarIcon/>
+                                                    {tx.senderAvatarLink === false ? (
+                                                        <DefaultavatarIcon/>
+                                                    ) : (
+                                                        <img src={tx.senderAvatarLink}></img>
+                                                    )}
                                                     <Badge variant="outline" className="py-3px shadow-sm hover:bg-accent">
                                                     <div className="leading-7 [&:not(:first-child)]:mt-6">
                                                         <div onClick={() => {

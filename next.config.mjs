@@ -20,6 +20,7 @@ const nextConfig = {
         AWS_REGION: process.env.AWS_REGION,
         TABLE_NAME: process.env.TABLE_NAME,
         MAP_HASH: process.env.MAP_HASH,
+        AVATAR_TABLE_NAME: process.env.AVATAR_TABLE_NAME,
     },
 };
 

@@ -71,7 +71,9 @@ export const mockParsedXecEncryptedSendTxWithOpReturn = {
     "isPaywallPayment": false,
     "paywallPayment": false,
     "paywallPaymentArticleTxid": false,
-    "nftShowcaseId": false
+    "nftShowcaseId": false,
+    "receiverAvatarLink": false,
+    "senderAvatarLink": false
 };
 
 export const mockXecSendTxWithOpReturnTweet = {
@@ -146,7 +148,9 @@ export const mockParsedXecSendTxWithOpReturnTweet = {
     "isPaywallPayment": false,
     "paywallPayment": false,
     "paywallPaymentArticleTxid": false,
-    "nftShowcaseId": false
+    "nftShowcaseId": false,
+    "receiverAvatarLink": false,
+    "senderAvatarLink": false
 };
 
 export const mockXecSendTxWithOpReturnEmoji = {
@@ -217,7 +221,9 @@ export const mockParsedXecSendTxWithOpReturnEmoji = {
     "isPaywallPayment": false,
     "paywallPayment": false,
     "paywallPaymentArticleTxid": false,
-    "nftShowcaseId": false
+    "nftShowcaseId": false,
+    "receiverAvatarLink": false,
+    "senderAvatarLink": false
 };
 
 export const mockXecSendTxWithOpReturnVideo = {
@@ -288,7 +294,9 @@ export const mockParsedXecSendTxWithOpReturnVideo = {
     "isPaywallPayment": false,
     "paywallPayment": false,
     "paywallPaymentArticleTxid": false,
-    "nftShowcaseId": false
+    "nftShowcaseId": false,
+    "receiverAvatarLink": false,
+    "senderAvatarLink": false
 };
 
 export const mockXecSendTxWithOpReturnImage = {
@@ -359,7 +367,9 @@ export const mockParsedXecSendTxWithOpReturnImage = {
     "isPaywallPayment": false,
     "paywallPayment": false,
     "paywallPaymentArticleTxid": false,
-    "nftShowcaseId": false
+    "nftShowcaseId": false,
+    "receiverAvatarLink": false,
+    "senderAvatarLink": false
 };
 
 export const mockXecSendTxWithOpReturn = {
@@ -430,7 +440,9 @@ export const mockParsedXecSendTxWithOpReturn = {
     "isPaywallPayment": false,
     "paywallPayment": false,
     "paywallPaymentArticleTxid": false,
-    "nftShowcaseId": false
+    "nftShowcaseId": false,
+    "receiverAvatarLink": false,
+    "senderAvatarLink": false
 };
 
 export const mockXecSendTxWithOpReturnTownhallPost = {
@@ -506,7 +518,9 @@ export const mockParsedXecSendTxWithOpReturnTownhallPost = {
     "isPaywallPayment": false,
     "paywallPayment": false,
     "paywallPaymentArticleTxid": false,
-    "nftShowcaseId": false
+    "nftShowcaseId": false,
+    "receiverAvatarLink": false,
+    "senderAvatarLink": false
 };
 
 export const mockXecSendTxWithOpReturnTownhallReplyPost = {
@@ -582,7 +596,9 @@ export const mockParsedXecSendTxWithOpReturnTownhallReplyPost = {
     "isPaywallPayment": false,
     "paywallPayment": false,
     "paywallPaymentArticleTxid": false,
-    "nftShowcaseId": false
+    "nftShowcaseId": false,
+    "receiverAvatarLink": false,
+    "senderAvatarLink": false
 };
 
 export const mockXecSendTxWithOpReturnNftShowcase = {
@@ -658,7 +674,9 @@ export const mockParsedXecSendTxWithOpReturnNftShowcase = {
     "isPaywallPayment": false,
     "paywallPayment": false,
     "paywallPaymentArticleTxid": false,
-    "nftShowcaseId": "076fc97838cea01911b1b83e26f5ec5c040e4aed039f24df6e3d076737c43482"
+    "nftShowcaseId": "076fc97838cea01911b1b83e26f5ec5c040e4aed039f24df6e3d076737c43482",
+    "receiverAvatarLink": false,
+    "senderAvatarLink": false
 };
 
 export const mockXecSendTxWithOpReturnArticle = {
@@ -739,7 +757,9 @@ export const mockParsedXecSendTxWithOpReturnArticle = {
     "isArticleReply": false,
     "isPaywallPayment": false,
     "paywallPaymentArticleTxid": false,
-    "paywallPayment": false
+    "paywallPayment": false,
+    "receiverAvatarLink": false,
+    "senderAvatarLink": false
 };
 
 export const mockXecSendTxWithOpReturnArticleReply = {
@@ -806,7 +826,9 @@ export const mockParsedXecSendTxWithOpReturnArticleReply = {
     "isArticleReply": true,
     "isPaywallPayment": false,
     "paywallPaymentArticleTxid": false,
-    "paywallPayment": false
+    "paywallPayment": false,
+    "receiverAvatarLink": false,
+    "senderAvatarLink": false
 };
 
 export const mockXecSendTxWithOpReturnPaywallPayment = {
@@ -900,7 +922,9 @@ export const mockParsedXecSendTxWithOpReturnPaywallPayment = {
     "isArticleReply": false,
     "isPaywallPayment": true,
     "paywallPaymentArticleTxid": "63a7854069594bc211b84a67d374b27e08d0838e0170b04c6314d8d7693aa7d8",
-    "paywallPayment": "10"
+    "paywallPayment": "10",
+    "receiverAvatarLink": false,
+    "senderAvatarLink": false
 };
 
 export const mockXecSendTxWithOpReturnArticleXecTip = {
@@ -971,6 +995,8 @@ export const mockParsedXecSendTxWithOpReturnArticleXecTip = {
     "isArticleReply": false,
     "isPaywallPayment": false,
     "paywallPaymentArticleTxid": false,
-    "paywallPayment": false
+    "paywallPayment": false,
+    "receiverAvatarLink": false,
+    "senderAvatarLink": false
 };
 

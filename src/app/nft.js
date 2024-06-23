@@ -1,12 +1,11 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { getNfts, nftTxListener } from '../chronik/chronik';
+import { getNfts, nftTxListener, addAvatar } from '../chronik/chronik';
 import Image from "next/image";
 import { appConfig } from '../config/app';
 import localforage from 'localforage';
 import { Modal } from "flowbite-react";
-import { formatDate } from "../utils/utils";
-import { encodeBip21NftShowcase } from '../utils/utils';
+import { encodeBip21NftShowcase, formatDate } from '../utils/utils';
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -15,7 +14,8 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-  } from "@/components/ui/card"
+} from "@/components/ui/card";
+import { toast } from 'react-toastify';
 
 export default function Nft( { chronik, address, isMobile } ) {
     const [nftParents, setNftParents] = useState([]);
@@ -109,6 +109,27 @@ export default function Nft( { chronik, address, isMobile } ) {
         nftTxListener(chronik, address, "Wallet updated");
     };
 
+    // Constructs the new avatar object and updated avatar array
+    const setAvatar = async (nftId) => {
+        const latestAvatars = await localforage.getItem(appConfig.localAvatarsParam);
+        const newAvatar = {
+            address: address,
+            link: `${appConfig.tokenIconsUrl}/64/${nftId}.png`,
+        }
+        latestAvatars.push(newAvatar);
+
+        try {
+            await addAvatar(latestAvatars, newAvatar);
+            setShowNftModal(false);
+            toast(`Avatar updated, refreshing app`);
+            setTimeout(function (){
+                window.location.reload();
+            }, 2000);
+        } catch (err) {
+            console.log('Error setting NFT as avatar', err.message);
+        }
+    };
+
     const RenderChildNfts = () => {
         if (!parentNftInFocus) {
             return;
@@ -153,6 +174,9 @@ export default function Nft( { chronik, address, isMobile } ) {
                                     <CardFooter>
                                         <Button onClick={() => { nftShowCasePost(childNftObj.tokenId, '') }}>
                                             Post to townhall
+                                        </Button>
+                                        <Button onClick={() => { setAvatar(childNftObj.tokenId) }}>
+                                            Set as avatar
                                         </Button>
                                     </CardFooter>
                                 </Card>

@@ -1,8 +1,51 @@
 import * as utxolib from '@bitgo/utxo-lib';
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import { chronik as chronikConfig } from '../config/chronik';
+import localforage from 'localforage';
 import { BN } from 'slp-mdm';
+import { appConfig } from '../config/app';
 const SATOSHIS_PER_XEC = 100;
+
+/**
+ * Checks whether an NFT avatar has been set for the given address
+ * @param {string} address the address being checked for any existing NFT avatars
+ * @param {Array} latestAvatars an address to NFT Avatar link mapping
+ * @returns {string | false} Returns the icon server reference if found, otherwise returns false
+ */
+export const getNFTAvatarLink = (address, latestAvatars) => {
+    if (!Array.isArray(latestAvatars)) {
+        return false;
+    }
+    let avatarIndex = latestAvatars.findIndex(thisAvatar => thisAvatar.address === address);
+    if (avatarIndex === -1) {
+        return false;
+    }
+
+    return latestAvatars[avatarIndex].link;
+};
+
+/**
+ * Calculates the total paywall revenue earned by the address in XEC
+ *
+ * @param {string} address the address being checked for the paywall revenue
+ * @param {Array} paywallTxs an array of paywall txs
+ * @returns Revenue earned denominated in XEC and total count of paywall unlocks
+ */
+export const totalPaywallEarnedByAddress = (address, paywallTxs) => {
+    const paywallTxsByAddress = [];
+    let totalPaywallRevenueByAddress = BN(0);
+    for (const paywallTx of paywallTxs) {
+        if (paywallTx.recipientAddress === address) {
+            paywallTxsByAddress.push(paywallTx);
+            totalPaywallRevenueByAddress = totalPaywallRevenueByAddress.plus(BN(paywallTx.paywallPayment));
+        }
+    }
+
+    return {
+        xecEarned: totalPaywallRevenueByAddress.toString(),
+        unlocksEarned: paywallTxsByAddress.length,
+    };
+};
 
 // Slices the full history array based on custom pagination size
 export const getPaginatedHistoryPage = (fullHistoryArray, pageNumber) => {

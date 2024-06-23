@@ -5,18 +5,12 @@ import { getTxHistory, txListener } from '../chronik/chronik';
 import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
 import cashaddr from 'ecashaddrjs';
-import { isValidRecipient, isValidMessage } from '../validation/validation';
+import { isValidRecipient } from '../validation/validation';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { MagnifyingGlassIcon, ResetIcon, Link2Icon, Share1Icon, ArrowRightIcon } from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon, ResetIcon, Link2Icon, Share1Icon } from "@radix-ui/react-icons";
 import {
-    AnonAvatar,
-    ShareIcon,
-    ReplyIcon,
-    SearchIcon,
-    ExportIcon,
-    EncryptionIcon,
     DecryptionIcon,
     MoneyIcon,
     AlitacoffeeIcon,
@@ -24,7 +18,7 @@ import {
     ReplieduseravatarIcon,
     Arrowright2Icon,
 } from "@/components/ui/social";
-import { encodeBip21Message, encodeBip2XecTip, getPaginatedHistoryPage } from '../utils/utils';
+import { encodeBip2XecTip, getPaginatedHistoryPage } from '../utils/utils';
 import {
   Pagination,
   PaginationContent,
@@ -36,7 +30,7 @@ import {
 } from "@/components/ui/pagination"
 import { HiInformationCircle } from "react-icons/hi";
 import { Input } from "@/components/ui/input"
-import { Popover, Avatar, Textarea, Alert, Modal } from "flowbite-react";
+import { Popover, Alert, Modal } from "flowbite-react";
 import {
   Card,
   CardContent,
@@ -63,7 +57,6 @@ const crypto = require('crypto');
 import copy from 'copy-to-clipboard';
 import { toast } from 'react-toastify';
 const chronik = new ChronikClientNode(chronikConfig.urls);
-import { PersonIcon } from '@radix-ui/react-icons';
 
 export default function TxHistory({ address }) {
     const [txHistory, setTxHistory] = useState(''); // current inbox history page
@@ -243,7 +236,11 @@ export default function TxHistory({ address }) {
                               {tx.replyAddress === address ? (
                                   <>
                                   <div className="flex items-center gap-2">
-                                      <DefaultavatarIcon/>
+                                      {tx.senderAvatarLink === false ? (
+                                        <DefaultavatarIcon/>
+                                      ) : (
+                                        <img src={tx.senderAvatarLink}></img>
+                                      )}
                                       <div className="font-medium dark:text-white">
                                           <div onClick={() => {
                                               copy(tx.replyAddress);
@@ -260,7 +257,11 @@ export default function TxHistory({ address }) {
                                 (<>
                                   <span>
                                   <div className="flex items-center gap-2">
-                                      <ReplieduseravatarIcon/>
+                                      {tx.senderAvatarLink === false ? (
+                                        <ReplieduseravatarIcon/>
+                                      ) : (
+                                        <img src={tx.senderAvatarLink}></img>
+                                      )}
                                       <div className="font-medium dark:text-white">
                                           <div onClick={() => {
                                               copy(tx.replyAddress);
@@ -269,7 +270,6 @@ export default function TxHistory({ address }) {
                                         <Badge className="leading-7  py-3px" variant="outline">
                                              {tx.replyAddress.substring(0,8)}...{tx.replyAddress.substring(tx.replyAddress.length - 5)}
                                         </Badge>
-                                            
                                           </div>
                                       </div>
                                       <Popover
@@ -346,7 +346,11 @@ export default function TxHistory({ address }) {
                                {tx.recipientAddress === address ? (
                                     <>
                                         <div className="flex items-center gap-2">
-                                            <DefaultavatarIcon/>
+                                            {tx.receiverAvatarLink === false ? (
+                                              <DefaultavatarIcon/>
+                                            ) : (
+                                              <img src={tx.receiverAvatarLink}></img>
+                                            )}
                                             <div className="font-medium dark:text-white"
                                                 onClick={() => {
                                                    copy(tx.recipientAddress);
@@ -366,7 +370,11 @@ export default function TxHistory({ address }) {
                                  (<>
                                    <span>
                                    <div className="flex items-center gap-2">
-                                       <ReplieduseravatarIcon/>
+                                       {tx.receiverAvatarLink === false ? (
+                                          <ReplieduseravatarIcon/>
+                                        ) : (
+                                          <img src={tx.receiverAvatarLink}></img>
+                                        )}
                                        <div className="font-medium dark:text-white">
                                            <div onClick={() => {
                                                copy(tx.recipientAddress);

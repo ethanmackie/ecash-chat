@@ -9,15 +9,14 @@ import Article from './article';
 import cashaddr from 'ecashaddrjs';
 import ProfilePanel from './profile';
 import { queryAliasServer } from '../alias/alias-server';
-import { encodeBip21Message, getTweetId } from '../utils/utils';
+import { encodeBip21Message, getTweetId, getNFTAvatarLink } from '../utils/utils';
 import { isMobileDevice } from '../utils/mobileCheck';
-import { txListener, refreshUtxos, txListenerOngoing, getArticleListing } from '../chronik/chronik';
+import { txListener, refreshUtxos, txListenerOngoing, getArticleListing, getAvatarListing } from '../chronik/chronik';
 import { appConfig } from '../config/app';
 import { isValidRecipient, messageHasErrors } from '../validation/validation';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import {
@@ -29,7 +28,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
     Card,
     CardContent,
-    CardDescription,
     CardFooter,
     CardHeader,
     CardTitle,
@@ -37,8 +35,6 @@ import {
 import { Button } from "@/components/ui/button"
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -49,17 +45,13 @@ import {
 import QRCode from "react-qr-code";
 import copy from 'copy-to-clipboard';
 import { Tooltip, Tabs, Alert, Modal, Popover } from "flowbite-react";
-import { HiOutlineMail, HiOutlineNewspaper, HiInformationCircle, HiOutlinePhotograph } from "react-icons/hi";
-import { BiSolidNews } from "react-icons/bi";
-import { GiDiscussion, GiAbstract010 } from "react-icons/gi";
-import { IoMdInformationCircleOutline } from "react-icons/io";
+import { HiInformationCircle } from "react-icons/hi";
 import { ToastContainer, toast } from 'react-toastify';
-import { PersonIcon, FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon } from '@radix-ui/react-icons';
+import { FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon } from '@radix-ui/react-icons';
 import 'react-toastify/dist/ReactToastify.css';
-import { YoutubeIcon, DefaultavatarIcon, EcashchatIcon, LoadingSpinner, Home3Icon, File3Icon, Nft3Icon, Inbox3Icon, Send3Icon, Info3icon, User3icon, QrcodeIcon, Logout3Icon } from "@/components/ui/social";
+import { YoutubeIcon, EcashchatIcon, LoadingSpinner, Home3Icon, File3Icon, Nft3Icon, Inbox3Icon, Send3Icon, Info3icon, User3icon, QrcodeIcon, Logout3Icon } from "@/components/ui/social";
 import {
     SendIcon,
-    LogoutIcon,
     EncryptionIcon,
 } from "@/components/ui/social";
 const crypto = require('crypto');
@@ -74,7 +66,6 @@ const packageJson = require('../../package.json');
 import localforage from 'localforage';
 import xecMessage from 'bitcoinjs-message';
 import * as utxolib from '@bitgo/utxo-lib';
-import { User2Icon } from 'lucide-react';
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -104,6 +95,8 @@ export default function Home() {
     const [showLoadingSpinner, setShowLoadingSpinner] = useState(true);
     const [showFullAddress, setShowFullAddress] = useState(false);
     const [showCard, setShowCard] = useState(true);
+    const [userAvatarLink, setUserAvatarLink] = useState(false);
+    const [latestAvatars, setLatestAvatars] = useState([]);
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
@@ -139,6 +132,18 @@ export default function Home() {
             setSharedArticleTxid(sharedArticleParam);
         }
 
+        // Preload the avatars
+        let avatars;
+        (async () => {
+            try {
+                avatars = await getAvatarListing();
+                await localforage.setItem(appConfig.localAvatarsParam, avatars);
+                setLatestAvatars(avatars);
+            } catch (err) {
+                console.log('Error retrieving avatars: ', err);
+            }
+        })();
+
         // Listen for cashtab extension messages on load
         window.addEventListener('message', handleMessage);
 
@@ -161,6 +166,13 @@ export default function Home() {
         // Listens for all mempool events for this address and silently
         // updates XEC balance in the background
         txListenerOngoing(chronik, address, setXecBalance);
+
+        (async () => {
+            const latestAvatars = await localforage.getItem(appConfig.localAvatarsParam);
+            setUserAvatarLink(
+                getNFTAvatarLink(address, latestAvatars),
+            );
+        })();
     }, [address]);
 
     // Parse for an address from cashtab
@@ -621,7 +633,7 @@ export default function Home() {
             )}
 
             {isLoggedIn && (
-                <ProfilePanel address={address} />
+                <ProfilePanel address={address} avatarLink={userAvatarLink} />
             )}
 
             {(isMobile && isLoggedIn) ? (
@@ -957,11 +969,11 @@ export default function Home() {
                   </Tabs.Item>
               )}
 
-              <Tabs.Item title="Town Hall" icon={Home3Icon} >
+              <Tabs.Item title="Town Hall" active icon={Home3Icon} >
                   <Townhall address={address} isMobile={isMobile} />
               </Tabs.Item>
 
-              <Tabs.Item title="Articles" active icon={File3Icon} >
+              <Tabs.Item title="Articles" icon={File3Icon} >
                 <Article chronik={chronik} address={address} isMobile={isMobile} sharedArticleTxid={sharedArticleTxid} />
               </Tabs.Item>
 
