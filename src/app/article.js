@@ -795,8 +795,9 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             </AlertDescription>
                             </Alert>
                         )}
+                        <div className="line-clamp-3">
                         <p
-                            className={`mt-0 line-clamp-3 text-sm leading-6 text-gray-600 break-words max-h-80 ${
+                            className={`mt-0 text-sm leading-6 text-gray-600 break-words max-h-80 ${
                             tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) ? 'blur-sm pt-6' : ''
                             }`}
                         >
@@ -810,6 +811,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             <RenderArticle content={tx.articleObject.content} />
                             )}
                         </p>
+                        </div>
                         </CardContent>
                             <CardFooter>
                                 <div className="relative mt-2 flex items-center gap-x-4">
