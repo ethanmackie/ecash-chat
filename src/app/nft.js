@@ -7,6 +7,7 @@ import localforage from 'localforage';
 import { Modal } from "flowbite-react";
 import { encodeBip21NftShowcase, formatDate } from '../utils/utils';
 import { Button } from "@/components/ui/button";
+import { MagicIcon} from "@/components/ui/social";
 import {
     Card,
     CardContent,
@@ -15,6 +16,14 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+  } from "@/components/ui/dropdown-menu";
 import { toast } from 'react-toastify';
 
 export default function Nft( { chronik, address, isMobile } ) {
@@ -172,12 +181,22 @@ export default function Nft( { chronik, address, isMobile } ) {
                                         />
                                     </CardContent>
                                     <CardFooter>
-                                        <Button onClick={() => { nftShowCasePost(childNftObj.tokenId, '') }}>
-                                            Post to townhall
-                                        </Button>
-                                        <Button onClick={() => { setAvatar(childNftObj.tokenId) }}>
-                                            Set as avatar
-                                        </Button>
+                                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button aria-haspopup="true" variant="outline">
+                                Action
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem onClick={() => { nftShowCasePost(childNftObj.tokenId, '') }}>
+                                Post to townhall
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { setAvatar(childNftObj.tokenId) }}>
+                                Set as avatar
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                                     </CardFooter>
                                 </Card>
                             ))}
