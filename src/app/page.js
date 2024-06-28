@@ -969,11 +969,11 @@ export default function Home() {
                   </Tabs.Item>
               )}
 
-              <Tabs.Item title="Town Hall" active icon={Home3Icon} >
+              <Tabs.Item title="Town Hall" icon={Home3Icon} >
                   <Townhall address={address} isMobile={isMobile} />
               </Tabs.Item>
 
-              <Tabs.Item title="Articles" icon={File3Icon} >
+              <Tabs.Item title="Articles" active icon={File3Icon} >
                 <Article chronik={chronik} address={address} isMobile={isMobile} sharedArticleTxid={sharedArticleTxid} />
               </Tabs.Item>
 
