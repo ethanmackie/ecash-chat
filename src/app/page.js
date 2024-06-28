@@ -633,7 +633,11 @@ export default function Home() {
             )}
 
             {isLoggedIn && (
-                <ProfilePanel address={address} avatarLink={userAvatarLink} />
+                <ProfilePanel
+                    address={address}
+                    avatarLink={userAvatarLink}
+                    xecBalance={xecBalance}
+                />
             )}
 
             {(isMobile && isLoggedIn) ? (

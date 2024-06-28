@@ -27,7 +27,7 @@ import { totalPaywallEarnedByAddress } from '../utils/utils';
 import { DefaultavatarsmallIcon, DefaultavatarIcon, GraphchartIcon} from "@/components/ui/social";
 import localforage from 'localforage';
 
-export default function ProfilePanel({ address, avatarLink }) {
+export default function ProfilePanel({ address, avatarLink, xecBalance }) {
     const [paywallRevenueXec, setPaywallRevenueXec] = useState('');
     const [paywallRevenueCount, setPaywallRevenueCount] = useState('');
     
@@ -80,7 +80,7 @@ export default function ProfilePanel({ address, avatarLink }) {
                 <CardContent>
                 <CardTitle>Balance</CardTitle>
                         <CardDescription className="max-w-lg break-words text-balance leading-relaxed">
-                        Placeholder
+                        {xecBalance} XEC
                         </CardDescription>
                         </CardContent>
                 </Card> 
