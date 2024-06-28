@@ -420,7 +420,7 @@ export default function TownHall({ address, isMobile }) {
                                         ) : (
                                             <Avatar className="h-9 w-9">
                                             <AvatarImage src={foundReply.senderAvatarLink} alt="User Avatar" />
-                                            <AvatarFallback>CN</AvatarFallback>
+                                            <AvatarFallback><DefaultavatarIcon/></AvatarFallback>
                                             </Avatar>
                                         )}
                                         <div
@@ -685,7 +685,7 @@ export default function TownHall({ address, isMobile }) {
                                                 ) : (
                                                     <Avatar className="h-9 w-9">
                                                         <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
-                                                        <AvatarFallback>CN</AvatarFallback>
+                                                        <AvatarFallback><DefaultavatarIcon/></AvatarFallback>
                                                     </Avatar>
                                                 )}
                                                 <Badge variant="outline" className="py-3px shadow-sm hover:bg-accent">
@@ -709,7 +709,7 @@ export default function TownHall({ address, isMobile }) {
                                                     ) : (
                                                         <Avatar className="h-9 w-9">
                                                         <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
-                                                        <AvatarFallback>CN</AvatarFallback>
+                                                        <AvatarFallback><DefaultavatarIcon/></AvatarFallback>
                                                        </Avatar>
                                                     )}
                                                     <Badge variant="outline" className="py-3px shadow-sm hover:bg-accent">

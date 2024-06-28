@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import {
     Sheet,
     SheetContent,
+    SheetTitle,
     SheetDescription,
     SheetHeader,
     SheetTrigger,
@@ -23,7 +24,7 @@ import {
 import { appConfig } from '../config/app';
 import { AnonAvatar } from "@/components/ui/social";
 import { totalPaywallEarnedByAddress } from '../utils/utils';
-import { DefaultavatarsmallIcon} from "@/components/ui/social";
+import { DefaultavatarsmallIcon, DefaultavatarIcon, GraphchartIcon} from "@/components/ui/social";
 import localforage from 'localforage';
 
 export default function ProfilePanel({ address, avatarLink }) {
@@ -52,9 +53,12 @@ export default function ProfilePanel({ address, avatarLink }) {
         </SheetTrigger>
         <SheetContent>
             <SheetHeader>
-            <SheetDescription>
-
-              <Card className="mt-2"> 
+            <SheetTitle>Profile</SheetTitle>
+          <SheetDescription>
+            Your Profile panel.
+          </SheetDescription>
+            </SheetHeader>
+            <Card className="mt-2"> 
               <CardHeader>
             <div className="flex items-center">
                     <div>
@@ -63,27 +67,27 @@ export default function ProfilePanel({ address, avatarLink }) {
                             ) : (
                                 <Avatar className="h-9 w-9">
                                 <AvatarImage src={avatarLink} alt="User Avatar" />
-                                <AvatarFallback>CN</AvatarFallback>
+                                <AvatarFallback><DefaultavatarIcon/></AvatarFallback>
                             </Avatar>
                             )}
                     </div>
                     <div className="ml-3">
-                    <p className="font-semibold leading-none tracking-tight ">Your Address：</p>
-                    <p className="text-sm text-muted-foreground max-w-lg break-words text-balance leading-relaxed">Alitatest</p>
+                    <p className="font-semibold leading-none tracking-tight ">Address</p>
+                    <p className="text-sm text-muted-foreground max-w-lg break-words text-balance leading-relaxed">{address ? `${address.substring(0, 11)}...${address.substring(address.length - 5)}` : ''}</p>
                     </div>
                 </div>
                 </CardHeader>
                 <CardContent>
-                <CardTitle>Your Address：</CardTitle>
+                <CardTitle>Balance</CardTitle>
                         <CardDescription className="max-w-lg break-words text-balance leading-relaxed">
-                        {address}
+                        Placeholder
                         </CardDescription>
                         </CardContent>
                 </Card> 
-
                 <Card className="mt-2">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Incomes</CardTitle>
+                    <GraphchartIcon className="text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">+{paywallRevenueXec} XEC</div>
@@ -94,15 +98,13 @@ export default function ProfilePanel({ address, avatarLink }) {
                 <Card className="mt-2">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Unlocks</CardTitle>
+                    <GraphchartIcon className="text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">+{paywallRevenueCount} </div>
                     <p className="text-xs text-muted-foreground">Total Paywall Unlocks Earned</p>
                 </CardContent>
                 </Card>
-
-            </SheetDescription>
-            </SheetHeader>
         </SheetContent>
         </Sheet>
         </button>
