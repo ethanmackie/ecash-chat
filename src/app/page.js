@@ -579,7 +579,7 @@ export default function Home() {
 
     return (
         <>
-        <ToastContainer />
+        <ToastContainer autoClose={appConfig.toastDuration} />
 
         {openSaveLoginModal === true && (
             <RenderSaveLoginModal />
