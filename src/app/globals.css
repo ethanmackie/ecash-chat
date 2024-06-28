@@ -97,6 +97,10 @@
   padding-bottom: 0.1875rem; 
 }
 
+.wmde-markdown {
+ color: black !important;
+ font-family: '__Inter_aaf875', '__Inter_Fallback_aaf875' !important;
+}
 .md-editor.wmde-markdown-var {
   border-radius: 8px !important; 
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
