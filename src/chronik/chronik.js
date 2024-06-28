@@ -19,6 +19,8 @@ const dbClient = new DynamoDBClient({
 });
 const docClient = DynamoDBDocumentClient.from(dbClient);
 
+// TODO: add mock-chronik-client to enable unit tests for chronik endpoints
+
 // Retrieves tx history via chronik, parses the response into formatted
 // objects and filter out eToken or non-msg txs
 export const getTxHistory = async (chronik, address, page = 0) => {
@@ -37,6 +39,12 @@ export const getTxHistory = async (chronik, address, page = 0) => {
     const txHistoryPromises = [];
     if (firstTxHistoryPage && firstTxHistoryPage.numPages > 1) {
         for (let i = 1; i < firstTxHistoryPage.numPages; i += 1) {
+            // As txs increase, tx retrieval with no cap will increasingly take longer as Chronik indexes more pages to be returned.
+            // Adding this cap to improve app loading times whilst still keeping enough txs coming through.
+            // i.e. cap of 3 chronik pages of 200 txs each = 600 txs, in the frontend that's 600 / 25 = 24 paginated UI pages.
+            if (i > chronikConfig.chronikHistoryPageCap) {
+                break;
+            }
             const thisTxHistoryPromise = new Promise((resolve, reject) => {
                 chronik
                 .address(
