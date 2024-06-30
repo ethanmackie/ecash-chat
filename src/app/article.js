@@ -46,6 +46,7 @@ import {
     txListener,
     articleTxListener,
     paywallTxListener,
+    refreshUtxos,
 } from '../chronik/chronik';
 import {
     encodeBip21Article,
@@ -84,7 +85,7 @@ import DOMPurify from 'dompurify';
 import MarkdownEditor from '@uiw/react-markdown-editor';
 import { getStackArray } from 'ecash-script';
 
-export default function Article( { chronik, address, isMobile, sharedArticleTxid } ) {
+export default function Article( { chronik, address, isMobile, sharedArticleTxid, setXecBalance } ) {
     const [articleHistory, setArticleHistory] = useState('');  // current article history page
     const [fullArticleHistory, setFullArticleHistory] = useState('');  // current article history page
     const [articleTitle, setArticleTitle] = useState(''); // title of the article being drafted
@@ -174,6 +175,9 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 }
             }
             setIsLoading(false);
+
+            const updatedCache = await refreshUtxos(chronik, address);
+            setXecBalance(updatedCache.xecBalance);
         })();
     }, []);
 

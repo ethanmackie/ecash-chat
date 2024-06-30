@@ -154,10 +154,6 @@ export default function Home() {
         if (address === '') {
             return;
         }
-        (async () => {
-            const updatedCache = await refreshUtxos(chronik, address);
-            setXecBalance(updatedCache.xecBalance);
-        })();
 
         if (!savedLogin) {
             setOpenSaveLoginModal(true);
@@ -973,12 +969,12 @@ export default function Home() {
                   </Tabs.Item>
               )}
 
-              <Tabs.Item title="Town Hall" icon={Home3Icon} >
+              <Tabs.Item title="Town Hall" active icon={Home3Icon} >
                   <Townhall address={address} isMobile={isMobile} />
               </Tabs.Item>
 
-              <Tabs.Item title="Articles" active icon={File3Icon} >
-                <Article chronik={chronik} address={address} isMobile={isMobile} sharedArticleTxid={sharedArticleTxid} />
+              <Tabs.Item title="Articles" icon={File3Icon} >
+                <Article chronik={chronik} address={address} isMobile={isMobile} sharedArticleTxid={sharedArticleTxid} setXecBalance={setXecBalance} />
               </Tabs.Item>
 
               <Tabs.Item title="NFTs" icon={Nft3Icon} >
