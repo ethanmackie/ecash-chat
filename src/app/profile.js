@@ -86,7 +86,7 @@ export default function ProfilePanel({ address, avatarLink, xecBalance }) {
                 </Card> 
                 <Card className="mt-2">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Incomes</CardTitle>
+                    <CardTitle className="text-sm font-medium">Income</CardTitle>
                     <GraphchartIcon className="text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
