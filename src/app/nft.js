@@ -28,6 +28,7 @@ import { toast } from 'react-toastify';
 
 export default function Nft( { chronik, address, isMobile } ) {
     const [nftParents, setNftParents] = useState([]);
+    const [nftChilds, setNftChilds] = useState([]);
     const [showNftModal, setShowNftModal] = useState(false);
     const [parentNftInFocus, setParentNftInFocus] = useState(null);
     const [fullNfts, setFullNfts] = useState([]);
@@ -89,6 +90,7 @@ export default function Nft( { chronik, address, isMobile } ) {
             }
             setFullNfts(thisFullNfts);
             setNftParents(chatCache.parentNftList);
+            setNftChilds(chatCache.childNftList);
         })();
     }, []);
 
@@ -150,6 +152,14 @@ export default function Nft( { chronik, address, isMobile } ) {
         });
         const childNftObjs = filteredChildNfts[0].childNft;
 
+        const childNftsObjsOwned = [];
+        for (const thisChildNft of childNftObjs) {
+            const childNftOwnedByWallet = nftChilds.find(nft => nft.token.tokenId === thisChildNft.tokenId);
+            if (typeof childNftOwnedByWallet !== 'undefined') {
+                childNftsObjsOwned.push(thisChildNft);
+            }
+        }
+
         return (
             <>
                 {/* Child NFT modal */}
@@ -162,7 +172,7 @@ export default function Nft( { chronik, address, isMobile } ) {
                     </Modal.Header>
                     <Modal.Body>
                         <div className="grid md:grid-cols-2 grid-cols-1 max-w-xl gap-2 mx-auto">
-                            {childNftObjs && childNftObjs.length > 0 && childNftObjs.map((childNftObj, index) => (
+                            {childNftsObjsOwned && childNftsObjsOwned.length > 0 && childNftsObjsOwned.map((childNftObj, index) => (
                                 <Card key={childNftObj.tokenId + index}
                                 className="transition-shadow duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50"
                                 >
