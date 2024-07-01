@@ -90,7 +90,7 @@ export default function ProfilePanel({ address, avatarLink, xecBalance }) {
                     <GraphchartIcon className="text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">+{paywallRevenueXec} XEC</div>
+                    <div className="text-2xl font-bold">+{paywallRevenueXec ? paywallRevenueXec : 0} XEC</div>
                     <p className="text-xs text-muted-foreground">Total Paywall Revenue Earned</p>
                 </CardContent>
                 </Card>
@@ -101,7 +101,7 @@ export default function ProfilePanel({ address, avatarLink, xecBalance }) {
                     <GraphchartIcon className="text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">+{paywallRevenueCount} </div>
+                    <div className="text-2xl font-bold">+{paywallRevenueCount ? paywallRevenueCount : 0} </div>
                     <p className="text-xs text-muted-foreground">Total Paywall Unlocks Earned</p>
                 </CardContent>
                 </Card>
