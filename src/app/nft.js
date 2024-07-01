@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { getNfts, nftTxListener, addAvatar } from '../chronik/chronik';
+import { getNfts, nftTxListener, addAvatar, updateAvatars } from '../chronik/chronik';
 import Image from "next/image";
 import { appConfig } from '../config/app';
 import localforage from 'localforage';
@@ -26,7 +26,7 @@ import {
   } from "@/components/ui/dropdown-menu";
 import { toast } from 'react-toastify';
 
-export default function Nft( { chronik, address, isMobile } ) {
+export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) {
     const [nftParents, setNftParents] = useState([]);
     const [nftChilds, setNftChilds] = useState([]);
     const [showNftModal, setShowNftModal] = useState(false);
@@ -133,6 +133,7 @@ export default function Nft( { chronik, address, isMobile } ) {
             await addAvatar(latestAvatars, newAvatar);
             setShowNftModal(false);
             toast(`Avatar updated, refreshing app`);
+            updateAvatars(setLatestAvatars);
             setTimeout(function (){
                 window.location.reload();
             }, 2000);

@@ -254,6 +254,22 @@ export const getArticleHistory = async (chronik, address, page = 0) => {
 };
 
 /**
+ * Retrieves the latest avatars from off-chain source and stores in localforage
+ * Note: callback function used here so other components can trigger a refresh of avatars upon setting a new NFT
+ *
+ * @param {Callback fn} setLatestAvatars the callback function to update local state with the latest avatars
+ */
+export const updateAvatars = async (setLatestAvatars) => {
+    try {
+        const avatars = await getAvatarListing();
+        await localforage.setItem(appConfig.localAvatarsParam, avatars);
+        setLatestAvatars(avatars);
+    } catch (err) {
+        console.log('Error retrieving avatars: ', err);
+    }
+};
+
+/**
  * Refreshes the app's utxos, XEC balance and NFT collection
  * @param {string} chronik the chronik-client instance
  * @param {string} address the eCash address of the active wallet

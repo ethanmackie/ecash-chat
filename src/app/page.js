@@ -11,7 +11,7 @@ import ProfilePanel from './profile';
 import { queryAliasServer } from '../alias/alias-server';
 import { encodeBip21Message, getTweetId, getNFTAvatarLink } from '../utils/utils';
 import { isMobileDevice } from '../utils/mobileCheck';
-import { txListener, refreshUtxos, txListenerOngoing, getArticleListing, getAvatarListing } from '../chronik/chronik';
+import { txListener, refreshUtxos, txListenerOngoing, getArticleListing, getAvatarListing, updateAvatars } from '../chronik/chronik';
 import { appConfig } from '../config/app';
 import { isValidRecipient, messageHasErrors } from '../validation/validation';
 import data from '@emoji-mart/data';
@@ -136,9 +136,7 @@ export default function Home() {
         let avatars;
         (async () => {
             try {
-                avatars = await getAvatarListing();
-                await localforage.setItem(appConfig.localAvatarsParam, avatars);
-                setLatestAvatars(avatars);
+                await updateAvatars(setLatestAvatars);
             } catch (err) {
                 console.log('Error retrieving avatars: ', err);
             }
@@ -978,7 +976,7 @@ export default function Home() {
               </Tabs.Item>
 
               <Tabs.Item title="NFTs" icon={Nft3Icon} >
-                  <Nft chronik={chronik} address={address} isMobile={isMobile} />
+                  <Nft chronik={chronik} address={address} isMobile={isMobile} setLatestAvatars={setLatestAvatars} />
               </Tabs.Item>
 
               <Tabs.Item title="About" icon={Info3icon} >
