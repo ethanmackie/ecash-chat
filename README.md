@@ -7,7 +7,7 @@
 - Direct wallet to wallet and an all-in townhall forum
 - Message encryption option via AES 256 CBC algorithm
 - Full length articles with paywall functionality
-- NFT showcase
+- NFT showcase and use as avatars
 - Displays only messaging transactions
 - Real time address specific filtering
 - XEC Tipping on addresses

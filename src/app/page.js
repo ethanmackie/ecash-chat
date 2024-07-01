@@ -991,7 +991,7 @@ export default function Home() {
                         <li>Direct wallet to wallet and an all-in townhall forum</li>
                         <li>Full length blogging facility with paywall option</li>
                         <li>Message encryption option via AES 256 CBC algorithm</li>
-                        <li>NFT Showcases</li>
+                        <li>NFT Showcases and use as avatars</li>
                         <li>Displays only messaging transactions</li>
                         <li>Real time address specific filtering</li>
                         <li>XEC Tipping on addresses</li>
@@ -1006,7 +1006,7 @@ export default function Home() {
                           <li><b>Send Message</b>: send public messages to another wallet</li>
                           <li><b>Townhall</b>: public onchain discussion forum</li>
                           <li><b>Articles</b>: write full length articles with paywall option</li>
-                          <li><b>NFTs</b>: browse and showcase your NFTs</li>
+                          <li><b>NFTs</b>: browse and showcase your NFTs and set as your avatar</li>
                       </ul>
                       <br />
                       <h2 className="mt-4 scroll-m-20 text-2xl font-semibold tracking-tight">Support:</h2>
