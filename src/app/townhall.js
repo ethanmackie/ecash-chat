@@ -1,18 +1,21 @@
 "use client";
 import  React, { useState, useEffect } from 'react';
 import { appConfig } from '../config/app';
-import { Tooltip, Avatar, Popover, Alert, Modal } from "flowbite-react";
+import { Tooltip, Popover, Alert, Modal } from "flowbite-react";
 import { Textarea } from "@/components/ui/textarea";
-import { opReturn as opreturnConfig } from '../config/opreturn';
 import { postHasErrors, replyHasErrors } from '../validation/validation';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator"
+import {
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
+  } from "@/components/ui/avatar";
 import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon, YoutubeIcon, AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon } from "@/components/ui/social";
 import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon, ChatBubbleIcon, Share1Icon } from '@radix-ui/react-icons';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
-import { HiInformationCircle } from "react-icons/hi";
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
 import {
@@ -39,7 +42,14 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion";
-import { getPaginatedHistoryPage, encodeBip21Message, encodeBip21Post, encodeBip21ReplyPost, encodeBip2XecTip, getTweetId } from '../utils/utils';
+import {
+    getPaginatedHistoryPage,
+    encodeBip21Message,
+    encodeBip21Post,
+    encodeBip21ReplyPost,
+    encodeBip2XecTip,
+    getTweetId,
+} from '../utils/utils';
 import {
     getTxHistory,
     getReplyTxDetails,
@@ -304,7 +314,7 @@ export default function TownHall({ address, isMobile }) {
             );
         }
         setReplyPost('');
-        txListener(chronik, address, "Townhall reply sent", appConfig.dustXec, appConfig.townhallAddress, getTownhallHistoryByPage);
+        txListener(chronik, address, "Townhall reply", appConfig.dustXec, appConfig.townhallAddress, getTownhallHistoryByPage);
     };
 
     const MessagePreviewModal = () => {
@@ -404,17 +414,27 @@ export default function TownHall({ address, isMobile }) {
                             <>
                                 <div className="flex flex-col break-words space-y-1.5 hover:shadow-md border gap-2 mt-2 w-full leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                                     <div className="flex justify-between items-center w-full" key={"townhallReply"+index}>
-                                        <div className="flex items-center gap-2">
-                                            <ReplieduseravatarIcon/>
-                                            <div className="font-medium dark:text-white" onClick={() => {
-                                                copy(foundReply.replyAddress);
-                                                toast(`${foundReply.replyAddress} copied to clipboard`);
-                                            }}>
-                                                <Badge className="leading-7 [&:not(:first-child)]:mt-6 py-3px" variant="outline">
-                                                    {foundReply.replyAddress.substring(0,10) + '...' + foundReply.replyAddress.substring(foundReply.replyAddress.length - 5)}
-                                                </Badge>
-                                            </div>
-                                            <RenderTipping address={foundReply.replyAddress} />
+                                    <div className="flex items-center gap-2">
+                                        {foundReply.senderAvatarLink === false ? (
+                                            <ReplieduseravatarIcon />
+                                        ) : (
+                                            <Avatar className="h-9 w-9">
+                                            <AvatarImage src={foundReply.senderAvatarLink} alt="User Avatar" />
+                                            <AvatarFallback><DefaultavatarIcon/></AvatarFallback>
+                                            </Avatar>
+                                        )}
+                                        <div
+                                            className="font-medium dark:text-white"
+                                            onClick={() => {
+                                            copy(foundReply.replyAddress);
+                                            toast(`${foundReply.replyAddress} copied to clipboard`);
+                                            }}
+                                        >
+                                            <Badge className="leading-7 shadow-sm hover:bg-accent [&:not(:first-child)]:mt-6 py-3px" variant="outline" >
+                                            {foundReply.replyAddress.substring(0, 10) + '...' + foundReply.replyAddress.substring(foundReply.replyAddress.length - 5)}
+                                            </Badge>
+                                        </div>
+                                        <RenderTipping address={foundReply.replyAddress} />
                                         </div>
                                     </div>
                                     <div className="py-2 leading-7">
@@ -659,24 +679,39 @@ export default function TownHall({ address, isMobile }) {
                                       <span>
                                          {tx.replyAddress === address ? (
                                              <>
-                                             <div className="flex items-center gap-2">
-                                                 <DefaultavatarIcon/>
-                                                 <Badge variant="outline" className="py-3px">
-                                                 <div className="font-medium dark:text-white">
-                                                     <div onClick={() => {
-                                                         copy(tx.replyAddress);
-                                                         toast(`${tx.replyAddress} copied to clipboard`);
-                                                     }}
-                                                     >Your wallet</div>
-                                                 </div>
-                                                 </Badge>
-                                             </div>
+                                           <div className="flex items-center gap-2">
+                                                {tx.senderAvatarLink === false ? (
+                                                    <DefaultavatarIcon />
+                                                ) : (
+                                                    <Avatar className="h-9 w-9">
+                                                        <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
+                                                        <AvatarFallback><DefaultavatarIcon/></AvatarFallback>
+                                                    </Avatar>
+                                                )}
+                                                <Badge variant="outline" className="py-3px shadow-sm hover:bg-accent">
+                                                    <div className="font-medium leading-7 dark:text-white">
+                                                        <div onClick={() => {
+                                                            copy(tx.replyAddress);
+                                                            toast(`${tx.replyAddress} copied to clipboard`);
+                                                        }}>
+                                                            Your wallet
+                                                        </div>
+                                                    </div>
+                                                </Badge>
+                                            </div>
                                              </>
                                          ) :
                                            (<>
                                              <span>
                                                 <div className="flex items-center gap-2">
-                                                    <DefaultavatarIcon/>
+                                                    {tx.senderAvatarLink === false ? (
+                                                        <DefaultavatarIcon/>
+                                                    ) : (
+                                                        <Avatar className="h-9 w-9">
+                                                        <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
+                                                        <AvatarFallback><DefaultavatarIcon/></AvatarFallback>
+                                                       </Avatar>
+                                                    )}
                                                     <Badge variant="outline" className="py-3px shadow-sm hover:bg-accent">
                                                     <div className="leading-7 [&:not(:first-child)]:mt-6">
                                                         <div onClick={() => {

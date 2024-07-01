@@ -3,7 +3,7 @@ import { chronik as chronikConfig } from '../config/chronik';
 import cashaddr from 'ecashaddrjs';
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import { appConfig } from '../config/app';
-import { formatDate, toXec } from '../utils/utils';
+import { formatDate, toXec, getNFTAvatarLink } from '../utils/utils';
 import { getStackArray } from 'ecash-script';
 import { BN } from 'slp-mdm';
 import { toast } from 'react-toastify';
@@ -30,6 +30,8 @@ export const getTxHistory = async (chronik, address, page = 0) => {
     ) {
         return;
     }
+
+    const latestAvatars = await localforage.getItem(appConfig.localAvatarsParam);
 
     // Retrieve first chronik page of tx history txs
     let firstTxHistoryPage = await chronik.address(address).history(page, chronikConfig.txHistoryPageSize);
@@ -80,6 +82,7 @@ export const getTxHistory = async (chronik, address, page = 0) => {
         const parsedTx = parseChronikTx(
             totalTxlHistoryTxs[i],
             address,
+            latestAvatars,
         );
 
         if (parsedTx.replyTxid) {
@@ -200,12 +203,14 @@ export const getArticleHistory = async (chronik, address, page = 0) => {
         }
 
         // Parse standard eCash Chat actions
+        const latestAvatars = await localforage.getItem(appConfig.localAvatarsParam);
         const parsedTxs = [];
         const replyTxs = [];
         for (let i = 0; i < totalTxlHistoryTxs.length; i += 1) {
             const parsedTx = parseChronikTx(
                 totalTxlHistoryTxs[i],
                 address,
+                latestAvatars,
             );
 
             // Separate out the replies so they can be rendered underneath the main posts
@@ -248,6 +253,21 @@ export const getArticleHistory = async (chronik, address, page = 0) => {
     }
 };
 
+/**
+ * Retrieves the latest avatars from off-chain source and stores in localforage
+ * Note: callback function used here so other components can trigger a refresh of avatars upon setting a new NFT
+ *
+ * @param {Callback fn} setLatestAvatars the callback function to update local state with the latest avatars
+ */
+export const updateAvatars = async (setLatestAvatars) => {
+    try {
+        const avatars = await getAvatarListing();
+        await localforage.setItem(appConfig.localAvatarsParam, avatars);
+        setLatestAvatars(avatars);
+    } catch (err) {
+        console.log('Error retrieving avatars: ', err);
+    }
+};
 
 /**
  * Refreshes the app's utxos, XEC balance and NFT collection
@@ -1142,7 +1162,7 @@ export const parseMediaTags = (opReturn) => {
 };
 
 // Parses a single chronik transaction
-export const parseChronikTx = (tx, address) => {
+export const parseChronikTx = (tx, address, latestAvatars = false) => {
     const { hash } = cashaddr.decode(address, true);
     const { inputs, outputs } = tx;
     // Assign defaults
@@ -1182,6 +1202,8 @@ export const parseChronikTx = (tx, address) => {
     let isPaywallPayment = false;
     let paywallPaymentArticleTxid = false;
     let paywallPayment = false;
+    let senderAvatarLink = false;
+    let receiverAvatarLink = false;
 
     if (tx.isCoinbase) {
         // Note that coinbase inputs have `undefined` for `thisInput.outputScript`
@@ -1543,6 +1565,11 @@ export const parseChronikTx = (tx, address) => {
         ).toLocaleTimeString();
     }
 
+    if (latestAvatars) {
+        senderAvatarLink = getNFTAvatarLink(replyAddress, latestAvatars);
+	    receiverAvatarLink = getNFTAvatarLink(recipientAddress, latestAvatars);
+    }
+
     // Return eToken specific fields if eToken tx
     if (isEtokenTx) {
         return {
@@ -1577,6 +1604,8 @@ export const parseChronikTx = (tx, address) => {
             isPaywallPayment,
             paywallPaymentArticleTxid,
             paywallPayment,
+            senderAvatarLink,
+            receiverAvatarLink,
         };
     }
     // Otherwise do not include these fields
@@ -1611,6 +1640,8 @@ export const parseChronikTx = (tx, address) => {
         isPaywallPayment,
         paywallPaymentArticleTxid,
         paywallPayment,
+        senderAvatarLink,
+        receiverAvatarLink,
     };
 };
 
@@ -1634,4 +1665,53 @@ export const getArticleListing = async () => {
     }
 
     return articles;
+};
+
+// Retrieves all avatar references from API
+export const getAvatarListing = async () => {
+    let avatars;
+    const command = new GetCommand({
+        TableName: process.env.AVATAR_TABLE_NAME,
+        Key: {
+            avatarlist: process.env.MAP_HASH
+        }
+    })
+    try {
+        const response = await docClient.send(command);
+        avatars = response.Item.avatar.reverse();
+    } catch (err) {
+        console.log(`Error in getAvatarListing: `, err.message);
+    }
+
+    return avatars;
+};
+
+/**
+ * Adds the avatar listing via API
+ *
+ * @param {Array} updatedAvatars an array of address to avatar NFT ID mappings
+ * @param {Object} newAvatar an object containing the new avatar's address to link mapping
+ */
+export const addAvatar = async (updatedAvatars, newAvatar) => {
+    try {
+        const command = new UpdateCommand({
+            TableName: process.env.AVATAR_TABLE_NAME,
+            Key: {
+              avatarlist: process.env.MAP_HASH
+            },
+            UpdateExpression: "SET #avatar = list_append(#avatar, :avatar)",
+            ExpressionAttributeValues: {
+                ":avatar": [newAvatar],
+            },
+            ExpressionAttributeNames: {
+                "#avatar": 'avatar',
+            },
+            ReturnValues: "ALL_NEW",
+        })
+        await docClient.send(command);
+        await localforage.setItem(appConfig.localAvatarsParam, updatedAvatars);
+    } catch (err) {
+        toast(`Error updating avatar, please try again`);
+        console.log('setAvatar: error committing avatar reference to DB', err.message);
+    }
 };

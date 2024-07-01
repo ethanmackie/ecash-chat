@@ -1,13 +1,13 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { getNfts, nftTxListener } from '../chronik/chronik';
+import { getNfts, nftTxListener, addAvatar, updateAvatars } from '../chronik/chronik';
 import Image from "next/image";
 import { appConfig } from '../config/app';
 import localforage from 'localforage';
 import { Modal } from "flowbite-react";
-import { formatDate } from "../utils/utils";
-import { encodeBip21NftShowcase } from '../utils/utils';
+import { encodeBip21NftShowcase, formatDate } from '../utils/utils';
 import { Button } from "@/components/ui/button";
+import { MagicIcon} from "@/components/ui/social";
 import {
     Card,
     CardContent,
@@ -15,10 +15,20 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-  } from "@/components/ui/card"
+} from "@/components/ui/card";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+  } from "@/components/ui/dropdown-menu";
+import { toast } from 'react-toastify';
 
-export default function Nft( { chronik, address, isMobile } ) {
+export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) {
     const [nftParents, setNftParents] = useState([]);
+    const [nftChilds, setNftChilds] = useState([]);
     const [showNftModal, setShowNftModal] = useState(false);
     const [parentNftInFocus, setParentNftInFocus] = useState(null);
     const [fullNfts, setFullNfts] = useState([]);
@@ -80,6 +90,7 @@ export default function Nft( { chronik, address, isMobile } ) {
             }
             setFullNfts(thisFullNfts);
             setNftParents(chatCache.parentNftList);
+            setNftChilds(chatCache.childNftList);
         })();
     }, []);
 
@@ -109,6 +120,28 @@ export default function Nft( { chronik, address, isMobile } ) {
         nftTxListener(chronik, address, "Wallet updated");
     };
 
+    // Constructs the new avatar object and updated avatar array
+    const setAvatar = async (nftId) => {
+        const latestAvatars = await localforage.getItem(appConfig.localAvatarsParam);
+        const newAvatar = {
+            address: address,
+            link: `${appConfig.tokenIconsUrl}/64/${nftId}.png`,
+        }
+        latestAvatars.push(newAvatar);
+
+        try {
+            await addAvatar(latestAvatars, newAvatar);
+            setShowNftModal(false);
+            toast(`Avatar updated, refreshing app`);
+            updateAvatars(setLatestAvatars);
+            setTimeout(function (){
+                window.location.reload();
+            }, 2000);
+        } catch (err) {
+            console.log('Error setting NFT as avatar', err.message);
+        }
+    };
+
     const RenderChildNfts = () => {
         if (!parentNftInFocus) {
             return;
@@ -119,6 +152,14 @@ export default function Nft( { chronik, address, isMobile } ) {
             return obj.parentNft.tokenId === parentNftInFocus.tokenId;
         });
         const childNftObjs = filteredChildNfts[0].childNft;
+
+        const childNftsObjsOwned = [];
+        for (const thisChildNft of childNftObjs) {
+            const childNftOwnedByWallet = nftChilds.find(nft => nft.token.tokenId === thisChildNft.tokenId);
+            if (typeof childNftOwnedByWallet !== 'undefined') {
+                childNftsObjsOwned.push(thisChildNft);
+            }
+        }
 
         return (
             <>
@@ -132,7 +173,7 @@ export default function Nft( { chronik, address, isMobile } ) {
                     </Modal.Header>
                     <Modal.Body>
                         <div className="grid md:grid-cols-2 grid-cols-1 max-w-xl gap-2 mx-auto">
-                            {childNftObjs && childNftObjs.length > 0 && childNftObjs.map((childNftObj, index) => (
+                            {childNftsObjsOwned && childNftsObjsOwned.length > 0 && childNftsObjsOwned.map((childNftObj, index) => (
                                 <Card key={childNftObj.tokenId + index}
                                 className="transition-shadow duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50"
                                 >
@@ -151,9 +192,22 @@ export default function Nft( { chronik, address, isMobile } ) {
                                         />
                                     </CardContent>
                                     <CardFooter>
-                                        <Button onClick={() => { nftShowCasePost(childNftObj.tokenId, '') }}>
-                                            Post to townhall
-                                        </Button>
+                                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button aria-haspopup="true" variant="outline">
+                                Action
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem onClick={() => { nftShowCasePost(childNftObj.tokenId, '') }}>
+                                Post to townhall
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { setAvatar(childNftObj.tokenId) }}>
+                                Set as avatar
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                                     </CardFooter>
                                 </Card>
                             ))}

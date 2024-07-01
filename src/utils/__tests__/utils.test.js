@@ -14,8 +14,10 @@ import {
     encodeBip21ReplyArticle,
     encodeBip21PaywallPayment,
     getPaginatedHistoryPage,
+    getNFTAvatarLink,
+    totalPaywallEarnedByAddress,
 } from '../utils';
-import { mockTxHistoryArray } from '../fixtures/mocks';
+import { mockTxHistoryArray, mockLatestAvatars, mockPaywallTxs } from '../fixtures/mocks';
 
 it(`getTweetId() correctly extracts the tweet ID from a valid tweet url`, () => {
     const tweetUrl = '[twt]https://twitter.com/CashtabWallet/status/1784451748028944549[/twt]';
@@ -127,4 +129,27 @@ it(`getPaginatedHistoryPage returns the correct paginated history for a custom p
     expect(
         getPaginatedHistoryPage(mockTxHistoryArray, 1),
     ).toStrictEqual(mockTxHistoryArray.slice(25, 28));
+});
+it(`getNFTAvatarLink returns the correct NFT link for an address`, () => {
+    expect(
+        getNFTAvatarLink(mockLatestAvatars[0].address, mockLatestAvatars),
+    ).toStrictEqual('https://icons.etokens.cash/64/85a96053f1e80297f0e9a0296e477f1aa0c486d38f269f4e49c8f6a20b578568.png');
+});
+it(`getNFTAvatarLink returns false for an invalid avatar array`, () => {
+    expect(
+        getNFTAvatarLink(mockLatestAvatars[0].address, 'NOT-A-Valid-ARRAY'),
+    ).toStrictEqual(false);
+});
+it(`getNFTAvatarLink returns false for an empty avatar array`, () => {
+    expect(
+        getNFTAvatarLink(mockLatestAvatars[0].address, []),
+    ).toStrictEqual(false);
+});
+it(`totalPaywallEarnedByAddress returns the correct paywall revenue earned and count for an address`, () => {
+    expect(
+        totalPaywallEarnedByAddress(mockLatestAvatars[0].address, mockPaywallTxs),
+    ).toStrictEqual({
+        "xecEarned": "6",
+        "unlocksEarned": 1
+    });
 });

@@ -3,23 +3,15 @@ import "./globals.css";
 import React, { useState, useEffect } from 'react';
 import { appConfig } from '../config/app';
 import { opReturn as opreturnConfig } from '../config/opreturn';
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Tooltip, Popover, Modal } from "flowbite-react";
+import { Popover, Modal } from "flowbite-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon, Pencil1Icon } from "@radix-ui/react-icons";
 import { ImDownload3 } from "react-icons/im";
 import { RiSave3Fill } from "react-icons/ri";
 import {
-    SendIcon,
-    LogoutIcon,
     EncryptionIcon,
     UnlockIcon,
 } from "@/components/ui/social";
@@ -54,6 +46,7 @@ import {
     txListener,
     articleTxListener,
     paywallTxListener,
+    refreshUtxos,
 } from '../chronik/chronik';
 import {
     encodeBip21Article,
@@ -62,9 +55,8 @@ import {
     encodeBip21PaywallPayment,
     getPaginatedHistoryPage,
 } from '../utils/utils';
-import { CrossIcon, AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, YoutubeIcon, AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon } from "@/components/ui/social";
+import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon } from "@/components/ui/social";
 import { toast } from 'react-toastify';
-import { Bold } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
 import { BiSolidNews } from "react-icons/bi";
 import {
@@ -93,7 +85,7 @@ import DOMPurify from 'dompurify';
 import MarkdownEditor from '@uiw/react-markdown-editor';
 import { getStackArray } from 'ecash-script';
 
-export default function Article( { chronik, address, isMobile, sharedArticleTxid } ) {
+export default function Article( { chronik, address, isMobile, sharedArticleTxid, setXecBalance } ) {
     const [articleHistory, setArticleHistory] = useState('');  // current article history page
     const [fullArticleHistory, setFullArticleHistory] = useState('');  // current article history page
     const [articleTitle, setArticleTitle] = useState(''); // title of the article being drafted
@@ -134,6 +126,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             setIsLoading(true);
             // Render the first page by default upon initial load
             let localArticleHistoryResp = await getArticleHistoryByPage(0);
+            localforage.setItem(appConfig.localpaywallTxsParam, localArticleHistoryResp.paywallTxs);
 
             // If this app was triggered by a shared article link
             if (sharedArticleTxid !== false) {
@@ -182,6 +175,9 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 }
             }
             setIsLoading(false);
+
+            const updatedCache = await refreshUtxos(chronik, address);
+            setXecBalance(updatedCache.xecBalance);
         })();
     }, []);
 
@@ -386,7 +382,11 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                     <div className="flex flex-col break-words space-y-1.5 gap-2 mt-2 w-full leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                         <div className="flex justify-between items-center w-full" key={"article"+index}>
                             <div className="flex items-center gap-2">
-                                <ReplieduseravatarIcon/>
+                                {foundReply.senderAvatarLink === false ? (
+                                    <ReplieduseravatarIcon/>
+                                ) : (
+                                <img src={foundReply.senderAvatarLink}></img>
+                                )}
                                 <div className="font-medium dark:text-white" onClick={() => {
                                     copy(foundReply.replyAddress);
                                     toast(`${foundReply.replyAddress} copied to clipboard`);
@@ -819,7 +819,11 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                         </CardContent>
                             <CardFooter>
                                 <div className="relative mt-2 flex items-center gap-x-4">
-                                <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
+                                {tx.senderAvatarLink === false ? (
+                                    <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
+                                ) : (
+                                <img src={tx.senderAvatarLink}></img>
+                                )}
                                 <div className="text-sm leading-6">
                                     <p className="font-semibold text-gray-900">
                                     <Badge variant="outline" className="py-3px">

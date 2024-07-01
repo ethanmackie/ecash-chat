@@ -5,18 +5,12 @@ import { getTxHistory, txListener } from '../chronik/chronik';
 import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
 import cashaddr from 'ecashaddrjs';
-import { isValidRecipient, isValidMessage } from '../validation/validation';
+import { isValidRecipient } from '../validation/validation';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { MagnifyingGlassIcon, ResetIcon, Link2Icon, Share1Icon, ArrowRightIcon } from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon, ResetIcon, Link2Icon, Share1Icon } from "@radix-ui/react-icons";
 import {
-    AnonAvatar,
-    ShareIcon,
-    ReplyIcon,
-    SearchIcon,
-    ExportIcon,
-    EncryptionIcon,
     DecryptionIcon,
     MoneyIcon,
     AlitacoffeeIcon,
@@ -24,7 +18,7 @@ import {
     ReplieduseravatarIcon,
     Arrowright2Icon,
 } from "@/components/ui/social";
-import { encodeBip21Message, encodeBip2XecTip, getPaginatedHistoryPage } from '../utils/utils';
+import { encodeBip2XecTip, getPaginatedHistoryPage } from '../utils/utils';
 import {
   Pagination,
   PaginationContent,
@@ -34,9 +28,14 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
 import { HiInformationCircle } from "react-icons/hi";
 import { Input } from "@/components/ui/input"
-import { Popover, Avatar, Textarea, Alert, Modal } from "flowbite-react";
+import { Popover, Alert, Modal } from "flowbite-react";
 import {
   Card,
   CardContent,
@@ -63,7 +62,6 @@ const crypto = require('crypto');
 import copy from 'copy-to-clipboard';
 import { toast } from 'react-toastify';
 const chronik = new ChronikClientNode(chronikConfig.urls);
-import { PersonIcon } from '@radix-ui/react-icons';
 
 export default function TxHistory({ address }) {
     const [txHistory, setTxHistory] = useState(''); // current inbox history page
@@ -243,13 +241,20 @@ export default function TxHistory({ address }) {
                               {tx.replyAddress === address ? (
                                   <>
                                   <div className="flex items-center gap-2">
-                                      <DefaultavatarIcon/>
+                                      {tx.senderAvatarLink === false ? (
+                                        <DefaultavatarIcon/>
+                                      ) : (
+                                        <Avatar className="h-9 w-9">
+                                        <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
+                                        <AvatarFallback>CN</AvatarFallback>
+                                       </Avatar>
+                                      )}
                                       <div className="font-medium dark:text-white">
                                           <div onClick={() => {
                                               copy(tx.replyAddress);
                                               toast(`${tx.replyAddress} copied to clipboard`);
                                           }}
-                                          ><Badge className="leading-7  py-3px" variant="outline">
+                                          ><Badge className="leading-7 shadow-sm hover:bg-accent py-3px" variant="outline">
                                                  <span className="hidden sm:block">Your wallet</span>
                                                 <span className="block sm:hidden">You</span>
                                             </Badge></div>
@@ -260,16 +265,22 @@ export default function TxHistory({ address }) {
                                 (<>
                                   <span>
                                   <div className="flex items-center gap-2">
-                                      <ReplieduseravatarIcon/>
+                                      {tx.senderAvatarLink === false ? (
+                                        <ReplieduseravatarIcon/>
+                                      ) : (
+                                        <Avatar className="h-9 w-9">
+                                        <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
+                                        <AvatarFallback>CN</AvatarFallback>
+                                       </Avatar>
+                                      )}
                                       <div className="font-medium dark:text-white">
                                           <div onClick={() => {
                                               copy(tx.replyAddress);
                                               toast(`${tx.replyAddress} copied to clipboard`);
                                           }}>
-                                        <Badge className="leading-7  py-3px" variant="outline">
+                                        <Badge className="leading-7 shadow-sm hover:bg-accent py-3px" variant="outline">
                                              {tx.replyAddress.substring(0,8)}...{tx.replyAddress.substring(tx.replyAddress.length - 5)}
                                         </Badge>
-                                            
                                           </div>
                                       </div>
                                       <Popover
@@ -346,7 +357,14 @@ export default function TxHistory({ address }) {
                                {tx.recipientAddress === address ? (
                                     <>
                                         <div className="flex items-center gap-2">
-                                            <DefaultavatarIcon/>
+                                            {tx.receiverAvatarLink === false ? (
+                                              <DefaultavatarIcon/>
+                                            ) : (
+                                              <Avatar className="h-9 w-9">
+                                              <AvatarImage src={tx.receiverAvatarLink} alt="User Avatar" />
+                                              <AvatarFallback>CN</AvatarFallback>
+                                             </Avatar>
+                                            )}
                                             <div className="font-medium dark:text-white"
                                                 onClick={() => {
                                                    copy(tx.recipientAddress);
@@ -354,7 +372,7 @@ export default function TxHistory({ address }) {
                                                 }}
                                             >
                                                 <div>
-                                                <Badge className="leading-7 py-3px" variant="outline">
+                                                <Badge className="leading-7 shadow-sm hover:bg-accent py-3px" variant="outline">
                                                 <span className="hidden sm:block">Your wallet</span>
                                                 <span className="block sm:hidden">You</span>
                                               </Badge>
@@ -362,17 +380,24 @@ export default function TxHistory({ address }) {
                                             </div>
                                         </div>
                                     </>
-                               ) : tx.iseCashChatPost === true ? <Badge className="leading-7  py-3px" variant="outline">eCash Chat Townhall</Badge> :
+                               ) : tx.iseCashChatPost === true ? <Badge className="leading-7 shadow-sm hover:bg-accent py-3px" variant="outline">eCash Chat Townhall</Badge> :
                                  (<>
                                    <span>
                                    <div className="flex items-center gap-2">
-                                       <ReplieduseravatarIcon/>
+                                       {tx.receiverAvatarLink === false ? (
+                                          <ReplieduseravatarIcon/>
+                                        ) : (
+                                          <Avatar className="h-9 w-9">
+                                          <AvatarImage src={tx.receiverAvatarLink} alt="User Avatar" />
+                                          <AvatarFallback>CN</AvatarFallback>
+                                         </Avatar>
+                                        )}
                                        <div className="font-medium dark:text-white">
                                            <div onClick={() => {
                                                copy(tx.recipientAddress);
                                                toast(`${tx.recipientAddress} copied to clipboard`);
                                            }}>
-                                            <Badge className="leading-7  py-3px" variant="outline">
+                                            <Badge className="leading-7 shadow-sm hover:bg-accent py-3px" variant="outline">
                                             {tx.recipientAddress.substring(0,8)}...{tx.recipientAddress.substring(tx.recipientAddress.length - 5)}
                                            </Badge>
                                               
