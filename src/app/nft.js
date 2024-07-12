@@ -71,8 +71,8 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                 const standaloneNftParent = {
                     tokenId: 0,
                     genesisInfo: {
-                        tokenName: 'Miscellaneous Collection',
-                        tokenTicker: 'N/A',
+                        tokenName: 'Miscellaneous NFTs',
+                        tokenTicker: '',
                         url: '',
                     },
                     genesisOutputScripts: {
@@ -254,19 +254,19 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                         className="transition-shadow duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50"
                     >
                         <CardHeader>
-                            <CardTitle>{nftParent.genesisInfo.tokenName} ({nftParent.genesisInfo.tokenTicker})</CardTitle>
+                            <CardTitle>{nftParent.genesisInfo.tokenName} {nftParent.genesisInfo.tokenTicker}</CardTitle>
                             <CardDescription>{nftParent.tokenId !== 0 && `Url: ${nftParent.genesisInfo.url}`}</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <img
-                                src={nftParent.tokenId === 0 ? '/ecash-square-icon.svg' : `${appConfig.tokenIconsUrl}/256/${nftParent.tokenId}.png`}
+                                src={nftParent.tokenId === 0 ? '/ecash-chat-logo.png' : `${appConfig.tokenIconsUrl}/256/${nftParent.tokenId}.png`}
                                 width={256}
                                 height={256}
                                 className="rounded-lg object-cover"
                                 alt={`icon for ${nftParent.tokenId}`}
                             />
-                            <p className="text-sm font-medium leading-none mt-4">Supply: {nftParent.genesisSupply} NFTs</p>
-                            <p className="text-sm font-medium leading-none">Created: {formatDate(nftParent.genesisOutputScripts.timeFirstSeen, navigator.language)}</p>
+                            {nftParent.tokenId !== 0 && (<p className="text-sm font-medium leading-none mt-4">Supply: {nftParent.genesisSupply} NFTs</p>)}
+                            {nftParent.tokenId !== 0 && (<p className="text-sm font-medium leading-none">Created: {formatDate(nftParent.genesisOutputScripts.timeFirstSeen, navigator.language)}</p>)}
                         </CardContent>
                         <CardFooter>
                         </CardFooter>
