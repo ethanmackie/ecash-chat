@@ -22,6 +22,11 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select"
+  import {
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
+  } from "@/components/ui/avatar";
 import {
     TwitterShareButton,
     TwitterIcon,
@@ -385,7 +390,10 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 {foundReply.senderAvatarLink === false ? (
                                     <ReplieduseravatarIcon/>
                                 ) : (
-                                <img src={foundReply.senderAvatarLink}></img>
+                                <Avatar className="h-9 w-9">
+                                <AvatarImage src={foundReply.senderAvatarLink} alt="User Avatar" />
+                                <AvatarFallback><DefaultavatarIcon/></AvatarFallback>
+                            </Avatar>
                                 )}
                                 <div className="font-medium dark:text-white" onClick={() => {
                                     copy(foundReply.replyAddress);
@@ -420,7 +428,13 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     // Validate the paywall price input
     const handlePaywallAmountChange = e => {
         const { value } = e.target;
-        if (value >= appConfig.dustXec || value === '') {
+
+        const decimalIndex = value.toString().indexOf('.');
+        const decimalPlaces = decimalIndex >= 0 ? value.toString().length - decimalIndex - 1 : 0;
+
+        if (decimalPlaces > 2) {
+            setPaywallAmountXecError(`Paywall amount must not exceed 2 decimal places`);
+        } else if (value >= appConfig.dustXec || value === '') {
             setPaywallAmountXecError(false);
         } else {
             setPaywallAmountXecError(`Paywall amount must be at minimum ${appConfig.dustXec} XEC`);
@@ -822,7 +836,10 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 {tx.senderAvatarLink === false ? (
                                     <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
                                 ) : (
-                                <img src={tx.senderAvatarLink}></img>
+                                <Avatar className="h-9 w-9">
+                                <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
+                                <AvatarFallback><DefaultavatarIcon/></AvatarFallback>
+                            </Avatar>
                                 )}
                                 <div className="text-sm leading-6">
                                     <p className="font-semibold text-gray-900">
