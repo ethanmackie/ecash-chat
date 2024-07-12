@@ -428,7 +428,13 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     // Validate the paywall price input
     const handlePaywallAmountChange = e => {
         const { value } = e.target;
-        if (value >= appConfig.dustXec || value === '') {
+
+        const decimalIndex = value.toString().indexOf('.');
+        const decimalPlaces = decimalIndex >= 0 ? value.toString().length - decimalIndex - 1 : 0;
+
+        if (decimalPlaces > 2) {
+            setPaywallAmountXecError(`Paywall amount must not exceed 2 decimal places`);
+        } else if (value >= appConfig.dustXec || value === '') {
             setPaywallAmountXecError(false);
         } else {
             setPaywallAmountXecError(`Paywall amount must be at minimum ${appConfig.dustXec} XEC`);
