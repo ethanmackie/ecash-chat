@@ -17,7 +17,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html className="h-full bg-white" lang="en">
+    <html className="h-full" lang="en">
       <head>
        {/* Twitter Card meta tags */}
         <meta name="twitter:card" content="summary_large_image" />
