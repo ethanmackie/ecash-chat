@@ -623,7 +623,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                         }>
                             Pay
                         </Button>
-                        <Button onClick={() => setShowPaywallPaymentModal(false)}>
+                        <Button variant="secondary" onClick={() => setShowPaywallPaymentModal(false)}>
                             Close
                         </Button>
                     </div>
@@ -734,7 +734,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     </Button>
                                     <Button 
                                     className="ml-2"
-                                    variant="ghost" onClick={() => setShowArticleModal(false)}>
+                                    variant="secondary" onClick={() => setShowArticleModal(false)}>
                                     Close
                                 </Button>
                                 </div>

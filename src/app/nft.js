@@ -213,7 +213,7 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                             ))}
                         </div>
                         <div className="flex justify-end mt-10">
-                            <Button  onClick={() => { setShowNftModal(false) }}>
+                            <Button variant="secondary" onClick={() => { setShowNftModal(false) }}>
                                 Close
                             </Button>
                         </div>
