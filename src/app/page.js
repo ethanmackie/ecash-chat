@@ -606,6 +606,7 @@ export default function Home() {
                     address={address}
                     avatarLink={userAvatarLink}
                     xecBalance={xecBalance}
+                    latestAvatars={latestAvatars}
                 />
             )}
 

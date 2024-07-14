@@ -1124,3 +1124,18 @@ export const mockPaywallTxs = [
         "receiverAvatarLink": false
     }
 ];
+
+export const mockPaywallLeaderboard = [
+    [
+        "ecash:qp54xhk40f3fewpkp80pa9v28jr6940fmv38nxlahf",
+        3
+    ],
+    [
+        "ecash:qq29stgf7cwxtq9c52mv3tuddgfujy5tduaellf3wm",
+        1
+    ],
+    [
+        "ecash:qrnl3m0etqmdm5a5zdstjv6v7tugz2xw6ccsjfhsle",
+        1
+    ]
+];

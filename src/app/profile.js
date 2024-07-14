@@ -23,14 +23,14 @@ import {
   } from "@/components/ui/avatar";
 import { appConfig } from '../config/app';
 import { AnonAvatar } from "@/components/ui/social";
-import { totalPaywallEarnedByAddress } from '../utils/utils';
+import { totalPaywallEarnedByAddress, getPaywallLeaderboard, getNFTAvatarLink } from '../utils/utils';
 import { DefaultavatarsmallIcon, DefaultavatarIcon, GraphchartIcon} from "@/components/ui/social";
 import localforage from 'localforage';
 
-export default function ProfilePanel({ address, avatarLink, xecBalance }) {
+export default function ProfilePanel({ address, avatarLink, xecBalance, latestAvatars }) {
     const [paywallRevenueXec, setPaywallRevenueXec] = useState('');
     const [paywallRevenueCount, setPaywallRevenueCount] = useState('');
-    
+    const [paywallLeaderboard, setPaywallLeaderboard] = useState('');
 
     useEffect(() => {
         (async () => {
@@ -38,6 +38,7 @@ export default function ProfilePanel({ address, avatarLink, xecBalance }) {
             const paywallResponse = totalPaywallEarnedByAddress(address, paywallTxs);
             setPaywallRevenueXec(paywallResponse.xecEarned);
             setPaywallRevenueCount(paywallResponse.unlocksEarned);
+            setPaywallLeaderboard(getPaywallLeaderboard(paywallTxs));
         })();
     }, []);
 
@@ -105,6 +106,26 @@ export default function ProfilePanel({ address, avatarLink, xecBalance }) {
                     <p className="text-xs text-muted-foreground">Total Paywall Unlocks Earned</p>
                 </CardContent>
                 </Card>
+
+                <Card className="mt-2">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Top 10 paywall earners by unlocks</CardTitle>
+                        <GraphchartIcon className="text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent className="text-sm">
+                        {paywallLeaderboard && paywallLeaderboard.length > 0 && paywallLeaderboard.map((earner) => (
+                            <li>
+                                <Avatar className="h-9 w-9"><AvatarImage src={getNFTAvatarLink(earner[0], latestAvatars)} alt="User Avatar" />
+                                    <AvatarFallback>
+                                        <DefaultavatarIcon/>
+                                    </AvatarFallback>
+                                </Avatar>
+                                {`${earner[0].substring(0, 11)}...${earner[0].substring(earner[0].length - 5)}`}:  {earner[1]}
+                            </li>
+                        ))}
+                    </CardContent>
+                </Card>
+
         </SheetContent>
         </Sheet>
         </button>

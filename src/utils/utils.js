@@ -334,3 +334,22 @@ export const getUserLocale = navigator => {
     return appConfig.defaultLocale;
 };
 
+// Calculates the top 10 paywall revenue earners by unlock count
+export const getPaywallLeaderboard = (paywallTxs) => {
+    const uncountedLeaderboard = [];
+    for (const paywallTx of paywallTxs) {
+        uncountedLeaderboard.push(paywallTx.recipientAddress);
+    }
+
+    let countedLeaderboard = uncountedLeaderboard.reduce(function (valueA, valueB) {
+        return (
+            valueA[valueB] ? ++valueA[valueB] :(valueA[valueB] = 1),
+            valueA
+        );
+    }, {});
+
+    const entries = Object.entries(countedLeaderboard);
+    const sortedLeaderboard = entries.sort((a, b) => b[1] - a[1]);
+    const sortedLeaderboardTop10 = sortedLeaderboard.slice(0, 10);
+    return sortedLeaderboardTop10;
+};

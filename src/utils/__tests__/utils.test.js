@@ -17,8 +17,9 @@ import {
     getNFTAvatarLink,
     totalPaywallEarnedByAddress,
     formatBalance,
+    getPaywallLeaderboard,
 } from '../utils';
-import { mockTxHistoryArray, mockLatestAvatars, mockPaywallTxs } from '../fixtures/mocks';
+import { mockTxHistoryArray, mockLatestAvatars, mockPaywallTxs, mockPaywallLeaderboard } from '../fixtures/mocks';
 
 it(`getTweetId() correctly extracts the tweet ID from a valid tweet url`, () => {
     const tweetUrl = '[twt]https://twitter.com/CashtabWallet/status/1784451748028944549[/twt]';
@@ -160,3 +161,7 @@ it(`formatBalance returns correct formatted balance with default locale`, () => 
 it(`formatBalance returns correct formatted balance with GB locale`, () => {
     expect(formatBalance(100000, 'en-GB')).toStrictEqual('100,000');
 });
+it(`getPaywallLeaderboard returns correct top 10 paywall unlock recipient by count`, () => {
+    expect(getPaywallLeaderboard(mockPaywallTxs)).toStrictEqual(mockPaywallLeaderboard);
+});
+
