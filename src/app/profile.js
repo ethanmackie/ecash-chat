@@ -114,7 +114,7 @@ export default function ProfilePanel({ address, avatarLink, xecBalance, latestAv
                     </CardHeader>
                     <CardContent className="text-sm">
                         {paywallLeaderboard && paywallLeaderboard.length > 0 && paywallLeaderboard.map((earner) => (
-                            <li>
+                            <li key={earner[0]}>
                                 <Avatar className="h-9 w-9"><AvatarImage src={getNFTAvatarLink(earner[0], latestAvatars)} alt="User Avatar" />
                                     <AvatarFallback>
                                         <DefaultavatarIcon/>
