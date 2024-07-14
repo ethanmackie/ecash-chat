@@ -809,7 +809,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             <Alert
                             className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-auto z-10 flex items-center justify-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/5"
                             >
-                            <AlertDescription className="flex items-center justify-center">
+               
+                            <AlertDescription className="flex items-center justify-center whitespace-nowrap">
                                 <EncryptionIcon />
                                 This article costs {formatBalance(tx.articleObject.paywallPrice, getUserLocale(navigator))} XEC to view
                             </AlertDescription>
