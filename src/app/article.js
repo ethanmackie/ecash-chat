@@ -609,7 +609,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             <Modal show={showPaywallPaymentModal} onClose={() => setShowPaywallPaymentModal(false)}>
                 <Modal.Header>{currentArticleTxObj.articleObject.title}</Modal.Header>
                 <Modal.Body>
-                    This article costs a one-off {currentArticleTxObj.articleObject.paywallPrice} XEC to access.<br />
+                    This article costs a one-off {formatBalance(currentArticleTxObj.articleObject.paywallPrice, getUserLocale(navigator))} XEC to access.<br />
                     <br />
                     <Button disabled>
                 <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
