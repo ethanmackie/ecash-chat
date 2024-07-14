@@ -226,19 +226,11 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
     return (
         <div className="flex w-full flex-col py-3 items-center">
             <a href="https://cashtab.com/#/etokens" target="_blank">
-                <button
+                <Button
                     type="button"
-                    className="text-white transition-transform transform hover:scale-110 shadow-2xl bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-4 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 me-2 mb-2"
                 >
-                    Mint NFTs on&emsp;
-                <Image
-                    src="/cashtab-logo.png"
-                    alt="Cashtab Logo"
-                    width={150}
-                    height={60}
-                    priority
-                />
-                </button>
+                    Mint NFTs on cashtab
+                </Button>
             </a>
             <br />
                 <div className="grid grid-cols-2 max-w-xl gap-2">
