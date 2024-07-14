@@ -303,3 +303,34 @@ export const formatDate = (dateString, userLocale = 'en') => {
         return dateFormattingError;
     }
 };
+
+// Formats an XEC balance based on the user's locale
+export const formatBalance = (unformattedBalance, optionalLocale) => {
+    try {
+        if (optionalLocale === undefined) {
+            return new Number(unformattedBalance).toLocaleString({
+                maximumFractionDigits: appConfig.cashDecimals,
+            });
+        }
+        return new Number(unformattedBalance).toLocaleString(optionalLocale, {
+            maximumFractionDigits: appConfig.cashDecimals,
+        });
+    } catch (err) {
+        console.error(`Error in formatBalance for ${unformattedBalance}`);
+        console.error(err);
+        return unformattedBalance;
+    }
+};
+
+/**
+ * Call in a web browser. Return user locale if available or default (e.g. 'en-US') if not.
+ * @param {object | undefined} navigator
+ * @returns {string}
+ */
+export const getUserLocale = navigator => {
+    if (typeof navigator?.language !== 'undefined') {
+        return navigator.language;
+    }
+    return appConfig.defaultLocale;
+};
+

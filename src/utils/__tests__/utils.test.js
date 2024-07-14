@@ -16,6 +16,7 @@ import {
     getPaginatedHistoryPage,
     getNFTAvatarLink,
     totalPaywallEarnedByAddress,
+    formatBalance,
 } from '../utils';
 import { mockTxHistoryArray, mockLatestAvatars, mockPaywallTxs } from '../fixtures/mocks';
 
@@ -152,4 +153,10 @@ it(`totalPaywallEarnedByAddress returns the correct paywall revenue earned and c
         "xecEarned": "6",
         "unlocksEarned": 1
     });
+});
+it(`formatBalance returns correct formatted balance with default locale`, () => {
+    expect(formatBalance(100000)).toStrictEqual('100,000');
+});
+it(`formatBalance returns correct formatted balance with GB locale`, () => {
+    expect(formatBalance(100000, 'en-GB')).toStrictEqual('100,000');
 });

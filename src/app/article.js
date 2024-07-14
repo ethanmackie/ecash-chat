@@ -59,6 +59,8 @@ import {
     encodeBip21ReplyArticle,
     encodeBip21PaywallPayment,
     getPaginatedHistoryPage,
+    getUserLocale,
+    formatBalance,
 } from '../utils/utils';
 import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon } from "@/components/ui/social";
 import { toast } from 'react-toastify';
@@ -809,7 +811,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             >
                             <AlertDescription className="flex items-center justify-center">
                                 <EncryptionIcon />
-                                This article costs {tx.articleObject.paywallPrice} XEC to view
+                                This article costs {formatBalance(tx.articleObject.paywallPrice, getUserLocale(navigator))} XEC to view
                             </AlertDescription>
                             </Alert>
                         )}
