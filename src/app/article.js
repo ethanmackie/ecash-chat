@@ -115,6 +115,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const [isLoading, setIsLoading] = useState(true);
     const [showEditor, setshowEditor] = useState(false);
     const [showSearchBar, setshowSearchBar] = useState(false);
+    
 
     useEffect(() => {
         const handleResize = () => {
