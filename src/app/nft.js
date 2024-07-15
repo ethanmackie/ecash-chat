@@ -63,6 +63,9 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                     const fullNftInfo = await chronik.token(nftChild.token.tokenId);
                     nftChild.genesisInfo = fullNftInfo.genesisInfo;
                     nftChild.tokenId = fullNftInfo.tokenId;
+                    if (fullNftInfo.block && fullNftInfo.block.timestamp) {
+                        nftChild.standaloneTimestamp = fullNftInfo.block.timestamp;
+                    }
                     standaloneNfts.push(nftChild);
                 }
             }
@@ -180,7 +183,7 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                                     <CardHeader>
                                         <CardTitle>{childNftObj.genesisInfo.tokenName} ({childNftObj.genesisInfo.tokenTicker})</CardTitle>
                                         <CardDescription>
-                                            <p>First seen: {formatDate(childNftObj.timeFirstSeen, navigator.language)}</p>
+                                            <p>Created: {childNftObj.block && childNftObj.block.timestamp ? formatDate(childNftObj.block.timestamp, navigator.language) : formatDate(childNftObj.standaloneTimestamp, navigator.language)}</p>
                                             <p>Price: N/A</p>
                                         </CardDescription>
                                     </CardHeader>
@@ -258,7 +261,7 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                                 alt={`icon for ${nftParent.tokenId}`}
                             />
                             {nftParent.tokenId !== 0 && (<p className="text-sm font-medium leading-none mt-4">Supply: {nftParent.genesisSupply} NFTs</p>)}
-                            {nftParent.tokenId !== 0 && (<p className="text-sm font-medium leading-none">Created: {formatDate(nftParent.genesisOutputScripts.timeFirstSeen, navigator.language)}</p>)}
+                            {nftParent.tokenId !== 0 && (<p className="text-sm font-medium leading-none">Created: {nftParent.block && nftParent.block.timestamp && formatDate(nftParent.block.timestamp, navigator.language)}</p>)}
                         </CardContent>
                         <CardFooter>
                         </CardFooter>
