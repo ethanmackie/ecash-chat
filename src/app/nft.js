@@ -63,6 +63,9 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                     const fullNftInfo = await chronik.token(nftChild.token.tokenId);
                     nftChild.genesisInfo = fullNftInfo.genesisInfo;
                     nftChild.tokenId = fullNftInfo.tokenId;
+                    if (fullNftInfo.block && fullNftInfo.block.timestamp) {
+                        nftChild.standaloneTimestamp = fullNftInfo.block.timestamp;
+                    }
                     standaloneNfts.push(nftChild);
                 }
             }
@@ -180,7 +183,7 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                                     <CardHeader>
                                         <CardTitle>{childNftObj.genesisInfo.tokenName} ({childNftObj.genesisInfo.tokenTicker})</CardTitle>
                                         <CardDescription>
-                                            <p>First seen: {formatDate(childNftObj.timeFirstSeen, navigator.language)}</p>
+                                            <p>Created: {childNftObj.block && childNftObj.block.timestamp ? formatDate(childNftObj.block.timestamp, navigator.language) : formatDate(childNftObj.standaloneTimestamp, navigator.language)}</p>
                                             <p>Price: N/A</p>
                                         </CardDescription>
                                     </CardHeader>
@@ -213,7 +216,7 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                             ))}
                         </div>
                         <div className="flex justify-end mt-10">
-                            <Button  onClick={() => { setShowNftModal(false) }}>
+                            <Button variant="secondary" onClick={() => { setShowNftModal(false) }}>
                                 Close
                             </Button>
                         </div>
@@ -226,19 +229,11 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
     return (
         <div className="flex w-full flex-col py-3 items-center">
             <a href="https://cashtab.com/#/etokens" target="_blank">
-                <button
+                <Button
                     type="button"
-                    className="text-white transition-transform transform hover:scale-110 shadow-2xl bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-4 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 me-2 mb-2"
                 >
-                    Mint NFTs on&emsp;
-                <Image
-                    src="/cashtab-logo.png"
-                    alt="Cashtab Logo"
-                    width={150}
-                    height={60}
-                    priority
-                />
-                </button>
+                    Mint NFTs on cashtab
+                </Button>
             </a>
             <br />
                 <div className="grid grid-cols-2 max-w-xl gap-2">
@@ -266,7 +261,7 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                                 alt={`icon for ${nftParent.tokenId}`}
                             />
                             {nftParent.tokenId !== 0 && (<p className="text-sm font-medium leading-none mt-4">Supply: {nftParent.genesisSupply} NFTs</p>)}
-                            {nftParent.tokenId !== 0 && (<p className="text-sm font-medium leading-none">Created: {formatDate(nftParent.genesisOutputScripts.timeFirstSeen, navigator.language)}</p>)}
+                            {nftParent.tokenId !== 0 && (<p className="text-sm font-medium leading-none">Created: {nftParent.block && nftParent.block.timestamp && formatDate(nftParent.block.timestamp, navigator.language)}</p>)}
                         </CardContent>
                         <CardFooter>
                         </CardFooter>

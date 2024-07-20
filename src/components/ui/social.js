@@ -75,7 +75,7 @@ export const SendIcon = () => {
 
 export const PostIcon = () => {
     return (
-        <svg className="h-6 w-6 text-white-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="h-4 w-4 text-white-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
         </svg>
     );
@@ -140,7 +140,7 @@ export const MoneyIcon = () => {
 
 export const YoutubeIcon = () => {
     return (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" data-reactroot="">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" data-reactroot="">
         <path strokeLinejoin="round" strokeLinecap="round" strokeMiterlimit="10" strokeWidth="1" stroke="#221b38" fill="none" d="M19.57 20H4.43C3.09 20 2 18.87 2 17.46V6.53C2 5.13 3.09 4 4.43 4H19.58C20.91 4 22 5.13 22 6.53V17.46C22 18.87 20.91 20 19.57 20Z"></path>
         <path strokeLinejoin="round" strokeLinecap="round" strokeMiterlimit="10" strokeWidth="1" stroke="#221b38" fill="none" d="M9 8V16L16 11.56L9 8Z"></path>
         </svg>

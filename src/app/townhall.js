@@ -593,7 +593,7 @@ export default function TownHall({ address, isMobile }) {
                         disabled={post === '' || postError}
                         onClick={() => { isMobile ? sendPost() : setShowMessagePreview(true) }}
                         >
-                        <PostIcon />&nbsp;Post
+                        <PostIcon className="mr-1" />Post
                         </Button>
                         </div>
                     </div>

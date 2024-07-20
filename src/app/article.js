@@ -59,6 +59,8 @@ import {
     encodeBip21ReplyArticle,
     encodeBip21PaywallPayment,
     getPaginatedHistoryPage,
+    getUserLocale,
+    formatBalance,
 } from '../utils/utils';
 import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon } from "@/components/ui/social";
 import { toast } from 'react-toastify';
@@ -113,6 +115,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const [isLoading, setIsLoading] = useState(true);
     const [showEditor, setshowEditor] = useState(false);
     const [showSearchBar, setshowSearchBar] = useState(false);
+    
 
     useEffect(() => {
         const handleResize = () => {
@@ -607,7 +610,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             <Modal show={showPaywallPaymentModal} onClose={() => setShowPaywallPaymentModal(false)}>
                 <Modal.Header>{currentArticleTxObj.articleObject.title}</Modal.Header>
                 <Modal.Body>
-                    This article costs a one-off {currentArticleTxObj.articleObject.paywallPrice} XEC to access.<br />
+                    This article costs a one-off {formatBalance(currentArticleTxObj.articleObject.paywallPrice, getUserLocale(navigator))} XEC to access.<br />
                     <br />
                     <Button disabled>
                 <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
@@ -623,7 +626,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                         }>
                             Pay
                         </Button>
-                        <Button onClick={() => setShowPaywallPaymentModal(false)}>
+                        <Button variant="secondary" onClick={() => setShowPaywallPaymentModal(false)}>
                             Close
                         </Button>
                     </div>
@@ -734,7 +737,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     </Button>
                                     <Button 
                                     className="ml-2"
-                                    variant="ghost" onClick={() => setShowArticleModal(false)}>
+                                    variant="secondary" onClick={() => setShowArticleModal(false)}>
                                     Close
                                 </Button>
                                 </div>
@@ -807,9 +810,10 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             <Alert
                             className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-auto z-10 flex items-center justify-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/5"
                             >
-                            <AlertDescription className="flex items-center justify-center">
+               
+                            <AlertDescription className="flex items-center justify-center whitespace-nowrap">
                                 <EncryptionIcon />
-                                This article costs {tx.articleObject.paywallPrice} XEC to view
+                                This article costs {formatBalance(tx.articleObject.paywallPrice, getUserLocale(navigator))} XEC to view
                             </AlertDescription>
                             </Alert>
                         )}

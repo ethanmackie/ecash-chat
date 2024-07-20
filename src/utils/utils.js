@@ -303,3 +303,53 @@ export const formatDate = (dateString, userLocale = 'en') => {
         return dateFormattingError;
     }
 };
+
+// Formats an XEC balance based on the user's locale
+export const formatBalance = (unformattedBalance, optionalLocale) => {
+    try {
+        if (optionalLocale === undefined) {
+            return new Number(unformattedBalance).toLocaleString({
+                maximumFractionDigits: appConfig.cashDecimals,
+            });
+        }
+        return new Number(unformattedBalance).toLocaleString(optionalLocale, {
+            maximumFractionDigits: appConfig.cashDecimals,
+        });
+    } catch (err) {
+        console.error(`Error in formatBalance for ${unformattedBalance}`);
+        console.error(err);
+        return unformattedBalance;
+    }
+};
+
+/**
+ * Call in a web browser. Return user locale if available or default (e.g. 'en-US') if not.
+ * @param {object | undefined} navigator
+ * @returns {string}
+ */
+export const getUserLocale = navigator => {
+    if (typeof navigator?.language !== 'undefined') {
+        return navigator.language;
+    }
+    return appConfig.defaultLocale;
+};
+
+// Calculates the top 10 paywall revenue earners by unlock count
+export const getPaywallLeaderboard = (paywallTxs) => {
+    const uncountedLeaderboard = [];
+    for (const paywallTx of paywallTxs) {
+        uncountedLeaderboard.push(paywallTx.recipientAddress);
+    }
+
+    let countedLeaderboard = uncountedLeaderboard.reduce(function (valueA, valueB) {
+        return (
+            valueA[valueB] ? ++valueA[valueB] :(valueA[valueB] = 1),
+            valueA
+        );
+    }, {});
+
+    const entries = Object.entries(countedLeaderboard);
+    const sortedLeaderboard = entries.sort((a, b) => b[1] - a[1]);
+    const sortedLeaderboardTop10 = sortedLeaderboard.slice(0, 10);
+    return sortedLeaderboardTop10;
+};
