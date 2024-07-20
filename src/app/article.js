@@ -462,11 +462,11 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
    // Filters articleHistory for txs where the author address matches
    const getTxHistoryByAddress = () => {
         if (
-            Array.isArray(articleHistory.txs) &&
-            articleHistory.txs.length > 0
+            Array.isArray(fullArticleHistory.txs) &&
+            fullArticleHistory.txs.length > 0
         ) {
             const filteredArticleHistory = [];
-            for (const tx of articleHistory.txs) {
+            for (const tx of fullArticleHistory.txs) {
                 if (
                     tx.replyAddress === addressToSearch
                 ) {
