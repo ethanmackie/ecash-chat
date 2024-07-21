@@ -648,8 +648,8 @@ export default function Home() {
       <main className="sm:flex flex-col items-center justify-center p-1 sm:px-5 relative z-10">
       {isLoggedIn === false && isMobile === false ? (
         <>
-            <div className="mx-auto max-w-xl mb-4 mt-8">
-            <div className="hidden sm:mb-8 sm:flex sm:justify-center">
+            <div className="mx-auto max-w-xl mb-4 mt-12">
+            <div className="hidden sm:mb-4 sm:flex sm:justify-center">
                 <div className="relative flex gap-1 items-center rounded-full px-3 py-1 text-sm leading-6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/40">
                 <RocketIcon/> Version: {packageJson.version}{' '}
                 </div>
@@ -690,7 +690,9 @@ export default function Home() {
               priority
             />
             </button>
+            
         </div>
+        
         )}
 
         {isLoggedIn === false && isMobile === false && (
