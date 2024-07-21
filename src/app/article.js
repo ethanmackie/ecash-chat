@@ -637,7 +637,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
     const FullArticleModal = () => {
         return (
-            <Modal show={showArticleModal} onClose={() => setShowArticleModal(false)}  className="bg-background/90">
+            <Modal show={showArticleModal} onClose={() => setShowArticleModal(false)}  className="bg-background/90 h-auto md:h-auto">
                 <div className="shadow-xl bg-white border rounded-lg">
                 <Modal.Header>{currentArticleTxObj.articleObject.title}</Modal.Header>
                 <Modal.Body>
