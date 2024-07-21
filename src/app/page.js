@@ -379,16 +379,24 @@ export default function Home() {
             opReturnRaw = encodeBip21Message(encryptedMessage, true);
         }
 
-        window.postMessage(
-            {
-                type: 'FROM_PAGE',
-                text: 'Cashtab',
-                txInfo: {
-                    bip21: `${recipient}?amount=${sendAmountXec}&op_return_raw=${opReturnRaw}`,
+        const bip21Str = `${recipient}?amount=${sendAmountXec}&op_return_raw=${opReturnRaw}`;
+        if (isMobile) {
+            window.open(
+                `https://cashtab.com/#/send?bip21=${bip21Str}`,
+                '_blank',
+            );
+        } else {
+            window.postMessage(
+                {
+                    type: 'FROM_PAGE',
+                    text: 'Cashtab',
+                    txInfo: {
+                        bip21: bip21Str,
+                    },
                 },
-            },
-            '*',
-        );
+                '*',
+            )
+        };
         setRecipient('');
         setMessage('');
         setPassword('');
@@ -783,167 +791,163 @@ export default function Home() {
 
           {/* Tab navigation */}
           <Tabs aria-label="eCash Chat" style="default" className='z-10 !border-b-0 focus:ring-0 relative mt-4 justify-center'>
-              {isMobile === false && (
-                  <Tabs.Item title="Inbox" icon={Inbox3Icon}>
-                      {cashaddr.isValidCashAddress(address, 'ecash') &&
-                          <TxHistory address={address} />
-                      }
-                  </Tabs.Item>
-              )}
+            <Tabs.Item title="Inbox" icon={Inbox3Icon}>
+                {cashaddr.isValidCashAddress(address, 'ecash') &&
+                    <TxHistory address={address} />
+                }
+            </Tabs.Item>
 
-              {isMobile === false && (
-                  <Tabs.Item title="Send" className='focus:ring-0' f icon={Send3Icon} >
-                      <div style={{ display: (isLoggedIn ? 'block' : 'none') }}>
-                          <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
-                                <MessagePreviewModal />
-                                <form className="space-y-0 w-full mx-auto max-w-xl" action="#" method="POST">
-                                  <div>
-                                    <div className="mt-2">
-                                      <Input
-                                        id="address"
-                                        name="address"
-                                        type="text"
-                                        value={recipient}
-                                        required
-                                        placeholder="to:address"
-                                        className="bg-gray-50"
-                                        onChange={e => handleAddressChange(e)}
-                                      />
-                                    </div>
-                                    <p className="mt-1 text-sm text-red-600 dark:text-red-500">{recipientError !== false && recipientError}</p>
-                                  </div>
+            <Tabs.Item title="Send" className='focus:ring-0' f icon={Send3Icon} >
+                <div style={{ display: (isLoggedIn ? 'block' : 'none') }}>
+                    <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
+                        <MessagePreviewModal />
+                        <form className="space-y-0 w-full mx-auto max-w-xl" action="#" method="POST">
+                            <div>
+                            <div className="mt-2">
+                                <Input
+                                id="address"
+                                name="address"
+                                type="text"
+                                value={recipient}
+                                required
+                                placeholder="to:address"
+                                className="bg-gray-50"
+                                onChange={e => handleAddressChange(e)}
+                                />
+                            </div>
+                            <p className="mt-1 text-sm text-red-600 dark:text-red-500">{recipientError !== false && recipientError}</p>
+                            </div>
 
-                                  <div>
-                                    <div className="mt-2 overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring">
-                                        <Textarea
-                                          id="message"
-                                          rows="4"
-                                          value={message}
-                                          placeholder={encryptionMode ? 'Your message, Max. 95 bytes' : 'Your message, Max. 215 bytes'}
-                                          required
-                                          className="bg-white resize-none border-0 p-3 shadow-none focus-visible:ring-0"
-                                          onChange={e => handleMessageChange(e)}
-                                        />
-                                        <p className="mt-2 text-sm text-red-600 px-3 dark:text-red-500">{messageError !== false && messageError}</p>
-                                        {/* Emoji picker and tooltip guide for embedding markups */}
-                                    
-                                        <div className="flex flex-col sm:flex-row justify-between items-center mt-2 p-3 pt-0">
-                                        <div className="flex gap-2 mb-2 sm:mb-0">
-                                            {/* Emoji Picker */}
-                                            <Popover
-                                                aria-labelledby="emoji-popover"
-                                                content={
-                                                    <div>
-                                                    <Picker
-                                                        data={data}
-                                                        onEmojiSelect={(e) => {
-                                                        setMessage(prevMessage => prevMessage.concat(e.native));
-                                                        }}
-                                                    />
-                                                    </div>
-                                                }
-                                                >
-                                                <Button variant="ghost" type="button">
-                                                    <FaceIcon /> 
-                                                </Button>
-                                                </Popover>
-                                            <Tooltip content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]" style="light">
-                                                <Button
-                                               variant="ghost"
-                                                type="button"
-                                                onClick={() => insertMarkupTags('[url]theurl[/url]')}
-                                                >
-                                                    <Link2Icon/>
-                                                </Button>
-                                            </Tooltip>
-                                            <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
-                                                <Button
-                                                variant="ghost"
-                                                type="button"
-                                                onClick={() => insertMarkupTags('[img]imageurl[/img]')}
-                                                >
-                                                     <ImageIcon/>
-                                                </Button>
-                                            </Tooltip>
-                                            <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=1234[/yt]" style="light">
-                                                <Button
-                                               variant="ghost"
-                                                type="button"
-                                                onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}
-                                                >
-                                                      <YoutubeIcon/>
-                                                </Button>
-                                            </Tooltip>
-                                            <Tooltip content="e.g. [twt]https://x.com/yourid/status/1234[/twt]" style="light">
-                                                <Button
-                                               variant="ghost"
-                                                type="button"
-                                                onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}
-                                                >
-                                                    <UITwitterIcon/>
-                                                </Button>
-                                            </Tooltip>
-                                          
-                                        </div>
-                                        <div>
-                                        <Button
-                                            type="button"
-                                            disabled={recipientError || messageError || sendAmountXecError || recipient === '' || (encryptionMode && password === '')}
-                                            className="w-full"
-                                            onClick={() => { setShowMessagePreview(true); }}
-                                            >
-                                            <SendIcon/>&nbsp;Send Message
-                                        </Button>
-                                  </div>
-                                 </div>
-                                    </div>     
-                                    <div className="grid w-full items-center gap-2 mt-4">                       
-                                    <Label htmlFor="value-input">Send XEC amount (optional, 5.5 XEC by default):</Label>
-                                    <Input
-                                        type="number"
-                                        id="value-input"
-                                        aria-describedby="helper-text-explanation" className="bg-gray-50"
-                                        defaultValue="5.5"
-                                        onChange={e => handleSendAmountChange(e)}
-                                    />                
-                                      </div>       
-                                    {/* Encryption mode toggle */}
-                                    <label className="inline-flex items-center cursor-pointer mt-2">
-                                        <Input
-                                            type="checkbox"
-                                            value=""
-                                            className="sr-only peer"
-                                            onClick={() => {
-                                                setMessage('')
-                                                setEncryptionMode(!encryptionMode)
-                                            }}
-                                        />
-                                        <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                                        <span className="ml-2 gap-1 flex items-center text-sm font-medium text-gray-900 dark:text-gray-300">
-                                        <EncryptionIcon />
-                                        Encrypt with password (optional):
-                                        </span>
-                                    </label>
-                                    {encryptionMode && (
-                                        <>
-                                            <Input
-                                                type="input"
-                                                id="password-input"
-                                                value={password}
-                                                maxlength="19"
-                                                aria-describedby="helper-text-explanation" className="bg-white mt-2"
-                                                placeholder="Set an optional encryption password"
-                                                onChange={e => setPassword(e.target.value)}
+                            <div>
+                            <div className="mt-2 overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring">
+                                <Textarea
+                                    id="message"
+                                    rows="4"
+                                    value={message}
+                                    placeholder={encryptionMode ? 'Your message, Max. 95 bytes' : 'Your message, Max. 215 bytes'}
+                                    required
+                                    className="bg-white resize-none border-0 p-3 shadow-none focus-visible:ring-0"
+                                    onChange={e => handleMessageChange(e)}
+                                />
+                                <p className="mt-2 text-sm text-red-600 px-3 dark:text-red-500">{messageError !== false && messageError}</p>
+                                {/* Emoji picker and tooltip guide for embedding markups */}
+                            
+                                <div className="flex flex-col sm:flex-row justify-between items-center mt-2 p-3 pt-0">
+                                <div className="flex gap-2 mb-2 sm:mb-0">
+                                    {/* Emoji Picker */}
+                                    <Popover
+                                        aria-labelledby="emoji-popover"
+                                        content={
+                                            <div>
+                                            <Picker
+                                                data={data}
+                                                onEmojiSelect={(e) => {
+                                                setMessage(prevMessage => prevMessage.concat(e.native));
+                                                }}
                                             />
-                                        </>
-                                    )}
-                                  </div>
+                                            </div>
+                                        }
+                                        >
+                                        <Button variant="ghost" type="button">
+                                            <FaceIcon /> 
+                                        </Button>
+                                        </Popover>
+                                    <Tooltip content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]" style="light">
+                                        <Button
+                                        variant="ghost"
+                                        type="button"
+                                        onClick={() => insertMarkupTags('[url]theurl[/url]')}
+                                        >
+                                            <Link2Icon/>
+                                        </Button>
+                                    </Tooltip>
+                                    <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
+                                        <Button
+                                        variant="ghost"
+                                        type="button"
+                                        onClick={() => insertMarkupTags('[img]imageurl[/img]')}
+                                        >
+                                                <ImageIcon/>
+                                        </Button>
+                                    </Tooltip>
+                                    <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=1234[/yt]" style="light">
+                                        <Button
+                                        variant="ghost"
+                                        type="button"
+                                        onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}
+                                        >
+                                                <YoutubeIcon/>
+                                        </Button>
+                                    </Tooltip>
+                                    <Tooltip content="e.g. [twt]https://x.com/yourid/status/1234[/twt]" style="light">
+                                        <Button
+                                        variant="ghost"
+                                        type="button"
+                                        onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}
+                                        >
+                                            <UITwitterIcon/>
+                                        </Button>
+                                    </Tooltip>
+                                    
+                                </div>
+                                <div>
+                                <Button
+                                    type="button"
+                                    disabled={recipientError || messageError || sendAmountXecError || recipient === '' || (encryptionMode && password === '')}
+                                    className="w-full"
+                                    onClick={() => { setShowMessagePreview(true); }}
+                                    >
+                                    <SendIcon/>&nbsp;Send Message
+                                </Button>
+                            </div>
+                            </div>
+                            </div>     
+                            <div className="grid w-full items-center gap-2 mt-4">                       
+                            <Label htmlFor="value-input">Send XEC amount (optional, 5.5 XEC by default):</Label>
+                            <Input
+                                type="number"
+                                id="value-input"
+                                aria-describedby="helper-text-explanation" className="bg-gray-50"
+                                defaultValue="5.5"
+                                onChange={e => handleSendAmountChange(e)}
+                            />                
+                                </div>       
+                            {/* Encryption mode toggle */}
+                            <label className="inline-flex items-center cursor-pointer mt-2">
+                                <Input
+                                    type="checkbox"
+                                    value=""
+                                    className="sr-only peer"
+                                    onClick={() => {
+                                        setMessage('')
+                                        setEncryptionMode(!encryptionMode)
+                                    }}
+                                />
+                                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                <span className="ml-2 gap-1 flex items-center text-sm font-medium text-gray-900 dark:text-gray-300">
+                                <EncryptionIcon />
+                                Encrypt with password (optional):
+                                </span>
+                            </label>
+                            {encryptionMode && (
+                                <>
+                                    <Input
+                                        type="input"
+                                        id="password-input"
+                                        value={password}
+                                        maxlength="19"
+                                        aria-describedby="helper-text-explanation" className="bg-white mt-2"
+                                        placeholder="Set an optional encryption password"
+                                        onChange={e => setPassword(e.target.value)}
+                                    />
+                                </>
+                            )}
+                            </div>
 
-                              </form>
-                       </div>
-                    </div>
-                  </Tabs.Item>
-              )}
+                        </form>
+                </div>
+            </div>
+            </Tabs.Item>
 
               <Tabs.Item title="Town Hall" active icon={Home3Icon} >
                   <Townhall address={address} isMobile={isMobile} />
