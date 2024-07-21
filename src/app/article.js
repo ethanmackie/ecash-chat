@@ -140,9 +140,14 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 getArticleHistoryByPage(0, true, articleCache);
             }
 
-            // Subsequent refresh based on on-chain source
+            // Use cached paywall data if applicable
             let localArticleHistoryResp = articleCache ? articleCache : await getArticleHistoryByPage(0);
             localforage.setItem(appConfig.localpaywallTxsParam, localArticleHistoryResp.paywallTxs);
+
+            setIsLoading(false);
+
+            // On-chain refresh of article history
+            await getArticleHistoryByPage(0);
 
             // If this app was triggered by a shared article link
             if (sharedArticleTxid !== false) {
@@ -158,8 +163,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                         stackArray[0] === opreturnConfig.articlePrefixHex
                     ) {
                         articleHash = Buffer.from(stackArray[1], 'hex');
-                    } else {
-                        throw new Error('Invalid article txid');
                     }
                 } catch (err) {
                     console.log(`Error retrieving tx details for ${sharedArticleTxid}`, err);
@@ -186,17 +189,11 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                         // If this article exists as a non-paywalled article, render directly
                         setShowArticleModal(true);
                     }
-                } else {
-                    toast('No article found for this article txid');
                 }
             }
-            setIsLoading(false);
 
             const updatedCache = await refreshUtxos(chronik, address);
             setXecBalance(updatedCache.xecBalance);
-
-            // On-chain refresh of article history
-            await getArticleHistoryByPage(0);
         })();
     }, []);
 
