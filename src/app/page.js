@@ -552,6 +552,7 @@ export default function Home() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                     <Button
+                     className="mt-2 sm:mt-0"
                         onClick={() => setOpenSaveLoginModal(false)}
                         variant="outline"
                             >
@@ -564,7 +565,6 @@ export default function Home() {
                     >
                         Save login
                     </Button>
-                    
                     </AlertDialogFooter>
                 </AlertDialogContent>
                 </AlertDialog>
