@@ -27,4 +27,6 @@ export const appConfig = {
     localArticlesParam: 'localArticles',
     localAvatarsParam: 'localAvatars',
     localpaywallTxsParam: 'paywallTxs',
+    localTownhallCacheParam: 'townhallCache',
+    localArticleCacheParam: 'articleCache',
 };

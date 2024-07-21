@@ -75,6 +75,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import { Skeleton } from "@/components/ui/skeleton";
+import localforage from 'localforage';
 
 export default function TownHall({ address, isMobile }) {
     const [townHallHistory, setTownHallHistory] = useState(''); // current history rendered on screen
@@ -101,14 +102,23 @@ export default function TownHall({ address, isMobile }) {
     const halfMaxPages = Math.floor(maxPagesToShow / 2);
 
     useEffect(() => {
-        // Render the first page by default upon initial load
+        // Check whether townhall history is cached
         (async () => {
+            await getTownhallHistoryByPage(0);
+            const townhallCache = await localforage.getItem(appConfig.localTownhallCacheParam);
+            // If cache exists, set initial render to cached history
+            if (townhallCache && townhallCache.txs && Array.isArray(townhallCache.txs) && townhallCache.txs.length > 0) {
+                setFullTownHallHistory(townhallCache);
+                getTownhallHistoryByPage(0, true, townhallCache);
+            }
+
+            // Subsequent refresh based on on-chain source
             await getTownhallHistoryByPage(0);
         })();
     }, []);
 
     // Refreshes the post history via chronik
-    const getTownhallHistoryByPage = async (pageNum = 0, localLookup = false) => {
+    const getTownhallHistoryByPage = async (pageNum = 0, localLookup = false, townhallCache = false) => {
         if (
             typeof pageNum !== "number" ||
             chronik === undefined
@@ -117,15 +127,17 @@ export default function TownHall({ address, isMobile }) {
         }
 
         if (localLookup) {
+            // if townhallCache was passed in from useEffect, use it as the source of truth for local lookup
+            let localFullTownHallHistory = townhallCache ? townhallCache : fullTownHallHistory;
             const selectedPageHistory = getPaginatedHistoryPage(
-                fullTownHallHistory.txs,
+                localFullTownHallHistory.txs,
                 pageNum,
             );
 
             setTownHallHistory({
                 txs: selectedPageHistory,
-                numPages: fullTownHallHistory.numPages,
-                replies: fullTownHallHistory.replies,
+                numPages: localFullTownHallHistory.numPages,
+                replies: localFullTownHallHistory.replies,
             });
         } else {
             const txHistoryResp = await getTxHistory(chronik, appConfig.townhallAddress, pageNum);
@@ -141,6 +153,7 @@ export default function TownHall({ address, isMobile }) {
                     replies: txHistoryResp.replies,
                 });
                 setFullTownHallHistory(txHistoryResp);
+                await localforage.setItem(appConfig.localTownhallCacheParam, txHistoryResp);
             }
         }
     };
