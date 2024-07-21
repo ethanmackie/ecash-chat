@@ -132,8 +132,16 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     useEffect(() => {
         (async () => {
             setIsLoading(true);
-            // Render the first page by default upon initial load
-            let localArticleHistoryResp = await getArticleHistoryByPage(0);
+
+            // If cache exists, set initial render to cached history
+            const articleCache = await localforage.getItem(appConfig.localArticleCacheParam);
+            if (articleCache && articleCache.txs && Array.isArray(articleCache.txs) && articleCache.txs.length > 0) {
+                setFullArticleHistory(articleCache);
+                getArticleHistoryByPage(0, true, articleCache);
+            }
+
+            // Subsequent refresh based on on-chain source
+            let localArticleHistoryResp = articleCache ? articleCache : await getArticleHistoryByPage(0);
             localforage.setItem(appConfig.localpaywallTxsParam, localArticleHistoryResp.paywallTxs);
 
             // If this app was triggered by a shared article link
@@ -186,12 +194,15 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
             const updatedCache = await refreshUtxos(chronik, address);
             setXecBalance(updatedCache.xecBalance);
+
+            // On-chain refresh of article history
+            await getArticleHistoryByPage(0);
         })();
     }, []);
 
     // Retrieves the article listing
     // Set localLookup to true to retrieve paginated data locally
-    const getArticleHistoryByPage = async (pageNum = 0, localLookup = false) => {
+    const getArticleHistoryByPage = async (pageNum = 0, localLookup = false, articleCache = false) => {
         if (
             typeof pageNum !== "number" ||
             chronik === undefined
@@ -200,16 +211,19 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         }
 
         if (localLookup) {
+            // if articleCache was passed in from useEffect, use it as the source of truth for local lookup
+            let localArticleHistory = articleCache ? articleCache : fullArticleHistory;
+
             const selectedPageHistory = getPaginatedHistoryPage(
-                fullArticleHistory.txs,
+                localArticleHistory.txs,
                 pageNum,
             );
 
             setArticleHistory({
                 txs: selectedPageHistory,
-                numPages: fullArticleHistory.numPages,
-                replies: fullArticleHistory.replies,
-                paywallTxs: fullArticleHistory.paywallTxs,
+                numPages: localArticleHistory.numPages,
+                replies: localArticleHistory.replies,
+                paywallTxs: localArticleHistory.paywallTxs,
             });
         } else {
             const txHistoryResp = await getArticleHistory(chronik, appConfig.townhallAddress, pageNum);
@@ -228,6 +242,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
                 setArticleHistory(currentArticleHistoryPage);
                 setFullArticleHistory(txHistoryResp);
+                await localforage.setItem(appConfig.localArticleCacheParam, txHistoryResp);
                 return currentArticleHistoryPage;
             }
         }
