@@ -104,7 +104,7 @@ export default function TownHall({ address, isMobile }) {
     useEffect(() => {
         // Check whether townhall history is cached
         (async () => {
-            await getTownhallHistoryByPage(0);
+            //await getTownhallHistoryByPage(0);
             const townhallCache = await localforage.getItem(appConfig.localTownhallCacheParam);
             // If cache exists, set initial render to cached history
             if (townhallCache && townhallCache.txs && Array.isArray(townhallCache.txs) && townhallCache.txs.length > 0) {
