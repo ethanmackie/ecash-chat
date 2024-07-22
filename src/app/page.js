@@ -8,6 +8,7 @@ import Nft from './nft';
 import Article from './article';
 import cashaddr from 'ecashaddrjs';
 import ProfilePanel from './profile';
+import ContactListPanel from './contact';
 import { queryAliasServer } from '../alias/alias-server';
 import { encodeBip21Message, getTweetId, getNFTAvatarLink } from '../utils/utils';
 import { isMobileDevice } from '../utils/mobileCheck';
@@ -47,7 +48,7 @@ import copy from 'copy-to-clipboard';
 import { Tooltip, Tabs, Alert, Modal, Popover } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
 import { ToastContainer, toast } from 'react-toastify';
-import { FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon } from '@radix-ui/react-icons';
+import { FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon, IdCardIcon } from '@radix-ui/react-icons';
 import 'react-toastify/dist/ReactToastify.css';
 import { YoutubeIcon, EcashchatIcon, LoadingSpinner, Home3Icon, File3Icon, Nft3Icon, Inbox3Icon, Send3Icon, Info3icon, User3icon, QrcodeIcon, Logout3Icon } from "@/components/ui/social";
 import {
@@ -607,6 +608,12 @@ export default function Home() {
                 <Button variant="outline" size="icon" className='mr-2' onClick={() => setShowCard(true)}>
                 <User3icon className="h-4 w-4" />
                 </Button>
+            )}
+
+            {isLoggedIn && (
+                <ContactListPanel
+                    latestAvatars={latestAvatars}
+                />
             )}
 
             {isLoggedIn && (

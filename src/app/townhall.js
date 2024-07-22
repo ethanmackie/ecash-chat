@@ -3,7 +3,7 @@ import  React, { useState, useEffect } from 'react';
 import { appConfig } from '../config/app';
 import { Tooltip, Popover, Alert, Modal } from "flowbite-react";
 import { Textarea } from "@/components/ui/textarea";
-import { postHasErrors, replyHasErrors } from '../validation/validation';
+import { postHasErrors, replyHasErrors, isValidRecipient } from '../validation/validation';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator"
 import {
@@ -12,7 +12,7 @@ import {
     AvatarImage,
   } from "@/components/ui/avatar";
 import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon, YoutubeIcon, AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon } from "@/components/ui/social";
-import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon, ChatBubbleIcon, Share1Icon } from '@radix-ui/react-icons';
+import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon, ChatBubbleIcon, Share1Icon, IdCardIcon } from '@radix-ui/react-icons';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
@@ -75,6 +75,8 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { addNewContact } from '../utils/utils';
 import localforage from 'localforage';
 
 export default function TownHall({ address, isMobile }) {
@@ -87,7 +89,9 @@ export default function TownHall({ address, isMobile }) {
     const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
     const [showMessagePreview, setShowMessagePreview] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
-    const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here 
+    const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here
+    const [contactListName, setContactListName] = useState('');
+    const [contactListAddress, setContactListAddress] = useState('');
 
     useEffect(() => {
       const handleResize = () => {
@@ -738,6 +742,50 @@ export default function TownHall({ address, isMobile }) {
 
                                                     {/* Tip XEC options */}
                                                     <RenderTipping address={tx.replyAddress} />
+
+                                                    {/* Add contact popover to input the new contact name */}
+                                                    <Popover
+                                                        aria-labelledby="default-popover"
+                                                        placement="top"
+                                                        onClick={e => {
+                                                            setContactListAddress(tx.replyAddress);
+                                                        }}
+                                                        content={
+                                                        <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
+                                                            <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
+                                                            <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Input contact name for <br />{tx.replyAddress}</h3>
+                                                            </div>
+                                                            <div className="px-3 py-2">
+                                                                <Input
+                                                                    id="addContactName"
+                                                                    name="addContactName"
+                                                                    type="text"
+                                                                    value={contactListName}
+                                                                    required
+                                                                    placeholder="New contact name"
+                                                                    className="bg-gray-50"
+                                                                    maxLength="30"
+                                                                    onChange={e => setContactListName(e.target.value)}
+                                                                />
+                                                                <Button
+                                                                    type="button"
+                                                                    disabled={contactListName === ''}
+                                                                    onClick={e => {
+                                                                        //setContactListAddress(tx.replyAddress);
+                                                                        addNewContact(contactListName, tx.replyAddress);
+                                                                        setContactListName('');
+                                                                    }}
+                                                                >
+                                                                    Add Contact
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                        }
+                                                    >
+                                                        <Button variant="outline" size="icon" className="mr-2">
+                                                            <IdCardIcon className="h-4 w-4" />
+                                                        </Button>
+                                                    </Popover>
                                                  </div>
                                              </span>
                                            </>)

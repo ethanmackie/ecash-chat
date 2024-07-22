@@ -4,6 +4,7 @@ import { chronik as chronikConfig } from '../config/chronik';
 import localforage from 'localforage';
 import { BN } from 'slp-mdm';
 import { appConfig } from '../config/app';
+import { toast } from 'react-toastify';
 const SATOSHIS_PER_XEC = 100;
 
 /**
@@ -352,4 +353,53 @@ export const getPaywallLeaderboard = (paywallTxs) => {
     const sortedLeaderboard = entries.sort((a, b) => b[1] - a[1]);
     const sortedLeaderboardTop10 = sortedLeaderboard.slice(0, 10);
     return sortedLeaderboardTop10;
+};
+
+// Add contact to local storage
+export const addNewContact = async (contactName, contactAddress) => {
+    let contactList = await localforage.getItem(appConfig.localContactsParam);
+
+    if (!Array.isArray(contactList)) {
+        contactList = [];
+    }
+
+    // Check to see if the contact exists
+    const contactExists = contactList.find(
+        contact => contact.address === contactAddress,
+    );
+
+    if (typeof contactExists !== 'undefined') {
+        // Contact exists
+        toast.error(
+            `${contactAddress} already exists in Contacts`,
+        );
+    } else {
+        contactList.push({
+            name: contactName,
+            address: contactAddress,
+        });
+        // update localforage and state
+        await localforage.setItem(appConfig.localContactsParam, contactList);
+        toast.success(
+            `"${contactName}" (${contactAddress}) added to Contacts`,
+        );
+    }
+};
+
+// Delete contact from local storage
+export const deleteContact = async (contactListAddressToDelete, setContactList) => {
+    let contactList = await localforage.getItem(appConfig.localContactsParam);
+    if (!Array.isArray(contactList)) {
+        contactList = [];
+    }
+
+    // filter contact from local contact list array
+    const updatedContactList = contactList.filter(
+        contact => contact.address !== contactListAddressToDelete,
+    );
+
+    // Update localforage and state
+    await localforage.setItem(appConfig.localContactsParam, updatedContactList);
+    setContactList(updatedContactList);
+    toast.success(`"${contactListAddressToDelete}" removed from Contacts`);
 };

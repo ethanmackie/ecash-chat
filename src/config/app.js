@@ -29,4 +29,5 @@ export const appConfig = {
     localpaywallTxsParam: 'paywallTxs',
     localTownhallCacheParam: 'townhallCache',
     localArticleCacheParam: 'articleCache',
+    localContactsParam: 'localContacts',
 };
