@@ -22,7 +22,7 @@ import {
     AvatarImage,
 } from "@/components/ui/avatar";
 import { appConfig } from '../config/app';
-import { getNFTAvatarLink, deleteContact, renameContact } from '../utils/utils';
+import { getNFTAvatarLink, deleteContact, renameContact, exportContacts } from '../utils/utils';
 import { DefaultavatarIcon} from "@/components/ui/social";
 import { IdCardIcon } from '@radix-ui/react-icons';
 import { toast } from 'react-toastify';
@@ -139,6 +139,14 @@ export default function ContactListPanel({ latestAvatars }) {
                         </div>
                         ))}
                     </CardContent>
+                    <Button
+                        type="button"
+                        onClick={e => {
+                            exportContacts(contactList);
+                        }}
+                    >
+                        Export contacts
+                    </Button>
                 </Card>
             </SheetContent>
             </Sheet>

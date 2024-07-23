@@ -427,3 +427,31 @@ export const renameContact = async (contactListAddressToRename, setContactList, 
     }
     setContactList(contactList);
 };
+
+// Export contacts from local storage
+export const exportContacts = contactListArray => {
+    if (!contactListArray) {
+        toast.error('Unable to export contact list');
+        return;
+    }
+
+    // convert object array into csv data
+    let csvContent =
+        'data:text/csv;charset=utf-8,' +
+        contactListArray.map(
+            element => '\n' + element.name + '|' + element.address,
+        );
+
+    // encode csv
+    var encodedUri = encodeURI(csvContent);
+
+    // hidden DOM node to set the default file name
+    var csvLink = document.createElement('a');
+    csvLink.setAttribute('href', encodedUri);
+    csvLink.setAttribute(
+        'download',
+        'eCashChat_Contacts.csv',
+    );
+    document.body.appendChild(csvLink);
+    csvLink.click();
+};
