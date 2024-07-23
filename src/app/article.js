@@ -1,6 +1,6 @@
 "use client";
 import "./globals.css";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { appConfig } from '../config/app';
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import { Textarea } from "@/components/ui/textarea";
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Popover, Modal } from "flowbite-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon, Pencil1Icon } from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon, Pencil1Icon, IdCardIcon } from "@radix-ui/react-icons";
 import { ImDownload3 } from "react-icons/im";
 import { RiSave3Fill } from "react-icons/ri";
 import {
@@ -61,6 +61,7 @@ import {
     getPaginatedHistoryPage,
     getUserLocale,
     formatBalance,
+    addNewContact,
 } from '../utils/utils';
 import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon } from "@/components/ui/social";
 import { toast } from 'react-toastify';
@@ -115,7 +116,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const [isLoading, setIsLoading] = useState(true);
     const [showEditor, setshowEditor] = useState(false);
     const [showSearchBar, setshowSearchBar] = useState(false);
-    
+    const newContactNameInput = useRef('');
 
     useEffect(() => {
         const handleResize = () => {
@@ -874,9 +875,51 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     </Badge>
                                     </p>
                                 </div>
-                                  {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (
-                                     <UnlockIcon />
-                                  )}
+                                {/* Add contact popover to input the new contact name */}
+                                <div
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                    }}
+                                >
+                                    <Popover
+                                        aria-labelledby="default-popover"
+                                        placement="top"
+                                        content={
+                                        <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
+                                            <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
+                                            <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Input contact name for <br />{tx.replyAddress}</h3>
+                                            </div>
+                                            <div className="px-3 py-2">
+                                                <Input
+                                                    id="addContactName"
+                                                    name="addContactName"
+                                                    type="text"
+                                                    ref={newContactNameInput}
+                                                    placeholder="New contact name"
+                                                    className="bg-gray-50"
+                                                    maxLength="30"
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    disabled={newContactNameInput?.current?.value === ''}
+                                                    onClick={e => {
+                                                        addNewContact(newContactNameInput?.current?.value, tx.replyAddress);
+                                                    }}
+                                                >
+                                                    Add Contact
+                                                </Button>
+                                            </div>
+                                        </div>
+                                        }
+                                    >
+                                        <Button variant="outline" size="icon" className="mr-2">
+                                            <IdCardIcon className="h-4 w-4" />
+                                        </Button>
+                                    </Popover>
+                                </div>
+                                {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (
+                                    <UnlockIcon />
+                                )}
                                 </div>
                             </CardFooter>
                             </Card>

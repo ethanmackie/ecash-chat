@@ -771,7 +771,6 @@ export default function TownHall({ address, isMobile }) {
                                                                     type="button"
                                                                     disabled={contactListName === ''}
                                                                     onClick={e => {
-                                                                        //setContactListAddress(tx.replyAddress);
                                                                         addNewContact(contactListName, tx.replyAddress);
                                                                         setContactListName('');
                                                                     }}
