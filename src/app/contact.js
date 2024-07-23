@@ -22,15 +22,18 @@ import {
     AvatarImage,
 } from "@/components/ui/avatar";
 import { appConfig } from '../config/app';
-import { getNFTAvatarLink, deleteContact } from '../utils/utils';
+import { getNFTAvatarLink, deleteContact, renameContact } from '../utils/utils';
 import { DefaultavatarIcon} from "@/components/ui/social";
 import { IdCardIcon } from '@radix-ui/react-icons';
 import { toast } from 'react-toastify';
 import copy from 'copy-to-clipboard';
+import { Input } from "@/components/ui/input";
+import { Popover } from "flowbite-react";
 import localforage from 'localforage';
 
 export default function ContactListPanel({ latestAvatars }) {
     const [contactList, setContactList] = useState([]);
+    const [contactListName, setContactListName] = useState('');
 
     useEffect(() => {
         (async () => {
@@ -42,37 +45,6 @@ export default function ContactListPanel({ latestAvatars }) {
         const contacts = await localforage.getItem(appConfig.localContactsParam);
         setContactList(contacts);
     };
-
-    /*
-    // Add contact to local storage
-    const addNewContact = async () => {
-        // Check to see if the contact exists
-        const contactExists = contactList.find(
-            contact => contact.address === contactListAddress,
-        );
-
-        if (typeof contactExists !== 'undefined') {
-            // Contact exists
-            toast.error(
-                `${contactListAddress} already exists in Contacts`,
-            );
-        } else {
-            contactList.push({
-                name: contactListName,
-                address: contactListAddress,
-            });
-            // update localforage and state
-            await localforage.setItem(appConfig.localContactsParam, contactList);
-            toast.success(
-                `"${contactListName}" (${contactListAddress}) added to Contacts`,
-            );
-        }
-
-        // Reset relevant state fields
-        setContactListName('');
-        setContactListAddress('');
-    };
-*/
 
     return (
         <button>
@@ -123,6 +95,46 @@ export default function ContactListPanel({ latestAvatars }) {
                             }}>
                                 Delete
                             </p>
+                            {/* Rename contact popover to input the new contact name */}
+                            <Popover
+                                aria-labelledby="default-popover"
+                                placement="top"
+                                content={
+                                <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
+                                    <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
+                                    <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Input new name for <br />{thisContact.address}</h3>
+                                    </div>
+                                    <div className="px-3 py-2">
+                                        <Input
+                                            id="addContactName"
+                                            name="addContactName"
+                                            type="text"
+                                            value={contactListName}
+                                            required
+                                            placeholder="New contact name"
+                                            className="bg-gray-50"
+                                            maxLength="30"
+                                            onChange={e => setContactListName(e.target.value)}
+                                        />
+                                        <Button
+                                            type="button"
+                                            disabled={contactListName === ''}
+                                            onClick={e => {
+                                                renameContact(thisContact.address, setContactList, contactListName);
+                                                setContactListName('');
+                                            }}
+                                        >
+                                            Rename Contact
+                                        </Button>
+                                    </div>
+                                </div>
+                                }
+                            >
+                                <Button variant="outline" size="icon" className="mr-2">
+                                    Rename
+                                </Button>
+                            </Popover>
+
                             </div>
                         </div>
                         ))}

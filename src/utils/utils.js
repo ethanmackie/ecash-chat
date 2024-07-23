@@ -403,3 +403,27 @@ export const deleteContact = async (contactListAddressToDelete, setContactList) 
     setContactList(updatedContactList);
     toast.success(`"${contactListAddressToDelete}" removed from Contacts`);
 };
+
+// Rename contact from local storage
+export const renameContact = async (contactListAddressToRename, setContactList, newName) => {
+    let contactList = await localforage.getItem(appConfig.localContactsParam);
+    // Find the contact to rename
+    let contactToUpdate = contactList.find(
+        contact => contact.address === contactListAddressToRename,
+    );
+
+    // if a match was found
+    if (typeof contactToUpdate !== 'undefined') {
+        // update the contact name
+        contactToUpdate.name = newName;
+
+        // Update localforage and state
+        await localforage.setItem(appConfig.localContactsParam, contactList);
+        toast.success(
+            `Contact renamed to "${newName}"`,
+        );
+    } else {
+        toast.error(`Unable to find contact`);
+    }
+    setContactList(contactList);
+};
