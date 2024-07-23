@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { appConfig } from '../config/app';
 import { getTxHistory, txListener } from '../chronik/chronik';
 import { chronik as chronikConfig } from '../config/chronik';
@@ -9,7 +9,7 @@ import { isValidRecipient } from '../validation/validation';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { MagnifyingGlassIcon, ResetIcon, Link2Icon, Share1Icon } from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon, ResetIcon, Link2Icon, Share1Icon, IdCardIcon } from "@radix-ui/react-icons";
 import {
     DecryptionIcon,
     MoneyIcon,
@@ -61,6 +61,7 @@ import {
 const crypto = require('crypto');
 import copy from 'copy-to-clipboard';
 import { toast } from 'react-toastify';
+import { addNewContact } from '../utils/utils';
 const chronik = new ChronikClientNode(chronikConfig.urls);
 
 export default function TxHistory({ address }) {
@@ -76,7 +77,8 @@ export default function TxHistory({ address }) {
     const [decryptionInput, setDecryptionInput] = useState('');
     const [encryptedMessage, setEncryptedMessage] = useState('');
     const [currentPage, setCurrentPage] = useState(0);
-    const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here 
+    const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here
+    const newContactNameInput = useRef('');
 
     useEffect(() => {
       const handleResize = () => {
@@ -348,6 +350,48 @@ export default function TxHistory({ address }) {
                                       </Button>
                                       </Popover>
                                     </div>
+                                    {/* Add contact popover to input the new contact name */}
+                                    <div
+                                          onClick={(e) => {
+                                              e.stopPropagation();
+                                          }}
+                                      >
+                                          <Popover
+                                              aria-labelledby="default-popover"
+                                              placement="top"
+                                              content={
+                                              <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
+                                                  <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
+                                                  <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Input contact name for <br />{tx.replyAddress}</h3>
+                                                  </div>
+                                                  <div className="px-3 py-2">
+                                                      <Input
+                                                          id="addContactName"
+                                                          name="addContactName"
+                                                          type="text"
+                                                          ref={newContactNameInput}
+                                                          placeholder="New contact name"
+                                                          className="bg-gray-50"
+                                                          maxLength="30"
+                                                      />
+                                                      <Button
+                                                          type="button"
+                                                          disabled={newContactNameInput?.current?.value === ''}
+                                                          onClick={e => {
+                                                              addNewContact(newContactNameInput?.current?.value, tx.replyAddress);
+                                                          }}
+                                                      >
+                                                          Add Contact
+                                                      </Button>
+                                                  </div>
+                                              </div>
+                                              }
+                                          >
+                                              <Button variant="outline" size="icon" className="mr-2">
+                                                  <IdCardIcon className="h-4 w-4" />
+                                              </Button>
+                                          </Popover>
+                                      </div>
                                   </span>
                                 </>)
                               }
@@ -473,6 +517,48 @@ export default function TxHistory({ address }) {
                                       </Button>
                                        </Popover>
                                     </div>
+                                    {/* Add contact popover to input the new contact name */}
+                                    <div
+                                          onClick={(e) => {
+                                              e.stopPropagation();
+                                          }}
+                                      >
+                                          <Popover
+                                              aria-labelledby="default-popover"
+                                              placement="top"
+                                              content={
+                                              <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
+                                                  <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
+                                                  <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Input contact name for <br />{tx.recipientAddress}</h3>
+                                                  </div>
+                                                  <div className="px-3 py-2">
+                                                      <Input
+                                                          id="addContactName"
+                                                          name="addContactName"
+                                                          type="text"
+                                                          ref={newContactNameInput}
+                                                          placeholder="New contact name"
+                                                          className="bg-gray-50"
+                                                          maxLength="30"
+                                                      />
+                                                      <Button
+                                                          type="button"
+                                                          disabled={newContactNameInput?.current?.value === ''}
+                                                          onClick={e => {
+                                                              addNewContact(newContactNameInput?.current?.value, tx.recipientAddress);
+                                                          }}
+                                                      >
+                                                          Add Contact
+                                                      </Button>
+                                                  </div>
+                                              </div>
+                                              }
+                                          >
+                                              <Button variant="outline" size="icon" className="mr-2">
+                                                  <IdCardIcon className="h-4 w-4" />
+                                              </Button>
+                                          </Popover>
+                                      </div>
                                    </span>
                                  </>)
                                }

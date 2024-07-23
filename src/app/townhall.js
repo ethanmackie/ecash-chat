@@ -91,7 +91,6 @@ export default function TownHall({ address, isMobile }) {
     const [currentPage, setCurrentPage] = useState(0);
     const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here
     const [contactListName, setContactListName] = useState('');
-    const [contactListAddress, setContactListAddress] = useState('');
 
     useEffect(() => {
       const handleResize = () => {
@@ -747,9 +746,6 @@ export default function TownHall({ address, isMobile }) {
                                                     <Popover
                                                         aria-labelledby="default-popover"
                                                         placement="top"
-                                                        onClick={e => {
-                                                            setContactListAddress(tx.replyAddress);
-                                                        }}
                                                         content={
                                                         <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
                                                             <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
