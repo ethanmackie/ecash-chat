@@ -62,6 +62,7 @@ import {
     getUserLocale,
     formatBalance,
     addNewContact,
+    getContactNameIfExist,
 } from '../utils/utils';
 import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon } from "@/components/ui/social";
 import { toast } from 'react-toastify';
@@ -117,6 +118,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const [showEditor, setshowEditor] = useState(false);
     const [showSearchBar, setshowSearchBar] = useState(false);
     const newContactNameInput = useRef('');
+    const [contactList, setContactList] = useState('');
 
     useEffect(() => {
         const handleResize = () => {
@@ -133,6 +135,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     useEffect(() => {
         (async () => {
             setIsLoading(true);
+
+            await refreshContactList();
 
             // If cache exists, set initial render to cached history
             const articleCache = await localforage.getItem(appConfig.localArticleCacheParam);
@@ -197,6 +201,11 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             setXecBalance(updatedCache.xecBalance);
         })();
     }, []);
+
+    const refreshContactList = async () => {
+        let contactList = await localforage.getItem(appConfig.localContactsParam);
+        setContactList(contactList);
+    };
 
     // Retrieves the article listing
     // Set localLookup to true to retrieve paginated data locally
@@ -416,7 +425,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     toast(`${foundReply.replyAddress} copied to clipboard`);
                                 }}>
                                     <Badge className="leading-7 [&:not(:first-child)]:mt-6 py-3px" variant="outline">
-                                        {foundReply.replyAddress.substring(0,10) + '...' + foundReply.replyAddress.substring(foundReply.replyAddress.length - 5)}
+                                        {getContactNameIfExist(foundReply.replyAddress, contactList)}
                                     </Badge>
                                 </div>
                                 <RenderTipping address={foundReply.replyAddress} />
@@ -657,7 +666,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                     {/* Article content */}
                     <div className="space-y-2 flex flex-col max-w-xl gap-2 break-words w-full leading-1.5 p-6">
                         <time dateTime={currentArticleTxObj.txTime} className="text-gray-500">
-                            By: {currentArticleTxObj.replyAddress}<br />
+                            By: {getContactNameIfExist(currentArticleTxObj.replyAddress, contactList)}<br />
                             {currentArticleTxObj.txDate}
                         </time>
                         <RenderArticle content={currentArticleTxObj.articleObject.content} />
@@ -869,8 +878,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                             toast(`${tx.replyAddress} copied to clipboard`);
                                         }}
                                         >
-                                        {tx.replyAddress.substring(0, 10)}...
-                                        {tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                        {getContactNameIfExist(tx.replyAddress, contactList)}
                                         </div>
                                     </Badge>
                                     </p>
@@ -903,7 +911,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                                     type="button"
                                                     disabled={newContactNameInput?.current?.value === ''}
                                                     onClick={e => {
-                                                        addNewContact(newContactNameInput?.current?.value, tx.replyAddress);
+                                                        addNewContact(newContactNameInput?.current?.value, tx.replyAddress, refreshContactList);
                                                     }}
                                                 >
                                                     Add Contact

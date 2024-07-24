@@ -356,7 +356,7 @@ export const getPaywallLeaderboard = (paywallTxs) => {
 };
 
 // Add contact to local storage
-export const addNewContact = async (contactName, contactAddress) => {
+export const addNewContact = async (contactName, contactAddress, refreshCallback) => {
     let contactList = await localforage.getItem(appConfig.localContactsParam);
 
     if (!Array.isArray(contactList)) {
@@ -384,10 +384,13 @@ export const addNewContact = async (contactName, contactAddress) => {
             `"${contactName}" (${contactAddress}) added to Contacts`,
         );
     }
+    if (refreshCallback) {
+        await refreshCallback();
+    }
 };
 
 // Delete contact from local storage
-export const deleteContact = async (contactListAddressToDelete, setContactList) => {
+export const deleteContact = async (contactListAddressToDelete, setContactList, refreshCallback) => {
     let contactList = await localforage.getItem(appConfig.localContactsParam);
     if (!Array.isArray(contactList)) {
         contactList = [];
@@ -402,10 +405,13 @@ export const deleteContact = async (contactListAddressToDelete, setContactList) 
     await localforage.setItem(appConfig.localContactsParam, updatedContactList);
     setContactList(updatedContactList);
     toast.success(`"${contactListAddressToDelete}" removed from Contacts`);
+    if (refreshCallback) {
+        await refreshCallback();
+    }
 };
 
 // Rename contact from local storage
-export const renameContact = async (contactListAddressToRename, setContactList, newName) => {
+export const renameContact = async (contactListAddressToRename, setContactList, newName, refreshCallback) => {
     let contactList = await localforage.getItem(appConfig.localContactsParam);
     // Find the contact to rename
     let contactToUpdate = contactList.find(
@@ -426,6 +432,9 @@ export const renameContact = async (contactListAddressToRename, setContactList, 
         toast.error(`Unable to find contact`);
     }
     setContactList(contactList);
+    if (refreshCallback) {
+        await refreshCallback();
+    }
 };
 
 // Export contacts from local storage
@@ -454,4 +463,18 @@ export const exportContacts = contactListArray => {
     );
     document.body.appendChild(csvLink);
     csvLink.click();
+};
+
+// Return the contact name based on address if this contact exists
+export const getContactNameIfExist = (address, contactList) => {
+    // Find the contact
+    let contactExists = contactList.find(
+        contact => contact.address === address,
+    );
+
+    // if a match was found
+    if (typeof contactExists !== 'undefined') {
+        return contactExists.name;
+    }
+    return address.substring(0,10) + '...' + address.substring(address.length - 5);
 };

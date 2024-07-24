@@ -49,6 +49,7 @@ import {
     encodeBip21ReplyPost,
     encodeBip2XecTip,
     getTweetId,
+    getContactNameIfExist,
 } from '../utils/utils';
 import {
     getTxHistory,
@@ -90,6 +91,7 @@ export default function TownHall({ address, isMobile }) {
     const [showMessagePreview, setShowMessagePreview] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here
+    const [contactList, setContactList] = useState('');
     const [contactListName, setContactListName] = useState('');
 
     useEffect(() => {
@@ -107,7 +109,7 @@ export default function TownHall({ address, isMobile }) {
     useEffect(() => {
         // Check whether townhall history is cached
         (async () => {
-            //await getTownhallHistoryByPage(0);
+            await refreshContactList();
             const townhallCache = await localforage.getItem(appConfig.localTownhallCacheParam);
             // If cache exists, set initial render to cached history
             if (townhallCache && townhallCache.txs && Array.isArray(townhallCache.txs) && townhallCache.txs.length > 0) {
@@ -119,6 +121,11 @@ export default function TownHall({ address, isMobile }) {
             await getTownhallHistoryByPage(0);
         })();
     }, []);
+
+    const refreshContactList = async () => {
+        let contactList = await localforage.getItem(appConfig.localContactsParam);
+        setContactList(contactList);
+    };
 
     // Refreshes the post history via chronik
     const getTownhallHistoryByPage = async (pageNum = 0, localLookup = false, townhallCache = false) => {
@@ -734,7 +741,7 @@ export default function TownHall({ address, isMobile }) {
                                                             copy(tx.replyAddress);
                                                             toast(`${tx.replyAddress} copied to clipboard`);
                                                         }}>
-                                                            {tx.replyAddress.substring(0,10)}...{tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                                            {getContactNameIfExist(tx.replyAddress, contactList)}
                                                         </div>
                                                     </div>
                                                     </Badge>
@@ -767,7 +774,7 @@ export default function TownHall({ address, isMobile }) {
                                                                     type="button"
                                                                     disabled={contactListName === ''}
                                                                     onClick={e => {
-                                                                        addNewContact(contactListName, tx.replyAddress);
+                                                                        addNewContact(contactListName, tx.replyAddress, refreshContactList);
                                                                         setContactListName('');
                                                                     }}
                                                                 >

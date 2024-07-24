@@ -18,7 +18,7 @@ import {
     ReplieduseravatarIcon,
     Arrowright2Icon,
 } from "@/components/ui/social";
-import { encodeBip2XecTip, getPaginatedHistoryPage } from '../utils/utils';
+import { encodeBip2XecTip, getPaginatedHistoryPage, getContactNameIfExist } from '../utils/utils';
 import {
   Pagination,
   PaginationContent,
@@ -63,6 +63,7 @@ import copy from 'copy-to-clipboard';
 import { toast } from 'react-toastify';
 import { addNewContact } from '../utils/utils';
 const chronik = new ChronikClientNode(chronikConfig.urls);
+import localforage from 'localforage';
 
 export default function TxHistory({ address }) {
     const [txHistory, setTxHistory] = useState(''); // current inbox history page
@@ -78,6 +79,7 @@ export default function TxHistory({ address }) {
     const [encryptedMessage, setEncryptedMessage] = useState('');
     const [currentPage, setCurrentPage] = useState(0);
     const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here
+    const [contactList, setContactList] = useState('');
     const newContactNameInput = useRef('');
 
     useEffect(() => {
@@ -95,9 +97,15 @@ export default function TxHistory({ address }) {
     useEffect(() => {
         // Render the first page by default upon initial load
         (async () => {
+            await refreshContactList();
             await getTxHistoryByPage(0);
         })();
     }, []);
+
+    const refreshContactList = async () => {
+        let contactList = await localforage.getItem(appConfig.localContactsParam);
+        setContactList(contactList);
+    };
 
     // Filters txHistory for txs where the address matches either the sender or receiver outputs
     const getTxHistoryByAddress = () => {
@@ -281,7 +289,7 @@ export default function TxHistory({ address }) {
                                               toast(`${tx.replyAddress} copied to clipboard`);
                                           }}>
                                         <Badge className="leading-7 shadow-sm hover:bg-accent py-3px" variant="outline">
-                                             {tx.replyAddress.substring(0,8)}...{tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                             {getContactNameIfExist(tx.replyAddress, contactList)}
                                         </Badge>
                                           </div>
                                       </div>
@@ -377,8 +385,8 @@ export default function TxHistory({ address }) {
                                                       <Button
                                                           type="button"
                                                           disabled={newContactNameInput?.current?.value === ''}
-                                                          onClick={e => {
-                                                              addNewContact(newContactNameInput?.current?.value, tx.replyAddress);
+                                                          onClick={async e => {
+                                                              await addNewContact(newContactNameInput?.current?.value, tx.replyAddress, refreshContactList);
                                                           }}
                                                       >
                                                           Add Contact
@@ -442,7 +450,7 @@ export default function TxHistory({ address }) {
                                                toast(`${tx.recipientAddress} copied to clipboard`);
                                            }}>
                                             <Badge className="leading-7 shadow-sm hover:bg-accent py-3px" variant="outline">
-                                            {tx.recipientAddress.substring(0,8)}...{tx.recipientAddress.substring(tx.recipientAddress.length - 5)}
+                                            {getContactNameIfExist(tx.recipientAddress, contactList)}
                                            </Badge>
                                               
                                           </div>
@@ -544,8 +552,8 @@ export default function TxHistory({ address }) {
                                                       <Button
                                                           type="button"
                                                           disabled={newContactNameInput?.current?.value === ''}
-                                                          onClick={e => {
-                                                              addNewContact(newContactNameInput?.current?.value, tx.recipientAddress);
+                                                          onClick={async e => {
+                                                              await addNewContact(newContactNameInput?.current?.value, tx.recipientAddress, refreshContactList);
                                                           }}
                                                       >
                                                           Add Contact

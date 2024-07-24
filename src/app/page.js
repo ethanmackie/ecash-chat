@@ -534,8 +534,7 @@ export default function Home() {
                     </p>
                 </div>
                 <div>
-                  <p className="font-light text-xs">Aliases Registered</p>
-                  <p className="font-medium tracking-wider text-sm">{aliases.registered ? aliases.registered.length : 0}</p>
+                    {/* Placeholder for alias display */}
                 </div>
               </div>
             </CardFooter>
