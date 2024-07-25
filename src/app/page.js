@@ -95,7 +95,7 @@ export default function Home() {
     const [savedLogin, setSavedLogin] = useState(false);
     const [showLoadingSpinner, setShowLoadingSpinner] = useState(true);
     const [showFullAddress, setShowFullAddress] = useState(false);
-    const [showCard, setShowCard] = useState(true);
+    const [showCard, setShowCard] = useState(false);
     const [userAvatarLink, setUserAvatarLink] = useState(false);
     const [latestAvatars, setLatestAvatars] = useState([]);
 

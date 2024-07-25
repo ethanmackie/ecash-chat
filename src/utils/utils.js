@@ -467,6 +467,9 @@ export const exportContacts = contactListArray => {
 
 // Return the contact name based on address if this contact exists
 export const getContactNameIfExist = (address, contactList) => {
+    if (!Array.isArray(contactList)) {
+        return address.substring(0,10) + '...' + address.substring(address.length - 5);
+    }
     // Find the contact
     let contactExists = contactList.find(
         contact => contact.address === address,
