@@ -6,5 +6,5 @@ export const chronik = {
     txHistoryPageSize: 200,
     articleHistoryPageSize: 25,
     townhallHistoryPageSize: 25,
-    chronikHistoryPageCap: 3,
+    chronikHistoryPageCap: 6,
 };
