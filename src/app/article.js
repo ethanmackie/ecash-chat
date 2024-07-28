@@ -63,6 +63,7 @@ import {
     formatBalance,
     addNewContact,
     getContactNameIfExist,
+    RenderTipping,
 } from '../utils/utils';
 import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon } from "@/components/ui/social";
 import { toast } from 'react-toastify';
@@ -429,7 +430,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                         {getContactNameIfExist(foundReply.replyAddress, contactList)}
                                     </Badge>
                                 </div>
-                                <RenderTipping address={foundReply.replyAddress} />
+                                <RenderTipping address={foundReply.replyAddress} sendXecTip={sendXecTip} />
                             </div>
                         </div>
                         <div className="py-2 leading-7">
@@ -577,79 +578,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         }
     };
 
-    // Render the tipping button popover
-    const RenderTipping = ( { address } ) => {
-        return (
-            <>
-            {/* Tip XEC options */}
-            <Popover
-              aria-labelledby="default-popover"
-              content={
-                <div className="w-50 text-sm text-gray-500 dark:text-gray-400">
-                  <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
-                    <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Tipping Amount</h3>
-                  </div>
-                  <div className="px-3 py-4">
-                      <Button
-                        type="button"
-                        onClick={e => {
-                            sendXecTip(address, 100);
-                        }}
-                      >
-                        100
-                      </Button>
-                      &nbsp;
-                      <Button
-                        type="button"
-                        onClick={e => {
-                            sendXecTip(address, 1000);
-                        }}
-                      >
-                        1k
-                      </Button>
-                      &nbsp;
-                      <Button
-                        type="button"
-                        onClick={e => {
-                            sendXecTip(address, 10000);
-                        }}
-                      >
-                        10k
-                      </Button>
-                      &nbsp;
-                      <Button
-                        type="button"
-                        onClick={e => {
-                            sendXecTip(address, 100000);
-                        }}
-                      >
-                        100k
-                      </Button>
-                      &nbsp;
-                      <Button
-                        type="button"
-                        onClick={e => {
-                            sendXecTip(address, 1000000);
-                        }}
-                      >
-                        1M
-                      </Button>
-                  </div>
-                </div>
-              }
-              >
-                <Button
-                    type="button"
-                    variant="outline" 
-                    size="icon"
-                >
-                   <AlitacoffeeIcon />
-                </Button>
-              </Popover>
-            </>
-        );
-    };
-
     const PaywallPaymentModal = () => {
         return (
             <Modal show={showPaywallPaymentModal} onClose={() => setShowPaywallPaymentModal(false)}>
@@ -702,7 +630,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 <Modal.Footer className="flex flex-col items-start space-x-0 space-y-2 rounded-b border-gray-200 p-6 dark:border-gray-600 border-t">
                     <div className="flex gap-2">
                         {/* Tipping action to an article */}
-                        <RenderTipping address={currentArticleTxObj.replyAddress} />
+                        <RenderTipping address={currentArticleTxObj.replyAddress} sendXecTip={sendXecTip} />
 
                         {/* Sharing options */}
                         <Popover

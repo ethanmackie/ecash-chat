@@ -50,6 +50,7 @@ import {
     encodeBip2XecTip,
     getTweetId,
     getContactNameIfExist,
+    RenderTipping,
 } from '../utils/utils';
 import {
     getTxHistory,
@@ -457,7 +458,7 @@ export default function TownHall({ address, isMobile }) {
                                             {foundReply.replyAddress.substring(0, 10) + '...' + foundReply.replyAddress.substring(foundReply.replyAddress.length - 5)}
                                             </Badge>
                                         </div>
-                                        <RenderTipping address={foundReply.replyAddress} />
+                                        <RenderTipping address={foundReply.replyAddress} sendXecTip={sendXecTip}/>
                                         </div>
                                     </div>
                                     <div className="py-2 leading-7">
@@ -473,79 +474,6 @@ export default function TownHall({ address, isMobile }) {
                 </AccordionContent>
             </AccordionItem>
             </Accordion>
-        );
-    };
-
-    // Render the tipping button popover
-    const RenderTipping = ( { address } ) => {
-        return (
-            <>
-            {/* Tip XEC options */}
-            <Popover
-              aria-labelledby="default-popover"
-              content={
-                <div className="w-50 text-sm text-gray-500 dark:text-gray-400">
-                  <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
-                    <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Tipping Amount</h3>
-                  </div>
-                  <div className="px-3 py-4">
-                      <Button
-                        type="button"
-                        onClick={e => {
-                            sendXecTip(address, 100);
-                        }}
-                      >
-                        100
-                      </Button>
-                      &nbsp;
-                      <Button
-                        type="button"
-                        onClick={e => {
-                            sendXecTip(address, 1000);
-                        }}
-                      >
-                        1k
-                      </Button>
-                      &nbsp;
-                      <Button
-                        type="button"
-                        onClick={e => {
-                            sendXecTip(address, 10000);
-                        }}
-                      >
-                        10k
-                      </Button>
-                      &nbsp;
-                      <Button
-                        type="button"
-                        onClick={e => {
-                            sendXecTip(address, 100000);
-                        }}
-                      >
-                        100k
-                      </Button>
-                      &nbsp;
-                      <Button
-                        type="button"
-                        onClick={e => {
-                            sendXecTip(address, 1000000);
-                        }}
-                      >
-                        1M
-                      </Button>
-                  </div>
-                </div>
-              }
-              >
-                <Button
-                    type="button"
-                    variant="outline" 
-                    size="icon"
-                >
-                   <AlitacoffeeIcon />
-                </Button>
-              </Popover>
-            </>
         );
     };
 
@@ -747,7 +675,7 @@ export default function TownHall({ address, isMobile }) {
                                                     </Badge>
 
                                                     {/* Tip XEC options */}
-                                                    <RenderTipping address={tx.replyAddress} />
+                                                    <RenderTipping address={tx.replyAddress} sendXecTip={sendXecTip} />
 
                                                     {/* Add contact popover to input the new contact name */}
                                                     <Popover

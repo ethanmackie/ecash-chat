@@ -5,6 +5,9 @@ import localforage from 'localforage';
 import { BN } from 'slp-mdm';
 import { appConfig } from '../config/app';
 import { toast } from 'react-toastify';
+import { AlitacoffeeIcon } from "@/components/ui/social";
+import { Button } from "@/components/ui/button";
+import { Popover } from "flowbite-react";
 const SATOSHIS_PER_XEC = 100;
 
 /**
@@ -480,4 +483,77 @@ export const getContactNameIfExist = (address, contactList) => {
         return contactExists.name;
     }
     return address.substring(0,10) + '...' + address.substring(address.length - 5);
+};
+
+// Render the tipping button popover
+export const RenderTipping = ( { address, sendXecTip } ) => {
+    return (
+        <>
+        {/* Tip XEC options */}
+        <Popover
+          aria-labelledby="default-popover"
+          content={
+            <div className="w-50 text-sm text-gray-500 dark:text-gray-400">
+              <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
+                <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Tipping Amount</h3>
+              </div>
+              <div className="px-3 py-4">
+                  <Button
+                    type="button"
+                    onClick={e => {
+                        sendXecTip(address, 100);
+                    }}
+                  >
+                    100
+                  </Button>
+                  &nbsp;
+                  <Button
+                    type="button"
+                    onClick={e => {
+                        sendXecTip(address, 1000);
+                    }}
+                  >
+                    1k
+                  </Button>
+                  &nbsp;
+                  <Button
+                    type="button"
+                    onClick={e => {
+                        sendXecTip(address, 10000);
+                    }}
+                  >
+                    10k
+                  </Button>
+                  &nbsp;
+                  <Button
+                    type="button"
+                    onClick={e => {
+                        sendXecTip(address, 100000);
+                    }}
+                  >
+                    100k
+                  </Button>
+                  &nbsp;
+                  <Button
+                    type="button"
+                    onClick={e => {
+                        sendXecTip(address, 1000000);
+                    }}
+                  >
+                    1M
+                  </Button>
+              </div>
+            </div>
+          }
+          >
+            <Button
+                type="button"
+                variant="outline"
+                size="icon"
+            >
+               <AlitacoffeeIcon />
+            </Button>
+          </Popover>
+        </>
+    );
 };

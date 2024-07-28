@@ -18,7 +18,7 @@ import {
     ReplieduseravatarIcon,
     Arrowright2Icon,
 } from "@/components/ui/social";
-import { encodeBip2XecTip, getPaginatedHistoryPage, getContactNameIfExist } from '../utils/utils';
+import { encodeBip2XecTip, getPaginatedHistoryPage, getContactNameIfExist, RenderTipping } from '../utils/utils';
 import {
   Pagination,
   PaginationContent,
@@ -293,70 +293,7 @@ export default function TxHistory({ address }) {
                                         </Badge>
                                           </div>
                                       </div>
-                                      <Popover
-                                        aria-labelledby="default-popover"
-                                        content={
-                                          <div className="w-50 text-sm text-gray-500 dark:text-gray-400">
-                                            <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
-                                              <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Tipping Amount</h3>
-                                            </div>
-                                            <div className="px-3 py-2">
-                                                <Button
-                                                  type="button"                                              
-                                                  onClick={e => {
-                                                      sendXecTip(tx.replyAddress, 100);
-                                                  }}
-                                                >
-                                                  100
-                                                </Button>
-                                                &nbsp;
-                                                <Button
-                                                  type="button"
-                                                  onClick={e => {
-                                                      sendXecTip(tx.replyAddress, 1000);
-                                                  }}
-                                                >
-                                                  1k
-                                                </Button>
-                                                &nbsp;
-                                                <Button
-                                                  type="button"
-                                                  onClick={e => {
-                                                      sendXecTip(tx.replyAddress, 10000);
-                                                  }}
-                                                >
-                                                  10k
-                                                </Button>
-                                                &nbsp;
-                                                <Button
-                                                  type="button"
-                                                  onClick={e => {
-                                                      sendXecTip(tx.replyAddress, 100000);
-                                                  }}
-                                                >
-                                                  100k
-                                                </Button>
-                                                &nbsp;
-                                                <Button
-                                                  type="button"
-                                                  onClick={e => {
-                                                      sendXecTip(tx.replyAddress, 1000000);
-                                                  }}
-                                                >
-                                                  1M
-                                                </Button>
-                                            </div>
-                                          </div>
-                                        }
-                                      >
-                                        <Button
-                                          type="button"
-                                          variant="outline" 
-                                          size="icon"
-                                      >
-                                        <AlitacoffeeIcon />
-                                      </Button>
-                                      </Popover>
+                                      <RenderTipping address={tx.replyAddress} sendXecTip={sendXecTip} />
                                     </div>
                                     {/* Add contact popover to input the new contact name */}
                                     <div
