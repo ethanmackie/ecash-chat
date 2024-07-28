@@ -8,12 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Popover, Modal } from "flowbite-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon, Pencil1Icon, IdCardIcon } from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon, Pencil1Icon } from "@radix-ui/react-icons";
 import { ImDownload3 } from "react-icons/im";
 import { RiSave3Fill } from "react-icons/ri";
 import {
     EncryptionIcon,
     UnlockIcon,
+    IdCardIcon,
 } from "@/components/ui/social";
 import {
     Select,
@@ -813,7 +814,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                         </div>
                         </CardContent>
                             <CardFooter>
-                                <div className="relative mt-2 flex items-center gap-x-4">
+                                <div className="relative mt-2 flex items-center gap-x-2">
                                 {tx.senderAvatarLink === false ? (
                                     <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
                                 ) : (
@@ -865,6 +866,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                                 <Button
                                                     type="button"
                                                     disabled={newContactNameInput?.current?.value === ''}
+                                                    className="mt-2"
                                                     onClick={e => {
                                                         addNewContact(newContactNameInput?.current?.value, tx.replyAddress, refreshContactList);
                                                     }}

@@ -9,7 +9,7 @@ import { isValidRecipient } from '../validation/validation';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { MagnifyingGlassIcon, ResetIcon, Link2Icon, Share1Icon, IdCardIcon } from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon, ResetIcon, Link2Icon, Share1Icon } from "@radix-ui/react-icons";
 import {
     DecryptionIcon,
     MoneyIcon,
@@ -17,6 +17,7 @@ import {
     DefaultavatarIcon, 
     ReplieduseravatarIcon,
     Arrowright2Icon,
+    IdCardIcon,
 } from "@/components/ui/social";
 import { encodeBip2XecTip, getPaginatedHistoryPage, getContactNameIfExist, RenderTipping } from '../utils/utils';
 import {
@@ -295,48 +296,6 @@ export default function TxHistory({ address }) {
                                       </div>
                                       <RenderTipping address={tx.replyAddress} sendXecTip={sendXecTip} />
                                     </div>
-                                    {/* Add contact popover to input the new contact name */}
-                                    <div
-                                          onClick={(e) => {
-                                              e.stopPropagation();
-                                          }}
-                                      >
-                                          <Popover
-                                              aria-labelledby="default-popover"
-                                              placement="top"
-                                              content={
-                                              <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
-                                                  <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
-                                                  <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Input contact name for <br />{tx.replyAddress}</h3>
-                                                  </div>
-                                                  <div className="px-3 py-2">
-                                                      <Input
-                                                          id="addContactName"
-                                                          name="addContactName"
-                                                          type="text"
-                                                          ref={newContactNameInput}
-                                                          placeholder="New contact name"
-                                                          className="bg-gray-50"
-                                                          maxLength="30"
-                                                      />
-                                                      <Button
-                                                          type="button"
-                                                          disabled={newContactNameInput?.current?.value === ''}
-                                                          onClick={async e => {
-                                                              await addNewContact(newContactNameInput?.current?.value, tx.replyAddress, refreshContactList);
-                                                          }}
-                                                      >
-                                                          Add Contact
-                                                      </Button>
-                                                  </div>
-                                              </div>
-                                              }
-                                          >
-                                              <Button variant="outline" size="icon" className="mr-2">
-                                                  <IdCardIcon className="h-4 w-4" />
-                                              </Button>
-                                          </Popover>
-                                      </div>
                                   </span>
                                 </>)
                               }
@@ -394,48 +353,6 @@ export default function TxHistory({ address }) {
                                        </div>
                                        <RenderTipping address={tx.recipientAddress} sendXecTip={sendXecTip} />
                                     </div>
-                                    {/* Add contact popover to input the new contact name */}
-                                    <div
-                                          onClick={(e) => {
-                                              e.stopPropagation();
-                                          }}
-                                      >
-                                          <Popover
-                                              aria-labelledby="default-popover"
-                                              placement="top"
-                                              content={
-                                              <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
-                                                  <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
-                                                  <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Input contact name for <br />{tx.recipientAddress}</h3>
-                                                  </div>
-                                                  <div className="px-3 py-2">
-                                                      <Input
-                                                          id="addContactName"
-                                                          name="addContactName"
-                                                          type="text"
-                                                          ref={newContactNameInput}
-                                                          placeholder="New contact name"
-                                                          className="bg-gray-50"
-                                                          maxLength="30"
-                                                      />
-                                                      <Button
-                                                          type="button"
-                                                          disabled={newContactNameInput?.current?.value === ''}
-                                                          onClick={async e => {
-                                                              await addNewContact(newContactNameInput?.current?.value, tx.recipientAddress, refreshContactList);
-                                                          }}
-                                                      >
-                                                          Add Contact
-                                                      </Button>
-                                                  </div>
-                                              </div>
-                                              }
-                                          >
-                                              <Button variant="outline" size="icon" className="mr-2">
-                                                  <IdCardIcon className="h-4 w-4" />
-                                              </Button>
-                                          </Popover>
-                                      </div>
                                    </span>
                                  </>)
                                }
@@ -641,7 +558,56 @@ export default function TxHistory({ address }) {
                                <Button variant="outline" size="icon">
                                <Share1Icon className="h-4 w-4" />
                               </Button>
+                           {/* one popover here only so the layout is cleaner */}
                             </Popover>
+                            {(tx.replyAddress !== address || tx.recipientAddress !== address) && (
+                            <div
+                              onClick={(e) => {
+                                e.stopPropagation();
+                              }}
+                            >
+                              <Popover
+                                aria-labelledby="default-popover"
+                                placement="top"
+                                content={
+                                  <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
+                                    <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
+                                      <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">
+                                        Input contact name for <br />
+                                        {tx.replyAddress !== address ? tx.replyAddress : tx.recipientAddress}
+                                      </h3>
+                                    </div>
+                                    <div className="px-3 py-2">
+                                      <Input
+                                        id="addContactName"
+                                        name="addContactName"
+                                        type="text"
+                                        ref={newContactNameInput}
+                                        placeholder="New contact name"
+                                        className="bg-white"
+                                        maxLength="30"
+                                      />
+                                      <Button
+                                        type="button"
+                                        disabled={newContactNameInput?.current?.value === ''}
+                                        className="mt-2"
+                                        onClick={async (e) => {
+                                          const addressToAdd = tx.replyAddress !== address ? tx.replyAddress : tx.recipientAddress;
+                                          await addNewContact(newContactNameInput?.current?.value, addressToAdd, refreshContactList);
+                                        }}
+                                      >
+                                        Add Contact
+                                      </Button>
+                                    </div>
+                                  </div>
+                                }
+                              >
+                                <Button variant="outline" size="icon" className="ml-2">
+                                  <IdCardIcon className="h-4 w-4" />
+                                </Button>
+                              </Popover>
+                            </div>
+                          )}
                         </div>
                      </div>
                     </div>
@@ -720,7 +686,7 @@ export default function TxHistory({ address }) {
                       type="text"
                       value={addressToSearch}
                       required
-                      className="bg-gray-50"
+                      className="bg-white"
                       placeholder='Search By Address'
                       onChange={e => handleAddressChange(e)}
                     />

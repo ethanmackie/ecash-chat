@@ -797,15 +797,9 @@ export default function Home() {
 
           {/* Tab navigation */}
           <Tabs aria-label="eCash Chat" style="default" className='z-10 !border-b-0 focus:ring-0 relative mt-4 justify-center'>
-            <Tabs.Item title="Inbox" icon={Inbox3Icon}>
-                {cashaddr.isValidCashAddress(address, 'ecash') &&
-                    <TxHistory address={address} />
-                }
-            </Tabs.Item>
-
-            <Tabs.Item title="Send" className='focus:ring-0' f icon={Send3Icon} >
-                <div style={{ display: (isLoggedIn ? 'block' : 'none') }}>
-                    <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
+            <Tabs.Item title="Message" icon={Send3Icon}>
+            <div style={{ display: (isLoggedIn ? 'block' : 'none') }}>
+                    <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96 mb-2">
                         <MessagePreviewModal />
                         <form className="space-y-0 w-full mx-auto max-w-xl" action="#" method="POST">
                             <div>
@@ -817,7 +811,7 @@ export default function Home() {
                                 value={recipient}
                                 required
                                 placeholder="to:address"
-                                className="bg-gray-50"
+                                className="bg-white"
                                 onChange={e => handleAddressChange(e)}
                                 />
                             </div>
@@ -908,13 +902,13 @@ export default function Home() {
                             </div>
                             </div>
                             </div>     
-                            <div className="grid w-full items-center gap-2 mt-4">                       
-                            <Label htmlFor="value-input">Send XEC amount (optional, 5.5 XEC by default):</Label>
+                            <div className="grid w-full items-center gap-2 mt-2">                       
                             <Input
                                 type="number"
                                 id="value-input"
-                                aria-describedby="helper-text-explanation" className="bg-gray-50"
+                                aria-describedby="helper-text-explanation" className="bg-white"
                                 defaultValue="5.5"
+                                placeholder="Send XEC amount (optional, at least 5.5 XEC)"
                                 onChange={e => handleSendAmountChange(e)}
                             />                
                                 </div>       
@@ -953,7 +947,11 @@ export default function Home() {
                         </form>
                 </div>
             </div>
+                {cashaddr.isValidCashAddress(address, 'ecash') &&
+                    <TxHistory address={address} />
+                }
             </Tabs.Item>
+
 
               <Tabs.Item title="Town Hall" active icon={Home3Icon} >
                   <Townhall address={address} isMobile={isMobile} />

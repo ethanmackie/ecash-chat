@@ -11,8 +11,8 @@ import {
     AvatarFallback,
     AvatarImage,
   } from "@/components/ui/avatar";
-import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon, YoutubeIcon, AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon } from "@/components/ui/social";
-import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon, ChatBubbleIcon, Share1Icon, IdCardIcon } from '@radix-ui/react-icons';
+import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon, YoutubeIcon, AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, IdCardIcon } from "@/components/ui/social";
+import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon, ChatBubbleIcon, Share1Icon } from '@radix-ui/react-icons';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
@@ -701,6 +701,7 @@ export default function TownHall({ address, isMobile }) {
                                                                 <Button
                                                                     type="button"
                                                                     disabled={contactListName === ''}
+                                                                    className="mt-2"
                                                                     onClick={e => {
                                                                         addNewContact(contactListName, tx.replyAddress, refreshContactList);
                                                                         setContactListName('');

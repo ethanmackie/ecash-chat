@@ -23,8 +23,7 @@ import {
 } from "@/components/ui/avatar";
 import { appConfig } from '../config/app';
 import { getNFTAvatarLink, deleteContact, renameContact, exportContacts } from '../utils/utils';
-import { DefaultavatarIcon} from "@/components/ui/social";
-import { IdCardIcon } from '@radix-ui/react-icons';
+import { DefaultavatarIcon, IdCardIcon} from "@/components/ui/social";
 import { toast } from 'react-toastify';
 import copy from 'copy-to-clipboard';
 import { Input } from "@/components/ui/input";
