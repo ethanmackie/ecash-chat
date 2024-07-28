@@ -557,7 +557,13 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             }
         }
 
-        return totalPaywallEarned.gt(0) && `${formatBalance(totalPaywallEarned, getUserLocale(navigator))} XEC earned`;
+        return totalPaywallEarned.gt(0) && `Earned: ${formatBalance(totalPaywallEarned, getUserLocale(navigator))} XEC`;
+    };
+
+    // Calculate the total number of comments for a particular article
+    const getTotalCommentsPerArticle = (txid, replies) => {
+        const foundReplies = replies.filter(replyTx => replyTx.articleTxid === txid);
+        return foundReplies.length > 0 && `Comments: ${foundReplies.length}`;
     };
 
     // Conditionally renders the appropriate modal based on paywall payment status
@@ -947,7 +953,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 )}
                                 </div>
                                 <div>
-                                    {getTotalPaywallEarnedPerArticle(tx.txid)}
+                                    {getTotalPaywallEarnedPerArticle(tx.txid)}<br />
+                                    {getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}
                                 </div>
                             </CardFooter>
                             </Card>
