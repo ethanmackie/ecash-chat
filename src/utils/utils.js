@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { AlitacoffeeIcon } from "@/components/ui/social";
 import { Button } from "@/components/ui/button";
 import { Popover } from "flowbite-react";
+import { Input } from "@/components/ui/input";
 const SATOSHIS_PER_XEC = 100;
 
 /**
@@ -542,6 +543,22 @@ export const RenderTipping = ( { address, sendXecTip } ) => {
                   >
                     1M
                   </Button>
+                  <br /><br />
+                    <Input
+                        id="customTip"
+                        name="customTip"
+                        type="number"
+                        placeholder="Custom tip in XEC"
+                        className="bg-gray-50"
+                    />
+                    <Button
+                        type="button"
+                        onClick={e => {
+                            sendXecTip(address, document.getElementById('customTip').value);
+                        }}
+                    >
+                        Custom
+                    </Button>
               </div>
             </div>
           }
