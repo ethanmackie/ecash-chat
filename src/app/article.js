@@ -93,6 +93,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import DOMPurify from 'dompurify';
 import MarkdownEditor from '@uiw/react-markdown-editor';
 import { getStackArray } from 'ecash-script';
+import { BN } from 'slp-mdm';
 
 export default function Article( { chronik, address, isMobile, sharedArticleTxid, setXecBalance } ) {
     const [articleHistory, setArticleHistory] = useState('');  // current article history page
@@ -543,6 +544,22 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         return paywallPaid;
     };
 
+    // Calculate the aggregate paywall revenue earned for a particular article
+    const getTotalPaywallEarnedPerArticle = (paywalledArticleTxId, localArticleHistoryResp = false) => {
+        let localArticleHistory = articleHistory;
+        if (localArticleHistoryResp) {
+            localArticleHistory = localArticleHistoryResp;
+        }
+        let totalPaywallEarned = BN(0);
+        for (const thisPaywallPayment of localArticleHistory.paywallTxs) {
+            if (thisPaywallPayment.paywallPaymentArticleTxid === paywalledArticleTxId) {
+                totalPaywallEarned = totalPaywallEarned.plus(BN(thisPaywallPayment.paywallPayment));
+            }
+        }
+
+        return totalPaywallEarned.gt(0) && `${formatBalance(totalPaywallEarned, getUserLocale(navigator))} XEC earned`;
+    };
+
     // Conditionally renders the appropriate modal based on paywall payment status
     const handlePaywallStatus = (paywalledArticleTxId, paywallPrice, localArticleHistoryResp = false) => {
         const paywallPaid = checkPaywallPayment(paywalledArticleTxId, paywallPrice, localArticleHistoryResp );
@@ -928,6 +945,9 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (
                                     <UnlockIcon />
                                 )}
+                                </div>
+                                <div>
+                                    {getTotalPaywallEarnedPerArticle(tx.txid)}
                                 </div>
                             </CardFooter>
                             </Card>
