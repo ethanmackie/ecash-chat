@@ -552,13 +552,17 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             localArticleHistory = localArticleHistoryResp;
         }
         let totalPaywallEarned = BN(0);
+        let totalUnlockCount = BN(0);
         for (const thisPaywallPayment of localArticleHistory.paywallTxs) {
             if (thisPaywallPayment.paywallPaymentArticleTxid === paywalledArticleTxId) {
                 totalPaywallEarned = totalPaywallEarned.plus(BN(thisPaywallPayment.paywallPayment));
+                totalUnlockCount = totalUnlockCount.plus(BN(1));
             }
         }
 
-        return totalPaywallEarned.gt(0) && `Earned: ${formatBalance(totalPaywallEarned, getUserLocale(navigator))} XEC`;
+        const paywallEarned = totalPaywallEarned.gt(0) ? `Earned ${formatBalance(totalPaywallEarned, getUserLocale(navigator))} XEC` : '';
+        const paywallUnlocks = totalUnlockCount.gt(0) ? ` from ${totalUnlockCount} unlocks` : '';
+        return paywallEarned + paywallUnlocks;
     };
 
     // Calculate the total number of comments for a particular article
