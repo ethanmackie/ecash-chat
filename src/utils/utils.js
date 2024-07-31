@@ -148,7 +148,7 @@ export const encodeBip21PaywallPayment = replyTxid => {
         script.push(Buffer.from(opreturnConfig.appPrefixesHex.paywallPaymentPrefixHex, 'hex'));
 
         // Push txid of paywalled article
-        script.push(Buffer.from(replyTxid));
+        script.push(Buffer.from(replyTxid, 'hex'));
 
         script = utxolib.script.compile(script).toString('hex');
         return script;

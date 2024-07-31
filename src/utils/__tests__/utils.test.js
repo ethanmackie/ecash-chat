@@ -78,7 +78,7 @@ it(`encodeBip2XecTip() correctly encodes a valid XEC tip for use in a BIP21 quer
 it(`encodeBip21PaywallPayment() correctly encodes a valid article paywall payment for use in a BIP21 querystring`, () => {
     expect(encodeBip21PaywallPayment(
         '0729318a128ee8f11d18b28237c8ae7ffa4e95c88ec69ebce716758e1973c5d4',
-    )).toStrictEqual('04706179774030373239333138613132386565386631316431386232383233376338616537666661346539356338386563363965626365373136373538653139373363356434');
+    )).toStrictEqual('0470617977200729318a128ee8f11d18b28237c8ae7ffa4e95c88ec69ebce716758e1973c5d4');
 });
 it(`Accepts a valid unix timestamp`, () => {
     expect(formatDate('1639679649', 'fr')).toBe('17 déc. 2021');

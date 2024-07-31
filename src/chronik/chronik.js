@@ -1368,7 +1368,8 @@ export const parseChronikTx = (tx, address, latestAvatars = false) => {
                     break;
                 }
                 case opreturnConfig.appPrefixesHex.paywallPaymentPrefixHex: {
-                    paywallPaymentArticleTxid = Buffer.from(stackArray[1], 'hex').toString();
+                    paywallPaymentArticleTxid = typeof stackArray[1] !== undefined && stackArray[1].length === 64 ?
+                        stackArray[1] : Buffer.from(stackArray[1], 'hex').toString();
                     isPaywallPayment = true;
                     break;
                 }
