@@ -394,6 +394,14 @@ export const IdCardIcon = () => {
 };
 
 
+export const Stats2Icon = () => {
+    return (
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path opacity="0.28" d="M21 21H7C4.79086 21 3 19.2091 3 17V3" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M8 17V13M13 17V6M18 17V9" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+ );
+};
 
 
 

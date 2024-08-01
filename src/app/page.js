@@ -634,6 +634,7 @@ export default function Home() {
                     toast(`Logged out of ${address}`);
                 }}
                 variant="outline"
+                size="icon"
                 >
                <Logout3Icon/>
                 </Button>

@@ -77,7 +77,7 @@ import {
     getContactNameIfExist,
     RenderTipping,
 } from '../utils/utils';
-import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, GraphchartIcon } from "@/components/ui/social";
+import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, GraphchartIcon, Stats2Icon } from "@/components/ui/social";
 import { toast } from 'react-toastify';
 import { Toggle } from "@/components/ui/toggle";
 import { BiSolidNews } from "react-icons/bi";
@@ -890,7 +890,35 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 </Popover>
                             </div>
                         </div>
-                        <div className="relative mt-2 flex items-center gap-x-2 ml-auto">
+                        <div className="relative mt-2 flex items-center gap-x-2 ml-auto md:hidden">
+                        {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (
+                              <UnlockIcon />
+                          )}
+                            <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button variant="ghost" size="icon" className="mr-2">
+                                            <Stats2Icon className="h-4 w-4" />
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-120">
+                                    <div className="flex flex-col items-start space-y-1 ml-2">
+                            <div className="flex items-center space-x-1">
+                                <ChatBubbleIcon />
+                                <span>{getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                            <GraphchartIcon />
+                            <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} `}</span>
+                            </div>
+                            <p>
+                                {getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned.gt(0) && 
+                                `Earned ${formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))} XEC`}
+                            </p>
+                            </div>
+                         </PopoverContent>
+                         </Popover>
+                      </div>
+                        <div className="relative mt-2 flex items-center gap-x-2 ml-auto hidden md:flex">
                           
                             {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (
                                 <UnlockIcon />
@@ -906,16 +934,15 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             
                             <div className="flex items-center space-x-1 ml-2">
                             <GraphchartIcon />
-                            <span> {getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount.gt(0) && 
-                        `${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} `}</span>
+                            <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} `}</span>
                          </div>
                             </TooltipTrigger>
                             <TooltipContent>
-                            <p>{getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned.gt(0) && 
-                        `Earned ${formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))} XEC`}
-                    <br />
-                    {getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount.gt(0) && 
-                        ` from ${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} unlocks`}</p>
+                            <p>
+                            {`Earned ${formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))} XEC`}
+                            <br />
+                            {` from ${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} unlocks`}
+                        </p>
                             </TooltipContent>
                         </Tooltip>
                         </TooltipProvider>        

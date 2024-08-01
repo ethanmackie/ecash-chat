@@ -294,7 +294,7 @@ export default function TxHistory({ address }) {
                                         </Badge>
                                           </div>
                                       </div>
-                                      <RenderTipping address={tx.replyAddress} sendXecTip={sendXecTip} />
+                                     
                                     </div>
                                   </span>
                                 </>)
@@ -351,7 +351,7 @@ export default function TxHistory({ address }) {
                                               
                                           </div>
                                        </div>
-                                       <RenderTipping address={tx.recipientAddress} sendXecTip={sendXecTip} />
+                                    
                                     </div>
                                    </span>
                                  </>)
@@ -606,8 +606,16 @@ export default function TxHistory({ address }) {
                                   <IdCardIcon className="h-4 w-4" />
                                 </Button>
                               </Popover>
+                              
                             </div>
+                            
                           )}
+                           <div className='ml-2'>
+                              <RenderTipping
+                              address={tx.recipientAddress === address ? tx.replyAddress : tx.recipientAddress}
+                              sendXecTip={sendXecTip}
+                            />
+                              </div>
                         </div>
                      </div>
                     </div>
