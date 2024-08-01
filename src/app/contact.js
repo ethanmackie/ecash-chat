@@ -76,14 +76,14 @@ export default function ContactListPanel({ latestAvatars }) {
                     </CardHeader>
                     <CardContent className="text-sm">
                     {contactList && contactList.length > 0 && contactList.map((thisContact) => (
-                        <div key={thisContact.address} className="flex items-center mt-2">
+                        <div key={thisContact.address} className="flex flex-col items-center mt-2">    
+                        <div className="flex flex-row w-full space-x-4">
                         <Avatar className="h-9 w-9">
                             <AvatarImage src={getNFTAvatarLink(thisContact.address, latestAvatars)} alt="User Avatar" />
                             <AvatarFallback>
                             <DefaultavatarIcon />
                             </AvatarFallback>
                         </Avatar>
-                        <div className="flex flex-row w-full space-x-4">
                             <div className="flex-1 ml-2">
                             <p className="font-semibold leading-none tracking-tight">{thisContact.name}</p>
                             <p
@@ -96,7 +96,7 @@ export default function ContactListPanel({ latestAvatars }) {
                                 {`${thisContact.address.substring(0, 11)}...${thisContact.address.substring(thisContact.address.length - 5)}`}
                             </p>
                             </div>
-                            <div className="ml-auto flex items-center space-x-2">
+                            <div className="ml-auto hidden sm:flex items-center space-x-2">
                             <Button variant="outline" size="icon"
                             onClick={() => {
                                 deleteContact(thisContact.address, setContactList);
@@ -145,6 +145,54 @@ export default function ContactListPanel({ latestAvatars }) {
                       </Popover>
                             </div>
                         </div>
+                        <div className="ml-auto flex sm:hidden items-center space-x-2">
+                            <Button variant="outline" size="icon"
+                            onClick={() => {
+                                deleteContact(thisContact.address, setContactList);
+                            }}
+                            >
+                        <Cross2Icon className="h-4 w-4" />
+                        </Button>
+                        <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" size="icon">
+                            <Pencil1Icon className="h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full">
+                        <div className="space-y-2">
+                            <h4 className="font-medium leading-none">Edit</h4>
+                            <p className="text-sm text-muted-foreground">
+                            Input new name for <br />{thisContact.address}
+                            </p>
+                        </div>
+                       
+                          <div className="py-2">
+                            <Input
+                              id="addContactName"
+                              name="addContactName"
+                              type="text"
+                              value={contactListName}
+                              required
+                              placeholder="New contact name"
+                              maxLength="30"
+                              onChange={e => setContactListName(e.target.value)}
+                            />
+                            <Button
+                              type="button"
+                              disabled={contactListName === ''}
+                              onClick={e => {
+                                renameContact(thisContact.address, setContactList, contactListName);
+                                setContactListName('');
+                              }}
+                              className="mt-2"
+                            >
+                              Rename Contact
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                            </div>
                         </div>
                     ))}
                     </CardContent>
