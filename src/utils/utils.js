@@ -556,6 +556,7 @@ export const RenderTipping = ( { address, sendXecTip } ) => {
                         onClick={e => {
                             sendXecTip(address, document.getElementById('customTip').value);
                         }}
+                        className="mt-2"
                     >
                         Custom
                     </Button>

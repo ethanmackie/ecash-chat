@@ -5,10 +5,21 @@ import { appConfig } from '../config/app';
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Popover, Modal } from "flowbite-react";
+import { Modal } from "flowbite-react";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+  } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon, Pencil1Icon } from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon, Pencil1Icon, ChatBubbleIcon} from "@radix-ui/react-icons";
 import { ImDownload3 } from "react-icons/im";
 import { RiSave3Fill } from "react-icons/ri";
 import {
@@ -66,7 +77,7 @@ import {
     getContactNameIfExist,
     RenderTipping,
 } from '../utils/utils';
-import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon } from "@/components/ui/social";
+import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, GraphchartIcon } from "@/components/ui/social";
 import { toast } from 'react-toastify';
 import { Toggle } from "@/components/ui/toggle";
 import { BiSolidNews } from "react-icons/bi";
@@ -560,16 +571,17 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 totalUnlockCount = totalUnlockCount.plus(BN(1));
             }
         }
-
-        const paywallEarned = totalPaywallEarned.gt(0) ? `Earned ${formatBalance(totalPaywallEarned, getUserLocale(navigator))} XEC` : '';
-        const paywallUnlocks = totalUnlockCount.gt(0) ? ` from ${totalUnlockCount} unlocks` : '';
-        return paywallEarned + paywallUnlocks;
+    
+        return {
+            totalPaywallEarned,
+            totalUnlockCount
+        };
     };
 
     // Calculate the total number of comments for a particular article
     const getTotalCommentsPerArticle = (txid, replies) => {
         const foundReplies = replies.filter(replyTx => replyTx.articleTxid === txid);
-        return foundReplies.length > 0 && `Comments: ${foundReplies.length}`;
+        return foundReplies.length;
     };
 
     // Conditionally renders the appropriate modal based on paywall payment status
@@ -638,50 +650,47 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                         <RenderTipping address={currentArticleTxObj.replyAddress} sendXecTip={sendXecTip} />
 
                         {/* Sharing options */}
-                        <Popover
-                            aria-labelledby="default-popover"
-                            placement="top"
-                            content={
-                            <div className="w-30 text-sm text-gray-500 dark:text-gray-400">
-                                <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
-                                <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Platform</h3>
-                                </div>
-                                <div className="px-3 py-2">
-                                    <TwitterShareButton
-                                        url={`https://${window.location.host}/?sharedArticleTxid=${currentArticleTxObj.txid}`}
-                                        title={`[Shared from eCashChat.com] - "${currentArticleTxObj.articleObject.title}"`}
-                                    >
-                                    <TwitterIcon size={25} round />
-                                    </TwitterShareButton>
-                                    &nbsp;
-                                    <FacebookShareButton
-                                        url={`https://${window.location.host}/?sharedArticleTxid=${currentArticleTxObj.txid}`}
-                                        quote={`[Shared from eCashChat.com] - "${currentArticleTxObj.articleObject.title}"`}
-                                    >
-                                    <FacebookIcon  size={25} round />
-                                    </FacebookShareButton>
-                                    &nbsp;
-                                    <RedditShareButton
-                                        url={`https://${window.location.host}/?sharedArticleTxid=${currentArticleTxObj.txid}`}
-                                        title={`[Shared from eCashChat.com] - "${currentArticleTxObj.articleObject.title}"`}
-                                    >
-                                    <RedditIcon size={25} round />
-                                    </RedditShareButton>
-                                    &nbsp;
-                                    <TelegramShareButton
-                                        url={`https://${window.location.host}/?sharedArticleTxid=${currentArticleTxObj.txid}`}
-                                        title={`[Shared from eCashChat.com] - "${currentArticleTxObj.articleObject.title}"`}
-                                    >
-                                    <TelegramIcon  size={25} round />
-                                    </TelegramShareButton>
-                                </div>
-                            </div>
-                            }
-                        >
+                        <Popover>
+                        <PopoverTrigger asChild>
                             <Button variant="outline" size="icon">
-                            <Share1Icon className="h-4 w-4" />
+                                <Share1Icon className="h-4 w-4" />
                             </Button>
-                        </Popover>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-30">
+                        <div className="space-y-2">
+                                        <h4 className="font-medium text-gray-900 leading-none">Select Platform</h4>
+                                    </div>
+                            <div className="pt-2">
+                                <TwitterShareButton
+                                    url={`https://${window.location.host}/?sharedArticleTxid=${currentArticleTxObj.txid}`}
+                                    title={`[Shared from eCashChat.com] - "${currentArticleTxObj.articleObject.title}"`}
+                                >
+                                    <TwitterIcon size={25} round />
+                                </TwitterShareButton>
+                                &nbsp;
+                                <FacebookShareButton
+                                    url={`https://${window.location.host}/?sharedArticleTxid=${currentArticleTxObj.txid}`}
+                                    quote={`[Shared from eCashChat.com] - "${currentArticleTxObj.articleObject.title}"`}
+                                >
+                                    <FacebookIcon size={25} round />
+                                </FacebookShareButton>
+                                &nbsp;
+                                <RedditShareButton
+                                    url={`https://${window.location.host}/?sharedArticleTxid=${currentArticleTxObj.txid}`}
+                                    title={`[Shared from eCashChat.com] - "${currentArticleTxObj.articleObject.title}"`}
+                                >
+                                    <RedditIcon size={25} round />
+                                </RedditShareButton>
+                                &nbsp;
+                                <TelegramShareButton
+                                    url={`https://${window.location.host}/?sharedArticleTxid=${currentArticleTxObj.txid}`}
+                                    title={`[Shared from eCashChat.com] - "${currentArticleTxObj.articleObject.title}"`}
+                                >
+                                    <TelegramIcon size={25} round />
+                                </TelegramShareButton>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
                         {/* Reply action to an article, disable if disableReplies is set to true */}
                         {currentArticleTxObj.articleObject.disbleReplies !== true && (
                             <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
@@ -749,156 +758,178 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         }
 
         return (
-                    <div className="max-w-xl w-full mx-auto">
-                    {latestArticleHistory &&
-                    latestArticleHistory.txs &&
-                    latestArticleHistory.txs.length > 0 ? (
-                    latestArticleHistory.txs.map((tx, index) => (
-                        tx.articleObject && (
+            <div className="max-w-xl w-full mx-auto">
+            {latestArticleHistory &&
+            latestArticleHistory.txs &&
+            latestArticleHistory.txs.length > 0 ? (
+            latestArticleHistory.txs.map((tx, index) => (
+                tx.articleObject && (
+                <Card key={index} className="max-w-xl w-full mt-2">
+                    <CardHeader>
+                        <div className="flex items-center gap-x-4 text-xs">
+                            <time dateTime={tx.txTime} className="text-gray-500">
+                                {tx.txDate}
+                            </time>
+                            <Badge variant="secondary">
+                                {tx.articleObject.category || 'General'}
+                            </Badge>
+                        </div>
+                        <CardTitle>{tx.articleObject.title}</CardTitle>
+                        <CardDescription></CardDescription>
+                    
+                    </CardHeader>
+                    <CardContent className="relative">
                         <a
-                            key={index}
                             href="#"
                             onClick={(e) => {
-                            e.preventDefault();
-                            setCurrentArticleTxObj(tx);
-                            if (tx.articleObject.paywallPrice > 0) {
-                                handlePaywallStatus(tx.txid, tx.articleObject.paywallPrice);
-                            } else {
-                                setShowArticleModal(true);
-                            }
+                                e.preventDefault();
+                                setCurrentArticleTxObj(tx);
+                                if (tx.articleObject.paywallPrice > 0) {
+                                    handlePaywallStatus(tx.txid, tx.articleObject.paywallPrice);
+                                } else {
+                                    setShowArticleModal(true);
+                                }
                             }}
                         >
-                            <Card className="max-w-xl w-full mt-2">
-                            <CardHeader>
-                                <div className="flex items-center gap-x-4 text-xs">
-                                <time dateTime={tx.txTime} className="text-gray-500">
-                                    {tx.txDate}
-                                </time>
-                                <Badge variant="secondary">
-                                    {tx.articleObject.category || 'General'}
-                                </Badge>
-                                </div>
-                                <CardTitle>
-                                {tx.articleObject.title}
-                                </CardTitle>
-                                <CardDescription></CardDescription>
-                            </CardHeader>
-                            <CardContent className="relative">
-                        {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (
-                            <Alert
-                            className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-auto z-10 flex items-center justify-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/5"
-                            >
-               
-                            <AlertDescription className="flex items-center justify-center whitespace-nowrap">
-                                <EncryptionIcon />
-                                This article costs {formatBalance(tx.articleObject.paywallPrice, getUserLocale(navigator))} XEC to view
-                            </AlertDescription>
-                            </Alert>
-                        )}
-                        <div className="line-clamp-3">
-                        <p
-                            className={`mt-0 text-sm leading-6 text-gray-600 break-words max-h-80 ${
-                            tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) ? 'blur-sm pt-6' : ''
-                            }`}
-                        >
-                            {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) ? (
-                            <>
-                                <Skeleton className="h-4 mt-2 w-full" />
-                                <Skeleton className="h-4 mt-2 w-2/3" />
-                                <Skeleton className="h-4 mt-2 w-1/2" />
-                            </>
-                            ) : (
-                            <RenderArticle content={tx.articleObject.content} />
+                            {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (
+                                <Alert
+                                    className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-auto z-10 flex items-center justify-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/5"
+                                >
+                                    <AlertDescription className="flex items-center justify-center whitespace-nowrap">
+                                        <EncryptionIcon />
+                                        This article costs {formatBalance(tx.articleObject.paywallPrice, getUserLocale(navigator))} XEC to view
+                                    </AlertDescription>
+                                </Alert>
                             )}
-                        </p>
-                        </div>
-                        </CardContent>
-                            <CardFooter>
-                                <div className="relative mt-2 flex items-center gap-x-2">
-                                {tx.senderAvatarLink === false ? (
-                                    <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
-                                ) : (
+                            <div className="line-clamp-3">
+                                <p
+                                    className={`mt-0 text-sm leading-6 text-gray-600 break-words max-h-80 ${
+                                        tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) ? 'blur-sm pt-6' : ''
+                                    }`}
+                                >
+                                    {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) ? (
+                                        <>
+                                            <Skeleton className="h-4 mt-2 w-full" />
+                                            <Skeleton className="h-4 mt-2 w-2/3" />
+                                            <Skeleton className="h-4 mt-2 w-1/2" />
+                                        </>
+                                    ) : (
+                                        <RenderArticle content={tx.articleObject.content} />
+                                    )}
+                                </p>
+                            </div>
+                        </a>
+                    </CardContent>
+                    <CardFooter>
+                    <div className="relative mt-2 flex items-center gap-x-2">
+                            {tx.senderAvatarLink === false ? (
+                                <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
+                            ) : (
                                 <Avatar className="h-9 w-9">
-                                <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
-                                <AvatarFallback><DefaultavatarIcon/></AvatarFallback>
-                            </Avatar>
-                                )}
-                                <div className="text-sm leading-6">
-                                    <p className="font-semibold text-gray-900">
+                                    <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
+                                    <AvatarFallback><DefaultavatarIcon /></AvatarFallback>
+                                </Avatar>
+                            )}
+                            <div className="text-sm leading-6">
+                                <p className="font-semibold text-gray-900">
                                     <Badge variant="outline" className="py-3px">
                                         <div
-                                        className="leading-7 [&:not(:first-child)]:mt-6"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            copy(tx.replyAddress);
-                                            toast(`${tx.replyAddress} copied to clipboard`);
-                                        }}
+                                            className="leading-7 [&:not(:first-child)]:mt-6"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                copy(tx.replyAddress);
+                                                toast(`${tx.replyAddress} copied to clipboard`);
+                                            }}
                                         >
-                                        {getContactNameIfExist(tx.replyAddress, contactList)}
+                                            {getContactNameIfExist(tx.replyAddress, contactList)}
                                         </div>
                                     </Badge>
-                                    </p>
-                                </div>
-                                {/* Add contact popover to input the new contact name */}
-                                <div
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                    }}
-                                >
-                                    <Popover
-                                        aria-labelledby="default-popover"
-                                        placement="top"
-                                        content={
-                                        <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
-                                            <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
-                                            <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Input contact name for <br />{tx.replyAddress}</h3>
-                                            </div>
-                                            <div className="px-3 py-2">
-                                                <Input
-                                                    id="addContactName"
-                                                    name="addContactName"
-                                                    type="text"
-                                                    ref={newContactNameInput}
-                                                    placeholder="New contact name"
-                                                    className="bg-gray-50"
-                                                    maxLength="30"
-                                                />
-                                                <Button
-                                                    type="button"
-                                                    disabled={newContactNameInput?.current?.value === ''}
-                                                    className="mt-2"
-                                                    onClick={e => {
-                                                        addNewContact(newContactNameInput?.current?.value, tx.replyAddress, refreshContactList);
-                                                    }}
-                                                >
-                                                    Add Contact
-                                                </Button>
-                                            </div>
-                                        </div>
-                                        }
-                                    >
+                                </p>
+                            </div>
+                            {/* Add contact popover to input the new contact name */}
+                            <div
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                }}
+                            >
+                                <Popover>
+                                    <PopoverTrigger asChild>
                                         <Button variant="outline" size="icon" className="mr-2">
                                             <IdCardIcon className="h-4 w-4" />
                                         </Button>
-                                    </Popover>
-                                </div>
-                                {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (
-                                    <UnlockIcon />
-                                )}
-                                </div>
-                                <div>
-                                    {getTotalPaywallEarnedPerArticle(tx.txid)}<br />
-                                    {getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}
-                                </div>
-                            </CardFooter>
-                            </Card>
-                        </a>
-                        )
-                    ))
-                    ) : (
-                    ''
-                    )}
-                </div>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-120">
+                                        <div className="space-y-2">
+                                            <h4 className="font-medium leading-none">New contact</h4>
+                                            <p className="text-sm text-muted-foreground">
+                                                Input contact name for <br />{tx.replyAddress}
+                                            </p>
+                                        </div>
+                                        <div className="py-2">
+                                            <Input
+                                                id="addContactName"
+                                                name="addContactName"
+                                                type="text"
+                                                ref={newContactNameInput}
+                                                placeholder="New contact name"
+                                                className="bg-gray-50"
+                                                maxLength="30"
+                                            />
+                                            <Button
+                                                type="button"
+                                                disabled={newContactNameInput?.current?.value === ''}
+                                                className="mt-2"
+                                                onClick={e => {
+                                                    addNewContact(newContactNameInput?.current?.value, tx.replyAddress, refreshContactList);
+                                                }}
+                                            >
+                                                Add Contact
+                                            </Button>
+                                        </div>
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
+                        </div>
+                        <div className="relative mt-2 flex items-center gap-x-2 ml-auto">
+                          
+                            {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (
+                                <UnlockIcon />
+                            )}
+                              <div className="flex items-center space-x-1 ml-2 ">
+                            <ChatBubbleIcon />
+                            <span>{getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}</span>
+                            </div>
+                            
+                            <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger>
+                            
+                            <div className="flex items-center space-x-1 ml-2">
+                            <GraphchartIcon />
+                            <span> {getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount.gt(0) && 
+                        `${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} `}</span>
+                         </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                            <p>{getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned.gt(0) && 
+                        `Earned ${formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))} XEC`}
+                    <br />
+                    {getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount.gt(0) && 
+                        ` from ${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} unlocks`}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                        </TooltipProvider>        
+                        <div>
+                      </div>
+                        </div>
+                    </CardFooter>
+                </Card>
+                )
+            ))
+            ) : (
+            ''
+            )}
+        </div>
                         );
                     };
 
