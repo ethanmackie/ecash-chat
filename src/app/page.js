@@ -950,7 +950,7 @@ export default function Home() {
                 </div>
             </div>
                 {cashaddr.isValidCashAddress(address, 'ecash') &&
-                    <TxHistory address={address} />
+                    <TxHistory address={address} isMobile={isMobile} />
                 }
             </Tabs.Item>
 

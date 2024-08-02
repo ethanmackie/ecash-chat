@@ -66,7 +66,7 @@ import { addNewContact } from '../utils/utils';
 const chronik = new ChronikClientNode(chronikConfig.urls);
 import localforage from 'localforage';
 
-export default function TxHistory({ address }) {
+export default function TxHistory({ address, isMobile }) {
     const [txHistory, setTxHistory] = useState(''); // current inbox history page
     const [fullTxHistory, setFullTxHistory] = useState(''); // full inbox history
     const [loadingMsg, setLoadingMsg] = useState('');
@@ -192,17 +192,25 @@ export default function TxHistory({ address }) {
     const sendXecTip = (recipient, tipAmount) => {
         // Encode the op_return message script
         const opReturnRaw = encodeBip2XecTip();
+        const bip21Str = `${recipient}?amount=${tipAmount}&op_return_raw=${opReturnRaw}`;
 
-        window.postMessage(
-            {
-                type: 'FROM_PAGE',
-                text: 'Cashtab',
-                txInfo: {
-                    bip21: `${recipient}?amount=${tipAmount}&op_return_raw=${opReturnRaw}`,
-                },
-            },
-            '*',
-        );
+        if (isMobile) {
+          window.open(
+              `https://cashtab.com/#/send?bip21=${bip21Str}`,
+              '_blank',
+          );
+        } else {
+          window.postMessage(
+              {
+                  type: 'FROM_PAGE',
+                  text: 'Cashtab',
+                  txInfo: {
+                      bip21: `${recipient}?amount=${tipAmount}&op_return_raw=${opReturnRaw}`,
+                  },
+              },
+              '*',
+          );
+        }
 
         txListener(chronik, address, "XEC tip", getTxHistoryByPage);
     };
