@@ -640,21 +640,21 @@ export default function Home() {
                 </Button>
             </div>
             ) : (
-            !isMobile && (
-                <div>
-                <Button
-                    onClick={isLoggedIn ? async () => {
-                    setIsLoggedIn(false);
-                    setSavedLogin(false);
-                    await localforage.setItem('savedLoginAddress', false);
-                    toast(`Logged out of ${address}`);
-                    } : () => getAddress()}
-                    variant="outline"
-                    size="icon"
-                >
-                    {isLoggedIn ? <Logout3Icon /> : 'Signin'}
-                </Button>
-                </div>
+                !isMobile && (
+                    <div>
+                      <Button
+                        onClick={isLoggedIn ? async () => {
+                          setIsLoggedIn(false);
+                          setSavedLogin(false);
+                          await localforage.setItem('savedLoginAddress', false);
+                          toast(`Logged out of ${address}`);
+                        } : () => getAddress()}
+                        variant="outline"
+                        {...(isLoggedIn ? { size: "icon" } : {})}
+                      >
+                        {isLoggedIn ? <Logout3Icon /> : 'Signin'}
+                      </Button>
+                    </div>
             )
             )}
             </div>
