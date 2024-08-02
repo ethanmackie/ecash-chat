@@ -650,6 +650,7 @@ export default function Home() {
                     toast(`Logged out of ${address}`);
                     } : () => getAddress()}
                     variant="outline"
+                    size="icon"
                 >
                     {isLoggedIn ? <Logout3Icon /> : 'Signin'}
                 </Button>
