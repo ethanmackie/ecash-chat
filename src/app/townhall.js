@@ -1,5 +1,5 @@
 "use client";
-import  React, { useState, useEffect } from 'react';
+import  React, { useState, useEffect, useRef } from 'react';
 import { appConfig } from '../config/app';
 import { Tooltip, Popover, Alert, Modal } from "flowbite-react";
 import { Textarea } from "@/components/ui/textarea";
@@ -51,6 +51,7 @@ import {
     getTweetId,
     getContactNameIfExist,
     RenderTipping,
+    isExistingContact,
 } from '../utils/utils';
 import {
     getTxHistory,
@@ -94,6 +95,7 @@ export default function TownHall({ address, isMobile }) {
     const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here
     const [contactList, setContactList] = useState('');
     const [contactListName, setContactListName] = useState('');
+    const newReplierContactNameInput = useRef('');
 
     useEffect(() => {
       const handleResize = () => {
@@ -455,10 +457,50 @@ export default function TownHall({ address, isMobile }) {
                                             }}
                                         >
                                             <Badge className="leading-7 shadow-sm hover:bg-accent [&:not(:first-child)]:mt-6 py-3px" variant="outline" >
-                                            {foundReply.replyAddress.substring(0, 10) + '...' + foundReply.replyAddress.substring(foundReply.replyAddress.length - 5)}
+                                                {getContactNameIfExist(foundReply.replyAddress, contactList)}
                                             </Badge>
                                         </div>
                                         <RenderTipping address={foundReply.replyAddress} sendXecTip={sendXecTip}/>
+
+                                        {/* Add contact popover to input the new contact name */}
+                                        {isExistingContact(foundReply.replyAddress, contactList) === false && (
+                                            <Popover
+                                                aria-labelledby="default-popover"
+                                                placement="top"
+                                                content={
+                                                <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
+                                                    <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
+                                                    <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Input contact name for <br />{foundReply.replyAddress}</h3>
+                                                    </div>
+                                                    <div className="px-3 py-2">
+                                                        <Input
+                                                            id="addContactName"
+                                                            name="addContactName"
+                                                            type="text"
+                                                            ref={newReplierContactNameInput}
+                                                            placeholder="New contact name"
+                                                            className="bg-gray-50"
+                                                            maxLength="30"
+                                                        />
+                                                        <Button
+                                                            type="button"
+                                                            disabled={newReplierContactNameInput?.current?.value === ''}
+                                                            className="mt-2"
+                                                            onClick={e => {
+                                                                addNewContact(newReplierContactNameInput?.current?.value, foundReply.replyAddress, refreshContactList);
+                                                            }}
+                                                        >
+                                                            Add Contact
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                                }
+                                            >
+                                                <Button variant="outline" size="icon" className="mr-2">
+                                                    <IdCardIcon className="h-4 w-4" />
+                                                </Button>
+                                            </Popover>
+                                        )}
                                         </div>
                                     </div>
                                     <div className="py-2 leading-7">
@@ -678,45 +720,47 @@ export default function TownHall({ address, isMobile }) {
                                                     <RenderTipping address={tx.replyAddress} sendXecTip={sendXecTip} />
 
                                                     {/* Add contact popover to input the new contact name */}
-                                                    <Popover
-                                                        aria-labelledby="default-popover"
-                                                        placement="top"
-                                                        content={
-                                                        <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
-                                                            <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
-                                                            <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Input contact name for <br />{tx.replyAddress}</h3>
+                                                    {isExistingContact(tx.replyAddress, contactList) === false && (
+                                                        <Popover
+                                                            aria-labelledby="default-popover"
+                                                            placement="top"
+                                                            content={
+                                                            <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
+                                                                <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
+                                                                <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Input contact name for <br />{tx.replyAddress}</h3>
+                                                                </div>
+                                                                <div className="px-3 py-2">
+                                                                    <Input
+                                                                        id="addContactName"
+                                                                        name="addContactName"
+                                                                        type="text"
+                                                                        value={contactListName}
+                                                                        required
+                                                                        placeholder="New contact name"
+                                                                        className="bg-gray-50"
+                                                                        maxLength="30"
+                                                                        onChange={e => setContactListName(e.target.value)}
+                                                                    />
+                                                                    <Button
+                                                                        type="button"
+                                                                        disabled={contactListName === ''}
+                                                                        className="mt-2"
+                                                                        onClick={e => {
+                                                                            addNewContact(contactListName, tx.replyAddress, refreshContactList);
+                                                                            setContactListName('');
+                                                                        }}
+                                                                    >
+                                                                        Add Contact
+                                                                    </Button>
+                                                                </div>
                                                             </div>
-                                                            <div className="px-3 py-2">
-                                                                <Input
-                                                                    id="addContactName"
-                                                                    name="addContactName"
-                                                                    type="text"
-                                                                    value={contactListName}
-                                                                    required
-                                                                    placeholder="New contact name"
-                                                                    className="bg-gray-50"
-                                                                    maxLength="30"
-                                                                    onChange={e => setContactListName(e.target.value)}
-                                                                />
-                                                                <Button
-                                                                    type="button"
-                                                                    disabled={contactListName === ''}
-                                                                    className="mt-2"
-                                                                    onClick={e => {
-                                                                        addNewContact(contactListName, tx.replyAddress, refreshContactList);
-                                                                        setContactListName('');
-                                                                    }}
-                                                                >
-                                                                    Add Contact
-                                                                </Button>
-                                                            </div>
-                                                        </div>
-                                                        }
-                                                    >
-                                                        <Button variant="outline" size="icon" className="mr-2">
-                                                            <IdCardIcon className="h-4 w-4" />
-                                                        </Button>
-                                                    </Popover>
+                                                            }
+                                                        >
+                                                            <Button variant="outline" size="icon" className="mr-2">
+                                                                <IdCardIcon className="h-4 w-4" />
+                                                            </Button>
+                                                        </Popover>
+                                                    )}
                                                  </div>
                                              </span>
                                            </>)

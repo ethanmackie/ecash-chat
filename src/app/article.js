@@ -76,6 +76,7 @@ import {
     addNewContact,
     getContactNameIfExist,
     RenderTipping,
+    isExistingContact,
 } from '../utils/utils';
 import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, GraphchartIcon, Stats2Icon } from "@/components/ui/social";
 import { toast } from 'react-toastify';
@@ -443,6 +444,46 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     </Badge>
                                 </div>
                                 <RenderTipping address={foundReply.replyAddress} sendXecTip={sendXecTip} />
+
+                                {/* Add contact popover to input the new contact name */}
+                                {isExistingContact(foundReply.replyAddress, contactList) === false && (
+                                    <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button variant="outline" size="icon" className="mr-2">
+                                            <IdCardIcon className="h-4 w-4" />
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-120">
+                                        <div className="space-y-2">
+                                            <h4 className="font-medium leading-none">New contact</h4>
+                                            <p className="text-sm text-muted-foreground">
+                                                Input contact name for <br />{foundReply.replyAddress}
+                                            </p>
+                                        </div>
+                                        <div className="py-2">
+                                            <Input
+                                                id="addContactName"
+                                                name="addContactName"
+                                                type="text"
+                                                ref={newContactNameInput}
+                                                placeholder="New contact name"
+                                                className="bg-gray-50"
+                                                maxLength="30"
+                                            />
+                                            <Button
+                                                type="button"
+                                                disabled={newContactNameInput?.current?.value === ''}
+                                                className="mt-2"
+                                                onClick={e => {
+                                                    addNewContact(newContactNameInput?.current?.value, foundReply.replyAddress, refreshContactList);
+                                                }}
+                                            >
+                                                Add Contact
+                                            </Button>
+                                        </div>
+                                    </PopoverContent>
+                                </Popover>
+                                )}
                             </div>
                         </div>
                         <div className="py-2 leading-7">
@@ -847,48 +888,50 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 </p>
                             </div>
                             {/* Add contact popover to input the new contact name */}
-                            <div
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                }}
-                            >
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                        <Button variant="outline" size="icon" className="mr-2">
-                                            <IdCardIcon className="h-4 w-4" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-120">
-                                        <div className="space-y-2">
-                                            <h4 className="font-medium leading-none">New contact</h4>
-                                            <p className="text-sm text-muted-foreground">
-                                                Input contact name for <br />{tx.replyAddress}
-                                            </p>
-                                        </div>
-                                        <div className="py-2">
-                                            <Input
-                                                id="addContactName"
-                                                name="addContactName"
-                                                type="text"
-                                                ref={newContactNameInput}
-                                                placeholder="New contact name"
-                                                className="bg-gray-50"
-                                                maxLength="30"
-                                            />
-                                            <Button
-                                                type="button"
-                                                disabled={newContactNameInput?.current?.value === ''}
-                                                className="mt-2"
-                                                onClick={e => {
-                                                    addNewContact(newContactNameInput?.current?.value, tx.replyAddress, refreshContactList);
-                                                }}
-                                            >
-                                                Add Contact
+                            {isExistingContact(tx.replyAddress, contactList) === false && (
+                                <div
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                    }}
+                                >
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button variant="outline" size="icon" className="mr-2">
+                                                <IdCardIcon className="h-4 w-4" />
                                             </Button>
-                                        </div>
-                                    </PopoverContent>
-                                </Popover>
-                            </div>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-120">
+                                            <div className="space-y-2">
+                                                <h4 className="font-medium leading-none">New contact</h4>
+                                                <p className="text-sm text-muted-foreground">
+                                                    Input contact name for <br />{tx.replyAddress}
+                                                </p>
+                                            </div>
+                                            <div className="py-2">
+                                                <Input
+                                                    id="addContactName"
+                                                    name="addContactName"
+                                                    type="text"
+                                                    ref={newContactNameInput}
+                                                    placeholder="New contact name"
+                                                    className="bg-gray-50"
+                                                    maxLength="30"
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    disabled={newContactNameInput?.current?.value === ''}
+                                                    className="mt-2"
+                                                    onClick={e => {
+                                                        addNewContact(newContactNameInput?.current?.value, tx.replyAddress, refreshContactList);
+                                                    }}
+                                                >
+                                                    Add Contact
+                                                </Button>
+                                            </div>
+                                        </PopoverContent>
+                                    </Popover>
+                                </div>
+                            )}
                         </div>
                         <div className="relative mt-2 flex items-center gap-x-2 ml-auto md:hidden">
                         {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (

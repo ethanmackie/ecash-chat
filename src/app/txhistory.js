@@ -82,6 +82,7 @@ export default function TxHistory({ address, isMobile }) {
     const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here
     const [contactList, setContactList] = useState('');
     const newContactNameInput = useRef('');
+    const newReplierContactNameInput = useRef('');
 
     useEffect(() => {
       const handleResize = () => {

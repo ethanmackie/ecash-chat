@@ -486,6 +486,24 @@ export const getContactNameIfExist = (address, contactList) => {
     return address.substring(0,10) + '...' + address.substring(address.length - 5);
 };
 
+// Checks whether the address is an existing contact
+export const isExistingContact = (address, contactList) => {
+    if (!Array.isArray(contactList)) {
+        return false;
+    }
+    // Find the contact
+    let contactExists = contactList.find(
+        contact => contact.address === address,
+    );
+
+    // if a match was found
+    if (typeof contactExists !== 'undefined') {
+        return true;
+    }
+
+    return false;
+};
+
 // Render the tipping button popover
 export const RenderTipping = ( { address, sendXecTip } ) => {
     return (
