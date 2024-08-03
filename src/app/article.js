@@ -205,6 +205,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             sharedArticleTxid,
                             sharedArticleObject.paywallPrice,
                             localArticleHistoryResp,
+                            articleTx.replyAddress,
                         );
                     } else {
                         // If this article exists as a non-paywalled article, render directly
@@ -582,12 +583,18 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     };
 
     // Check whether the paywall price for the article has been paid by this address
-    const checkPaywallPayment = (paywalledArticleTxId, paywallPrice, localArticleHistoryResp = false) => {
+    const checkPaywallPayment = (paywalledArticleTxId, paywallPrice, localArticleHistoryResp = false, articleAuthor = false) => {
         let paywallPaid = false;
         let localArticleHistory = articleHistory;
         if (localArticleHistoryResp) {
             localArticleHistory = localArticleHistoryResp;
         }
+
+        // Waive paywall for article author
+        if (articleAuthor === address) {
+            return true;
+        }
+
         for (const thisPaywallPayment of localArticleHistory.paywallTxs) {
             if (
                 thisPaywallPayment.paywallPaymentArticleTxid === paywalledArticleTxId &&
@@ -630,9 +637,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     };
 
     // Conditionally renders the appropriate modal based on paywall payment status
-    const handlePaywallStatus = (paywalledArticleTxId, paywallPrice, localArticleHistoryResp = false) => {
-        const paywallPaid = checkPaywallPayment(paywalledArticleTxId, paywallPrice, localArticleHistoryResp );
-        console.log('Paid paywall fee? ', paywallPaid);
+    const handlePaywallStatus = (paywalledArticleTxId, paywallPrice, localArticleHistoryResp = false, articleAuthor = false) => {
+        const paywallPaid = checkPaywallPayment(paywalledArticleTxId, paywallPrice, localArticleHistoryResp, articleAuthor);
         if (paywallPaid) {
             setShowArticleModal(true);
         } else {
@@ -829,13 +835,13 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 e.preventDefault();
                                 setCurrentArticleTxObj(tx);
                                 if (tx.articleObject.paywallPrice > 0) {
-                                    handlePaywallStatus(tx.txid, tx.articleObject.paywallPrice);
+                                    handlePaywallStatus(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress);
                                 } else {
                                     setShowArticleModal(true);
                                 }
                             }}
                         >
-                            {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (
+                            {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) && (
                                 <Alert
                                     className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-auto z-10 flex items-center justify-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/5"
                                 >
@@ -848,10 +854,10 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             <div className="line-clamp-3">
                                 <p
                                     className={`mt-0 text-sm leading-6 text-gray-600 break-words max-h-80 ${
-                                        tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) ? 'blur-sm pt-6' : ''
+                                        tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) ? 'blur-sm pt-6' : ''
                                     }`}
                                 >
-                                    {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) ? (
+                                    {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) ? (
                                         <>
                                             <Skeleton className="h-4 mt-2 w-full" />
                                             <Skeleton className="h-4 mt-2 w-2/3" />
@@ -966,7 +972,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                       </div>
                         <div className="relative mt-2 flex items-center gap-x-2 ml-auto hidden md:flex">
                           
-                            {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (
+                            {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) && (
                                 <TooltipProvider>
                                 <Tooltip>
                                   <TooltipTrigger> <UnlockIcon /></TooltipTrigger>
