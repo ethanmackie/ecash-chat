@@ -6,6 +6,8 @@ const nextConfig = {
     // See https://stackoverflow.com/questions/71847778/why-my-nextjs-component-is-rendering-twice
     reactStrictMode: false,
 
+    optimizeFonts: false,
+
     experimental: {
         missingSuspenseWithCSRBailout: false,
     },
