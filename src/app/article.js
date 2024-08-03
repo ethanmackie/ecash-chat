@@ -900,10 +900,10 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                                 <IdCardIcon className="h-4 w-4" />
                                             </Button>
                                         </PopoverTrigger>
-                                        <PopoverContent className="w-120">
+                                        <PopoverContent>
                                             <div className="space-y-2">
                                                 <h4 className="font-medium leading-none">New contact</h4>
-                                                <p className="text-sm text-muted-foreground">
+                                                <p className="text-sm text-muted-foreground max-w-96 break-words">
                                                     Input contact name for <br />{tx.replyAddress}
                                                 </p>
                                             </div>

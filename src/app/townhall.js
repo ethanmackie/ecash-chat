@@ -13,7 +13,7 @@ import {
     AvatarImage,
   } from "@/components/ui/avatar";
 import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon, YoutubeIcon, AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, IdCardIcon } from "@/components/ui/social";
-import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon, ChatBubbleIcon, Share1Icon } from '@radix-ui/react-icons';
+import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon, ChatBubbleIcon, Share1Icon, Pencil1Icon } from '@radix-ui/react-icons';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
@@ -473,8 +473,11 @@ export default function TownHall({ address, isMobile }) {
                                        </PopoverTrigger>
                                        <PopoverContent>
                                            <div className="space-y-2">
-                                               <h4 className="font-medium leading-none">New contact</h4>
-                                               <p className="text-sm text-muted-foreground">
+                                           <h4 className="flex items-center font-medium leading-none">
+                                                <Pencil1Icon className="h-4 w-4 mr-1" />
+                                                New contact
+                                            </h4>
+                                               <p className="text-sm text-muted-foreground break-words max-w-96">
                                                    Input contact name for <br />{foundReply.replyAddress}
                                                </p>
                                            </div>
@@ -723,10 +726,13 @@ export default function TownHall({ address, isMobile }) {
                                                                <IdCardIcon className="h-4 w-4" />
                                                            </Button>
                                                        </PopoverTrigger>
-                                                       <PopoverContent className="w-auto">
+                                                       <PopoverContent>
                                                            <div className="space-y-2">
-                                                               <h4 className="font-medium leading-none">New contact</h4>
-                                                               <p className="text-sm text-muted-foreground">
+                                                           <h4 className="flex items-center font-medium leading-none">
+                                                                <Pencil1Icon className="h-4 w-4 mr-1" />
+                                                                New contact
+                                                            </h4>
+                                                               <p className="text-sm text-muted-foreground break-words max-w-96">
                                                                    Input contact name for <br />{tx.replyAddress}
                                                                </p>
                                                            </div>

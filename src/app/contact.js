@@ -110,10 +110,13 @@ export default function ContactListPanel({ latestAvatars }) {
                             <Pencil1Icon className="h-4 w-4" />
                           </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-full">
+                        <PopoverContent>
                         <div className="space-y-2">
-                            <h4 className="font-medium leading-none">Edit</h4>
-                            <p className="text-sm text-muted-foreground">
+                        <h4 className="flex items-center font-medium leading-none">
+                            <Pencil1Icon className="h-4 w-4 mr-1" />
+                            Edit
+                        </h4>
+                            <p className="text-sm text-muted-foreground max-w-96 break-words">
                             Input new name for <br />{thisContact.address}
                             </p>
                         </div>
@@ -159,10 +162,13 @@ export default function ContactListPanel({ latestAvatars }) {
                             <Pencil1Icon className="h-4 w-4" />
                           </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-full">
+                        <PopoverContent>
                         <div className="space-y-2">
-                            <h4 className="font-medium leading-none">Edit</h4>
-                            <p className="text-sm text-muted-foreground">
+                        <h4 className="flex items-center font-medium leading-none">
+                                <Pencil1Icon className="h-4 w-4 mr-1" />
+                                Edit
+                            </h4>
+                            <p className="text-sm text-muted-foreground max-w-96 break-words">
                             Input new name for <br />{thisContact.address}
                             </p>
                         </div>
