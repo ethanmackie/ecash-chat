@@ -471,7 +471,7 @@ export default function TownHall({ address, isMobile }) {
                                                <IdCardIcon className="h-4 w-4" />
                                            </Button>
                                        </PopoverTrigger>
-                                       <PopoverContent className="w-120">
+                                       <PopoverContent>
                                            <div className="space-y-2">
                                                <h4 className="font-medium leading-none">New contact</h4>
                                                <p className="text-sm text-muted-foreground">
@@ -832,7 +832,7 @@ export default function TownHall({ address, isMobile }) {
                                         <ChatBubbleIcon className="h-4 w-4" />
                                     </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className='w-120'>
+                                <PopoverContent className='min-w-96'>
                                     <div >
                                         <div className="space-y-2 ">
                                                 <h4 className="font-medium leading-none">Reply to: </h4>
@@ -863,9 +863,7 @@ export default function TownHall({ address, isMobile }) {
                                     </div>
                                 </PopoverContent>
                             </Popover>
-
                                        {/* Share buttons with other social platforms */}
-
                                        <Popover>
                                     <PopoverTrigger asChild>
                                         <Button variant="outline" size="icon">
