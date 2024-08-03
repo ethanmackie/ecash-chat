@@ -1,19 +1,32 @@
 "use client";
 import "./globals.css";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { appConfig } from '../config/app';
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Popover, Modal } from "flowbite-react";
+import { Modal } from "flowbite-react";
 import { Button } from "@/components/ui/button";
+import { Activity } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+  } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon, Pencil1Icon } from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon, Pencil1Icon, ChatBubbleIcon} from "@radix-ui/react-icons";
 import { ImDownload3 } from "react-icons/im";
 import { RiSave3Fill } from "react-icons/ri";
 import {
     EncryptionIcon,
     UnlockIcon,
+    IdCardIcon,
 } from "@/components/ui/social";
 import {
     Select,
@@ -61,8 +74,12 @@ import {
     getPaginatedHistoryPage,
     getUserLocale,
     formatBalance,
+    addNewContact,
+    getContactNameIfExist,
+    RenderTipping,
+    isExistingContact,
 } from '../utils/utils';
-import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon } from "@/components/ui/social";
+import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, GraphchartIcon, Stats2Icon } from "@/components/ui/social";
 import { toast } from 'react-toastify';
 import { Toggle } from "@/components/ui/toggle";
 import { BiSolidNews } from "react-icons/bi";
@@ -91,6 +108,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import DOMPurify from 'dompurify';
 import MarkdownEditor from '@uiw/react-markdown-editor';
 import { getStackArray } from 'ecash-script';
+import { BN } from 'slp-mdm';
 
 export default function Article( { chronik, address, isMobile, sharedArticleTxid, setXecBalance } ) {
     const [articleHistory, setArticleHistory] = useState('');  // current article history page
@@ -115,7 +133,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const [isLoading, setIsLoading] = useState(true);
     const [showEditor, setshowEditor] = useState(false);
     const [showSearchBar, setshowSearchBar] = useState(false);
-    
+    const newContactNameInput = useRef('');
+    const [contactList, setContactList] = useState('');
 
     useEffect(() => {
         const handleResize = () => {
@@ -132,9 +151,24 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     useEffect(() => {
         (async () => {
             setIsLoading(true);
-            // Render the first page by default upon initial load
-            let localArticleHistoryResp = await getArticleHistoryByPage(0);
+
+            await refreshContactList();
+
+            // If cache exists, set initial render to cached history
+            const articleCache = await localforage.getItem(appConfig.localArticleCacheParam);
+            if (articleCache && articleCache.txs && Array.isArray(articleCache.txs) && articleCache.txs.length > 0) {
+                setFullArticleHistory(articleCache);
+                getArticleHistoryByPage(0, true, articleCache);
+            }
+
+            // Use cached paywall data if applicable
+            let localArticleHistoryResp = articleCache ? articleCache : await getArticleHistoryByPage(0);
             localforage.setItem(appConfig.localpaywallTxsParam, localArticleHistoryResp.paywallTxs);
+
+            setIsLoading(false);
+
+            // On-chain refresh of article history
+            await getArticleHistoryByPage(0);
 
             // If this app was triggered by a shared article link
             if (sharedArticleTxid !== false) {
@@ -150,8 +184,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                         stackArray[0] === opreturnConfig.articlePrefixHex
                     ) {
                         articleHash = Buffer.from(stackArray[1], 'hex');
-                    } else {
-                        throw new Error('Invalid article txid');
                     }
                 } catch (err) {
                     console.log(`Error retrieving tx details for ${sharedArticleTxid}`, err);
@@ -178,20 +210,22 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                         // If this article exists as a non-paywalled article, render directly
                         setShowArticleModal(true);
                     }
-                } else {
-                    toast('No article found for this article txid');
                 }
             }
-            setIsLoading(false);
 
             const updatedCache = await refreshUtxos(chronik, address);
             setXecBalance(updatedCache.xecBalance);
         })();
     }, []);
 
+    const refreshContactList = async () => {
+        let contactList = await localforage.getItem(appConfig.localContactsParam);
+        setContactList(contactList);
+    };
+
     // Retrieves the article listing
     // Set localLookup to true to retrieve paginated data locally
-    const getArticleHistoryByPage = async (pageNum = 0, localLookup = false) => {
+    const getArticleHistoryByPage = async (pageNum = 0, localLookup = false, articleCache = false) => {
         if (
             typeof pageNum !== "number" ||
             chronik === undefined
@@ -200,16 +234,19 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         }
 
         if (localLookup) {
+            // if articleCache was passed in from useEffect, use it as the source of truth for local lookup
+            let localArticleHistory = articleCache ? articleCache : fullArticleHistory;
+
             const selectedPageHistory = getPaginatedHistoryPage(
-                fullArticleHistory.txs,
+                localArticleHistory.txs,
                 pageNum,
             );
 
             setArticleHistory({
                 txs: selectedPageHistory,
-                numPages: fullArticleHistory.numPages,
-                replies: fullArticleHistory.replies,
-                paywallTxs: fullArticleHistory.paywallTxs,
+                numPages: localArticleHistory.numPages,
+                replies: localArticleHistory.replies,
+                paywallTxs: localArticleHistory.paywallTxs,
             });
         } else {
             const txHistoryResp = await getArticleHistory(chronik, appConfig.townhallAddress, pageNum);
@@ -228,6 +265,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
                 setArticleHistory(currentArticleHistoryPage);
                 setFullArticleHistory(txHistoryResp);
+                await localforage.setItem(appConfig.localArticleCacheParam, txHistoryResp);
                 return currentArticleHistoryPage;
             }
         }
@@ -403,10 +441,53 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     toast(`${foundReply.replyAddress} copied to clipboard`);
                                 }}>
                                     <Badge className="leading-7 [&:not(:first-child)]:mt-6 py-3px" variant="outline">
-                                        {foundReply.replyAddress.substring(0,10) + '...' + foundReply.replyAddress.substring(foundReply.replyAddress.length - 5)}
+                                        {getContactNameIfExist(foundReply.replyAddress, contactList)}
                                     </Badge>
                                 </div>
-                                <RenderTipping address={foundReply.replyAddress} />
+                                <RenderTipping address={foundReply.replyAddress} sendXecTip={sendXecTip} />
+
+                                {/* Add contact popover to input the new contact name */}
+                                {isExistingContact(foundReply.replyAddress, contactList) === false && (
+                                    <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button variant="outline" size="icon" className="mr-2">
+                                            <IdCardIcon className="h-4 w-4" />
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent>
+                                        <div className="space-y-2">
+                                        <h4 className="flex items-center font-medium leading-none">
+                                                <Pencil1Icon className="h-4 w-4 mr-1" />
+                                                New contact
+                                            </h4>
+                                            <p className="text-sm text-muted-foreground max-w-96 break-words">
+                                                Input contact name for <br />{foundReply.replyAddress}
+                                            </p>
+                                        </div>
+                                        <div className="py-2">
+                                            <Input
+                                                id="addContactName"
+                                                name="addContactName"
+                                                type="text"
+                                                ref={newContactNameInput}
+                                                placeholder="New contact name"
+                                                className="bg-gray-50"
+                                                maxLength="30"
+                                            />
+                                            <Button
+                                                type="button"
+                                                disabled={newContactNameInput?.current?.value === ''}
+                                                className="mt-2"
+                                                onClick={e => {
+                                                    addNewContact(newContactNameInput?.current?.value, foundReply.replyAddress, refreshContactList);
+                                                }}
+                                            >
+                                                Add Contact
+                                            </Button>
+                                        </div>
+                                    </PopoverContent>
+                                </Popover>
+                                )}
                             </div>
                         </div>
                         <div className="py-2 leading-7">
@@ -521,6 +602,33 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         return paywallPaid;
     };
 
+    // Calculate the aggregate paywall revenue earned for a particular article
+    const getTotalPaywallEarnedPerArticle = (paywalledArticleTxId, localArticleHistoryResp = false) => {
+        let localArticleHistory = articleHistory;
+        if (localArticleHistoryResp) {
+            localArticleHistory = localArticleHistoryResp;
+        }
+        let totalPaywallEarned = BN(0);
+        let totalUnlockCount = BN(0);
+        for (const thisPaywallPayment of localArticleHistory.paywallTxs) {
+            if (thisPaywallPayment.paywallPaymentArticleTxid === paywalledArticleTxId) {
+                totalPaywallEarned = totalPaywallEarned.plus(BN(thisPaywallPayment.paywallPayment));
+                totalUnlockCount = totalUnlockCount.plus(BN(1));
+            }
+        }
+    
+        return {
+            totalPaywallEarned,
+            totalUnlockCount
+        };
+    };
+
+    // Calculate the total number of comments for a particular article
+    const getTotalCommentsPerArticle = (txid, replies) => {
+        const foundReplies = replies.filter(replyTx => replyTx.articleTxid === txid);
+        return foundReplies.length;
+    };
+
     // Conditionally renders the appropriate modal based on paywall payment status
     const handlePaywallStatus = (paywalledArticleTxId, paywallPrice, localArticleHistoryResp = false) => {
         const paywallPaid = checkPaywallPayment(paywalledArticleTxId, paywallPrice, localArticleHistoryResp );
@@ -530,79 +638,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         } else {
             setShowPaywallPaymentModal(true);
         }
-    };
-
-    // Render the tipping button popover
-    const RenderTipping = ( { address } ) => {
-        return (
-            <>
-            {/* Tip XEC options */}
-            <Popover
-              aria-labelledby="default-popover"
-              content={
-                <div className="w-50 text-sm text-gray-500 dark:text-gray-400">
-                  <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
-                    <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Tipping Amount</h3>
-                  </div>
-                  <div className="px-3 py-4">
-                      <Button
-                        type="button"
-                        onClick={e => {
-                            sendXecTip(address, 100);
-                        }}
-                      >
-                        100
-                      </Button>
-                      &nbsp;
-                      <Button
-                        type="button"
-                        onClick={e => {
-                            sendXecTip(address, 1000);
-                        }}
-                      >
-                        1k
-                      </Button>
-                      &nbsp;
-                      <Button
-                        type="button"
-                        onClick={e => {
-                            sendXecTip(address, 10000);
-                        }}
-                      >
-                        10k
-                      </Button>
-                      &nbsp;
-                      <Button
-                        type="button"
-                        onClick={e => {
-                            sendXecTip(address, 100000);
-                        }}
-                      >
-                        100k
-                      </Button>
-                      &nbsp;
-                      <Button
-                        type="button"
-                        onClick={e => {
-                            sendXecTip(address, 1000000);
-                        }}
-                      >
-                        1M
-                      </Button>
-                  </div>
-                </div>
-              }
-              >
-                <Button
-                    type="button"
-                    variant="outline" 
-                    size="icon"
-                >
-                   <AlitacoffeeIcon />
-                </Button>
-              </Popover>
-            </>
-        );
     };
 
     const PaywallPaymentModal = () => {
@@ -637,14 +672,14 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
     const FullArticleModal = () => {
         return (
-            <Modal show={showArticleModal} onClose={() => setShowArticleModal(false)}  className="bg-background/90">
+            <Modal show={showArticleModal} onClose={() => setShowArticleModal(false)}  className="bg-background/90 h-auto md:h-auto">
                 <div className="shadow-xl bg-white border rounded-lg">
                 <Modal.Header>{currentArticleTxObj.articleObject.title}</Modal.Header>
                 <Modal.Body>
                     {/* Article content */}
                     <div className="space-y-2 flex flex-col max-w-xl gap-2 break-words w-full leading-1.5 p-6">
                         <time dateTime={currentArticleTxObj.txTime} className="text-gray-500">
-                            By: {currentArticleTxObj.replyAddress}<br />
+                            By: {getContactNameIfExist(currentArticleTxObj.replyAddress, contactList)}<br />
                             {currentArticleTxObj.txDate}
                         </time>
                         <RenderArticle content={currentArticleTxObj.articleObject.content} />
@@ -657,53 +692,50 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 <Modal.Footer className="flex flex-col items-start space-x-0 space-y-2 rounded-b border-gray-200 p-6 dark:border-gray-600 border-t">
                     <div className="flex gap-2">
                         {/* Tipping action to an article */}
-                        <RenderTipping address={currentArticleTxObj.replyAddress} />
+                        <RenderTipping address={currentArticleTxObj.replyAddress} sendXecTip={sendXecTip} />
 
                         {/* Sharing options */}
-                        <Popover
-                            aria-labelledby="default-popover"
-                            placement="top"
-                            content={
-                            <div className="w-30 text-sm text-gray-500 dark:text-gray-400">
-                                <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
-                                <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Platform</h3>
-                                </div>
-                                <div className="px-3 py-2">
-                                    <TwitterShareButton
-                                        url={`https://${window.location.host}/?sharedArticleTxid=${currentArticleTxObj.txid}`}
-                                        title={`[Shared from eCashChat.com] - "${currentArticleTxObj.articleObject.title}"`}
-                                    >
-                                    <TwitterIcon size={25} round />
-                                    </TwitterShareButton>
-                                    &nbsp;
-                                    <FacebookShareButton
-                                        url={`https://${window.location.host}/?sharedArticleTxid=${currentArticleTxObj.txid}`}
-                                        quote={`[Shared from eCashChat.com] - "${currentArticleTxObj.articleObject.title}"`}
-                                    >
-                                    <FacebookIcon  size={25} round />
-                                    </FacebookShareButton>
-                                    &nbsp;
-                                    <RedditShareButton
-                                        url={`https://${window.location.host}/?sharedArticleTxid=${currentArticleTxObj.txid}`}
-                                        title={`[Shared from eCashChat.com] - "${currentArticleTxObj.articleObject.title}"`}
-                                    >
-                                    <RedditIcon size={25} round />
-                                    </RedditShareButton>
-                                    &nbsp;
-                                    <TelegramShareButton
-                                        url={`https://${window.location.host}/?sharedArticleTxid=${currentArticleTxObj.txid}`}
-                                        title={`[Shared from eCashChat.com] - "${currentArticleTxObj.articleObject.title}"`}
-                                    >
-                                    <TelegramIcon  size={25} round />
-                                    </TelegramShareButton>
-                                </div>
-                            </div>
-                            }
-                        >
+                        <Popover>
+                        <PopoverTrigger asChild>
                             <Button variant="outline" size="icon">
-                            <Share1Icon className="h-4 w-4" />
+                                <Share1Icon className="h-4 w-4" />
                             </Button>
-                        </Popover>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-30">
+                        <div className="space-y-2">
+                                        <h4 className="font-medium text-gray-900 leading-none">Select Platform</h4>
+                                    </div>
+                            <div className="pt-2">
+                                <TwitterShareButton
+                                    url={`https://${window.location.host}/?sharedArticleTxid=${currentArticleTxObj.txid}`}
+                                    title={`[Shared from eCashChat.com] - "${currentArticleTxObj.articleObject.title}"`}
+                                >
+                                    <TwitterIcon size={25} round />
+                                </TwitterShareButton>
+                                &nbsp;
+                                <FacebookShareButton
+                                    url={`https://${window.location.host}/?sharedArticleTxid=${currentArticleTxObj.txid}`}
+                                    quote={`[Shared from eCashChat.com] - "${currentArticleTxObj.articleObject.title}"`}
+                                >
+                                    <FacebookIcon size={25} round />
+                                </FacebookShareButton>
+                                &nbsp;
+                                <RedditShareButton
+                                    url={`https://${window.location.host}/?sharedArticleTxid=${currentArticleTxObj.txid}`}
+                                    title={`[Shared from eCashChat.com] - "${currentArticleTxObj.articleObject.title}"`}
+                                >
+                                    <RedditIcon size={25} round />
+                                </RedditShareButton>
+                                &nbsp;
+                                <TelegramShareButton
+                                    url={`https://${window.location.host}/?sharedArticleTxid=${currentArticleTxObj.txid}`}
+                                    title={`[Shared from eCashChat.com] - "${currentArticleTxObj.articleObject.title}"`}
+                                >
+                                    <TelegramIcon size={25} round />
+                                </TelegramShareButton>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
                         {/* Reply action to an article, disable if disableReplies is set to true */}
                         {currentArticleTxObj.articleObject.disbleReplies !== true && (
                             <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
@@ -771,110 +803,214 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         }
 
         return (
-                    <div className="max-w-xl w-full mx-auto">
-                    {latestArticleHistory &&
-                    latestArticleHistory.txs &&
-                    latestArticleHistory.txs.length > 0 ? (
-                    latestArticleHistory.txs.map((tx, index) => (
-                        tx.articleObject && (
+            <div className="max-w-xl w-full mx-auto">
+            {latestArticleHistory &&
+            latestArticleHistory.txs &&
+            latestArticleHistory.txs.length > 0 ? (
+            latestArticleHistory.txs.map((tx, index) => (
+                tx.articleObject && (
+                <Card key={index} className="max-w-xl w-full mt-2">
+                    <CardHeader>
+                        <div className="flex items-center gap-x-4 text-xs">
+                            <time dateTime={tx.txTime} className="text-gray-500">
+                                {tx.txDate}
+                            </time>
+                            <Badge variant="secondary">
+                                {tx.articleObject.category || 'General'}
+                            </Badge>
+                        </div>
+                        <CardTitle>{tx.articleObject.title}</CardTitle>
+                        <CardDescription></CardDescription>
+                    
+                    </CardHeader>
+                    <CardContent className="relative">
                         <a
-                            key={index}
                             href="#"
                             onClick={(e) => {
-                            e.preventDefault();
-                            setCurrentArticleTxObj(tx);
-                            if (tx.articleObject.paywallPrice > 0) {
-                                handlePaywallStatus(tx.txid, tx.articleObject.paywallPrice);
-                            } else {
-                                setShowArticleModal(true);
-                            }
+                                e.preventDefault();
+                                setCurrentArticleTxObj(tx);
+                                if (tx.articleObject.paywallPrice > 0) {
+                                    handlePaywallStatus(tx.txid, tx.articleObject.paywallPrice);
+                                } else {
+                                    setShowArticleModal(true);
+                                }
                             }}
                         >
-                            <Card className="max-w-xl w-full mt-2">
-                            <CardHeader>
-                                <div className="flex items-center gap-x-4 text-xs">
-                                <time dateTime={tx.txTime} className="text-gray-500">
-                                    {tx.txDate}
-                                </time>
-                                <Badge variant="secondary">
-                                    {tx.articleObject.category || 'General'}
-                                </Badge>
-                                </div>
-                                <CardTitle>
-                                {tx.articleObject.title}
-                                </CardTitle>
-                                <CardDescription></CardDescription>
-                            </CardHeader>
-                            <CardContent className="relative">
-                        {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (
-                            <Alert
-                            className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-auto z-10 flex items-center justify-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/5"
-                            >
-               
-                            <AlertDescription className="flex items-center justify-center whitespace-nowrap">
-                                <EncryptionIcon />
-                                This article costs {formatBalance(tx.articleObject.paywallPrice, getUserLocale(navigator))} XEC to view
-                            </AlertDescription>
-                            </Alert>
-                        )}
-                        <div className="line-clamp-3">
-                        <p
-                            className={`mt-0 text-sm leading-6 text-gray-600 break-words max-h-80 ${
-                            tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) ? 'blur-sm pt-6' : ''
-                            }`}
-                        >
-                            {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) ? (
-                            <>
-                                <Skeleton className="h-4 mt-2 w-full" />
-                                <Skeleton className="h-4 mt-2 w-2/3" />
-                                <Skeleton className="h-4 mt-2 w-1/2" />
-                            </>
-                            ) : (
-                            <RenderArticle content={tx.articleObject.content} />
+                            {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (
+                                <Alert
+                                    className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-auto z-10 flex items-center justify-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/5"
+                                >
+                                    <AlertDescription className="flex items-center justify-center whitespace-nowrap">
+                                        <EncryptionIcon />
+                                        This article costs {formatBalance(tx.articleObject.paywallPrice, getUserLocale(navigator))} XEC to view
+                                    </AlertDescription>
+                                </Alert>
                             )}
-                        </p>
-                        </div>
-                        </CardContent>
-                            <CardFooter>
-                                <div className="relative mt-2 flex items-center gap-x-4">
-                                {tx.senderAvatarLink === false ? (
-                                    <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
-                                ) : (
+                            <div className="line-clamp-3">
+                                <p
+                                    className={`mt-0 text-sm leading-6 text-gray-600 break-words max-h-80 ${
+                                        tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) ? 'blur-sm pt-6' : ''
+                                    }`}
+                                >
+                                    {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) ? (
+                                        <>
+                                            <Skeleton className="h-4 mt-2 w-full" />
+                                            <Skeleton className="h-4 mt-2 w-2/3" />
+                                            <Skeleton className="h-4 mt-2 w-1/2" />
+                                        </>
+                                    ) : (
+                                        <RenderArticle content={tx.articleObject.content} />
+                                    )}
+                                </p>
+                            </div>
+                        </a>
+                    </CardContent>
+                    <CardFooter>
+                    <div className="relative mt-2 flex items-center gap-x-2">
+                            {tx.senderAvatarLink === false ? (
+                                <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
+                            ) : (
                                 <Avatar className="h-9 w-9">
-                                <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
-                                <AvatarFallback><DefaultavatarIcon/></AvatarFallback>
-                            </Avatar>
-                                )}
-                                <div className="text-sm leading-6">
-                                    <p className="font-semibold text-gray-900">
+                                    <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
+                                    <AvatarFallback><DefaultavatarIcon /></AvatarFallback>
+                                </Avatar>
+                            )}
+                            <div className="text-sm leading-6">
+                                <p className="font-semibold text-gray-900">
                                     <Badge variant="outline" className="py-3px">
                                         <div
-                                        className="leading-7 [&:not(:first-child)]:mt-6"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            copy(tx.replyAddress);
-                                            toast(`${tx.replyAddress} copied to clipboard`);
-                                        }}
+                                            className="leading-7 [&:not(:first-child)]:mt-6"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                copy(tx.replyAddress);
+                                                toast(`${tx.replyAddress} copied to clipboard`);
+                                            }}
                                         >
-                                        {tx.replyAddress.substring(0, 10)}...
-                                        {tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                            {getContactNameIfExist(tx.replyAddress, contactList)}
                                         </div>
                                     </Badge>
-                                    </p>
+                                </p>
+                            </div>
+                            {/* Add contact popover to input the new contact name */}
+                            {isExistingContact(tx.replyAddress, contactList) === false && (
+                                <div
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                    }}
+                                >
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button variant="outline" size="icon" className="mr-2">
+                                                <IdCardIcon className="h-4 w-4" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent>
+                                            <div className="space-y-2">
+                                            <h4 className="flex items-center font-medium leading-none">
+                                                <Pencil1Icon className="h-4 w-4 mr-1" />
+                                                New contact
+                                            </h4>
+                                                <p className="text-sm text-muted-foreground max-w-96 break-words">
+                                                    Input contact name for <br />{tx.replyAddress}
+                                                </p>
+                                            </div>
+                                            <div className="py-2">
+                                                <Input
+                                                    id="addContactName"
+                                                    name="addContactName"
+                                                    type="text"
+                                                    ref={newContactNameInput}
+                                                    placeholder="New contact name"
+                                                    className="bg-gray-50"
+                                                    maxLength="30"
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    disabled={newContactNameInput?.current?.value === ''}
+                                                    className="mt-2"
+                                                    onClick={e => {
+                                                        addNewContact(newContactNameInput?.current?.value, tx.replyAddress, refreshContactList);
+                                                    }}
+                                                >
+                                                    Add Contact
+                                                </Button>
+                                            </div>
+                                        </PopoverContent>
+                                    </Popover>
                                 </div>
-                                  {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (
-                                     <UnlockIcon />
-                                  )}
-                                </div>
-                            </CardFooter>
-                            </Card>
-                        </a>
-                        )
-                    ))
-                    ) : (
-                    ''
-                    )}
-                </div>
+                            )}
+                        </div>
+                        <div className="relative mt-2 flex items-center gap-x-2 ml-auto md:hidden">
+                            <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button variant="ghost" size="icon" className="mr-2">
+                                        <Activity className="h-4 w-4 text-muted-foreground" />
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-120">
+                                    <div className="flex flex-col items-start space-y-1 ml-2">
+                            <div className="flex items-center space-x-1">
+                                <ChatBubbleIcon />
+                                <span>{getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                            <GraphchartIcon />
+                            <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} `}</span>
+                            </div>
+                            <p>
+                                {getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned.gt(0) && 
+                                `Earned ${formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))} XEC`}
+                            </p>
+                            </div>
+                         </PopoverContent>
+                         </Popover>
+                      </div>
+                        <div className="relative mt-2 flex items-center gap-x-2 ml-auto hidden md:flex">
+                          
+                            {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (
+                                <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger> <UnlockIcon /></TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>This article has been paid.</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            )}
+                              <div className="flex items-center space-x-1 ml-2 ">
+                            <ChatBubbleIcon />
+                            <span>{getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}</span>
+                            </div>
+                            
+                            <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger>
+                            
+                            <div className="flex items-center space-x-1 ml-2">
+                            <GraphchartIcon />
+                            <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} `}</span>
+                         </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                            <p>
+                            {`Earned ${formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))} XEC`}
+                            <br />
+                            {` from ${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} unlocks`}
+                        </p>
+                            </TooltipContent>
+                        </Tooltip>
+                        </TooltipProvider>        
+                        <div>
+                      </div>
+                        </div>
+                    </CardFooter>
+                </Card>
+                )
+            ))
+            ) : (
+            ''
+            )}
+        </div>
                         );
                     };
 

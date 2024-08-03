@@ -23,7 +23,7 @@ import {
   } from "@/components/ui/avatar";
 import { appConfig } from '../config/app';
 import { AnonAvatar } from "@/components/ui/social";
-import { totalPaywallEarnedByAddress, getPaywallLeaderboard, getNFTAvatarLink } from '../utils/utils';
+import { totalPaywallEarnedByAddress, getPaywallLeaderboard, getNFTAvatarLink, getContactNameIfExist } from '../utils/utils';
 import { DefaultavatarsmallIcon, DefaultavatarIcon, GraphchartIcon} from "@/components/ui/social";
 import localforage from 'localforage';
 
@@ -31,6 +31,7 @@ export default function ProfilePanel({ address, avatarLink, xecBalance, latestAv
     const [paywallRevenueXec, setPaywallRevenueXec] = useState('');
     const [paywallRevenueCount, setPaywallRevenueCount] = useState('');
     const [paywallLeaderboard, setPaywallLeaderboard] = useState('');
+    const [contactList, setContactList] = useState('');
 
     useEffect(() => {
         (async () => {
@@ -39,6 +40,8 @@ export default function ProfilePanel({ address, avatarLink, xecBalance, latestAv
             setPaywallRevenueXec(paywallResponse.xecEarned);
             setPaywallRevenueCount(paywallResponse.unlocksEarned);
             setPaywallLeaderboard(getPaywallLeaderboard(paywallTxs));
+            let contactList = await localforage.getItem(appConfig.localContactsParam);
+            setContactList(contactList);
         })();
     }, []);
 
@@ -122,7 +125,7 @@ export default function ProfilePanel({ address, avatarLink, xecBalance, latestAv
               </AvatarFallback>
             </Avatar>
             <div className="ml-3">
-              <p className="font-semibold leading-none tracking-tight">{`${earner[0].substring(0, 11)}...${earner[0].substring(earner[0].length - 5)}`}</p>
+              <p className="font-semibold leading-none tracking-tight">{getContactNameIfExist(earner[0], contactList)}</p>
               <p className="text-sm text-muted-foreground max-w-lg break-words text-balance leading-relaxed">{earner[1]} unlocks</p>
             </div>
           </div>

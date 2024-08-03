@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { appConfig } from '../config/app';
 import { getTxHistory, txListener } from '../chronik/chronik';
 import { chronik as chronikConfig } from '../config/chronik';
@@ -17,8 +17,9 @@ import {
     DefaultavatarIcon, 
     ReplieduseravatarIcon,
     Arrowright2Icon,
+    IdCardIcon,
 } from "@/components/ui/social";
-import { encodeBip2XecTip, getPaginatedHistoryPage } from '../utils/utils';
+import { encodeBip2XecTip, getPaginatedHistoryPage, getContactNameIfExist, RenderTipping } from '../utils/utils';
 import {
   Pagination,
   PaginationContent,
@@ -61,9 +62,11 @@ import {
 const crypto = require('crypto');
 import copy from 'copy-to-clipboard';
 import { toast } from 'react-toastify';
+import { addNewContact } from '../utils/utils';
 const chronik = new ChronikClientNode(chronikConfig.urls);
+import localforage from 'localforage';
 
-export default function TxHistory({ address }) {
+export default function TxHistory({ address, isMobile }) {
     const [txHistory, setTxHistory] = useState(''); // current inbox history page
     const [fullTxHistory, setFullTxHistory] = useState(''); // full inbox history
     const [loadingMsg, setLoadingMsg] = useState('');
@@ -76,7 +79,10 @@ export default function TxHistory({ address }) {
     const [decryptionInput, setDecryptionInput] = useState('');
     const [encryptedMessage, setEncryptedMessage] = useState('');
     const [currentPage, setCurrentPage] = useState(0);
-    const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here 
+    const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here
+    const [contactList, setContactList] = useState('');
+    const newContactNameInput = useRef('');
+    const newReplierContactNameInput = useRef('');
 
     useEffect(() => {
       const handleResize = () => {
@@ -93,9 +99,15 @@ export default function TxHistory({ address }) {
     useEffect(() => {
         // Render the first page by default upon initial load
         (async () => {
+            await refreshContactList();
             await getTxHistoryByPage(0);
         })();
     }, []);
+
+    const refreshContactList = async () => {
+        let contactList = await localforage.getItem(appConfig.localContactsParam);
+        setContactList(contactList);
+    };
 
     // Filters txHistory for txs where the address matches either the sender or receiver outputs
     const getTxHistoryByAddress = () => {
@@ -181,17 +193,25 @@ export default function TxHistory({ address }) {
     const sendXecTip = (recipient, tipAmount) => {
         // Encode the op_return message script
         const opReturnRaw = encodeBip2XecTip();
+        const bip21Str = `${recipient}?amount=${tipAmount}&op_return_raw=${opReturnRaw}`;
 
-        window.postMessage(
-            {
-                type: 'FROM_PAGE',
-                text: 'Cashtab',
-                txInfo: {
-                    bip21: `${recipient}?amount=${tipAmount}&op_return_raw=${opReturnRaw}`,
-                },
-            },
-            '*',
-        );
+        if (isMobile) {
+          window.open(
+              `https://cashtab.com/#/send?bip21=${bip21Str}`,
+              '_blank',
+          );
+        } else {
+          window.postMessage(
+              {
+                  type: 'FROM_PAGE',
+                  text: 'Cashtab',
+                  txInfo: {
+                      bip21: `${recipient}?amount=${tipAmount}&op_return_raw=${opReturnRaw}`,
+                  },
+              },
+              '*',
+          );
+        }
 
         txListener(chronik, address, "XEC tip", getTxHistoryByPage);
     };
@@ -279,74 +299,11 @@ export default function TxHistory({ address }) {
                                               toast(`${tx.replyAddress} copied to clipboard`);
                                           }}>
                                         <Badge className="leading-7 shadow-sm hover:bg-accent py-3px" variant="outline">
-                                             {tx.replyAddress.substring(0,8)}...{tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                             {getContactNameIfExist(tx.replyAddress, contactList)}
                                         </Badge>
                                           </div>
                                       </div>
-                                      <Popover
-                                        aria-labelledby="default-popover"
-                                        content={
-                                          <div className="w-50 text-sm text-gray-500 dark:text-gray-400">
-                                            <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
-                                              <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Tipping Amount</h3>
-                                            </div>
-                                            <div className="px-3 py-2">
-                                                <Button
-                                                  type="button"                                              
-                                                  onClick={e => {
-                                                      sendXecTip(tx.replyAddress, 100);
-                                                  }}
-                                                >
-                                                  100
-                                                </Button>
-                                                &nbsp;
-                                                <Button
-                                                  type="button"
-                                                  onClick={e => {
-                                                      sendXecTip(tx.replyAddress, 1000);
-                                                  }}
-                                                >
-                                                  1k
-                                                </Button>
-                                                &nbsp;
-                                                <Button
-                                                  type="button"
-                                                  onClick={e => {
-                                                      sendXecTip(tx.replyAddress, 10000);
-                                                  }}
-                                                >
-                                                  10k
-                                                </Button>
-                                                &nbsp;
-                                                <Button
-                                                  type="button"
-                                                  onClick={e => {
-                                                      sendXecTip(tx.replyAddress, 100000);
-                                                  }}
-                                                >
-                                                  100k
-                                                </Button>
-                                                &nbsp;
-                                                <Button
-                                                  type="button"
-                                                  onClick={e => {
-                                                      sendXecTip(tx.replyAddress, 1000000);
-                                                  }}
-                                                >
-                                                  1M
-                                                </Button>
-                                            </div>
-                                          </div>
-                                        }
-                                      >
-                                        <Button
-                                          type="button"
-                                          variant="outline" 
-                                          size="icon"
-                                      >
-                                        <AlitacoffeeIcon />
-                                      </Button>
-                                      </Popover>
+                                     
                                     </div>
                                   </span>
                                 </>)
@@ -398,80 +355,12 @@ export default function TxHistory({ address }) {
                                                toast(`${tx.recipientAddress} copied to clipboard`);
                                            }}>
                                             <Badge className="leading-7 shadow-sm hover:bg-accent py-3px" variant="outline">
-                                            {tx.recipientAddress.substring(0,8)}...{tx.recipientAddress.substring(tx.recipientAddress.length - 5)}
+                                            {getContactNameIfExist(tx.recipientAddress, contactList)}
                                            </Badge>
                                               
                                           </div>
                                        </div>
-                                       <Popover
-                                         aria-labelledby="default-popover"
-                                         content={
-                                           <div className="w-50 text-sm text-gray-500 dark:text-gray-400">
-                                             <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
-                                               <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Tipping Amount</h3>
-                                             </div>
-                                             <div className="px-3 py-2">
-                                                 <button
-                                                   type="button"
-                                                   className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                                   onClick={e => {
-                                                       sendXecTip(tx.recipientAddress, 100);
-                                                   }}
-                                                 >
-                                                   100
-                                                 </button>
-                                                 &nbsp;
-                                                 <button
-                                                   type="button"
-                                                   className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                                   onClick={e => {
-                                                       sendXecTip(tx.recipientAddress, 1000);
-                                                   }}
-                                                 >
-                                                   1k
-                                                 </button>
-                                                 &nbsp;
-                                                 <button
-                                                   type="button"
-                                                   className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                                   onClick={e => {
-                                                       sendXecTip(tx.recipientAddress, 10000);
-                                                   }}
-                                                 >
-                                                   10k
-                                                 </button>
-                                                 &nbsp;
-                                                 <button
-                                                   type="button"
-                                                   className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                                   onClick={e => {
-                                                       sendXecTip(tx.recipientAddress, 100000);
-                                                   }}
-                                                 >
-                                                   100k
-                                                 </button>
-                                                 &nbsp;
-                                                 <button
-                                                   type="button"
-                                                   className="rounded bg-blue-500 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                                   onClick={e => {
-                                                       sendXecTip(tx.recipientAddress, 1000000);
-                                                   }}
-                                                 >
-                                                   1M
-                                                 </button>
-                                             </div>
-                                           </div>
-                                         }
-                                       >
-                                          <Button
-                                          type="button"
-                                          variant="outline" 
-                                          size="icon"
-                                      >
-                                        <AlitacoffeeIcon />
-                                      </Button>
-                                       </Popover>
+                                    
                                     </div>
                                    </span>
                                  </>)
@@ -678,7 +567,64 @@ export default function TxHistory({ address }) {
                                <Button variant="outline" size="icon">
                                <Share1Icon className="h-4 w-4" />
                               </Button>
+                           {/* one popover here only so the layout is cleaner */}
                             </Popover>
+                            {(tx.replyAddress !== address || tx.recipientAddress !== address) && (
+                            <div
+                              onClick={(e) => {
+                                e.stopPropagation();
+                              }}
+                            >
+                              <Popover
+                                aria-labelledby="default-popover"
+                                placement="top"
+                                content={
+                                  <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
+                                    <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
+                                      <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">
+                                        Input contact name for <br />
+                                        {tx.replyAddress !== address ? tx.replyAddress : tx.recipientAddress}
+                                      </h3>
+                                    </div>
+                                    <div className="px-3 py-2">
+                                      <Input
+                                        id="addContactName"
+                                        name="addContactName"
+                                        type="text"
+                                        ref={newContactNameInput}
+                                        placeholder="New contact name"
+                                        className="bg-white"
+                                        maxLength="30"
+                                      />
+                                      <Button
+                                        type="button"
+                                        disabled={newContactNameInput?.current?.value === ''}
+                                        className="mt-2"
+                                        onClick={async (e) => {
+                                          const addressToAdd = tx.replyAddress !== address ? tx.replyAddress : tx.recipientAddress;
+                                          await addNewContact(newContactNameInput?.current?.value, addressToAdd, refreshContactList);
+                                        }}
+                                      >
+                                        Add Contact
+                                      </Button>
+                                    </div>
+                                  </div>
+                                }
+                              >
+                                <Button variant="outline" size="icon" className="ml-2">
+                                  <IdCardIcon className="h-4 w-4" />
+                                </Button>
+                              </Popover>
+                              
+                            </div>
+                            
+                          )}
+                           <div className='ml-2'>
+                              <RenderTipping
+                              address={tx.recipientAddress === address ? tx.replyAddress : tx.recipientAddress}
+                              sendXecTip={sendXecTip}
+                            />
+                              </div>
                         </div>
                      </div>
                     </div>
@@ -757,7 +703,7 @@ export default function TxHistory({ address }) {
                       type="text"
                       value={addressToSearch}
                       required
-                      className="bg-gray-50"
+                      className="bg-white"
                       placeholder='Search By Address'
                       onChange={e => handleAddressChange(e)}
                     />

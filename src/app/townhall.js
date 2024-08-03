@@ -1,9 +1,10 @@
 "use client";
-import  React, { useState, useEffect } from 'react';
+import  React, { useState, useEffect, useRef } from 'react';
 import { appConfig } from '../config/app';
-import { Tooltip, Popover, Alert, Modal } from "flowbite-react";
+import { Tooltip, Alert, Modal } from "flowbite-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
-import { postHasErrors, replyHasErrors } from '../validation/validation';
+import { postHasErrors, replyHasErrors, isValidRecipient } from '../validation/validation';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator"
 import {
@@ -11,8 +12,8 @@ import {
     AvatarFallback,
     AvatarImage,
   } from "@/components/ui/avatar";
-import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon, YoutubeIcon, AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon } from "@/components/ui/social";
-import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon, ChatBubbleIcon, Share1Icon } from '@radix-ui/react-icons';
+import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon, YoutubeIcon, AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, IdCardIcon } from "@/components/ui/social";
+import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon, ChatBubbleIcon, Share1Icon, Pencil1Icon } from '@radix-ui/react-icons';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
@@ -49,6 +50,9 @@ import {
     encodeBip21ReplyPost,
     encodeBip2XecTip,
     getTweetId,
+    getContactNameIfExist,
+    RenderTipping,
+    isExistingContact,
 } from '../utils/utils';
 import {
     getTxHistory,
@@ -75,6 +79,9 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { addNewContact } from '../utils/utils';
+import localforage from 'localforage';
 
 export default function TownHall({ address, isMobile }) {
     const [townHallHistory, setTownHallHistory] = useState(''); // current history rendered on screen
@@ -86,7 +93,10 @@ export default function TownHall({ address, isMobile }) {
     const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
     const [showMessagePreview, setShowMessagePreview] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
-    const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here 
+    const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here
+    const [contactList, setContactList] = useState('');
+    const [contactListName, setContactListName] = useState('');
+    const newReplierContactNameInput = useRef('');
 
     useEffect(() => {
       const handleResize = () => {
@@ -101,14 +111,28 @@ export default function TownHall({ address, isMobile }) {
     const halfMaxPages = Math.floor(maxPagesToShow / 2);
 
     useEffect(() => {
-        // Render the first page by default upon initial load
+        // Check whether townhall history is cached
         (async () => {
+            await refreshContactList();
+            const townhallCache = await localforage.getItem(appConfig.localTownhallCacheParam);
+            // If cache exists, set initial render to cached history
+            if (townhallCache && townhallCache.txs && Array.isArray(townhallCache.txs) && townhallCache.txs.length > 0) {
+                setFullTownHallHistory(townhallCache);
+                getTownhallHistoryByPage(0, true, townhallCache);
+            }
+
+            // Subsequent refresh based on on-chain source
             await getTownhallHistoryByPage(0);
         })();
     }, []);
 
+    const refreshContactList = async () => {
+        let contactList = await localforage.getItem(appConfig.localContactsParam);
+        setContactList(contactList);
+    };
+
     // Refreshes the post history via chronik
-    const getTownhallHistoryByPage = async (pageNum = 0, localLookup = false) => {
+    const getTownhallHistoryByPage = async (pageNum = 0, localLookup = false, townhallCache = false) => {
         if (
             typeof pageNum !== "number" ||
             chronik === undefined
@@ -117,15 +141,17 @@ export default function TownHall({ address, isMobile }) {
         }
 
         if (localLookup) {
+            // if townhallCache was passed in from useEffect, use it as the source of truth for local lookup
+            let localFullTownHallHistory = townhallCache ? townhallCache : fullTownHallHistory;
             const selectedPageHistory = getPaginatedHistoryPage(
-                fullTownHallHistory.txs,
+                localFullTownHallHistory.txs,
                 pageNum,
             );
 
             setTownHallHistory({
                 txs: selectedPageHistory,
-                numPages: fullTownHallHistory.numPages,
-                replies: fullTownHallHistory.replies,
+                numPages: localFullTownHallHistory.numPages,
+                replies: localFullTownHallHistory.replies,
             });
         } else {
             const txHistoryResp = await getTxHistory(chronik, appConfig.townhallAddress, pageNum);
@@ -141,6 +167,7 @@ export default function TownHall({ address, isMobile }) {
                     replies: txHistoryResp.replies,
                 });
                 setFullTownHallHistory(txHistoryResp);
+                await localforage.setItem(appConfig.localTownhallCacheParam, txHistoryResp);
             }
         }
     };
@@ -431,10 +458,53 @@ export default function TownHall({ address, isMobile }) {
                                             }}
                                         >
                                             <Badge className="leading-7 shadow-sm hover:bg-accent [&:not(:first-child)]:mt-6 py-3px" variant="outline" >
-                                            {foundReply.replyAddress.substring(0, 10) + '...' + foundReply.replyAddress.substring(foundReply.replyAddress.length - 5)}
+                                                {getContactNameIfExist(foundReply.replyAddress, contactList)}
                                             </Badge>
                                         </div>
-                                        <RenderTipping address={foundReply.replyAddress} />
+                                        <RenderTipping address={foundReply.replyAddress} sendXecTip={sendXecTip}/>
+
+                                        {/* Add contact popover to input the new contact name */}
+                                        {isExistingContact(foundReply.replyAddress, contactList) === false && (
+                                       <Popover>
+                                       <PopoverTrigger asChild>
+                                           <Button variant="outline" size="icon" className="mr-2">
+                                               <IdCardIcon className="h-4 w-4" />
+                                           </Button>
+                                       </PopoverTrigger>
+                                       <PopoverContent>
+                                           <div className="space-y-2">
+                                           <h4 className="flex items-center font-medium leading-none">
+                                                <Pencil1Icon className="h-4 w-4 mr-1" />
+                                                New contact
+                                            </h4>
+                                               <p className="text-sm text-muted-foreground break-words max-w-96">
+                                                   Input contact name for <br />{foundReply.replyAddress}
+                                               </p>
+                                           </div>
+                                           <div className="py-2">
+                                               <Input
+                                                   id="addContactName"
+                                                   name="addContactName"
+                                                   type="text"
+                                                   ref={newReplierContactNameInput}
+                                                   placeholder="New contact name"
+                                                   className="bg-gray-50"
+                                                   maxLength="30"
+                                               />
+                                               <Button
+                                                   type="button"
+                                                   disabled={newReplierContactNameInput?.current?.value === ''}
+                                                   className="mt-2"
+                                                   onClick={e => {
+                                                       addNewContact(newReplierContactNameInput?.current?.value, foundReply.replyAddress, refreshContactList);
+                                                   }}
+                                               >
+                                                   Add Contact
+                                               </Button>
+                                           </div>
+                                       </PopoverContent>
+                                   </Popover>
+                                        )}
                                         </div>
                                     </div>
                                     <div className="py-2 leading-7">
@@ -450,79 +520,6 @@ export default function TownHall({ address, isMobile }) {
                 </AccordionContent>
             </AccordionItem>
             </Accordion>
-        );
-    };
-
-    // Render the tipping button popover
-    const RenderTipping = ( { address } ) => {
-        return (
-            <>
-            {/* Tip XEC options */}
-            <Popover
-              aria-labelledby="default-popover"
-              content={
-                <div className="w-50 text-sm text-gray-500 dark:text-gray-400">
-                  <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
-                    <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Tipping Amount</h3>
-                  </div>
-                  <div className="px-3 py-4">
-                      <Button
-                        type="button"
-                        onClick={e => {
-                            sendXecTip(address, 100);
-                        }}
-                      >
-                        100
-                      </Button>
-                      &nbsp;
-                      <Button
-                        type="button"
-                        onClick={e => {
-                            sendXecTip(address, 1000);
-                        }}
-                      >
-                        1k
-                      </Button>
-                      &nbsp;
-                      <Button
-                        type="button"
-                        onClick={e => {
-                            sendXecTip(address, 10000);
-                        }}
-                      >
-                        10k
-                      </Button>
-                      &nbsp;
-                      <Button
-                        type="button"
-                        onClick={e => {
-                            sendXecTip(address, 100000);
-                        }}
-                      >
-                        100k
-                      </Button>
-                      &nbsp;
-                      <Button
-                        type="button"
-                        onClick={e => {
-                            sendXecTip(address, 1000000);
-                        }}
-                      >
-                        1M
-                      </Button>
-                  </div>
-                </div>
-              }
-              >
-                <Button
-                    type="button"
-                    variant="outline" 
-                    size="icon"
-                >
-                   <AlitacoffeeIcon />
-                </Button>
-              </Popover>
-            </>
         );
     };
 
@@ -546,26 +543,21 @@ export default function TownHall({ address, isMobile }) {
 
                         {/* this is icons, buttons on left */}
                         <div className="flex gap-2 mb-2 sm:mb-0">
-                        <Popover
-                            aria-labelledby="emoji-popover"
-                            content={
-                                <div>
-                                <Picker
-                                    data={data}
-                                    onEmojiSelect={(e) => {
-                                    setPost(post + e.native);
-                                    }}
-                                />
-                                </div>
-                            }
-                            >
-                            <Button
-                                variant="ghost"
-                                onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}
-                            >
-                                <FaceIcon /> 
+                        <Popover>
+                        <PopoverTrigger>
+                            <Button variant="ghost" onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}>
+                                <FaceIcon />
                             </Button>
-                        </Popover>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-0 h-0 p-0"> 
+                            <Picker
+                                data={data}
+                                onEmojiSelect={(e) => {
+                                    setPost(post + e.native);
+                                }}
+                            />
+                        </PopoverContent>
+                    </Popover>
                         <Tooltip content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]" style="light">
                             <Button variant="ghost" onClick={() => insertMarkupTags('[url]theurl[/url]')}>
                             <Link2Icon/>
@@ -718,13 +710,59 @@ export default function TownHall({ address, isMobile }) {
                                                             copy(tx.replyAddress);
                                                             toast(`${tx.replyAddress} copied to clipboard`);
                                                         }}>
-                                                            {tx.replyAddress.substring(0,10)}...{tx.replyAddress.substring(tx.replyAddress.length - 5)}
+                                                            {getContactNameIfExist(tx.replyAddress, contactList)}
                                                         </div>
                                                     </div>
                                                     </Badge>
 
                                                     {/* Tip XEC options */}
-                                                    <RenderTipping address={tx.replyAddress} />
+                                                    <RenderTipping address={tx.replyAddress} sendXecTip={sendXecTip} />
+
+                                                    {/* Add contact popover to input the new contact name */}
+                                                    {isExistingContact(tx.replyAddress, contactList) === false && (
+                                                       <Popover>
+                                                       <PopoverTrigger asChild>
+                                                           <Button variant="outline" size="icon" className="mr-2">
+                                                               <IdCardIcon className="h-4 w-4" />
+                                                           </Button>
+                                                       </PopoverTrigger>
+                                                       <PopoverContent>
+                                                           <div className="space-y-2">
+                                                           <h4 className="flex items-center font-medium leading-none">
+                                                                <Pencil1Icon className="h-4 w-4 mr-1" />
+                                                                New contact
+                                                            </h4>
+                                                               <p className="text-sm text-muted-foreground break-words max-w-96">
+                                                                   Input contact name for <br />{tx.replyAddress}
+                                                               </p>
+                                                           </div>
+                                                           <div className="py-2">
+                                                               <Input
+                                                                   id="addContactName"
+                                                                   name="addContactName"
+                                                                   type="text"
+                                                                   value={contactListName}
+                                                                   required
+                                                                   placeholder="New contact name"
+                                                                   className="bg-gray-50"
+                                                                   maxLength="30"
+                                                                   onChange={e => setContactListName(e.target.value)}
+                                                               />
+                                                               <Button
+                                                                   type="button"
+                                                                   disabled={contactListName === ''}
+                                                                   className="mt-2"
+                                                                   onClick={e => {
+                                                                       addNewContact(contactListName, tx.replyAddress, refreshContactList);
+                                                                       setContactListName('');
+                                                                   }}
+                                                               >
+                                                                   Add Contact
+                                                               </Button>
+                                                           </div>
+                                                       </PopoverContent>
+                                                   </Popover>
+                                                    )}
                                                  </div>
                                              </span>
                                            </>)
@@ -794,110 +832,105 @@ export default function TownHall({ address, isMobile }) {
                                    {/* Reply action to a townhall post */}
                                    <div>    
                                        {/* Reply popover to input the reply content */}
-                                       <Popover
-                                         aria-labelledby="default-popover"
-                                         placement="top"
-                                         content={
-                                           <div className="w-120 text-sm text-gray-500 dark:text-gray-400">
-                                             <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
-                                               <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Reply to {tx.replyAddress}</h3>
-                                             </div>
-                                             <div className="px-3 py-2">
-                                                 {/* Reply input field */}
-                                                 <Textarea
-                                                     id="reply-post"
-                                                     value={replyPost}
-                                                     placeholder="Post your reply..."
-                                                     className="bg-gray-50"
-                                                     required
-                                                     onChange={e => handleReplyPostChange(e)}
-                                                     rows={4}
-                                                 />
-                                                 <p className="mt-2 text-sm text-red-600 dark:text-red-500">{replyPostError !== false && replyPostError}</p>
-                                                 <Button
-                                                   type="button"
-                                                   disabled={replyPostError || replyPost === ''}
-                                                   onClick={e => {
-                                                       replytoPost(tx.txid, replyPost)
-                                                   }}
-                                                 >
-                                                   Post Reply
-                                                 </Button>
-                                             </div>
-                                           </div>
-                                         }
-                                       >
-                                          <Button variant="outline" size="icon" className="mr-2">
-                                             <ChatBubbleIcon className="h-4 w-4" />
-                                         </Button>
-                                       </Popover>
-
+                                <Popover>
+                                <PopoverTrigger>
+                                    <Button variant="outline" size="icon" className="mr-2">
+                                        <ChatBubbleIcon className="h-4 w-4" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className='min-w-96'>
+                                    <div >
+                                        <div className="space-y-2 ">
+                                                <h4 className="font-medium leading-none">Reply to: </h4>
+                                                <p className="text-sm text-muted-foreground break-words">
+                                                {tx.replyAddress}
+                                                </p>
+                                            </div>
+                                        <div className="py-2">
+                                            <Textarea
+                                                id="reply-post"
+                                                value={replyPost}
+                                                placeholder="Post your reply..."
+                                                required
+                                                onChange={e => handleReplyPostChange(e)}
+                                                rows={4}
+                                            />
+                                            <p className="mt-2 text-sm text-red-600 dark:text-red-500">{replyPostError !== false && replyPostError}</p>
+                                            <Button
+                                                type="button"
+                                                disabled={replyPostError || replyPost === ''}
+                                                onClick={e => {
+                                                    replytoPost(tx.txid, replyPost)
+                                                }}
+                                            >
+                                                Post Reply
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
                                        {/* Share buttons with other social platforms */}
-
-                                       <Popover
-                                         aria-labelledby="default-popover"
-                                         placement="top"
-                                         content={
-                                           <div className="w-30 text-sm text-gray-500 dark:text-gray-400">
-                                             <div className="border-b border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
-                                               <h3 id="default-popover" className="font-semibold text-gray-900 dark:text-white">Select Platform</h3>
-                                             </div>
-                                             <div className="px-3 py-2">
-                                                 <TwitterShareButton
-                                                   url={
-                                                       tx.imageSrc !== false ? tx.imageSrc
-                                                           : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
-                                                           : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
-                                                           : 'https://ecashchat.com'
-                                                   }
-                                                   title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
-                                                 >
-                                                   <TwitterIcon size={25} round />
-                                                 </TwitterShareButton>
-                                                 &nbsp;
-                                                 <FacebookShareButton
-                                                   url={
-                                                       tx.imageSrc !== false ? tx.imageSrc
-                                                           : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
-                                                           : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
-                                                           : 'https://ecashchat.com'
-                                                   }
-                                                   quote={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
-                                                 >
-                                                   <FacebookIcon  size={25} round />
-                                                 </FacebookShareButton>
-                                                 &nbsp;
-                                                 <RedditShareButton
-                                                   url={
-                                                       tx.imageSrc !== false ? tx.imageSrc
-                                                           : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
-                                                           : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
-                                                           : 'https://ecashchat.com'
-                                                   }
-                                                   title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
-                                                 >
-                                                   <RedditIcon size={25} round />
-                                                 </RedditShareButton>
-                                                 &nbsp;
-                                                 <TelegramShareButton
-                                                   url={
-                                                       tx.imageSrc !== false ? tx.imageSrc
-                                                           : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
-                                                           : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
-                                                           : 'https://ecashchat.com'
-                                                   }
-                                                   title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
-                                                 >
-                                                   <TelegramIcon  size={25} round />
-                                                 </TelegramShareButton>
-                                             </div>
-                                           </div>
-                                         }
-                                       >
-                                         <Button variant="outline" size="icon">
-                                          <Share1Icon className="h-4 w-4" />
-                                         </Button>
-                                       </Popover>
+                                       <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button variant="outline" size="icon">
+                                            <Share1Icon className="h-4 w-4" />
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-30">
+                                    <div className="space-y-2">
+                                        <h4 className="font-medium text-gray-900 leading-none">Select Platform</h4>
+                                    </div>
+                                        <div className="pt-2">
+                                            <TwitterShareButton
+                                                url={
+                                                    tx.imageSrc !== false ? tx.imageSrc
+                                                        : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                                        : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                                        : 'https://ecashchat.com'
+                                                }
+                                                title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
+                                            >
+                                                <TwitterIcon size={25} round />
+                                            </TwitterShareButton>
+                                            &nbsp;
+                                            <FacebookShareButton
+                                                url={
+                                                    tx.imageSrc !== false ? tx.imageSrc
+                                                        : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                                        : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                                        : 'https://ecashchat.com'
+                                                }
+                                                quote={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
+                                            >
+                                                <FacebookIcon size={25} round />
+                                            </FacebookShareButton>
+                                            &nbsp;
+                                            <RedditShareButton
+                                                url={
+                                                    tx.imageSrc !== false ? tx.imageSrc
+                                                        : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                                        : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                                        : 'https://ecashchat.com'
+                                                }
+                                                title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
+                                            >
+                                                <RedditIcon size={25} round />
+                                            </RedditShareButton>
+                                            &nbsp;
+                                            <TelegramShareButton
+                                                url={
+                                                    tx.imageSrc !== false ? tx.imageSrc
+                                                        : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                                        : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                                        : 'https://ecashchat.com'
+                                                }
+                                                title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
+                                            >
+                                                <TelegramIcon size={25} round />
+                                            </TelegramShareButton>
+                                        </div>
+                                    </PopoverContent>
+                                </Popover>
                                             {/* Render corresponding replies for this post */}
                                             {<RenderReplies txid={tx.txid} replies={townHallHistory.replies} />}
                                    </div>

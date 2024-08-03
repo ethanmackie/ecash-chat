@@ -4,6 +4,11 @@ import { chronik as chronikConfig } from '../config/chronik';
 import localforage from 'localforage';
 import { BN } from 'slp-mdm';
 import { appConfig } from '../config/app';
+import { toast } from 'react-toastify';
+import { AlitacoffeeIcon } from "@/components/ui/social";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 const SATOSHIS_PER_XEC = 100;
 
 /**
@@ -352,4 +357,224 @@ export const getPaywallLeaderboard = (paywallTxs) => {
     const sortedLeaderboard = entries.sort((a, b) => b[1] - a[1]);
     const sortedLeaderboardTop10 = sortedLeaderboard.slice(0, 10);
     return sortedLeaderboardTop10;
+};
+
+// Add contact to local storage
+export const addNewContact = async (contactName, contactAddress, refreshCallback) => {
+    let contactList = await localforage.getItem(appConfig.localContactsParam);
+
+    if (!Array.isArray(contactList)) {
+        contactList = [];
+    }
+
+    // Check to see if the contact exists
+    const contactExists = contactList.find(
+        contact => contact.address === contactAddress,
+    );
+
+    if (typeof contactExists !== 'undefined') {
+        // Contact exists
+        toast.error(
+            `${contactAddress} already exists in Contacts`,
+        );
+    } else {
+        contactList.push({
+            name: contactName,
+            address: contactAddress,
+        });
+        // update localforage and state
+        await localforage.setItem(appConfig.localContactsParam, contactList);
+        toast.success(
+            `"${contactName}" (${contactAddress}) added to Contacts`,
+        );
+    }
+    if (refreshCallback) {
+        await refreshCallback();
+    }
+};
+
+// Delete contact from local storage
+export const deleteContact = async (contactListAddressToDelete, setContactList, refreshCallback) => {
+    let contactList = await localforage.getItem(appConfig.localContactsParam);
+    if (!Array.isArray(contactList)) {
+        contactList = [];
+    }
+
+    // filter contact from local contact list array
+    const updatedContactList = contactList.filter(
+        contact => contact.address !== contactListAddressToDelete,
+    );
+
+    // Update localforage and state
+    await localforage.setItem(appConfig.localContactsParam, updatedContactList);
+    setContactList(updatedContactList);
+    toast.success(`"${contactListAddressToDelete}" removed from Contacts`);
+    if (refreshCallback) {
+        await refreshCallback();
+    }
+};
+
+// Rename contact from local storage
+export const renameContact = async (contactListAddressToRename, setContactList, newName, refreshCallback) => {
+    let contactList = await localforage.getItem(appConfig.localContactsParam);
+    // Find the contact to rename
+    let contactToUpdate = contactList.find(
+        contact => contact.address === contactListAddressToRename,
+    );
+
+    // if a match was found
+    if (typeof contactToUpdate !== 'undefined') {
+        // update the contact name
+        contactToUpdate.name = newName;
+
+        // Update localforage and state
+        await localforage.setItem(appConfig.localContactsParam, contactList);
+        toast.success(
+            `Contact renamed to "${newName}"`,
+        );
+    } else {
+        toast.error(`Unable to find contact`);
+    }
+    setContactList(contactList);
+    if (refreshCallback) {
+        await refreshCallback();
+    }
+};
+
+// Export contacts from local storage
+export const exportContacts = contactListArray => {
+    if (!contactListArray) {
+        toast.error('Unable to export contact list');
+        return;
+    }
+
+    // convert object array into csv data
+    let csvContent =
+        'data:text/csv;charset=utf-8,' +
+        contactListArray.map(
+            element => '\n' + element.name + '|' + element.address,
+        );
+
+    // encode csv
+    var encodedUri = encodeURI(csvContent);
+
+    // hidden DOM node to set the default file name
+    var csvLink = document.createElement('a');
+    csvLink.setAttribute('href', encodedUri);
+    csvLink.setAttribute(
+        'download',
+        'eCashChat_Contacts.csv',
+    );
+    document.body.appendChild(csvLink);
+    csvLink.click();
+};
+
+// Return the contact name based on address if this contact exists
+export const getContactNameIfExist = (address, contactList) => {
+    if (!Array.isArray(contactList)) {
+        return address.substring(0,10) + '...' + address.substring(address.length - 5);
+    }
+    // Find the contact
+    let contactExists = contactList.find(
+        contact => contact.address === address,
+    );
+
+    // if a match was found
+    if (typeof contactExists !== 'undefined') {
+        return contactExists.name;
+    }
+    return address.substring(0,10) + '...' + address.substring(address.length - 5);
+};
+
+// Checks whether the address is an existing contact
+export const isExistingContact = (address, contactList) => {
+    if (!Array.isArray(contactList)) {
+        return false;
+    }
+    // Find the contact
+    let contactExists = contactList.find(
+        contact => contact.address === address,
+    );
+
+    // if a match was found
+    if (typeof contactExists !== 'undefined') {
+        return true;
+    }
+
+    return false;
+};
+
+// Render the tipping button popover
+export const RenderTipping = ( { address, sendXecTip } ) => {
+    return (
+        <>
+        {/* Tip XEC options */}
+        <Popover>
+                <PopoverTrigger asChild>
+                    <Button type="button" variant="outline" size="icon">
+                        <AlitacoffeeIcon />
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-50 text-sm text-gray-500 dark:text-gray-400">
+                    <div className="space-y-2">
+                            <h4 className="font-medium leading-none"> <AlitacoffeeIcon /></h4>
+                            <p className="text-sm text-muted-foreground">
+                            Send a little XEC as a tip
+                            </p>
+                        </div>
+                    <div className="py-4">
+                        <Button
+                            type="button"
+                            onClick={() => sendXecTip(address, 100)}
+                        >
+                            100
+                        </Button>
+                        &nbsp;
+                        <Button
+                            type="button"
+                            onClick={() => sendXecTip(address, 1000)}
+                        >
+                            1k
+                        </Button>
+                        &nbsp;
+                        <Button
+                            type="button"
+                            onClick={() => sendXecTip(address, 10000)}
+                        >
+                            10k
+                        </Button>
+                        &nbsp;
+                        <Button
+                            type="button"
+                            onClick={() => sendXecTip(address, 100000)}
+                        >
+                            100k
+                        </Button>
+                        &nbsp;
+                        <Button
+                            type="button"
+                            onClick={() => sendXecTip(address, 1000000)}
+                        >
+                            1M
+                        </Button>
+
+                        <Input
+                            id="customTip"
+                            name="customTip"
+                            type="number"
+                            placeholder="Custom tip in XEC"
+                            className="mt-2"
+                        />
+                        <Button
+                            type="button"
+                            onClick={() => sendXecTip(address, document.getElementById('customTip').value)}
+                            className="mt-2"
+                        >
+                            Custom
+                        </Button>
+                    </div>
+                </PopoverContent>
+            </Popover>
+        </>
+    );
 };
