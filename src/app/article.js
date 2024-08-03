@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Modal } from "flowbite-react";
 import { Button } from "@/components/ui/button";
+import { Activity } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -940,13 +941,10 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             )}
                         </div>
                         <div className="relative mt-2 flex items-center gap-x-2 ml-auto md:hidden">
-                        {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (
-                              <UnlockIcon />
-                          )}
                             <Popover>
                                     <PopoverTrigger asChild>
                                         <Button variant="ghost" size="icon" className="mr-2">
-                                            <Stats2Icon className="h-4 w-4" />
+                                        <Activity className="h-4 w-4 text-muted-foreground" />
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-120">
@@ -970,7 +968,14 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                         <div className="relative mt-2 flex items-center gap-x-2 ml-auto hidden md:flex">
                           
                             {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (
-                                <UnlockIcon />
+                                <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger> <UnlockIcon /></TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>This article has been paid.</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                             )}
                               <div className="flex items-center space-x-1 ml-2 ">
                             <ChatBubbleIcon />
