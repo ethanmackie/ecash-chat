@@ -784,8 +784,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         let latestArticleHistory;
 
         if (
-            Array.isArray(txHistoryByAddress) &&
-            txHistoryByAddress.length > 0
+            Array.isArray(txHistoryByAddress)
         ) {
             latestArticleHistory = { txs: txHistoryByAddress };
         } else {
