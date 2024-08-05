@@ -9,7 +9,7 @@ import { BN } from 'slp-mdm';
 import { toast } from 'react-toastify';
 import localforage from 'localforage';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, GetCommand, ScanCommand, UpdateCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 const dbClient = new DynamoDBClient({
     credentials: {
         accessKeyId: process.env.DYNAMODB_ACCESS_KEY_ID,
@@ -776,20 +776,10 @@ export const articleTxListener = async (
                         ) {
                             console.log('articleTxListener: tx sender and recipient matches');
                             try {
-                                const command = new UpdateCommand({
+                                const command = new PutCommand({
                                     TableName: process.env.TABLE_NAME,
-                                    Key: {
-                                      hash: 'main'
-                                    },
-                                    UpdateExpression: "SET #article = list_append(#article, :article)",
-                                    ExpressionAttributeValues: {
-                                      ":article": [articleObject],
-                                    },
-                                    ExpressionAttributeNames: {
-                                        "#article": 'article',
-                                    },
-                                    ReturnValues: "ALL_NEW",
-                                })
+                                    Item: articleObject,
+                                });
                                 await docClient.send(command);
                                 await localforage.setItem(appConfig.localArticlesParam, updatedArticles);
                                 toast(`Article posted`);
@@ -1659,22 +1649,28 @@ export const parseChronikTx = (tx, address, latestAvatars = false) => {
 
 // Retrieves all articles from API
 export const getArticleListing = async () => {
-    let articles;
-    const command = new GetCommand({
+    let articles = [];
+    const scanCommand = new ScanCommand({
         TableName: process.env.TABLE_NAME,
-        Key: {
-          hash: process.env.MAP_HASH
-        }
-    })
+    });
+
     try {
-        const response = await docClient.send(command);
-        articles = response.Item.article;
+        let items = await docClient.send(scanCommand);
+        for (const itemObj of items.Items) {
+            if (Array.isArray(itemObj.article)) {
+                articles = articles.concat(itemObj.article);
+            } else {
+                articles = articles.concat([itemObj]);
+            }
+        }
         if (!Array.isArray(articles)) {
             articles = [];
         }
     } catch (err) {
         console.log(`Error in getArticleListing: `, err);
     }
+
+    console.log('articles count: ', articles.length);
 
     return articles;
 };
