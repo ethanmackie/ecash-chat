@@ -119,8 +119,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const [disableArticleReplies, setDisableArticleReplies] = useState(false);
     const [currentArticleTxObj, setCurrentArticleTxObj] = useState(false); // the tx object containing the full article / tx being viewed
     const [articleError, setArticleError] = useState(false);
-    const [replyArticle, setReplyArticle] = useState('');
-    const [replyArticleError, setReplyArticleError] = useState(false);
     const [showArticleModal, setShowArticleModal] = useState(false);
     const [showPaywallPaymentModal, setShowPaywallPaymentModal] = useState(false);
     const [paywallAmountXec, setPaywallAmountXec] = useState('');
@@ -136,6 +134,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const newContactNameInput = useRef('');
     const [contactList, setContactList] = useState('');
     const [curateByContacts, setCurateByContacts] = useState(false);
+    const articleReplyInput = useRef('');
 
     useEffect(() => {
         const handleResize = () => {
@@ -367,6 +366,9 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
     // Pass a reply to article tx BIP21 query string to cashtab extensions
     const replytoArticle = (replyTxid, replyMsg) => {
+        if (replyMsg.trim() === '') {
+            return;
+        }
         // Encode the op_return message script
         const opReturnRaw = encodeBip21ReplyArticle(replyMsg, replyTxid);
         const bip21Str = `${address}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`;
@@ -388,7 +390,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 '*',
             );
         }
-        setReplyArticle('');
         txListener(chronik, address, "Article reply", appConfig.dustXec, address, getArticleHistoryByPage);
     };
 
@@ -793,33 +794,33 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
                     {currentArticleTxObj.articleObject.disbleReplies !== true && (
                     <div className="w-full ml-0">
-                                    {/* Reply input field */}
-                                    <Textarea
-                                        id="reply-post"
-                                        defaultValue={replyArticle}
-                                        placeholder="Post your reply..."
-                                        className="bg-gray-50"
-                                        onBlur={e => setReplyArticle(e.target.value)}
-                                        maxLength={opreturnConfig.articleReplyByteLimit}
-                                        rows={4}
-                                    />
-                                    <Button
-                                        type="button"
-                                        className="mt-2"
-                                        disabled={replyArticle === ''}
-                                        onClick={e => {
-                                            replytoArticle(currentArticleTxObj.txid, replyArticle)
-                                        }}
-                                    >
-                                        Post Reply
-                                    </Button>
-                                    <Button 
-                                    className="ml-2"
-                                    variant="secondary" onClick={() => setShowArticleModal(false)}>
-                                    Close
-                                </Button>
-                                </div>
-                                )}
+                        {/* Reply input field */}
+                        <Textarea
+                            id="reply-post"
+                            name="reply-post"
+                            ref={articleReplyInput}
+                            placeholder="Post your reply..."
+                            className="bg-gray-50"
+                            maxLength={opreturnConfig.articleReplyByteLimit}
+                            rows={4}
+                        />
+                        <Button
+                            type="button"
+                            className="mt-2"
+                            onClick={e => {
+                                replytoArticle(currentArticleTxObj.txid, articleReplyInput?.current?.value)
+                            }}
+                        >
+                            Post Reply
+                        </Button>
+                        <Button
+                            className="ml-2"
+                            variant="secondary" onClick={() => setShowArticleModal(false)}
+                        >
+                            Close
+                        </Button>
+                    </div>
+                    )}
                 </Modal.Footer>
                 </div>
             </Modal>
