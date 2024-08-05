@@ -135,6 +135,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const [showSearchBar, setshowSearchBar] = useState(false);
     const newContactNameInput = useRef('');
     const [contactList, setContactList] = useState('');
+    const [curateByContacts, setCurateByContacts] = useState(false);
 
     useEffect(() => {
         const handleResize = () => {
@@ -158,7 +159,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             const articleCache = await localforage.getItem(appConfig.localArticleCacheParam);
             if (articleCache && articleCache.txs && Array.isArray(articleCache.txs) && articleCache.txs.length > 0) {
                 setFullArticleHistory(articleCache);
-                getArticleHistoryByPage(0, true, articleCache);
+                getArticleHistoryByPage(0, true, articleCache, curateByContacts);
             }
 
             // Use cached paywall data if applicable
@@ -226,7 +227,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
     // Retrieves the article listing
     // Set localLookup to true to retrieve paginated data locally
-    const getArticleHistoryByPage = async (pageNum = 0, localLookup = false, articleCache = false) => {
+    const getArticleHistoryByPage = async (pageNum = 0, localLookup = false, articleCache = false, curateByContacts = false) => {
         if (
             typeof pageNum !== "number" ||
             chronik === undefined
@@ -237,6 +238,21 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         if (localLookup) {
             // if articleCache was passed in from useEffect, use it as the source of truth for local lookup
             let localArticleHistory = articleCache ? articleCache : fullArticleHistory;
+
+            // If the user opts to curate content by contacts only
+            if (curateByContacts === true) {
+                const contactOnlyArticleHistoryTxs = [];
+                for (const tx of localArticleHistory.txs) {
+                    let txByContact = contactList.find(
+                        contact => contact.address === tx.replyAddress,
+                    );
+                    // if a match was found
+                    if (typeof txByContact !== 'undefined') {
+                        contactOnlyArticleHistoryTxs.push(tx);
+                    }
+                }
+                localArticleHistory.txs = contactOnlyArticleHistoryTxs;
+            }
 
             const selectedPageHistory = getPaginatedHistoryPage(
                 localArticleHistory.txs,
@@ -269,6 +285,30 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 await localforage.setItem(appConfig.localArticleCacheParam, txHistoryResp);
                 return currentArticleHistoryPage;
             }
+        }
+    };
+
+    // Handle the checkbox to curate posts from contacts only
+    const handleCurateByContactsChange = async (newState) => {
+        setCurateByContacts(newState);
+        const articleCache = await localforage.getItem(appConfig.localArticleCacheParam);
+        if (newState === true) {
+            await refreshContactList();
+            setCurrentPage(0);
+            await getArticleHistoryByPage(
+                0,
+                true, // filter on local cache only
+                articleCache,
+                true, // flag for contact filter
+            );
+        } else {
+            setCurrentPage(0);
+            await getArticleHistoryByPage(
+                0,
+                true, // filter on local cache only
+                articleCache,
+                false,
+            );
         }
     };
 
@@ -1152,6 +1192,21 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                         </div>
                 )}
                
+                <div className="relative flex items-start mt-2 mb-2">
+                    <div className="flex h-6 items-center py-2">
+                        <Checkbox
+                        id="curateByContacts"
+                        checked={curateByContacts}
+                        onCheckedChange={() => handleCurateByContactsChange(!curateByContacts)}
+                        className="rounded"
+                        />
+                    </div>
+                    <div className="ml-3 text-sm leading-6">
+                        <Label htmlFor="curateByContacts" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                            Only show articles by your contacts
+                        </Label>
+                    </div>
+                </div>
 
                 {/*Set up pagination menu*/}
                 <span>
@@ -1164,7 +1219,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 onClick={(e) => {
                                 e.preventDefault();
                                 setCurrentPage(old => Math.max(0, old - 1));
-                                getArticleHistoryByPage(Math.max(0, currentPage - 1), true);
+                                getArticleHistoryByPage(Math.max(0, currentPage - 1), true, false, curateByContacts);
                                 }}
                                 disabled={currentPage === 0}
                             />
@@ -1184,7 +1239,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     href="#"
                                     onClick={(e) => {
                                     e.preventDefault();
-                                    getArticleHistoryByPage(i, true);
+                                    getArticleHistoryByPage(i, true, false, curateByContacts);
                                     setCurrentPage(i);
                                     }}
                                     isActive={currentPage === i}
@@ -1209,7 +1264,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 onClick={(e) => {
                                 e.preventDefault();
                                 setCurrentPage(old => Math.min(articleHistory.numPages - 1, old + 1));
-                                getArticleHistoryByPage(Math.min(articleHistory.numPages - 1, currentPage + 1), true);
+                                getArticleHistoryByPage(Math.min(articleHistory.numPages - 1, currentPage + 1), true, false, curateByContacts);
                                 }}
                                 disabled={currentPage === articleHistory.numPages - 1}
                             />
