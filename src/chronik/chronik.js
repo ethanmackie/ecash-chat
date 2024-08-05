@@ -159,6 +159,17 @@ export const getArticleHistory = async (chronik, address, page = 0) => {
             totalTxlHistoryTxs = totalTxlHistoryTxs.concat(executedTxHistoryPromises[i].txs);
         }
 
+        // Remove duplicate hashes commited onchain either accidentally or maliciously
+        const uniqueArticles = [];
+        totalTxlHistoryTxs = totalTxlHistoryTxs.filter(element => {
+            const isDuplicate = uniqueArticles.includes(element.outputs[0].outputScript);
+            if (!isDuplicate) {
+                uniqueArticles.push(element.outputs[0].outputScript);
+                return true;
+            }
+            return false;
+        });
+
         const localArticles = await localforage.getItem(appConfig.localArticlesParam);
 
         // Retrieve first chronik page of paywall txs
