@@ -333,7 +333,7 @@ export default function TownHall({ address, isMobile }) {
             );
         }
         setPost('');
-        txListener(chronik, address, "Townhall post sent", appConfig.dustXec, appConfig.townhallAddress, getTownhallHistoryByPage);
+        txListener(chronik, address, "Townhall post", appConfig.dustXec, appConfig.townhallAddress, getTownhallHistoryByPage);
     };
 
     // Pass a reply post tx BIP21 query string to cashtab extensions
