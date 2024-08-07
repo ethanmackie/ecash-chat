@@ -110,7 +110,7 @@ import MarkdownEditor from '@uiw/react-markdown-editor';
 import { getStackArray } from 'ecash-script';
 import { BN } from 'slp-mdm';
 
-export default function Article( { chronik, address, isMobile, sharedArticleTxid, setXecBalance } ) {
+export default function Article( { chronik, address, isMobile, sharedArticleTxid, setXecBalance, setOpenSharedArticleLoader } ) {
     const [articleHistory, setArticleHistory] = useState('');  // current article history page
     const [fullArticleHistory, setFullArticleHistory] = useState('');  // current article history page
     const [articleTitle, setArticleTitle] = useState(''); // title of the article being drafted
@@ -199,6 +199,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                     articleTx.articleObject = sharedArticleObject;
                     setCurrentArticleTxObj(articleTx);
 
+                    setOpenSharedArticleLoader(false);
                     if (sharedArticleObject.paywallPrice > 0) {
                         // If this article exists, and is a paywalled article, check paywall payment and render accordingly
                         handlePaywallStatus(

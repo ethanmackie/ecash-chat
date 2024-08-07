@@ -98,6 +98,7 @@ export default function Home() {
     const [showCard, setShowCard] = useState(false);
     const [userAvatarLink, setUserAvatarLink] = useState(false);
     const [latestAvatars, setLatestAvatars] = useState([]);
+    const [openSharedArticleLoader, setOpenSharedArticleLoader] = useState(false);
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
@@ -131,6 +132,7 @@ export default function Home() {
         const sharedArticleParam = searchParams.get("sharedArticleTxid");
         if (sharedArticleParam) {
             setSharedArticleTxid(sharedArticleParam);
+            setOpenSharedArticleLoader(true);
         }
 
         // Preload the avatars
@@ -587,6 +589,31 @@ export default function Home() {
             <RenderSaveLoginModal />
         )}
 
+        <AlertDialog open={openSharedArticleLoader} onOpenChange={setOpenSharedArticleLoader}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                <AlertDialogTitle>Retrieving shared article from the blockchain</AlertDialogTitle>
+                <AlertDialogDescription>
+                    <div className="flex flex-col space-y-3">
+                        <div className="space-y-2">
+                            Txid: 
+                            <a 
+                                href={`${appConfig.blockExplorerUrl}/tx/${sharedArticleTxid}`} 
+                                target="_blank" 
+                                className="ml-2 dark:text-white font-medium" 
+                            >
+                                {sharedArticleTxid.toString().substring(0,15) + '........' + sharedArticleTxid.toString().substring(sharedArticleTxid.toString().length - 15)}
+                            </a>
+                            <Skeleton className="h-4 w-[400px]" />
+                            <Skeleton className="h-4 w-[350px]" />
+                            <Skeleton className="h-4 w-[300px]" />
+                        </div>
+                    </div>
+                </AlertDialogDescription>
+                </AlertDialogHeader>
+            </AlertDialogContent>
+        </AlertDialog>
+
         <div className="sm:flex flex-col items-center justify-center p-5 relative z-10">
         <div className="background_content"></div>
         </div>
@@ -960,7 +987,7 @@ export default function Home() {
               </Tabs.Item>
 
               <Tabs.Item title="Articles" icon={File3Icon} >
-                <Article chronik={chronik} address={address} isMobile={isMobile} sharedArticleTxid={sharedArticleTxid} setXecBalance={setXecBalance} />
+                <Article chronik={chronik} address={address} isMobile={isMobile} sharedArticleTxid={sharedArticleTxid} setXecBalance={setXecBalance} setOpenSharedArticleLoader={setOpenSharedArticleLoader} />
               </Tabs.Item>
 
               <Tabs.Item title="NFTs" icon={Nft3Icon} >
