@@ -312,6 +312,14 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         }
     };
 
+    // Calculates article reading time in minutes
+    const getEstiamtedReadingTime = (articleContent) => {
+        if (!articleContent) {
+            return 1;
+        }
+        return Math.ceil(articleContent.split(" ").length / 200);
+    };
+
     // Pass an article tx BIP21 query string to cashtab extensions
     const sendArticle = async () => {
         const crypto = require('crypto');
@@ -862,6 +870,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             <time dateTime={tx.txTime} className="text-gray-500">
                                 {tx.txDate}
                             </time>
+
+                            {getEstiamtedReadingTime(tx.articleObject.content)} min read
                             <Badge variant="secondary">
                                 {tx.articleObject.category || 'General'}
                             </Badge>
