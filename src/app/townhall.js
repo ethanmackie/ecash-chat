@@ -460,7 +460,7 @@ export default function TownHall({ address, isMobile }) {
             '*',
         );
 
-        txListener(chronik, address, "Townhall XEC tip sent", tipAmount, recipient, getTownhallHistoryByPage);
+        txListener(chronik, address, "Townhall XEC tip", tipAmount, recipient, getTownhallHistoryByPage);
     };
 
     // Lookup and render any corresponding replies
