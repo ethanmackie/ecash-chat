@@ -110,7 +110,7 @@ import MarkdownEditor from '@uiw/react-markdown-editor';
 import { getStackArray } from 'ecash-script';
 import { BN } from 'slp-mdm';
 
-export default function Article( { chronik, address, isMobile, sharedArticleTxid, setXecBalance } ) {
+export default function Article( { chronik, address, isMobile, sharedArticleTxid, setXecBalance, setOpenSharedArticleLoader } ) {
     const [articleHistory, setArticleHistory] = useState('');  // current article history page
     const [fullArticleHistory, setFullArticleHistory] = useState('');  // current article history page
     const [articleTitle, setArticleTitle] = useState(''); // title of the article being drafted
@@ -119,8 +119,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const [disableArticleReplies, setDisableArticleReplies] = useState(false);
     const [currentArticleTxObj, setCurrentArticleTxObj] = useState(false); // the tx object containing the full article / tx being viewed
     const [articleError, setArticleError] = useState(false);
-    const [replyArticle, setReplyArticle] = useState('');
-    const [replyArticleError, setReplyArticleError] = useState(false);
     const [showArticleModal, setShowArticleModal] = useState(false);
     const [showPaywallPaymentModal, setShowPaywallPaymentModal] = useState(false);
     const [paywallAmountXec, setPaywallAmountXec] = useState('');
@@ -135,6 +133,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const [showSearchBar, setshowSearchBar] = useState(false);
     const newContactNameInput = useRef('');
     const [contactList, setContactList] = useState('');
+    const [curateByContacts, setCurateByContacts] = useState(false);
+    const articleReplyInput = useRef('');
 
     useEffect(() => {
         const handleResize = () => {
@@ -158,7 +158,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             const articleCache = await localforage.getItem(appConfig.localArticleCacheParam);
             if (articleCache && articleCache.txs && Array.isArray(articleCache.txs) && articleCache.txs.length > 0) {
                 setFullArticleHistory(articleCache);
-                getArticleHistoryByPage(0, true, articleCache);
+                getArticleHistoryByPage(0, true, articleCache, curateByContacts);
             }
 
             // Use cached paywall data if applicable
@@ -199,12 +199,14 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                     articleTx.articleObject = sharedArticleObject;
                     setCurrentArticleTxObj(articleTx);
 
+                    setOpenSharedArticleLoader(false);
                     if (sharedArticleObject.paywallPrice > 0) {
                         // If this article exists, and is a paywalled article, check paywall payment and render accordingly
                         handlePaywallStatus(
                             sharedArticleTxid,
                             sharedArticleObject.paywallPrice,
                             localArticleHistoryResp,
+                            articleTx.replyAddress,
                         );
                     } else {
                         // If this article exists as a non-paywalled article, render directly
@@ -225,7 +227,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
     // Retrieves the article listing
     // Set localLookup to true to retrieve paginated data locally
-    const getArticleHistoryByPage = async (pageNum = 0, localLookup = false, articleCache = false) => {
+    const getArticleHistoryByPage = async (pageNum = 0, localLookup = false, articleCache = false, curateByContacts = false) => {
         if (
             typeof pageNum !== "number" ||
             chronik === undefined
@@ -236,6 +238,21 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         if (localLookup) {
             // if articleCache was passed in from useEffect, use it as the source of truth for local lookup
             let localArticleHistory = articleCache ? articleCache : fullArticleHistory;
+
+            // If the user opts to curate content by contacts only
+            if (curateByContacts === true) {
+                const contactOnlyArticleHistoryTxs = [];
+                for (const tx of localArticleHistory.txs) {
+                    let txByContact = contactList.find(
+                        contact => contact.address === tx.replyAddress,
+                    );
+                    // if a match was found
+                    if (typeof txByContact !== 'undefined') {
+                        contactOnlyArticleHistoryTxs.push(tx);
+                    }
+                }
+                localArticleHistory.txs = contactOnlyArticleHistoryTxs;
+            }
 
             const selectedPageHistory = getPaginatedHistoryPage(
                 localArticleHistory.txs,
@@ -269,6 +286,38 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 return currentArticleHistoryPage;
             }
         }
+    };
+
+    // Handle the checkbox to curate posts from contacts only
+    const handleCurateByContactsChange = async (newState) => {
+        setCurateByContacts(newState);
+        const articleCache = await localforage.getItem(appConfig.localArticleCacheParam);
+        if (newState === true) {
+            await refreshContactList();
+            setCurrentPage(0);
+            await getArticleHistoryByPage(
+                0,
+                true, // filter on local cache only
+                articleCache,
+                true, // flag for contact filter
+            );
+        } else {
+            setCurrentPage(0);
+            await getArticleHistoryByPage(
+                0,
+                true, // filter on local cache only
+                articleCache,
+                false,
+            );
+        }
+    };
+
+    // Calculates article reading time in minutes
+    const getEstiamtedReadingTime = (articleContent) => {
+        if (!articleContent) {
+            return 1;
+        }
+        return Math.ceil(articleContent.split(" ").length / 200);
     };
 
     // Pass an article tx BIP21 query string to cashtab extensions
@@ -326,6 +375,9 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
     // Pass a reply to article tx BIP21 query string to cashtab extensions
     const replytoArticle = (replyTxid, replyMsg) => {
+        if (replyMsg.trim() === '') {
+            return;
+        }
         // Encode the op_return message script
         const opReturnRaw = encodeBip21ReplyArticle(replyMsg, replyTxid);
         const bip21Str = `${address}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`;
@@ -347,7 +399,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 '*',
             );
         }
-        setReplyArticle('');
         txListener(chronik, address, "Article reply", appConfig.dustXec, address, getArticleHistoryByPage);
     };
 
@@ -582,12 +633,18 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     };
 
     // Check whether the paywall price for the article has been paid by this address
-    const checkPaywallPayment = (paywalledArticleTxId, paywallPrice, localArticleHistoryResp = false) => {
+    const checkPaywallPayment = (paywalledArticleTxId, paywallPrice, localArticleHistoryResp = false, articleAuthor = false) => {
         let paywallPaid = false;
         let localArticleHistory = articleHistory;
         if (localArticleHistoryResp) {
             localArticleHistory = localArticleHistoryResp;
         }
+
+        // Waive paywall for article author
+        if (articleAuthor === address) {
+            return true;
+        }
+
         for (const thisPaywallPayment of localArticleHistory.paywallTxs) {
             if (
                 thisPaywallPayment.paywallPaymentArticleTxid === paywalledArticleTxId &&
@@ -630,9 +687,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     };
 
     // Conditionally renders the appropriate modal based on paywall payment status
-    const handlePaywallStatus = (paywalledArticleTxId, paywallPrice, localArticleHistoryResp = false) => {
-        const paywallPaid = checkPaywallPayment(paywalledArticleTxId, paywallPrice, localArticleHistoryResp );
-        console.log('Paid paywall fee? ', paywallPaid);
+    const handlePaywallStatus = (paywalledArticleTxId, paywallPrice, localArticleHistoryResp = false, articleAuthor = false) => {
+        const paywallPaid = checkPaywallPayment(paywalledArticleTxId, paywallPrice, localArticleHistoryResp, articleAuthor);
         if (paywallPaid) {
             setShowArticleModal(true);
         } else {
@@ -747,33 +803,33 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
                     {currentArticleTxObj.articleObject.disbleReplies !== true && (
                     <div className="w-full ml-0">
-                                    {/* Reply input field */}
-                                    <Textarea
-                                        id="reply-post"
-                                        defaultValue={replyArticle}
-                                        placeholder="Post your reply..."
-                                        className="bg-gray-50"
-                                        onBlur={e => setReplyArticle(e.target.value)}
-                                        maxLength={opreturnConfig.articleReplyByteLimit}
-                                        rows={4}
-                                    />
-                                    <Button
-                                        type="button"
-                                        className="mt-2"
-                                        disabled={replyArticle === ''}
-                                        onClick={e => {
-                                            replytoArticle(currentArticleTxObj.txid, replyArticle)
-                                        }}
-                                    >
-                                        Post Reply
-                                    </Button>
-                                    <Button 
-                                    className="ml-2"
-                                    variant="secondary" onClick={() => setShowArticleModal(false)}>
-                                    Close
-                                </Button>
-                                </div>
-                                )}
+                        {/* Reply input field */}
+                        <Textarea
+                            id="reply-post"
+                            name="reply-post"
+                            ref={articleReplyInput}
+                            placeholder="Post your reply..."
+                            className="bg-gray-50"
+                            maxLength={opreturnConfig.articleReplyByteLimit}
+                            rows={4}
+                        />
+                        <Button
+                            type="button"
+                            className="mt-2"
+                            onClick={e => {
+                                replytoArticle(currentArticleTxObj.txid, articleReplyInput?.current?.value)
+                            }}
+                        >
+                            Post Reply
+                        </Button>
+                        <Button
+                            className="ml-2"
+                            variant="secondary" onClick={() => setShowArticleModal(false)}
+                        >
+                            Close
+                        </Button>
+                    </div>
+                    )}
                 </Modal.Footer>
                 </div>
             </Modal>
@@ -784,8 +840,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         let latestArticleHistory;
 
         if (
-            Array.isArray(txHistoryByAddress) &&
-            txHistoryByAddress.length > 0
+            Array.isArray(txHistoryByAddress)
         ) {
             latestArticleHistory = { txs: txHistoryByAddress };
         } else {
@@ -815,6 +870,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             <time dateTime={tx.txTime} className="text-gray-500">
                                 {tx.txDate}
                             </time>
+
+                            {getEstiamtedReadingTime(tx.articleObject.content)} min read
                             <Badge variant="secondary">
                                 {tx.articleObject.category || 'General'}
                             </Badge>
@@ -830,13 +887,13 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 e.preventDefault();
                                 setCurrentArticleTxObj(tx);
                                 if (tx.articleObject.paywallPrice > 0) {
-                                    handlePaywallStatus(tx.txid, tx.articleObject.paywallPrice);
+                                    handlePaywallStatus(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress);
                                 } else {
                                     setShowArticleModal(true);
                                 }
                             }}
                         >
-                            {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (
+                            {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) && (
                                 <Alert
                                     className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-auto z-10 flex items-center justify-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/5"
                                 >
@@ -849,10 +906,10 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             <div className="line-clamp-3">
                                 <p
                                     className={`mt-0 text-sm leading-6 text-gray-600 break-words max-h-80 ${
-                                        tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) ? 'blur-sm pt-6' : ''
+                                        tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) ? 'blur-sm pt-6' : ''
                                     }`}
                                 >
-                                    {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) ? (
+                                    {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) ? (
                                         <>
                                             <Skeleton className="h-4 mt-2 w-full" />
                                             <Skeleton className="h-4 mt-2 w-2/3" />
@@ -967,7 +1024,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                       </div>
                         <div className="relative mt-2 flex items-center gap-x-2 ml-auto hidden md:flex">
                           
-                            {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice) && (
+                            {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) && (
                                 <TooltipProvider>
                                 <Tooltip>
                                   <TooltipTrigger> <UnlockIcon /></TooltipTrigger>
@@ -1147,6 +1204,21 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                         </div>
                 )}
                
+                <div className="relative flex items-start mt-2 mb-2">
+                    <div className="flex h-6 items-center py-2">
+                        <Checkbox
+                        id="curateByContacts"
+                        checked={curateByContacts}
+                        onCheckedChange={() => handleCurateByContactsChange(!curateByContacts)}
+                        className="rounded"
+                        />
+                    </div>
+                    <div className="ml-3 text-sm leading-6">
+                        <Label htmlFor="curateByContacts" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                            Only show articles by your contacts
+                        </Label>
+                    </div>
+                </div>
 
                 {/*Set up pagination menu*/}
                 <span>
@@ -1159,7 +1231,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 onClick={(e) => {
                                 e.preventDefault();
                                 setCurrentPage(old => Math.max(0, old - 1));
-                                getArticleHistoryByPage(Math.max(0, currentPage - 1), true);
+                                getArticleHistoryByPage(Math.max(0, currentPage - 1), true, false, curateByContacts);
                                 }}
                                 disabled={currentPage === 0}
                             />
@@ -1179,7 +1251,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     href="#"
                                     onClick={(e) => {
                                     e.preventDefault();
-                                    getArticleHistoryByPage(i, true);
+                                    getArticleHistoryByPage(i, true, false, curateByContacts);
                                     setCurrentPage(i);
                                     }}
                                     isActive={currentPage === i}
@@ -1204,7 +1276,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 onClick={(e) => {
                                 e.preventDefault();
                                 setCurrentPage(old => Math.min(articleHistory.numPages - 1, old + 1));
-                                getArticleHistoryByPage(Math.min(articleHistory.numPages - 1, currentPage + 1), true);
+                                getArticleHistoryByPage(Math.min(articleHistory.numPages - 1, currentPage + 1), true, false, curateByContacts);
                                 }}
                                 disabled={currentPage === articleHistory.numPages - 1}
                             />

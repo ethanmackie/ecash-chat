@@ -63,6 +63,8 @@ const crypto = require('crypto');
 import copy from 'copy-to-clipboard';
 import { toast } from 'react-toastify';
 import { addNewContact } from '../utils/utils';
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 const chronik = new ChronikClientNode(chronikConfig.urls);
 import localforage from 'localforage';
 
@@ -83,6 +85,7 @@ export default function TxHistory({ address, isMobile }) {
     const [contactList, setContactList] = useState('');
     const newContactNameInput = useRef('');
     const newReplierContactNameInput = useRef('');
+    const [curateByContacts, setCurateByContacts] = useState(false);
 
     useEffect(() => {
       const handleResize = () => {
@@ -130,7 +133,7 @@ export default function TxHistory({ address, isMobile }) {
     };
 
     // Retrieves the tx history specific to OP_RETURN messages
-    const getTxHistoryByPage = async (pageNum = 0, localLookup = false) => {
+    const getTxHistoryByPage = async (pageNum = 0, localLookup = false, curateByContacts = false) => {
       if (
           typeof pageNum !== "number" ||
           chronik === undefined ||
@@ -140,6 +143,21 @@ export default function TxHistory({ address, isMobile }) {
       }
 
       if (localLookup) {
+        // If the user opts to curate content by contacts only
+        if (curateByContacts === true) {
+          const contactOnlyInboxHistoryTxs = [];
+          for (const tx of fullTxHistory.txs) {
+              let txByContact = contactList.find(
+                  contact => contact.address === tx.replyAddress,
+              );
+              // if a match was found
+              if (typeof txByContact !== 'undefined') {
+                contactOnlyInboxHistoryTxs.push(tx);
+              }
+          }
+          fullTxHistory.txs = contactOnlyInboxHistoryTxs;
+        }
+
         const selectedPageHistory = getPaginatedHistoryPage(
             fullTxHistory.txs,
             pageNum,
@@ -165,6 +183,27 @@ export default function TxHistory({ address, isMobile }) {
             });
             setFullTxHistory(txHistoryResp);
         }
+      }
+    };
+
+    // Handle the checkbox to curate posts from contacts only
+    const handleCurateByContactsChange = async (newState) => {
+      setCurateByContacts(newState);
+      if (newState === true) {
+          await refreshContactList();
+          setCurrentPage(0);
+          await getTxHistoryByPage(
+              0,
+              true, // filter on local cache only
+              true, // flag for contact filter
+          );
+      } else {
+          setCurrentPage(0);
+          await getTxHistoryByPage(
+              0,
+              false, // filter on local cache only
+              false,
+          );
       }
     };
 
@@ -640,6 +679,22 @@ export default function TxHistory({ address, isMobile }) {
          <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
          {txHistory && txHistory !== '' ? (
             <>
+            <div className="relative flex items-start mt-2 mb-2">
+              <div className="flex h-6 items-center py-2">
+                  <Checkbox
+                  id="curateByContacts"
+                  checked={curateByContacts}
+                  onCheckedChange={() => handleCurateByContactsChange(!curateByContacts)}
+                  className="rounded"
+                  />
+              </div>
+              <div className="ml-3 text-sm leading-6">
+                  <Label htmlFor="curateByContacts" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      Only show messages by your contacts
+                  </Label>
+              </div>
+            </div>
+
             {/*Set up pagination menu*/}
 
             <span>
@@ -650,7 +705,7 @@ export default function TxHistory({ address, isMobile }) {
                         href="#"
                         onClick={(e) => {
                           setCurrentPage((old) => Math.max(0, old - 1));
-                          getTxHistoryByPage(Math.max(0, currentPage - 1), true);
+                          getTxHistoryByPage(Math.max(0, currentPage - 1), true, curateByContacts);
                         }}
                         disabled={currentPage === 0}
                       />
@@ -669,7 +724,7 @@ export default function TxHistory({ address, isMobile }) {
                             href="#"
                             onClick={(e) => {
                               e.preventDefault();
-                              getTxHistoryByPage(i, true);
+                              getTxHistoryByPage(i, true, curateByContacts);
                               setCurrentPage(i);
                             }}
                             isActive={currentPage === i}
@@ -685,7 +740,7 @@ export default function TxHistory({ address, isMobile }) {
                         onClick={(e) => {
                           e.preventDefault();
                           setCurrentPage((old) => Math.min(txHistory.numPages - 1, old + 1));
-                          getTxHistoryByPage(Math.min(txHistory.numPages - 1, currentPage + 1), true);
+                          getTxHistoryByPage(Math.min(txHistory.numPages - 1, currentPage + 1), true, curateByContacts);
                         }}
                         disabled={currentPage === txHistory.numPages - 1}
                       />

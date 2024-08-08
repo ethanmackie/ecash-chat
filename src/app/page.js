@@ -98,6 +98,7 @@ export default function Home() {
     const [showCard, setShowCard] = useState(false);
     const [userAvatarLink, setUserAvatarLink] = useState(false);
     const [latestAvatars, setLatestAvatars] = useState([]);
+    const [openSharedArticleLoader, setOpenSharedArticleLoader] = useState(false);
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
@@ -131,6 +132,7 @@ export default function Home() {
         const sharedArticleParam = searchParams.get("sharedArticleTxid");
         if (sharedArticleParam) {
             setSharedArticleTxid(sharedArticleParam);
+            setOpenSharedArticleLoader(true);
         }
 
         // Preload the avatars
@@ -797,6 +799,34 @@ export default function Home() {
           {/* Credit card summary */}
           <CreditCardHeader />
 
+        <AlertDialog
+            open={openSharedArticleLoader}
+            onOpenChange={setOpenSharedArticleLoader}
+        >
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                <AlertDialogTitle>Retrieving shared article</AlertDialogTitle>
+                <AlertDialogDescription>
+                    <div className="flex flex-col space-y-3">
+                        <div className="space-y-2">
+                            Txid: 
+                            <a 
+                                href={`${appConfig.blockExplorerUrl}/tx/${sharedArticleTxid}`} 
+                                target="_blank" 
+                                className="ml-2 dark:text-white font-medium" 
+                            >
+                                {sharedArticleTxid.toString().substring(0,10) + '........' + sharedArticleTxid.toString().substring(sharedArticleTxid.toString().length - 10)}
+                            </a>
+                            <Skeleton className="h-4 w-[350px]" />
+                            <Skeleton className="h-4 w-[300px]" />
+                            <Skeleton className="h-4 w-[270px]" />
+                        </div>
+                    </div>
+                </AlertDialogDescription>
+                </AlertDialogHeader>
+            </AlertDialogContent>
+        </AlertDialog>
+
           {/* Tab navigation */}
           <Tabs aria-label="eCash Chat" style="default" className='z-10 !border-b-0 focus:ring-0 relative mt-4 justify-center'>
             <Tabs.Item title="Message" icon={Send3Icon}>
@@ -960,7 +990,7 @@ export default function Home() {
               </Tabs.Item>
 
               <Tabs.Item title="Articles" icon={File3Icon} >
-                <Article chronik={chronik} address={address} isMobile={isMobile} sharedArticleTxid={sharedArticleTxid} setXecBalance={setXecBalance} />
+                <Article chronik={chronik} address={address} isMobile={isMobile} sharedArticleTxid={sharedArticleTxid} setXecBalance={setXecBalance} setOpenSharedArticleLoader={setOpenSharedArticleLoader} />
               </Tabs.Item>
 
               <Tabs.Item title="NFTs" icon={Nft3Icon} >

@@ -80,6 +80,8 @@ import {
 } from "@/components/ui/pagination"
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { addNewContact } from '../utils/utils';
 import localforage from 'localforage';
 
@@ -97,6 +99,7 @@ export default function TownHall({ address, isMobile }) {
     const [contactList, setContactList] = useState('');
     const [contactListName, setContactListName] = useState('');
     const newReplierContactNameInput = useRef('');
+    const [curateByContacts, setCurateByContacts] = useState(false);
 
     useEffect(() => {
       const handleResize = () => {
@@ -118,7 +121,7 @@ export default function TownHall({ address, isMobile }) {
             // If cache exists, set initial render to cached history
             if (townhallCache && townhallCache.txs && Array.isArray(townhallCache.txs) && townhallCache.txs.length > 0) {
                 setFullTownHallHistory(townhallCache);
-                getTownhallHistoryByPage(0, true, townhallCache);
+                getTownhallHistoryByPage(0, true, townhallCache, curateByContacts);
             }
 
             // Subsequent refresh based on on-chain source
@@ -132,7 +135,7 @@ export default function TownHall({ address, isMobile }) {
     };
 
     // Refreshes the post history via chronik
-    const getTownhallHistoryByPage = async (pageNum = 0, localLookup = false, townhallCache = false) => {
+    const getTownhallHistoryByPage = async (pageNum = 0, localLookup = false, townhallCache = false, curateByContacts = false) => {
         if (
             typeof pageNum !== "number" ||
             chronik === undefined
@@ -143,6 +146,22 @@ export default function TownHall({ address, isMobile }) {
         if (localLookup) {
             // if townhallCache was passed in from useEffect, use it as the source of truth for local lookup
             let localFullTownHallHistory = townhallCache ? townhallCache : fullTownHallHistory;
+
+            // If the user opts to curate content by contacts only
+            if (curateByContacts === true) {
+                const contactOnlyTownHallHistoryTxs = [];
+                for (const tx of localFullTownHallHistory.txs) {
+                    let txByContact = contactList.find(
+                        contact => contact.address === tx.replyAddress,
+                    );
+                    // if a match was found
+                    if (typeof txByContact !== 'undefined') {
+                        contactOnlyTownHallHistoryTxs.push(tx);
+                    }
+                }
+                localFullTownHallHistory.txs = contactOnlyTownHallHistoryTxs;
+            }
+
             const selectedPageHistory = getPaginatedHistoryPage(
                 localFullTownHallHistory.txs,
                 pageNum,
@@ -314,7 +333,7 @@ export default function TownHall({ address, isMobile }) {
             );
         }
         setPost('');
-        txListener(chronik, address, "Townhall post sent", appConfig.dustXec, appConfig.townhallAddress, getTownhallHistoryByPage);
+        txListener(chronik, address, "Townhall post", appConfig.dustXec, appConfig.townhallAddress, getTownhallHistoryByPage);
     };
 
     // Pass a reply post tx BIP21 query string to cashtab extensions
@@ -393,6 +412,30 @@ export default function TownHall({ address, isMobile }) {
         );
     };
 
+    // Handle the checkbox to curate posts from contacts only
+    const handleCurateByContactsChange = async (newState) => {
+        setCurateByContacts(newState);
+        const townhallCache = await localforage.getItem(appConfig.localTownhallCacheParam);
+        if (newState === true) {
+            await refreshContactList();
+            setCurrentPage(0);
+            await getTownhallHistoryByPage(
+                0,
+                true, // filter on local cache only
+                townhallCache,
+                true, // flag for contact filter
+            );
+        } else {
+            setCurrentPage(0);
+            await getTownhallHistoryByPage(
+                0,
+                true, // filter on local cache only
+                townhallCache,
+                false,
+            );
+        }
+    };
+
     // Pass a XEC tip tx BIP21 query string to cashtab extensions
     const sendXecTip = (recipient, tipAmount) => {
         // Encode the op_return message script
@@ -417,7 +460,7 @@ export default function TownHall({ address, isMobile }) {
             '*',
         );
 
-        txListener(chronik, address, "Townhall XEC tip sent", tipAmount, recipient, getTownhallHistoryByPage);
+        txListener(chronik, address, "Townhall XEC tip", tipAmount, recipient, getTownhallHistoryByPage);
     };
 
     // Lookup and render any corresponding replies
@@ -592,71 +635,87 @@ export default function TownHall({ address, isMobile }) {
                 </>
              <Separator className="my-2" />
             {/* Townhall Post History */}
-            {/*Set up pagination menu*/}
-            <span>
-                <Pagination>
-                    <PaginationContent>
-                        {/* Previous button */}
-                        <PaginationItem>
-                        <PaginationPrevious
-                            href="#"
-                            onClick={(e) => {
-                            e.preventDefault();
-                            setCurrentPage(old => Math.max(0, old - 1));
-                            getTownhallHistoryByPage(Math.max(0, currentPage - 1), true);
-                            }}
-                            disabled={currentPage === 0}
-                        />
-                        </PaginationItem>
 
-                        {/* Numbered page links with dynamic display logic */}
-                        {Array.from({ length: townHallHistory.numPages }, (_, i) => i)
-                        .filter(i => {
-                            if (townHallHistory.numPages <= maxPagesToShow) return true;
-                            if (currentPage <= halfMaxPages) return i < maxPagesToShow;
-                            if (currentPage >= townHallHistory.numPages - halfMaxPages) return i >= townHallHistory.numPages - maxPagesToShow;
-                            return i >= currentPage - halfMaxPages && i <= currentPage + halfMaxPages;
-                        })
-                        .map(i => (
-                            <PaginationItem key={i}>
-                            <PaginationLink
+            <div className="relative flex items-start mt-2 mb-2">
+                <div className="flex h-6 items-center py-2">
+                    <Checkbox
+                    id="curateByContacts"
+                    checked={curateByContacts}
+                    onCheckedChange={() => handleCurateByContactsChange(!curateByContacts)}
+                    className="rounded"
+                    />
+                </div>
+                <div className="ml-3 text-sm leading-6">
+                    <Label htmlFor="curateByContacts" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        Only show posts by your contacts
+                    </Label>
+                </div>
+            </div>
+
+            {/*Set up pagination menu*/}
+                <span>
+                    <Pagination>
+                        <PaginationContent>
+                            {/* Previous button */}
+                            <PaginationItem>
+                            <PaginationPrevious
                                 href="#"
                                 onClick={(e) => {
                                 e.preventDefault();
-                                getTownhallHistoryByPage(i, true);
-                                setCurrentPage(i);
+                                setCurrentPage(old => Math.max(0, old - 1));
+                                getTownhallHistoryByPage(Math.max(0, currentPage - 1), true, false, curateByContacts);
                                 }}
-                                isActive={currentPage === i}
-                                key={"pagination"+i}
-                            >
-                                {i + 1}
-                            </PaginationLink>
+                                disabled={currentPage === 0}
+                            />
                             </PaginationItem>
-                        ))}
 
-                        {/* Optional ellipsis for overflow, modifying to appear conditionally */}
-                        {(townHallHistory.numPages > maxPagesToShow && currentPage < townHallHistory.numPages - halfMaxPages) && (
-                        <PaginationItem>
-                            <PaginationEllipsis />
-                        </PaginationItem>
-                        )}
+                            {/* Numbered page links with dynamic display logic */}
+                            {Array.from({ length: townHallHistory.numPages }, (_, i) => i)
+                            .filter(i => {
+                                if (townHallHistory.numPages <= maxPagesToShow) return true;
+                                if (currentPage <= halfMaxPages) return i < maxPagesToShow;
+                                if (currentPage >= townHallHistory.numPages - halfMaxPages) return i >= townHallHistory.numPages - maxPagesToShow;
+                                return i >= currentPage - halfMaxPages && i <= currentPage + halfMaxPages;
+                            })
+                            .map(i => (
+                                <PaginationItem key={i}>
+                                <PaginationLink
+                                    href="#"
+                                    onClick={(e) => {
+                                    e.preventDefault();
+                                    getTownhallHistoryByPage(i, true, false, curateByContacts);
+                                    setCurrentPage(i);
+                                    }}
+                                    isActive={currentPage === i}
+                                    key={"pagination"+i}
+                                >
+                                    {i + 1}
+                                </PaginationLink>
+                                </PaginationItem>
+                            ))}
 
-                        {/* Next button */}
-                        <PaginationItem>
-                        <PaginationNext
-                            href="#"
-                            onClick={(e) => {
-                            e.preventDefault();
-                            setCurrentPage(old => Math.min(townHallHistory.numPages - 1, old + 1));
-                            getTownhallHistoryByPage(Math.min(townHallHistory.numPages - 1, currentPage + 1), true);
-                            }}
-                            disabled={currentPage === townHallHistory.numPages - 1}
-                        />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
-            </span>
+                            {/* Optional ellipsis for overflow, modifying to appear conditionally */}
+                            {(townHallHistory.numPages > maxPagesToShow && currentPage < townHallHistory.numPages - halfMaxPages) && (
+                            <PaginationItem>
+                                <PaginationEllipsis />
+                            </PaginationItem>
+                            )}
 
+                            {/* Next button */}
+                            <PaginationItem>
+                            <PaginationNext
+                                href="#"
+                                onClick={(e) => {
+                                e.preventDefault();
+                                setCurrentPage(old => Math.min(townHallHistory.numPages - 1, old + 1));
+                                getTownhallHistoryByPage(Math.min(townHallHistory.numPages - 1, currentPage + 1), true, false, curateByContacts);
+                                }}
+                                disabled={currentPage === townHallHistory.numPages - 1}
+                            />
+                            </PaginationItem>
+                        </PaginationContent>
+                    </Pagination>
+                </span>
             <div>
             {
                 townHallHistory &&
