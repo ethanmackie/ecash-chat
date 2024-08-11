@@ -731,6 +731,7 @@ export default function Home() {
                           value={recipient}
                           onChange={(e) => handleAddressChange(e)}
                         />
+                        <p className="mt-2 text-sm text-red-600 dark:text-red-500">{recipientError !== false && recipientError}</p>
                       </div>
                       <div className="grid gap-2">
                         <div className="flex items-center">
