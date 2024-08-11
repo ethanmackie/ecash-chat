@@ -139,6 +139,24 @@ export const encodeBip2XecTip = () => {
     }
 };
 
+// Encodes the op_return script for an XEC dust authentication tx
+export const encodeBip21Auth = (authHex) => {
+    try {
+        let script = [];
+
+        // Push eCash Chat protocol identifier
+        script.push(Buffer.from(opreturnConfig.appPrefixesHex.authPrefixHex, 'hex'));
+
+        // Push random hash + timestamp
+        script.push(Buffer.from(authHex, 'hex'));
+
+        script = utxolib.script.compile(script).toString('hex');
+        return script;
+    } catch (err) {
+        console.log('Error encoding authentication tx: ', err);
+    }
+};
+
 // Encodes the op_return script for an XEC paywall payment
 export const encodeBip21PaywallPayment = replyTxid => {
     try {

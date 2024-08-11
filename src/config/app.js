@@ -18,6 +18,7 @@ export const appConfig = {
     notificationDurationLong: 5,
     localStorageMaxCharacters: 24,
     townhallAddress: 'ecash:qpc20prr862zklsun9rj2kgseqfjvgezts4ah8wh7h',
+    authAddress: 'ecash:qzeq9xxpkht2s2np7myv6uy04papecdf0g0zly33v5',
     blockExplorerUrl: 'https://explorer.e.cash',
     historyRefreshInterval: 60000,
     articleRefreshInterval: 120000,

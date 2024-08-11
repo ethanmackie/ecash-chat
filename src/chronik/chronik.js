@@ -883,6 +883,75 @@ export const txListener = async (
 };
 
 /**
+ * Subscribes to authentication txs
+ *
+ * @param {string} chronik the chronik-client instance
+ * @param {string} receivingAddress the auth endpoint address
+ * @param {string} authenticationHex the authentication hex
+ * @param {callback fn} savingLoginModalCallback a callback function to render the save login modal
+ * @param {callback fn} viewAddress a callback function to login as the address
+ * @param {callback fn} setShowDustTxAuthenticationLoader a callback function to disable the authentication loader
+ * @throws {error} err chronik websocket subscription errors
+ */
+export const authTxListener = async (
+    chronik,
+    receivingAddress,
+    authenticationHex,
+    savingLoginModalCallback = false,
+    viewAddress = false,
+    setShowDustTxAuthenticationLoader = false,
+) => {
+    // Get type and hash
+    const { type, hash } = cashaddr.decode(receivingAddress, true);
+
+    try {
+        const ws = chronik.ws({
+            onMessage: msg => {
+                if (msg.msgType === 'TX_ADDED_TO_MEMPOOL') {
+                    let mempoolTx;
+                    setTimeout(async() => { // temporary until Extension is refactored to allow direct passing of callback functions
+                        mempoolTx = await chronik.tx(msg.txid);
+                        const authenticatingUser = cashaddr.encodeOutputScript(mempoolTx.inputs[0].outputScript);
+                        if (mempoolTx.outputs[0].outputScript.includes(authenticationHex)) {
+                            // Notify user
+                            toast(`Authentication successful, logging in as ${authenticatingUser}`);
+
+                            // Unsubscribe and close websocket
+                            ws.unsubscribeFromScript(type, hash);
+                            ws.close();
+
+                            // Render save login modal
+                            if (savingLoginModalCallback) {
+                                savingLoginModalCallback(true);
+                            }
+
+                            // Log in to the authenticated address
+                            if (viewAddress) {
+                                viewAddress(authenticatingUser);
+                            }
+
+                            if (setShowDustTxAuthenticationLoader) {
+                                setShowDustTxAuthenticationLoader(false);
+                            }
+                        }
+                    }, 500);
+                }
+            },
+        });
+
+        // Wait for WS to be connected:
+        await ws.waitForOpen();
+
+        // Subscript to script
+        ws.subscribeToScript(type, hash);
+    } catch (err) {
+        console.log(
+            'authTxListener: Error in chronik websocket subscription: ' + err,
+        );
+    }
+};
+
+/**
  * Subscribes to a given address and listens for new websocket events specific to paywall payments
  *
  * @param {string} chronik the chronik-client instance

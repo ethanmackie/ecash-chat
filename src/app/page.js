@@ -10,9 +10,15 @@ import cashaddr from 'ecashaddrjs';
 import ProfilePanel from './profile';
 import ContactListPanel from './contact';
 import { queryAliasServer } from '../alias/alias-server';
-import { encodeBip21Message, getTweetId, getNFTAvatarLink } from '../utils/utils';
+import { encodeBip21Message, getTweetId, getNFTAvatarLink, encodeBip21Auth } from '../utils/utils';
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion";
 import { isMobileDevice } from '../utils/mobileCheck';
-import { txListener, refreshUtxos, txListenerOngoing, getArticleListing, getAvatarListing, updateAvatars } from '../chronik/chronik';
+import { txListener, txListenerOngoing, getArticleListing, updateAvatars, authTxListener } from '../chronik/chronik';
 import { appConfig } from '../config/app';
 import { isValidRecipient, messageHasErrors } from '../validation/validation';
 import data from '@emoji-mart/data';
@@ -48,7 +54,7 @@ import copy from 'copy-to-clipboard';
 import { Tooltip, Tabs, Alert, Modal, Popover } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
 import { ToastContainer, toast } from 'react-toastify';
-import { FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon, IdCardIcon } from '@radix-ui/react-icons';
+import { FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon, ReloadIcon } from '@radix-ui/react-icons';
 import 'react-toastify/dist/ReactToastify.css';
 import { YoutubeIcon, EcashchatIcon, LoadingSpinner, Home3Icon, File3Icon, Nft3Icon, Inbox3Icon, Send3Icon, Info3icon, User3icon, QrcodeIcon, Logout3Icon } from "@/components/ui/social";
 import {
@@ -99,6 +105,7 @@ export default function Home() {
     const [userAvatarLink, setUserAvatarLink] = useState(false);
     const [latestAvatars, setLatestAvatars] = useState([]);
     const [openSharedArticleLoader, setOpenSharedArticleLoader] = useState(false);
+    const [showDustTxAuthenticationLoader, setShowDustTxAuthenticationLoader] = useState(false);
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
@@ -404,6 +411,26 @@ export default function Home() {
         setMessage('');
         setPassword('');
         txListener(chronik, address, "Message", sendAmountXec, recipient, false);
+    };
+
+    const verifyDustTx = () => {
+        setShowDustTxAuthenticationLoader(true);
+        // Encode the op_return message script
+        const authenticationHex = crypto.randomBytes(20).toString('hex');
+        const opReturnRaw = encodeBip21Auth(authenticationHex);
+        const bip21Str = `${appConfig.authAddress}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`;
+        window.open(
+            `https://cashtab.com/#/send?bip21=${bip21Str}`,
+            '_blank',
+        );
+        authTxListener(
+            chronik,
+            appConfig.authAddress,
+            authenticationHex,
+            setOpenSaveLoginModal,
+            viewAddress,
+            setShowDustTxAuthenticationLoader,
+        );
     };
 
     const MessagePreviewModal = () => {
@@ -730,49 +757,85 @@ export default function Home() {
             <><br />
             <div className="px-4">
                 <Alert color="info">
-                    <br />
                     <p><b>Mobile device detected </b></p>
-                    <p>Please use your wallet to sign an <b>'ecashchat'</b> message via <a href='https://cashtab.com/#/signverifymsg' target='_blank'>Cashtab</a> and input the signature below for verification.</p><br />
                 </Alert>
-                <form className="space-y-6" action="#" method="POST">
-                    <div>
-                        <div className="mt-2">
-                          <Input
-                            id="viewAddress"
-                            name="viewAddress"
-                            type="text"
-                            placeholder="Enter your eCash address..."
-                            value={recipient}
-                            required
-                            onChange={e => handleAddressChange(e)}
-                          />
-                        </div>
-                        <p className="mt-2 text-sm text-red-600 dark:text-red-500">{recipientError !== false && recipientError}</p>
-                        <div className="mt-2">
-                          <Input
-                            id="viewSignature"
-                            name="viewSignature"
-                            type="text"
-                            placeholder="Enter your signature..."
-                            value={signature}
-                            required
-                            onChange={e => setSignature(e.target.value)}
-                          />
-                        </div>
-                        <div>
-                          <Button
-                            type="button"
-                            disabled={recipientError || recipient === '' || signature === ''}
-                            className="flex w-full mt-2"
-                            onClick={() => {
-                                verifySignature();
-                            }}
-                          >
-                            Login
-                          </Button>
-                        </div>
-                  </div>
-              </form>
+
+                <Accordion type="single" collapsible>
+                    <AccordionItem value="mobile-signature-login">
+                        <AccordionTrigger>Login via cashtab signature</AccordionTrigger>
+                        <AccordionContent>
+                        <Alert color="info">
+                            <br />
+                            <p>Please use your wallet to sign an <b>'ecashchat'</b> message via <a href='https://cashtab.com/#/signverifymsg' target='_blank'>Cashtab</a> and input the signature below for verification.</p><br />
+                        </Alert>
+                        <form className="space-y-6" action="#" method="POST">
+                            <div>
+                                <div className="mt-2">
+                                <Input
+                                    id="viewAddress"
+                                    name="viewAddress"
+                                    type="text"
+                                    placeholder="Enter your eCash address..."
+                                    value={recipient}
+                                    required
+                                    onChange={e => handleAddressChange(e)}
+                                />
+                                </div>
+                                <p className="mt-2 text-sm text-red-600 dark:text-red-500">{recipientError !== false && recipientError}</p>
+                                <div className="mt-2">
+                                <Input
+                                    id="viewSignature"
+                                    name="viewSignature"
+                                    type="text"
+                                    placeholder="Enter your signature..."
+                                    value={signature}
+                                    required
+                                    onChange={e => setSignature(e.target.value)}
+                                />
+                                </div>
+                                <div>
+                                <Button
+                                    type="button"
+                                    disabled={recipientError || recipient === '' || signature === ''}
+                                    className="flex w-full mt-2"
+                                    onClick={() => {
+                                        verifySignature();
+                                    }}
+                                >
+                                    Login
+                                </Button>
+                                </div>
+                            </div>
+                        </form>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
+
+                <Accordion type="single" collapsible>
+                    <AccordionItem value="mobile-dusttx-login">
+                        <AccordionTrigger>Login via sending cashtab dust transaction</AccordionTrigger>
+                        <AccordionContent>
+                            <div>
+                                <Button
+                                    type="button"
+                                    className="flex w-full mt-2"
+                                    onClick={() => {
+                                        verifyDustTx();
+                                    }}
+                                >
+                                    Send dust tx ({appConfig.dustXec} XEC)
+                                </Button>
+                            </div>
+                            <br />
+                            {showDustTxAuthenticationLoader && (
+                            <Button disabled>
+                                <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                                Authentication in progress
+                            </Button>
+                            )}
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
               </div>
             </>
         )}
