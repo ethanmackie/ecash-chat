@@ -832,7 +832,7 @@ export default function Home() {
                           </Button>
                         </div>
                       </>
-                    ) : (
+                    ) : isMobile && (
                       <Button
                         type="button"
                         variant="outline"
@@ -853,7 +853,6 @@ export default function Home() {
                             />&nbsp;dust
                         </div>
                       </Button>
-                      
                     )}
                     </div>
                     <div className="mt-4 text-center text-sm">
