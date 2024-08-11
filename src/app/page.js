@@ -605,11 +605,11 @@ export default function Home() {
               </a>
             </div>
             <div className="flex">       
-            {!showCard && (
-                <Button variant="outline" size="icon" className='mr-2' onClick={() => setShowCard(true)}>
-                <User3icon className="h-4 w-4" />
-                </Button>
-            )}
+            {isLoggedIn && !showCard && (
+            <Button variant="outline" size="icon" className='mr-2' onClick={() => setShowCard(true)}>
+            <User3icon className="h-4 w-4" />
+            </Button>
+        )}
 
             {isLoggedIn && (
                 <ContactListPanel
