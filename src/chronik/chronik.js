@@ -1274,6 +1274,7 @@ export const parseChronikTx = (tx, address, latestAvatars = false) => {
     let paywallPayment = false;
     let senderAvatarLink = false;
     let receiverAvatarLink = false;
+    let authenticationTx = false;
 
     if (tx.isCoinbase) {
         // Note that coinbase inputs have `undefined` for `thisInput.outputScript`
@@ -1488,6 +1489,12 @@ export const parseChronikTx = (tx, address, latestAvatars = false) => {
                     }
                     break;
                 }
+                case opreturnConfig.appPrefixesHex.authPrefixHex: {
+                    authenticationTx = true;
+                    iseCashChatMessage = true;
+                    opReturnMessage = `Authentication tx for ${replyAddress}`;
+                    break;
+                }
                 default: {
                     // utf8 decode
                     opReturnMessage = Buffer.from(
@@ -1677,6 +1684,7 @@ export const parseChronikTx = (tx, address, latestAvatars = false) => {
             paywallPayment,
             senderAvatarLink,
             receiverAvatarLink,
+            authenticationTx,
         };
     }
     // Otherwise do not include these fields
@@ -1713,6 +1721,7 @@ export const parseChronikTx = (tx, address, latestAvatars = false) => {
         paywallPayment,
         senderAvatarLink,
         receiverAvatarLink,
+        authenticationTx,
     };
 };
 
