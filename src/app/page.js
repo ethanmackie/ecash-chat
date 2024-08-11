@@ -782,7 +782,7 @@ export default function Home() {
                       </Button>
                       <div className="flex items-center">
                     <Separator className="flex-grow w-1/4" />
-                    <span className="text-sm text-muted-foreground">or</span>
+                    <span className="text-sm text-muted-foreground">{" "}or{" "}</span>
                     <Separator className="flex-grow w-1/4" />
                     </div>
                     {!isMobile && (
@@ -845,8 +845,15 @@ export default function Home() {
                             />
                         </div>
                       </Button>
+                      
                     )}
                     </div>
+                    <div className="mt-4 text-center text-sm">
+                    Don&apos;t have an address?{" "}
+                    <a href="https://cashtab.com" target="_blank" rel="noopener noreferrer" className="underline">
+                    Create
+                    </a>
+                </div>
                   </div>
                 </div>
 
