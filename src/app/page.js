@@ -801,7 +801,15 @@ export default function Home() {
                         </div>
                         ) : (
                         <div className="flex items-center justify-center">
-                            <span>Sign in with Cashtab Extension</span>
+                          <span>Sign in with</span>
+                          <Image
+                            src="/Cashtab-extension-light-flex.png"
+                            alt="cashtab Extension Logo"
+                            width={156}
+                            height={64}
+                            priority
+                            className="ml-2"
+                          />
                         </div>
                         )}
                     </Button>
@@ -834,15 +842,15 @@ export default function Home() {
                         }}
                       >
                         <div className="flex items-center justify-center">
-                          <span>Send {appConfig.dustXec} XEC with </span>
+                          <span>Sign in with</span>
                           <Image
                             src="/cashtab-logo-light.png"
-                            alt="cashtab Extension Logo"
+                            alt="cashtab Logo"
                             width={78}
                             height={32}
                             priority
                             className="ml-2"
-                            />
+                            />&nbsp;dust
                         </div>
                       </Button>
                       
