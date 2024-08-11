@@ -816,10 +816,13 @@ export default function Home() {
                     )}
 
                       {showDustTxAuthenticationLoader ? (
-                    <Button disabled className="flex w-full">
-                        <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                        Authentication in progress
-                    </Button>
+                        <>
+                          <Button disabled className="flex w-full">
+                              <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                              Authentication in progress
+                          </Button>
+                          <a href="#" onClick={() => setShowDustTxAuthenticationLoader(false)}>Cancel</a>
+                        </>
                     ) : (
                     <Button
                         type="button"
