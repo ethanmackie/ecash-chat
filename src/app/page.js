@@ -78,7 +78,7 @@ import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { Separator } from "@/components/ui/separator"
 
 
-const words = `Login with Cashtab Extension`;
+const words = `Continue with Cashtab Extension`;
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -801,7 +801,7 @@ export default function Home() {
                         </div>
                         ) : (
                         <div className="flex items-center justify-center">
-                            <TextGenerateEffect words={words} />
+                            <span>Sign in with Cashtab Extension</span>
                         </div>
                         )}
                     </Button>
@@ -834,7 +834,15 @@ export default function Home() {
                         }}
                       >
                         <div className="flex items-center justify-center">
-                          <span>Send {appConfig.dustXec} XEC with Cashtab </span>
+                          <span>Send {appConfig.dustXec} XEC with </span>
+                          <Image
+                            src="/cashtab-logo-light.png"
+                            alt="cashtab Extension Logo"
+                            width={78}
+                            height={32}
+                            priority
+                            className="ml-2"
+                            />
                         </div>
                       </Button>
                     )}
