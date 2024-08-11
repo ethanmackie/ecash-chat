@@ -720,19 +720,23 @@ export default function Home() {
                       </p>
                     </div>
                     <div className="grid gap-4">
-                      <div className="grid gap-2">
+                    <div className="grid gap-2">
                         <Label htmlFor="email">Address</Label>
                         <Input
-                          id="viewAddress"
-                          name="viewAddress"
-                          className="bg-white"
-                          type="text"
-                          placeholder="Enter your eCash address..."
-                          value={recipient}
-                          onChange={(e) => handleAddressChange(e)}
+                            id="viewAddress"
+                            name="viewAddress"
+                            className="bg-white"
+                            type="text"
+                            placeholder="Enter your eCash address..."
+                            value={recipient}
+                            onChange={(e) => handleAddressChange(e)}
                         />
-                        <p className="mt-2 text-sm text-red-600 dark:text-red-500">{recipientError !== false && recipientError}</p>
-                      </div>
+                        {recipientError && (
+                            <p className="text-sm text-red-600 dark:text-red-500">
+                            {recipientError}
+                            </p>
+                        )}
+                        </div>
                       <div className="grid gap-2">
                         <div className="flex items-center">
                           <Label htmlFor="password">Signature</Label>
