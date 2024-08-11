@@ -55,7 +55,7 @@ import copy from 'copy-to-clipboard';
 import { Tooltip, Tabs, Alert, Modal, Popover } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
 import { ToastContainer, toast } from 'react-toastify';
-import { FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon, ReloadIcon } from '@radix-ui/react-icons';
+import { FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon, ReloadIcon, Cross2Icon } from '@radix-ui/react-icons';
 import 'react-toastify/dist/ReactToastify.css';
 import { YoutubeIcon, EcashchatIcon, LoadingSpinner, Home3Icon, File3Icon, Nft3Icon, Inbox3Icon, Send3Icon, Info3icon, User3icon, QrcodeIcon, Logout3Icon } from "@/components/ui/social";
 import {
@@ -78,7 +78,7 @@ import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { Separator } from "@/components/ui/separator"
 
 
-const words = `Socialize, monetize and earn on the eCash blockchain?`;
+const words = `Login with Cashtab Extension`;
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -773,7 +773,7 @@ export default function Home() {
                         disabled={
                           recipientError || recipient === "" || signature === ""
                         }
-                        className="flex w-full mt-2"
+                        className="flex w-full"
                         onClick={() => {
                           verifySignature();
                         }}
@@ -801,15 +801,7 @@ export default function Home() {
                         </div>
                         ) : (
                         <div className="flex items-center justify-center">
-                            <span>Login via</span>
-                            <Image
-                            src="/cashtab-extension-light.png"
-                            alt="cashtab Extension Logo"
-                            width={96}
-                            height={32}
-                            priority
-                            className="ml-2"
-                            />
+                            <TextGenerateEffect words={words} />
                         </div>
                         )}
                     </Button>
@@ -817,33 +809,34 @@ export default function Home() {
 
                       {showDustTxAuthenticationLoader ? (
                         <>
-                          <Button disabled className="flex w-full">
-                              <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                              Authentication in progress
+                        <div className="flex w-full items-center">
+                          <Button disabled className="flex w-full mr-2">
+                            <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                            Authentication in progress
                           </Button>
-                          <a href="#" onClick={() => setShowDustTxAuthenticationLoader(false)}>Cancel</a>
-                        </>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setShowDustTxAuthenticationLoader(false)}
+                          >
+                            <Cross2Icon/>
+                          </Button>
+                        </div>
+                      </>
                     ) : (
-                    <Button
+                      <Button
                         type="button"
                         variant="outline"
                         className="flex w-full"
                         onClick={() => {
-                        verifyDustTx();
+                          verifyDustTx();
                         }}
-                    >
-                          <div className="flex items-center justify-center">
-                            <span>Login via </span>
-                            <Image
-                                src="/cashtab-logo-light.png"
-                                alt="Cashtab Logo"
-                                width={96}
-                                height={32}
-                                priority
-                                className="ml-2"
-                            />
-                            </div>
-                    </Button>
+                      >
+                        <div className="flex items-center justify-center">
+                          <span>Send {appConfig.dustXec} XEC with Cashtab </span>
+                        </div>
+                      </Button>
                     )}
                     </div>
                   </div>
