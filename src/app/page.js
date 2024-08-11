@@ -780,33 +780,35 @@ export default function Home() {
                     <span className="text-sm text-muted-foreground">or</span>
                     <Separator className="flex-grow w-1/4" />
                     </div>
-                      <Button
+                    {!isMobile && (
+                    <Button
                         variant="outline"
                         className="w-full"
                         onClick={() => {
-                            if (!isLoggedIn && !isMobile && step === "fresh") {
+                        if (!isLoggedIn && step === "fresh") {
                             getAddress();
-                            }
+                        }
                         }}
-                        >
+                    >
                         {showLoadingSpinner ? (
-                            <div className="flex justify-center">
+                        <div className="flex justify-center">
                             <LoadingSpinner className="h-2 w-2 animate-spin" />
-                            </div>
+                        </div>
                         ) : (
-                            <div className="flex items-center justify-center">
+                        <div className="flex items-center justify-center">
                             <span>Login via</span>
                             <Image
-                                src="/cashtab-extension-light.png"
-                                alt="cashtab Extension Logo"
-                                width={96}
-                                height={32}
-                                priority
-                                className="ml-2"
+                            src="/cashtab-extension-light.png"
+                            alt="cashtab Extension Logo"
+                            width={96}
+                            height={32}
+                            priority
+                            className="ml-2"
                             />
-                            </div>
+                        </div>
                         )}
-                        </Button>
+                    </Button>
+                    )}
 
                       {showDustTxAuthenticationLoader ? (
                     <Button disabled className="flex w-full">
@@ -823,7 +825,7 @@ export default function Home() {
                         }}
                     >
                           <div className="flex items-center justify-center">
-                            <span>Login via ({appConfig.dustXec} XEC) </span>
+                            <span>Login via </span>
                             <Image
                                 src="/cashtab-logo-light.png"
                                 alt="Cashtab Logo"
