@@ -170,6 +170,21 @@ export const getArticleHistory = async (chronik, address, page = 0) => {
             return false;
         });
 
+        // Remove muted addresses
+        let mutedList = await localforage.getItem(appConfig.localMuteParam);
+        if (!Array.isArray(mutedList)) {
+            mutedList = [];
+        }
+        const totalTxlHistoryTxsInclMuted = [];
+        for (const tx of totalTxlHistoryTxs) {
+            const thisTxAddress = cashaddr.encodeOutputScript(tx.inputs[0].outputScript);
+            const found = mutedList.find(element => element.address === thisTxAddress);
+            if (!found) {
+                totalTxlHistoryTxsInclMuted.push(tx);
+            }
+        };
+        totalTxlHistoryTxs = totalTxlHistoryTxsInclMuted;
+
         const localArticles = await localforage.getItem(appConfig.localArticlesParam);
 
         // Retrieve first chronik page of paywall txs
