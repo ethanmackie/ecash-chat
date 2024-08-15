@@ -73,7 +73,8 @@ export const mockParsedXecEncryptedSendTxWithOpReturn = {
     "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false,
     "receiverAvatarLink": false,
-    "senderAvatarLink": false
+    "senderAvatarLink": false,
+    "authenticationTx": false
 };
 
 export const mockXecSendTxWithOpReturnTweet = {
@@ -150,7 +151,8 @@ export const mockParsedXecSendTxWithOpReturnTweet = {
     "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false,
     "receiverAvatarLink": false,
-    "senderAvatarLink": false
+    "senderAvatarLink": false,
+    "authenticationTx": false
 };
 
 export const mockXecSendTxWithOpReturnEmoji = {
@@ -223,7 +225,8 @@ export const mockParsedXecSendTxWithOpReturnEmoji = {
     "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false,
     "receiverAvatarLink": false,
-    "senderAvatarLink": false
+    "senderAvatarLink": false,
+    "authenticationTx": false
 };
 
 export const mockXecSendTxWithOpReturnVideo = {
@@ -296,7 +299,8 @@ export const mockParsedXecSendTxWithOpReturnVideo = {
     "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false,
     "receiverAvatarLink": false,
-    "senderAvatarLink": false
+    "senderAvatarLink": false,
+    "authenticationTx": false
 };
 
 export const mockXecSendTxWithOpReturnImage = {
@@ -369,7 +373,8 @@ export const mockParsedXecSendTxWithOpReturnImage = {
     "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false,
     "receiverAvatarLink": false,
-    "senderAvatarLink": false
+    "senderAvatarLink": false,
+    "authenticationTx": false
 };
 
 export const mockXecSendTxWithOpReturn = {
@@ -442,7 +447,8 @@ export const mockParsedXecSendTxWithOpReturn = {
     "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false,
     "receiverAvatarLink": false,
-    "senderAvatarLink": false
+    "senderAvatarLink": false,
+    "authenticationTx": false
 };
 
 export const mockXecSendTxWithOpReturnTownhallPost = {
@@ -520,7 +526,8 @@ export const mockParsedXecSendTxWithOpReturnTownhallPost = {
     "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false,
     "receiverAvatarLink": false,
-    "senderAvatarLink": false
+    "senderAvatarLink": false,
+    "authenticationTx": false
 };
 
 export const mockXecSendTxWithOpReturnTownhallReplyPost = {
@@ -598,7 +605,8 @@ export const mockParsedXecSendTxWithOpReturnTownhallReplyPost = {
     "paywallPaymentArticleTxid": false,
     "nftShowcaseId": false,
     "receiverAvatarLink": false,
-    "senderAvatarLink": false
+    "senderAvatarLink": false,
+    "authenticationTx": false
 };
 
 export const mockXecSendTxWithOpReturnNftShowcase = {
@@ -676,7 +684,8 @@ export const mockParsedXecSendTxWithOpReturnNftShowcase = {
     "paywallPaymentArticleTxid": false,
     "nftShowcaseId": "076fc97838cea01911b1b83e26f5ec5c040e4aed039f24df6e3d076737c43482",
     "receiverAvatarLink": false,
-    "senderAvatarLink": false
+    "senderAvatarLink": false,
+    "authenticationTx": false
 };
 
 export const mockXecSendTxWithOpReturnArticle = {
@@ -759,7 +768,8 @@ export const mockParsedXecSendTxWithOpReturnArticle = {
     "paywallPaymentArticleTxid": false,
     "paywallPayment": false,
     "receiverAvatarLink": false,
-    "senderAvatarLink": false
+    "senderAvatarLink": false,
+    "authenticationTx": false
 };
 
 export const mockXecSendTxWithOpReturnArticleReply = {
@@ -828,7 +838,8 @@ export const mockParsedXecSendTxWithOpReturnArticleReply = {
     "paywallPaymentArticleTxid": false,
     "paywallPayment": false,
     "receiverAvatarLink": false,
-    "senderAvatarLink": false
+    "senderAvatarLink": false,
+    "authenticationTx": false
 };
 
 export const mockXecSendTxWithOpReturnPaywallPayment = {
@@ -924,7 +935,8 @@ export const mockParsedXecSendTxWithOpReturnPaywallPayment = {
     "paywallPaymentArticleTxid": "63a7854069594bc211b84a67d374b27e08d0838e0170b04c6314d8d7693aa7d8",
     "paywallPayment": "10",
     "receiverAvatarLink": false,
-    "senderAvatarLink": false
+    "senderAvatarLink": false,
+    "authenticationTx": false
 };
 
 export const mockXecSendTxWithOpReturnArticleXecTip = {
@@ -997,6 +1009,7 @@ export const mockParsedXecSendTxWithOpReturnArticleXecTip = {
     "paywallPaymentArticleTxid": false,
     "paywallPayment": false,
     "receiverAvatarLink": false,
-    "senderAvatarLink": false
+    "senderAvatarLink": false,
+    "authenticationTx": false
 };
 

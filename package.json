@@ -1,6 +1,6 @@
 {
   "name": "ecash-chat",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -52,6 +52,7 @@
     "emoji-mart": "^5.5.2",
     "flowbite": "^2.3.0",
     "flowbite-react": "^0.7.8",
+    "framer-motion": "^11.3.24",
     "jest-when": "^3.6.0",
     "localforage": "^1.10.0",
     "lucide-react": "^0.378.0",

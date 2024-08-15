@@ -377,6 +377,7 @@ export default function TxHistory({ address, isMobile }) {
                                         </div>
                                     </>
                                ) : tx.iseCashChatPost === true ? <Badge className="leading-7 shadow-sm hover:bg-accent py-3px" variant="outline">eCash Chat Townhall</Badge> :
+                                   tx.authenticationTx === true ? <Badge className="leading-7 shadow-sm hover:bg-accent py-3px" variant="outline">eCash Chat Authenticator</Badge> :
                                  (<>
                                    <span>
                                    <div className="flex items-center gap-2">

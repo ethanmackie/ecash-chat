@@ -8,6 +8,8 @@
 - Message encryption option via AES 256 CBC algorithm
 - Full length articles with paywall functionality
 - NFT showcase and use as avatars
+- Contacts management
+- Content curation based on contacts
 - Displays only messaging transactions
 - Real time address specific filtering
 - XEC Tipping on addresses
@@ -27,7 +29,7 @@ The eCash Chat protocol adopts the following onchain hex prefixes:
 - Post to townhall = 63686174 (chat) + 706f7374 (post) + [utf-8 message]
 - Reply to a townhall post = 63686174 (chat) + 68617368 (reply) + [txid of original post] + [utf-8 reply message]
 - Showcase an NFT to townhall = 63686174 (chat) + 6e667473 (nfts) + [txid of nft] + [utf-8 reply message]
-- Set profile pic = 63686174 (chat) + 70696373 (pics) + [utf-8 NFT id] (not implemented yet)
+- Mobile authentication = 61757468 (auth) + random string
 
 To assist with web apps in rendering these actions accordingly, here are some example breakdowns:
 

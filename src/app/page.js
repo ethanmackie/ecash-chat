@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import TxHistory from './txhistory';
@@ -10,9 +11,15 @@ import cashaddr from 'ecashaddrjs';
 import ProfilePanel from './profile';
 import ContactListPanel from './contact';
 import { queryAliasServer } from '../alias/alias-server';
-import { encodeBip21Message, getTweetId, getNFTAvatarLink } from '../utils/utils';
+import { encodeBip21Message, getTweetId, getNFTAvatarLink, encodeBip21Auth } from '../utils/utils';
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion";
 import { isMobileDevice } from '../utils/mobileCheck';
-import { txListener, refreshUtxos, txListenerOngoing, getArticleListing, getAvatarListing, updateAvatars } from '../chronik/chronik';
+import { txListener, txListenerOngoing, getArticleListing, updateAvatars, authTxListener } from '../chronik/chronik';
 import { appConfig } from '../config/app';
 import { isValidRecipient, messageHasErrors } from '../validation/validation';
 import data from '@emoji-mart/data';
@@ -48,7 +55,7 @@ import copy from 'copy-to-clipboard';
 import { Tooltip, Tabs, Alert, Modal, Popover } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
 import { ToastContainer, toast } from 'react-toastify';
-import { FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon, IdCardIcon } from '@radix-ui/react-icons';
+import { FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon, ReloadIcon, Cross2Icon } from '@radix-ui/react-icons';
 import 'react-toastify/dist/ReactToastify.css';
 import { YoutubeIcon, EcashchatIcon, LoadingSpinner, Home3Icon, File3Icon, Nft3Icon, Inbox3Icon, Send3Icon, Info3icon, User3icon, QrcodeIcon, Logout3Icon } from "@/components/ui/social";
 import {
@@ -67,6 +74,11 @@ const packageJson = require('../../package.json');
 import localforage from 'localforage';
 import xecMessage from 'bitcoinjs-message';
 import * as utxolib from '@bitgo/utxo-lib';
+import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
+import { Separator } from "@/components/ui/separator"
+
+
+const words = `Continue with Cashtab Extension`;
 
 export default function Home() {
     const [address, setAddress] = useState('');
@@ -99,6 +111,7 @@ export default function Home() {
     const [userAvatarLink, setUserAvatarLink] = useState(false);
     const [latestAvatars, setLatestAvatars] = useState([]);
     const [openSharedArticleLoader, setOpenSharedArticleLoader] = useState(false);
+    const [showDustTxAuthenticationLoader, setShowDustTxAuthenticationLoader] = useState(false);
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
@@ -406,6 +419,26 @@ export default function Home() {
         txListener(chronik, address, "Message", sendAmountXec, recipient, false);
     };
 
+    const verifyDustTx = () => {
+        setShowDustTxAuthenticationLoader(true);
+        // Encode the op_return message script
+        const authenticationHex = crypto.randomBytes(20).toString('hex');
+        const opReturnRaw = encodeBip21Auth(authenticationHex);
+        const bip21Str = `${appConfig.authAddress}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`;
+        window.open(
+            `https://cashtab.com/#/send?bip21=${bip21Str}`,
+            '_blank',
+        );
+        authTxListener(
+            chronik,
+            appConfig.authAddress,
+            authenticationHex,
+            setOpenSaveLoginModal,
+            viewAddress,
+            setShowDustTxAuthenticationLoader,
+        );
+    };
+
     const MessagePreviewModal = () => {
         return (
             <Modal show={showMessagePreview} onClose={() => setShowMessagePreview(false)}>
@@ -582,206 +615,276 @@ export default function Home() {
     };
 
     return (
-        <>
+      <>
         <ToastContainer autoClose={appConfig.toastDuration} />
 
-        {openSaveLoginModal === true && (
-            <RenderSaveLoginModal />
-        )}
+        {openSaveLoginModal === true && <RenderSaveLoginModal />}
 
         <div className="sm:flex flex-col items-center justify-center p-5 relative z-10">
-        <div className="background_content"></div>
+          <div className="background_content"></div>
         </div>
-
 
         <header className="fixed mt-4 flex top-0 z-50 w-full justify-center ">
           <div className="container flex items-center justify-between rounded-lg flex bg-black w-full h-14 mx-4 md:mx-auto md:max-w-xl lg:max-w-3xl border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/40">
             <div className="sm:flex">
               <a className="flex items-center space-x-2" href="#">
                 <EcashchatIcon />
-                <span className="font-bold sm:inline-block">
-                eCashChat 
-                </span>
+                <span className="font-bold sm:inline-block">eCashChat</span>
               </a>
             </div>
-            <div className="flex">       
-            {!showCard && (
-                <Button variant="outline" size="icon" className='mr-2' onClick={() => setShowCard(true)}>
-                <User3icon className="h-4 w-4" />
-                </Button>
-            )}
-
-            {isLoggedIn && (
-                <ContactListPanel
-                    latestAvatars={latestAvatars}
-                />
-            )}
-
-            {isLoggedIn && (
-                <ProfilePanel
-                    address={address}
-                    avatarLink={userAvatarLink}
-                    xecBalance={xecBalance}
-                    latestAvatars={latestAvatars}
-                />
-            )}
-
-            {(isMobile && isLoggedIn) ? (
-            <div>
+            <div className="flex">
+              {isLoggedIn && !showCard && (
                 <Button
-                onClick={async () => {
-                    setIsLoggedIn(false);
-                    setSavedLogin(false);
-                    await localforage.setItem('savedLoginAddress', false);
-                    toast(`Logged out of ${address}`);
-                }}
-                variant="outline"
-                size="icon"
+                  variant="outline"
+                  size="icon"
+                  className="mr-2"
+                  onClick={() => setShowCard(true)}
                 >
-               <Logout3Icon/>
+                  <User3icon className="h-4 w-4" />
                 </Button>
-            </div>
-            ) : (
-                !isMobile && (
-                    <div>
-                      <Button
-                        onClick={isLoggedIn ? async () => {
-                          setIsLoggedIn(false);
-                          setSavedLogin(false);
-                          await localforage.setItem('savedLoginAddress', false);
-                          toast(`Logged out of ${address}`);
-                        } : () => getAddress()}
-                        variant="outline"
-                        {...(isLoggedIn ? { size: "icon" } : {})}
-                      >
-                        {isLoggedIn ? <Logout3Icon /> : 'Signin'}
-                      </Button>
-                    </div>
-            )
-            )}
-            </div>
-            </div>
-        </header>
-        
-      <main className="sm:flex flex-col items-center justify-center p-1 sm:px-5 relative z-10">
-      {isLoggedIn === false && isMobile === false ? (
-        <>
-            <div className="mx-auto max-w-xl mb-4 mt-12">
-            <div className="hidden sm:mb-4 sm:flex sm:justify-center">
-                <div className="relative flex gap-1 items-center rounded-full px-3 py-1 text-sm leading-6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/40">
-                <RocketIcon/> Version: {packageJson.version}{' '}
+              )}
+
+              {isLoggedIn && <ContactListPanel latestAvatars={latestAvatars} />}
+
+              {isLoggedIn && (
+                <ProfilePanel
+                  address={address}
+                  avatarLink={userAvatarLink}
+                  xecBalance={xecBalance}
+                  latestAvatars={latestAvatars}
+                />
+              )}
+
+              {isMobile && isLoggedIn ? (
+                <div>
+                  <Button
+                    onClick={async () => {
+                      setIsLoggedIn(false);
+                      setSavedLogin(false);
+                      await localforage.setItem("savedLoginAddress", false);
+                      toast(`Logged out of ${address}`);
+                    }}
+                    variant="outline"
+                    size="icon"
+                  >
+                    <Logout3Icon />
+                  </Button>
                 </div>
+              ) : (
+                !isMobile && (
+                  <div>
+                    <Button
+                      onClick={
+                        isLoggedIn
+                          ? async () => {
+                              setIsLoggedIn(false);
+                              setSavedLogin(false);
+                              await localforage.setItem(
+                                "savedLoginAddress",
+                                false
+                              );
+                              toast(`Logged out of ${address}`);
+                            }
+                          : () => getAddress()
+                      }
+                      variant="outline"
+                      {...(isLoggedIn ? { size: "icon" } : {})}
+                    >
+                      {isLoggedIn ? <Logout3Icon /> : "Signin"}
+                    </Button>
+                  </div>
+                )
+              )}
             </div>
-            <div className="text-center">
-                <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-4xl">
-                {'Socialize, monetize and earn on the eCash blockchain'}
-                </h1>
-            </div>
-            </div>
-        
-        </>
-        ) : (
-            <div className="flex justify-center">
-            </div>
-        )}
+          </div>
+        </header>
 
-    {showLoadingSpinner && (
-        <div className="flex justify-center">
-        <LoadingSpinner className="mr-2 h-4 w-4 animate-spin" />
-        </div>
-    )}
-
-      <div>
-       {isLoggedIn === false && isMobile === false && step === 'fresh' && (
-        <div className='flex justify-center'>
-            <button
-               type="button"
-               className="text-white transition-transform transform hover:scale-105 bg-blue-500 hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55"               
-               onClick={() => getAddress()}
-            >
-            Sign in with&emsp;
-            <Image
-              src="/cashtab-extension.png"
-              alt="eCash Extension Logo"
-              width={120}
-              height={40}
-              priority
-            />
-            </button>
-            
-        </div>
-        
-        )}
-
-        {isLoggedIn === false && isMobile === false && (
-            <div className='mx-auto mt-4 '>
-            <Image
-                src="/landingp1.png"
-                alt="groupchat"
-                width={800}
-                height={400}
-                priority
-            />
-            </div>
-        )}
-
-        {/* Currently this app is not optimized for mobile use as Cashtab Extension is not available on non-desktop platforms */}
-        {isMobile === true && isLoggedIn === false && (
-            <><br />
-            <div className="px-4">
-                <Alert color="info">
-                    <br />
-                    <p><b>Mobile device detected </b></p>
-                    <p>Please use your wallet to sign an <b>'ecashchat'</b> message via <a href='https://cashtab.com/#/signverifymsg' target='_blank'>Cashtab</a> and input the signature below for verification.</p><br />
-                </Alert>
-                <form className="space-y-6" action="#" method="POST">
-                    <div>
-                        <div className="mt-2">
-                          <Input
+        <main className="sm:flex flex-col items-center justify-center p-1 sm:px-5 relative z-10">
+          {isLoggedIn === false ? (
+            <>
+              <div className="mx-auto max-w-xl mb-0 mt-20">
+                <div className="mb-4 flex justify-center">
+                  <div className="relative flex gap-1 items-center rounded-full px-3 py-1 text-sm leading-6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/40">
+                    <RocketIcon /> Version: {packageJson.version}{" "}
+                  </div>
+                </div>
+                <div className="text-center">
+                </div>
+              </div>
+                <div className="flex items-center justify-center">
+                  <div className="mx-auto grid w-[350px] gap-6">
+                    <div className="grid gap-2 text-center">
+                      <h1 className="text-3xl font-bold">Sign in </h1>
+                      <p className="text-balance text-muted-foreground">
+                      Socialize, monetize and earn on the eCash blockchain
+                      </p>
+                    </div>
+                    <div className="grid gap-4">
+                    <div className="grid gap-2">
+                        <Label htmlFor="email">Address</Label>
+                        <Input
                             id="viewAddress"
                             name="viewAddress"
+                            className="bg-white"
                             type="text"
                             placeholder="Enter your eCash address..."
                             value={recipient}
-                            required
-                            onChange={e => handleAddressChange(e)}
+                            onChange={(e) => handleAddressChange(e)}
+                        />
+                        {recipientError && (
+                            <p className="text-sm text-red-600 dark:text-red-500">
+                            {recipientError}
+                            </p>
+                        )}
+                        </div>
+                      <div className="grid gap-2">
+                        <div className="flex items-center">
+                          <Label htmlFor="password">Signature</Label>
+                          <PopoverShad >
+                        <PopoverTriggerShad className="ml-auto inline-block text-sm underline">Guide</PopoverTriggerShad>
+                        <PopoverContentShad>
+                        Please use your wallet to sign an <b>'ecashchat'</b>{" "}
+                            message via{" "}
+                            <a
+                              href="https://cashtab.com/#/signverifymsg"
+                              target="_blank"
+                              className='underline'
+                            >
+                              Cashtab
+                            </a>{" "}
+                            and input the signature below for verification.
+                        </PopoverContentShad>
+                        </PopoverShad>
+
+                        </div>
+                        <Input
+                          id="viewSignature"
+                          name="viewSignature"
+                          type="text"
+                          className="bg-white"
+                          placeholder="Enter your signature..."
+                          value={signature}
+                          required
+                          onChange={(e) => setSignature(e.target.value)}
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        disabled={
+                          recipientError || recipient === "" || signature === ""
+                        }
+                        className="flex w-full"
+                        onClick={() => {
+                          verifySignature();
+                        }}
+                      >
+                        Login
+                      </Button>
+                      <div className="flex items-center">
+                    <Separator className="flex-grow w-1/4" />
+                    <span className="text-sm text-muted-foreground">{" "}or{" "}</span>
+                    <Separator className="flex-grow w-1/4" />
+                    </div>
+                    {!isMobile && (
+                    <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => {
+                        if (!isLoggedIn && step === "fresh") {
+                            getAddress();
+                        }
+                        }}
+                    >
+                        {showLoadingSpinner ? (
+                        <div className="flex justify-center">
+                            <LoadingSpinner className="h-2 w-2 animate-spin" />
+                        </div>
+                        ) : (
+                        <div className="flex items-center justify-center">
+                          <span>Sign in with</span>
+                          <Image
+                            src="/Cashtab-extension-light-flex.png"
+                            alt="cashtab Extension Logo"
+                            width={156}
+                            height={64}
+                            priority
+                            className="ml-2"
                           />
                         </div>
-                        <p className="mt-2 text-sm text-red-600 dark:text-red-500">{recipientError !== false && recipientError}</p>
-                        <div className="mt-2">
-                          <Input
-                            id="viewSignature"
-                            name="viewSignature"
-                            type="text"
-                            placeholder="Enter your signature..."
-                            value={signature}
-                            required
-                            onChange={e => setSignature(e.target.value)}
-                          />
-                        </div>
-                        <div>
+                        )}
+                    </Button>
+                    )}
+
+                      {showDustTxAuthenticationLoader ? (
+                        <>
+                        <div className="flex w-full items-center">
+                          <Button disabled className="flex w-full mr-2">
+                            <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                            Authentication in progress
+                          </Button>
                           <Button
                             type="button"
-                            disabled={recipientError || recipient === '' || signature === ''}
-                            className="flex w-full mt-2"
-                            onClick={() => {
-                                verifySignature();
-                            }}
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setShowDustTxAuthenticationLoader(false)}
                           >
-                            Login
+                            <Cross2Icon/>
                           </Button>
                         </div>
+                      </>
+                    ) : isMobile && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex w-full"
+                        onClick={() => {
+                          verifyDustTx();
+                        }}
+                      >
+                        <div className="flex items-center justify-center">
+                          <span>Sign in with</span>
+                          <Image
+                            src="/cashtab-logo-light.png"
+                            alt="cashtab Logo"
+                            width={78}
+                            height={32}
+                            priority
+                            className="ml-2"
+                            />&nbsp;dust
+                        </div>
+                      </Button>
+                    )}
+                    </div>
+                    <div className="mt-4 text-center text-sm">
+                    Don&apos;t have an address?{" "}
+                    <a href="https://cashtab.com" target="_blank" rel="noopener noreferrer" className="underline">
+                    Create
+                    </a>
+                </div>
                   </div>
-              </form>
-              </div>
-            </>
-        )}
+                </div>
 
-        {/* If Cashtab Extension is not installed, render button to install */}
-        {isLoggedIn === false && isMobile === false && step === 'install' && (
-            <a href="https://chromewebstore.google.com/detail/cashtab/obldfcmebhllhjlhjbnghaipekcppeag" target="_blank">
-                <button type="button" className="text-white transition-transform transform hover:scale-110 shadow-2xl bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 me-2 mb-2">
-                Install &emsp;
+            </>
+          ) : (
+            <div></div>
+          )}
+          <div>
+
+            {/* Currently this app is not optimized for mobile use as Cashtab Extension is not available on non-desktop platforms */}
+
+            {/* If Cashtab Extension is not installed, render button to install */}
+            {isLoggedIn === false &&
+              isMobile === false &&
+              step === "install" && (
+                <a
+                  href="https://chromewebstore.google.com/detail/cashtab/obldfcmebhllhjlhjbnghaipekcppeag"
+                  target="_blank"
+                >
+                  <button
+                    type="button"
+                    className="text-white mt-4 transition-transform transform hover:scale-110 shadow-2xl bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 me-2 mb-2"
+                  >
+                    Install &emsp;
                     <Image
                       src="/cashtab-extension.png"
                       alt="eCash Extension Logo"
@@ -789,54 +892,70 @@ export default function Home() {
                       height={50}
                       priority
                     />
-                </button>
-            </a>
-        )}
+                  </button>
+                </a>
+              )}
 
-        {/* If logged in, render wallet details and message history */}
-        {isLoggedIn === true && (
-          <>
-          {/* Credit card summary */}
-          <CreditCardHeader />
+            {/* If logged in, render wallet details and message history */}
+            {isLoggedIn === true && (
+              <>
+                {/* Credit card summary */}
+                <CreditCardHeader />
 
-        <AlertDialog
-            open={openSharedArticleLoader}
-            onOpenChange={setOpenSharedArticleLoader}
-        >
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                <AlertDialogTitle>Retrieving shared article</AlertDialogTitle>
-                <AlertDialogDescription>
-                    <div className="flex flex-col space-y-3">
-                        <div className="space-y-2">
-                            Txid: 
-                            <a 
-                                href={`${appConfig.blockExplorerUrl}/tx/${sharedArticleTxid}`} 
-                                target="_blank" 
-                                className="ml-2 dark:text-white font-medium" 
+                <AlertDialog
+                  open={openSharedArticleLoader}
+                  onOpenChange={setOpenSharedArticleLoader}
+                >
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Retrieving shared article
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        <div className="flex flex-col space-y-3">
+                          <div className="space-y-2">
+                            Txid:
+                            <a
+                              href={`${appConfig.blockExplorerUrl}/tx/${sharedArticleTxid}`}
+                              target="_blank"
+                              className="ml-2 dark:text-white font-medium"
                             >
-                                {sharedArticleTxid.toString().substring(0,10) + '........' + sharedArticleTxid.toString().substring(sharedArticleTxid.toString().length - 10)}
+                              {sharedArticleTxid.toString().substring(0, 10) +
+                                "........" +
+                                sharedArticleTxid
+                                  .toString()
+                                  .substring(
+                                    sharedArticleTxid.toString().length - 10
+                                  )}
                             </a>
                             <Skeleton className="h-4 w-[350px]" />
                             <Skeleton className="h-4 w-[300px]" />
                             <Skeleton className="h-4 w-[270px]" />
+                          </div>
                         </div>
-                    </div>
-                </AlertDialogDescription>
-                </AlertDialogHeader>
-            </AlertDialogContent>
-        </AlertDialog>
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                  </AlertDialogContent>
+                </AlertDialog>
 
-          {/* Tab navigation */}
-          <Tabs aria-label="eCash Chat" style="default" className='z-10 !border-b-0 focus:ring-0 relative mt-4 justify-center'>
-            <Tabs.Item title="Message" icon={Send3Icon}>
-            <div style={{ display: (isLoggedIn ? 'block' : 'none') }}>
-                    <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96 mb-2">
+                {/* Tab navigation */}
+                <Tabs
+                  aria-label="eCash Chat"
+                  style="default"
+                  className="z-10 !border-b-0 focus:ring-0 relative mt-4 justify-center"
+                >
+                  <Tabs.Item title="Message" icon={Send3Icon}>
+                    <div style={{ display: isLoggedIn ? "block" : "none" }}>
+                      <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96 mb-2">
                         <MessagePreviewModal />
-                        <form className="space-y-0 w-full mx-auto max-w-xl" action="#" method="POST">
-                            <div>
+                        <form
+                          className="space-y-0 w-full mx-auto max-w-xl"
+                          action="#"
+                          method="POST"
+                        >
+                          <div>
                             <div className="mt-2">
-                                <Input
+                              <Input
                                 id="address"
                                 name="address"
                                 type="text"
@@ -844,215 +963,319 @@ export default function Home() {
                                 required
                                 placeholder="to:address"
                                 className="bg-white"
-                                onChange={e => handleAddressChange(e)}
-                                />
+                                onChange={(e) => handleAddressChange(e)}
+                              />
                             </div>
-                            <p className="mt-1 text-sm text-red-600 dark:text-red-500">{recipientError !== false && recipientError}</p>
-                            </div>
+                            <p className="mt-1 text-sm text-red-600 dark:text-red-500">
+                              {recipientError !== false && recipientError}
+                            </p>
+                          </div>
 
-                            <div>
+                          <div>
                             <div className="mt-2 overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring">
-                                <Textarea
-                                    id="message"
-                                    rows="4"
-                                    value={message}
-                                    placeholder={encryptionMode ? 'Your message, Max. 95 bytes' : 'Your message, Max. 215 bytes'}
-                                    required
-                                    className="bg-white resize-none border-0 p-3 shadow-none focus-visible:ring-0"
-                                    onChange={e => handleMessageChange(e)}
-                                />
-                                <p className="mt-2 text-sm text-red-600 px-3 dark:text-red-500">{messageError !== false && messageError}</p>
-                                {/* Emoji picker and tooltip guide for embedding markups */}
-                            
-                                <div className="flex flex-col sm:flex-row justify-between items-center mt-2 p-3 pt-0">
+                              <Textarea
+                                id="message"
+                                rows="4"
+                                value={message}
+                                placeholder={
+                                  encryptionMode
+                                    ? "Your message, Max. 95 bytes"
+                                    : "Your message, Max. 215 bytes"
+                                }
+                                required
+                                className="bg-white resize-none border-0 p-3 shadow-none focus-visible:ring-0"
+                                onChange={(e) => handleMessageChange(e)}
+                              />
+                              <p className="mt-2 text-sm text-red-600 px-3 dark:text-red-500">
+                                {messageError !== false && messageError}
+                              </p>
+                              {/* Emoji picker and tooltip guide for embedding markups */}
+
+                              <div className="flex flex-col sm:flex-row justify-between items-center mt-2 p-3 pt-0">
                                 <div className="flex gap-2 mb-2 sm:mb-0">
-                                    {/* Emoji Picker */}
-                                    <Popover
-                                        aria-labelledby="emoji-popover"
-                                        content={
-                                            <div>
-                                            <Picker
-                                                data={data}
-                                                onEmojiSelect={(e) => {
-                                                setMessage(prevMessage => prevMessage.concat(e.native));
-                                                }}
-                                            />
-                                            </div>
-                                        }
-                                        >
-                                        <Button variant="ghost" type="button">
-                                            <FaceIcon /> 
-                                        </Button>
-                                        </Popover>
-                                    <Tooltip content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]" style="light">
-                                        <Button
-                                        variant="ghost"
-                                        type="button"
-                                        onClick={() => insertMarkupTags('[url]theurl[/url]')}
-                                        >
-                                            <Link2Icon/>
-                                        </Button>
-                                    </Tooltip>
-                                    <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
-                                        <Button
-                                        variant="ghost"
-                                        type="button"
-                                        onClick={() => insertMarkupTags('[img]imageurl[/img]')}
-                                        >
-                                                <ImageIcon/>
-                                        </Button>
-                                    </Tooltip>
-                                    <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=1234[/yt]" style="light">
-                                        <Button
-                                        variant="ghost"
-                                        type="button"
-                                        onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}
-                                        >
-                                                <YoutubeIcon/>
-                                        </Button>
-                                    </Tooltip>
-                                    <Tooltip content="e.g. [twt]https://x.com/yourid/status/1234[/twt]" style="light">
-                                        <Button
-                                        variant="ghost"
-                                        type="button"
-                                        onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}
-                                        >
-                                            <UITwitterIcon/>
-                                        </Button>
-                                    </Tooltip>
-                                    
+                                  {/* Emoji Picker */}
+                                  <Popover
+                                    aria-labelledby="emoji-popover"
+                                    content={
+                                      <div>
+                                        <Picker
+                                          data={data}
+                                          onEmojiSelect={(e) => {
+                                            setMessage((prevMessage) =>
+                                              prevMessage.concat(e.native)
+                                            );
+                                          }}
+                                        />
+                                      </div>
+                                    }
+                                  >
+                                    <Button variant="ghost" type="button">
+                                      <FaceIcon />
+                                    </Button>
+                                  </Popover>
+                                  <Tooltip
+                                    content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]"
+                                    style="light"
+                                  >
+                                    <Button
+                                      variant="ghost"
+                                      type="button"
+                                      onClick={() =>
+                                        insertMarkupTags("[url]theurl[/url]")
+                                      }
+                                    >
+                                      <Link2Icon />
+                                    </Button>
+                                  </Tooltip>
+                                  <Tooltip
+                                    content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]"
+                                    style="light"
+                                  >
+                                    <Button
+                                      variant="ghost"
+                                      type="button"
+                                      onClick={() =>
+                                        insertMarkupTags("[img]imageurl[/img]")
+                                      }
+                                    >
+                                      <ImageIcon />
+                                    </Button>
+                                  </Tooltip>
+                                  <Tooltip
+                                    content="e.g. [yt]https://www.youtube.com/watch?v=1234[/yt]"
+                                    style="light"
+                                  >
+                                    <Button
+                                      variant="ghost"
+                                      type="button"
+                                      onClick={() =>
+                                        insertMarkupTags("[yt]youtubeurl[/yt]")
+                                      }
+                                    >
+                                      <YoutubeIcon />
+                                    </Button>
+                                  </Tooltip>
+                                  <Tooltip
+                                    content="e.g. [twt]https://x.com/yourid/status/1234[/twt]"
+                                    style="light"
+                                  >
+                                    <Button
+                                      variant="ghost"
+                                      type="button"
+                                      onClick={() =>
+                                        insertMarkupTags("[twt]tweeturl[/twt]")
+                                      }
+                                    >
+                                      <UITwitterIcon />
+                                    </Button>
+                                  </Tooltip>
                                 </div>
                                 <div>
-                                <Button
+                                  <Button
                                     type="button"
-                                    disabled={recipientError || messageError || sendAmountXecError || recipient === '' || (encryptionMode && password === '')}
+                                    disabled={
+                                      recipientError ||
+                                      messageError ||
+                                      sendAmountXecError ||
+                                      recipient === "" ||
+                                      (encryptionMode && password === "")
+                                    }
                                     className="w-full"
-                                    onClick={() => { setShowMessagePreview(true); }}
-                                    >
-                                    <SendIcon/>&nbsp;Send Message
-                                </Button>
+                                    onClick={() => {
+                                      setShowMessagePreview(true);
+                                    }}
+                                  >
+                                    <SendIcon />
+                                    &nbsp;Send Message
+                                  </Button>
+                                </div>
+                              </div>
                             </div>
-                            </div>
-                            </div>     
-                            <div className="grid w-full items-center gap-2 mt-2">                       
-                            <Input
+                            <div className="grid w-full items-center gap-2 mt-2">
+                              <Input
                                 type="number"
                                 id="value-input"
-                                aria-describedby="helper-text-explanation" className="bg-white"
+                                aria-describedby="helper-text-explanation"
+                                className="bg-white"
                                 defaultValue="5.5"
                                 placeholder="Send XEC amount (optional, at least 5.5 XEC)"
-                                onChange={e => handleSendAmountChange(e)}
-                            />                
-                                </div>       
+                                onChange={(e) => handleSendAmountChange(e)}
+                              />
+                            </div>
                             {/* Encryption mode toggle */}
                             <label className="inline-flex items-center cursor-pointer mt-2">
-                                <Input
-                                    type="checkbox"
-                                    value=""
-                                    className="sr-only peer"
-                                    onClick={() => {
-                                        setMessage('')
-                                        setEncryptionMode(!encryptionMode)
-                                    }}
-                                />
-                                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                                <span className="ml-2 gap-1 flex items-center text-sm font-medium text-gray-900 dark:text-gray-300">
+                              <Input
+                                type="checkbox"
+                                value=""
+                                className="sr-only peer"
+                                onClick={() => {
+                                  setMessage("");
+                                  setEncryptionMode(!encryptionMode);
+                                }}
+                              />
+                              <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                              <span className="ml-2 gap-1 flex items-center text-sm font-medium text-gray-900 dark:text-gray-300">
                                 <EncryptionIcon />
                                 Encrypt with password (optional):
-                                </span>
+                              </span>
                             </label>
                             {encryptionMode && (
-                                <>
-                                    <Input
-                                        type="input"
-                                        id="password-input"
-                                        value={password}
-                                        maxlength="19"
-                                        aria-describedby="helper-text-explanation" className="bg-white mt-2"
-                                        placeholder="Set an optional encryption password"
-                                        onChange={e => setPassword(e.target.value)}
-                                    />
-                                </>
+                              <>
+                                <Input
+                                  type="input"
+                                  id="password-input"
+                                  value={password}
+                                  maxlength="19"
+                                  aria-describedby="helper-text-explanation"
+                                  className="bg-white mt-2"
+                                  placeholder="Set an optional encryption password"
+                                  onChange={(e) => setPassword(e.target.value)}
+                                />
+                              </>
                             )}
-                            </div>
-
+                          </div>
                         </form>
-                </div>
-            </div>
-                {cashaddr.isValidCashAddress(address, 'ecash') &&
-                    <TxHistory address={address} isMobile={isMobile} />
-                }
-            </Tabs.Item>
+                      </div>
+                    </div>
+                    {cashaddr.isValidCashAddress(address, "ecash") && (
+                      <TxHistory address={address} isMobile={isMobile} />
+                    )}
+                  </Tabs.Item>
 
+                  <Tabs.Item title="Town Hall" active icon={Home3Icon}>
+                    <Townhall address={address} isMobile={isMobile} />
+                  </Tabs.Item>
 
-              <Tabs.Item title="Town Hall" active icon={Home3Icon} >
-                  <Townhall address={address} isMobile={isMobile} />
-              </Tabs.Item>
+                  <Tabs.Item title="Articles" icon={File3Icon}>
+                    <Article
+                      chronik={chronik}
+                      address={address}
+                      isMobile={isMobile}
+                      sharedArticleTxid={sharedArticleTxid}
+                      setXecBalance={setXecBalance}
+                      setOpenSharedArticleLoader={setOpenSharedArticleLoader}
+                    />
+                  </Tabs.Item>
 
-              <Tabs.Item title="Articles" icon={File3Icon} >
-                <Article chronik={chronik} address={address} isMobile={isMobile} sharedArticleTxid={sharedArticleTxid} setXecBalance={setXecBalance} setOpenSharedArticleLoader={setOpenSharedArticleLoader} />
-              </Tabs.Item>
+                  <Tabs.Item title="NFTs" icon={Nft3Icon}>
+                    <Nft
+                      chronik={chronik}
+                      address={address}
+                      isMobile={isMobile}
+                      setLatestAvatars={setLatestAvatars}
+                    />
+                  </Tabs.Item>
 
-              <Tabs.Item title="NFTs" icon={Nft3Icon} >
-                  <Nft chronik={chronik} address={address} isMobile={isMobile} setLatestAvatars={setLatestAvatars} />
-              </Tabs.Item>
-
-              <Tabs.Item title="About" icon={Info3icon} >
-              <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
-                      <h2 className="mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">What is eCash Chat?</h2>
-                      <p className='leading-7 [&:not(:first-child)]:mt-6'>eCash Chat is an on-chain web platform that enables anyone to socialize,
-                      <br />monetize and earn on the eCash blockchain.</p>
+                  <Tabs.Item title="About" icon={Info3icon}>
+                    <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
+                      <h2 className="mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
+                        What is eCash Chat?
+                      </h2>
+                      <p className="leading-7 [&:not(:first-child)]:mt-6">
+                        eCash Chat is an on-chain web platform that enables
+                        anyone to socialize,
+                        <br />
+                        monetize and earn on the eCash blockchain.
+                      </p>
                       <br />
-                      <h2 className="mt-4 scroll-m-20 text-2xl font-semibold tracking-tight">Key features:</h2>
+                      <h2 className="mt-4 scroll-m-20 text-2xl font-semibold tracking-tight">
+                        Key features:
+                      </h2>
                       <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
                         <li>One-click metamask-like login experience</li>
-                        <li>Direct wallet to wallet and an all-in townhall forum</li>
-                        <li>Full length blogging facility with paywall option</li>
-                        <li>Message encryption option via AES 256 CBC algorithm</li>
+                        <li>
+                          Direct wallet to wallet and an all-in townhall forum
+                        </li>
+                        <li>
+                          Full length blogging facility with paywall option
+                        </li>
+                        <li>
+                          Message encryption option via AES 256 CBC algorithm
+                        </li>
                         <li>NFT Showcases and use as avatars</li>
                         <li>Displays only messaging transactions</li>
                         <li>Real time address specific filtering</li>
                         <li>XEC Tipping on addresses</li>
-                        <li>Enables embedding of images, videos, tweets and emojis in messages</li>
-                        <li>Powered by In-Node Chronik and Cashtab Extensions</li>
-                        <li>Integrated with the eCash Alias protocol (coming soon)</li>
+                        <li>
+                          Enables embedding of images, videos, tweets and emojis
+                          in messages
+                        </li>
+                        <li>
+                          Powered by In-Node Chronik and Cashtab Extensions
+                        </li>
+                        <li>
+                          Integrated with the eCash Alias protocol (coming soon)
+                        </li>
                       </ul>
                       <br />
-                      <h2 className="mt-4 scroll-m-20 text-2xl font-semibold tracking-tight">User guide:</h2>
+                      <h2 className="mt-4 scroll-m-20 text-2xl font-semibold tracking-tight">
+                        User guide:
+                      </h2>
                       <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-                          <li><b>Inbox</b>: a direct wallet to wallet messaging history.</li>
-                          <li><b>Send Message</b>: send public messages to another wallet</li>
-                          <li><b>Townhall</b>: public onchain discussion forum</li>
-                          <li><b>Articles</b>: write full length articles with paywall option</li>
-                          <li><b>NFTs</b>: browse and showcase your NFTs and set as your avatar</li>
+                        <li>
+                          <b>Inbox</b>: a direct wallet to wallet messaging
+                          history.
+                        </li>
+                        <li>
+                          <b>Send Message</b>: send public messages to another
+                          wallet
+                        </li>
+                        <li>
+                          <b>Townhall</b>: public onchain discussion forum
+                        </li>
+                        <li>
+                          <b>Articles</b>: write full length articles with
+                          paywall option
+                        </li>
+                        <li>
+                          <b>NFTs</b>: browse and showcase your NFTs and set as
+                          your avatar
+                        </li>
                       </ul>
                       <br />
-                      <h2 className="mt-4 scroll-m-20 text-2xl font-semibold tracking-tight">Support:</h2>
+                      <h2 className="mt-4 scroll-m-20 text-2xl font-semibold tracking-tight">
+                        Support:
+                      </h2>
                       <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-                          <li>
-                              For general support please visit the official <a href="https://t.me/ecash" target="_blank" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">eCash Telegram Channel</a>.
-                          </li>
-                          <li>
-                              For technical references please refer to the <a href="https://github.com/ethanmackie/ecash-chat" target="_blank" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">github repository</a>.
-                          </li>
+                        <li>
+                          For general support please visit the official{" "}
+                          <a
+                            href="https://t.me/ecash"
+                            target="_blank"
+                            className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                          >
+                            eCash Telegram Channel
+                          </a>
+                          .
+                        </li>
+                        <li>
+                          For technical references please refer to the{" "}
+                          <a
+                            href="https://github.com/ethanmackie/ecash-chat"
+                            target="_blank"
+                            className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                          >
+                            github repository
+                          </a>
+                          .
+                        </li>
                       </ul>
-                      <div className='mx-auto mb-4'>
-                      <Image
-                        src="/groupchat.svg"
-                        alt="groupchat"
-                        width={400}
-                        height={400}
-                        priority
+                      <div className="mx-auto mb-4">
+                        <Image
+                          src="/groupchat.svg"
+                          alt="groupchat"
+                          width={400}
+                          height={400}
+                          priority
                         />
-                        </div>
-                  </div>
-                </Tabs.Item>
-            </Tabs>
-          </>
-        )}
-        </div>
-      </main>
-  
-    </>
-  );
+                      </div>
+                    </div>
+                  </Tabs.Item>
+                </Tabs>
+              </>
+            )}
+          </div>
+        </main>
+      </>
+    );
 }
