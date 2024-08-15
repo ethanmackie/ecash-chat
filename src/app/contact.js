@@ -23,7 +23,13 @@ import {
     AvatarImage,
 } from "@/components/ui/avatar";
 import { appConfig } from '../config/app';
-import { getNFTAvatarLink, deleteContact, renameContact, exportContacts } from '../utils/utils';
+import {
+  getNFTAvatarLink,
+  deleteContact,
+  renameContact,
+  exportContacts,
+  deleteMutedContact,
+} from '../utils/utils';
 import { DefaultavatarIcon, IdCardIcon} from "@/components/ui/social";
 import { toast } from 'react-toastify';
 import copy from 'copy-to-clipboard';
@@ -37,6 +43,7 @@ import localforage from 'localforage';
 
 export default function ContactListPanel({ latestAvatars }) {
     const [contactList, setContactList] = useState([]);
+    const [muteList, setMuteList] = useState([]);
     const [contactListName, setContactListName] = useState('');
 
     useEffect(() => {
@@ -46,8 +53,12 @@ export default function ContactListPanel({ latestAvatars }) {
     }, []);
 
     const refreshContacts = async () => {
-        const contacts = await localforage.getItem(appConfig.localContactsParam);
-        setContactList(contacts);
+        setContactList(
+          await localforage.getItem(appConfig.localContactsParam),
+        );
+        setMuteList(
+          await localforage.getItem(appConfig.localMuteParam),
+        );
     };
 
     return (
@@ -212,6 +223,47 @@ export default function ContactListPanel({ latestAvatars }) {
                     </Button>
                     </CardFooter>
     
+                </Card>
+
+                <Card className="mt-2">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Muted accounts</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-sm">
+                    {muteList && muteList.length > 0 && muteList.map((thisContact) => (
+                        <div key={thisContact.address} className="flex flex-col items-center mt-2">    
+                          <div className="flex flex-row w-full space-x-4">
+                            <Avatar className="h-9 w-9">
+                                <AvatarImage src={getNFTAvatarLink(thisContact.address, latestAvatars)} alt="User Avatar" />
+                                <AvatarFallback>
+                                <DefaultavatarIcon />
+                                </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 ml-2">
+                              <p className="font-semibold leading-none tracking-tight">{thisContact.name}</p>
+                              <p
+                                  className="text-sm text-muted-foreground max-w-lg break-words text-balance leading-relaxed"
+                                  onClick={() => {
+                                  copy(thisContact.address);
+                                  toast(`${thisContact.address} copied to clipboard`);
+                                  }}
+                              >
+                                  {`${thisContact.address.substring(0, 11)}...${thisContact.address.substring(thisContact.address.length - 5)}`}
+                              </p>
+                              </div>
+                              <div className="ml-auto hidden sm:flex items-center space-x-2">
+                                <Button variant="outline" size="icon"
+                                onClick={() => {
+                                  deleteMutedContact(thisContact.address, setMuteList);
+                              }}
+                              >
+                              <Cross2Icon className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                    ))}
+                    </CardContent>    
                 </Card>
             </SheetContent>
             </Sheet>

@@ -27,6 +27,7 @@ import {
     EncryptionIcon,
     UnlockIcon,
     IdCardIcon,
+    MuteIcon,
 } from "@/components/ui/social";
 import {
     Select,
@@ -78,6 +79,7 @@ import {
     getContactNameIfExist,
     RenderTipping,
     isExistingContact,
+    muteNewContact,
 } from '../utils/utils';
 import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, GraphchartIcon, Stats2Icon } from "@/components/ui/social";
 import { toast } from 'react-toastify';
@@ -133,6 +135,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const [showSearchBar, setshowSearchBar] = useState(false);
     const newContactNameInput = useRef('');
     const [contactList, setContactList] = useState('');
+    const [muteList, setMuteList] = useState('');
     const [curateByContacts, setCurateByContacts] = useState(false);
     const articleReplyInput = useRef('');
 
@@ -215,24 +218,39 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 }
             }
 
+        })();
+
+        (async () => {
             const updatedCache = await refreshUtxos(chronik, address);
             setXecBalance(updatedCache.xecBalance);
         })();
-    }, []);
+    }, [muteList]);
 
     const refreshContactList = async () => {
-        let contactList = await localforage.getItem(appConfig.localContactsParam);
-        setContactList(contactList);
+        setContactList(
+            await localforage.getItem(appConfig.localContactsParam),
+        );
     };
 
     // Retrieves the article listing
     // Set localLookup to true to retrieve paginated data locally
-    const getArticleHistoryByPage = async (pageNum = 0, localLookup = false, articleCache = false, curateByContacts = false) => {
+    const getArticleHistoryByPage = async (
+        pageNum = 0,
+        localLookup = false,
+        articleCache = false,
+        curateByContacts = false,
+    ) => {
         if (
             typeof pageNum !== "number" ||
             chronik === undefined
         ) {
             return;
+        }
+
+        // Remove muted addresses
+        let mutedList = await localforage.getItem(appConfig.localMuteParam);
+        if (!Array.isArray(mutedList)) {
+            mutedList = [];
         }
 
         if (localLookup) {
@@ -253,6 +271,18 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 }
                 localArticleHistory.txs = contactOnlyArticleHistoryTxs;
             }
+
+            const totalTxlHistoryTxsInclMuted = [];
+            for (const tx of localArticleHistory.txs) {
+                let txByContact = mutedList.find(
+                    contact => contact.address === tx.replyAddress,
+                );
+                // if a match was not found
+                if (typeof txByContact === 'undefined') {
+                    totalTxlHistoryTxsInclMuted.push(tx);
+                }
+            }
+            localArticleHistory.txs = totalTxlHistoryTxsInclMuted;
 
             const selectedPageHistory = getPaginatedHistoryPage(
                 localArticleHistory.txs,
@@ -996,6 +1026,18 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     </Popover>
                                 </div>
                             )}
+                            <div>
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="mr-2"
+                                    onClick={e => {
+                                        muteNewContact('Muted user', tx.replyAddress, setMuteList);
+                                    }}
+                                >
+                                    <MuteIcon className="h-4 w-4" />
+                                </Button>
+                            </div>
                         </div>
                         <div className="relative mt-2 flex items-center gap-x-2 ml-auto md:hidden">
                             <Popover>
