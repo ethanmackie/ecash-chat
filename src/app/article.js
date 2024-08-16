@@ -247,7 +247,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             return;
         }
 
-        // Remove muted addresses
+        // Retrieve muted addresses
         let mutedList = await localforage.getItem(appConfig.localMuteParam);
         if (!Array.isArray(mutedList)) {
             mutedList = [];
@@ -272,6 +272,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 localArticleHistory.txs = contactOnlyArticleHistoryTxs;
             }
 
+            // Remove muted addresses
             const totalTxlHistoryTxsInclMuted = [];
             for (const tx of localArticleHistory.txs) {
                 let txByContact = mutedList.find(
