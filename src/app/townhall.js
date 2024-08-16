@@ -12,7 +12,14 @@ import {
     AvatarFallback,
     AvatarImage,
   } from "@/components/ui/avatar";
-import { AnonAvatar, ShareIcon, ReplyIcon, EmojiIcon, PostIcon, YoutubeIcon, AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, IdCardIcon } from "@/components/ui/social";
+import {
+    PostIcon,
+    YoutubeIcon,
+    DefaultavatarIcon,
+    ReplieduseravatarIcon,
+    IdCardIcon,
+    MuteIcon,
+} from "@/components/ui/social";
 import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon, ChatBubbleIcon, Share1Icon, Pencil1Icon } from '@radix-ui/react-icons';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
@@ -53,6 +60,7 @@ import {
     getContactNameIfExist,
     RenderTipping,
     isExistingContact,
+    muteNewContact,
 } from '../utils/utils';
 import {
     getTxHistory,
@@ -100,6 +108,7 @@ export default function TownHall({ address, isMobile }) {
     const [contactListName, setContactListName] = useState('');
     const newReplierContactNameInput = useRef('');
     const [curateByContacts, setCurateByContacts] = useState(false);
+    const [muteList, setMuteList] = useState('');
 
     useEffect(() => {
       const handleResize = () => {
@@ -127,7 +136,7 @@ export default function TownHall({ address, isMobile }) {
             // Subsequent refresh based on on-chain source
             await getTownhallHistoryByPage(0);
         })();
-    }, []);
+    }, [muteList]);
 
     const refreshContactList = async () => {
         let contactList = await localforage.getItem(appConfig.localContactsParam);
@@ -135,12 +144,23 @@ export default function TownHall({ address, isMobile }) {
     };
 
     // Refreshes the post history via chronik
-    const getTownhallHistoryByPage = async (pageNum = 0, localLookup = false, townhallCache = false, curateByContacts = false) => {
+    const getTownhallHistoryByPage = async (
+        pageNum = 0,
+        localLookup = false,
+        townhallCache = false,
+        curateByContacts = false,
+    ) => {
         if (
             typeof pageNum !== "number" ||
             chronik === undefined
         ) {
             return;
+        }
+
+        // Retrieve muted addresses
+        let mutedList = await localforage.getItem(appConfig.localMuteParam);
+        if (!Array.isArray(mutedList)) {
+            mutedList = [];
         }
 
         if (localLookup) {
@@ -161,6 +181,19 @@ export default function TownHall({ address, isMobile }) {
                 }
                 localFullTownHallHistory.txs = contactOnlyTownHallHistoryTxs;
             }
+
+            // Remove posts from muted users
+            const totalTxlHistoryTxsInclMuted = [];
+            for (const tx of localFullTownHallHistory.txs) {
+                let txByContact = mutedList.find(
+                    contact => contact.address === tx.replyAddress,
+                );
+                // if a match was not found
+                if (typeof txByContact === 'undefined') {
+                    totalTxlHistoryTxsInclMuted.push(tx);
+                }
+            }
+            localFullTownHallHistory.txs = totalTxlHistoryTxsInclMuted;
 
             const selectedPageHistory = getPaginatedHistoryPage(
                 localFullTownHallHistory.txs,
@@ -823,6 +856,20 @@ export default function TownHall({ address, isMobile }) {
                                                    </Popover>
                                                     )}
                                                  </div>
+
+                                                 <div>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="icon"
+                                                        className="mr-2"
+                                                        onClick={e => {
+                                                            muteNewContact('Muted user', tx.replyAddress, setMuteList);
+                                                        }}
+                                                    >
+                                                        <MuteIcon className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+
                                              </span>
                                            </>)
                                          }
