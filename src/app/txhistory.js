@@ -13,13 +13,19 @@ import { MagnifyingGlassIcon, ResetIcon, Link2Icon, Share1Icon } from "@radix-ui
 import {
     DecryptionIcon,
     MoneyIcon,
-    AlitacoffeeIcon,
     DefaultavatarIcon, 
     ReplieduseravatarIcon,
     Arrowright2Icon,
     IdCardIcon,
+    MuteIcon,
 } from "@/components/ui/social";
-import { encodeBip2XecTip, getPaginatedHistoryPage, getContactNameIfExist, RenderTipping } from '../utils/utils';
+import {
+  encodeBip2XecTip,
+  getPaginatedHistoryPage,
+  getContactNameIfExist,
+  RenderTipping,
+  muteNewContact,
+} from '../utils/utils';
 import {
   Pagination,
   PaginationContent,
@@ -86,6 +92,7 @@ export default function TxHistory({ address, isMobile }) {
     const newContactNameInput = useRef('');
     const newReplierContactNameInput = useRef('');
     const [curateByContacts, setCurateByContacts] = useState(false);
+    const [muteList, setMuteList] = useState('');
 
     useEffect(() => {
       const handleResize = () => {
@@ -105,7 +112,7 @@ export default function TxHistory({ address, isMobile }) {
             await refreshContactList();
             await getTxHistoryByPage(0);
         })();
-    }, []);
+    }, [muteList]);
 
     const refreshContactList = async () => {
         let contactList = await localforage.getItem(appConfig.localContactsParam);
@@ -133,13 +140,23 @@ export default function TxHistory({ address, isMobile }) {
     };
 
     // Retrieves the tx history specific to OP_RETURN messages
-    const getTxHistoryByPage = async (pageNum = 0, localLookup = false, curateByContacts = false) => {
+    const getTxHistoryByPage = async (
+      pageNum = 0,
+      localLookup = false,
+      curateByContacts = false,
+    ) => {
       if (
           typeof pageNum !== "number" ||
           chronik === undefined ||
           !cashaddr.isValidCashAddress(address, 'ecash')
       ) {
           return;
+      }
+
+      // Retrieve muted addresses
+      let mutedList = await localforage.getItem(appConfig.localMuteParam);
+      if (!Array.isArray(mutedList)) {
+          mutedList = [];
       }
 
       if (localLookup) {
@@ -157,6 +174,19 @@ export default function TxHistory({ address, isMobile }) {
           }
           fullTxHistory.txs = contactOnlyInboxHistoryTxs;
         }
+
+        // Remove messages from muted users
+        const totalTxlHistoryTxsInclMuted = [];
+        for (const tx of fullTxHistory.txs) {
+            let txByContact = mutedList.find(
+                contact => contact.address === tx.replyAddress,
+            );
+            // if a match was not found
+            if (typeof txByContact === 'undefined') {
+                totalTxlHistoryTxsInclMuted.push(tx);
+            }
+        }
+        fullTxHistory.txs = totalTxlHistoryTxsInclMuted;
 
         const selectedPageHistory = getPaginatedHistoryPage(
             fullTxHistory.txs,
@@ -341,6 +371,17 @@ export default function TxHistory({ address, isMobile }) {
                                              {getContactNameIfExist(tx.replyAddress, contactList)}
                                         </Badge>
                                           </div>
+
+                                          <Button
+                                            variant="outline"
+                                            size="icon"
+                                            className="mr-2"
+                                            onClick={e => {
+                                                muteNewContact('Muted user', tx.replyAddress, setMuteList);
+                                            }}
+                                        >
+                                            <MuteIcon className="h-4 w-4" />
+                                        </Button>
                                       </div>
                                      
                                     </div>
