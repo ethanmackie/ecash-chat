@@ -254,7 +254,7 @@ export default function ContactListPanel({ latestAvatars }) {
                               <div className="ml-auto hidden sm:flex items-center space-x-2">
                                 <Button variant="outline" size="icon"
                                 onClick={() => {
-                                  deleteMutedContact(thisContact.address, setMuteList);
+                                  deleteMutedContact(thisContact.address, setMuteList, window);
                               }}
                               >
                               <Cross2Icon className="h-4 w-4" />

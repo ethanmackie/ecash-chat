@@ -863,7 +863,7 @@ export default function TownHall({ address, isMobile }) {
                                                         size="icon"
                                                         className="mr-2"
                                                         onClick={e => {
-                                                            muteNewContact('Muted user', tx.replyAddress, setMuteList);
+                                                            muteNewContact('Muted user', tx.replyAddress, setMuteList, window);
                                                         }}
                                                     >
                                                         <MuteIcon className="h-4 w-4" />
