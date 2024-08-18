@@ -175,6 +175,7 @@ export const getArticleHistory = async (chronik, address, page = 0) => {
         }
 
         // Remove duplicate hashes commited onchain either accidentally or maliciously
+        /*
         const uniqueArticles = [];
         totalTxlHistoryTxs = totalTxlHistoryTxs.filter(element => {
             const isDuplicate = uniqueArticles.includes(element.outputs[0].outputScript);
@@ -184,6 +185,7 @@ export const getArticleHistory = async (chronik, address, page = 0) => {
             }
             return false;
         });
+*/
 
         // Remove muted addresses
         let mutedList = await localforage.getItem(appConfig.localMuteParam);
