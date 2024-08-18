@@ -378,7 +378,7 @@ export const getPaywallLeaderboard = (paywallTxs) => {
 };
 
 // Add contact to local storage mute list
-export const muteNewContact = async (contactName, contactAddress, setMuteList) => {
+export const muteNewContact = async (contactName, contactAddress, setMuteList, window) => {
     let muteList = await localforage.getItem(appConfig.localMuteParam);
 
     if (!Array.isArray(muteList)) {
@@ -403,16 +403,22 @@ export const muteNewContact = async (contactName, contactAddress, setMuteList) =
         // update localforage and state
         await localforage.setItem(appConfig.localMuteParam, muteList);
         toast.success(
-            `"${contactName}" (${contactAddress}) added to mute list`,
+            `"${contactName}" (${contactAddress}) added to mute list, refreshing app...`,
         );
     }
     if (setMuteList) {
         setMuteList(muteList);
     }
+
+    if (window) {
+        setTimeout(function (){
+            window.location.reload();
+        }, 2000);
+    }
 };
 
 // Delete contact from local storage must list
-export const deleteMutedContact = async (contactListAddressToDelete, setContactList, setMuteList) => {
+export const deleteMutedContact = async (contactListAddressToDelete, setMuteList, window) => {
     let muteList = await localforage.getItem(appConfig.localMuteParam);
     if (!Array.isArray(muteList)) {
         muteList = [];
@@ -425,10 +431,14 @@ export const deleteMutedContact = async (contactListAddressToDelete, setContactL
 
     // Update localforage and state
     await localforage.setItem(appConfig.localMuteParam, updatedMutetList);
-    setContactList(updatedMutetList);
-    toast.success(`User unmuted, please refresh to retrieve their content again`);
+    toast.success(`User unmuted, refreshing app...`);
     if (setMuteList) {
         setMuteList(updatedMutetList);
+    }
+    if (window) {
+        setTimeout(function (){
+            window.location.reload();
+        }, 2000);
     }
 };
 
