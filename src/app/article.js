@@ -897,16 +897,19 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 tx.articleObject && (
                 <Card key={index} className="max-w-xl w-full mt-2">
                     <CardHeader>
-                        <div className="flex items-center gap-x-4 text-xs">
-                            <time dateTime={tx.txTime} className="text-gray-500">
-                                {tx.txDate}
-                            </time>
+                    <div className="flex items-center gap-x-4 text-xs">
+                        <time dateTime={tx.txTime} className="text-muted-foreground">
+                            {tx.txDate}
+                        </time>
 
+                        <span className="text-muted-foreground">
                             {getEstiamtedReadingTime(tx.articleObject.content)} min read
-                            <Badge variant="secondary">
-                                {tx.articleObject.category || 'General'}
-                            </Badge>
-                        </div>
+                        </span>
+
+                        <Badge variant="secondary">
+                            {tx.articleObject.category || 'General'}
+                        </Badge>
+                    </div>
                         <CardTitle>{tx.articleObject.title}</CardTitle>
                         <CardDescription></CardDescription>
                     
