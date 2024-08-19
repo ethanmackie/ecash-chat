@@ -12,6 +12,7 @@ import ProfilePanel from './profile';
 import ContactListPanel from './contact';
 import { queryAliasServer } from '../alias/alias-server';
 import { encodeBip21Message, getTweetId, getNFTAvatarLink, encodeBip21Auth } from '../utils/utils';
+import { Toggle } from "@/components/ui/toggle";
 import {
     Accordion,
     AccordionContent,
@@ -633,16 +634,17 @@ export default function Home() {
               </a>
             </div>
             <div className="flex">
-              {isLoggedIn && !showCard && (
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="mr-2"
-                  onClick={() => setShowCard(true)}
-                >
-                  <User3icon className="h-4 w-4" />
-                </Button>
-              )}
+        
+            {isLoggedIn && (
+            <Toggle
+                variant="outline"
+                aria-label="Toggle italic"
+                className="mr-2 w-9 px-0"
+                onClick={() => setShowCard((prev) => !prev)}
+            >
+                <User3icon className="h-4 w-4" />
+            </Toggle>
+            )}
 
               {isLoggedIn && <ContactListPanel latestAvatars={latestAvatars} />}
 
