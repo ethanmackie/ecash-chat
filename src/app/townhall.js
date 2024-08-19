@@ -892,7 +892,7 @@ export default function TownHall({ address, isMobile }) {
                                 }}
                                 >
                                 <EyeNoneIcon className="h-4 w-4 mr-2" />
-                                Mute
+                                Mute 
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                             </DropdownMenu>

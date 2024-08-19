@@ -15,12 +15,20 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+  } from "@/components/ui/dropdown-menu";
+import {
     Popover,
     PopoverContent,
     PopoverTrigger,
   } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon, Pencil1Icon, ChatBubbleIcon} from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon, Pencil1Icon, ChatBubbleIcon, DotsHorizontalIcon, EyeNoneIcon} from "@radix-ui/react-icons";
 import { ImDownload3 } from "react-icons/im";
 import { RiSave3Fill } from "react-icons/ri";
 import {
@@ -897,7 +905,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 tx.articleObject && (
                 <Card key={index} className="max-w-xl w-full mt-2">
                     <CardHeader>
-                    <div className="flex items-center gap-x-4 text-xs">
+                    <div className="flex items-center justify-between gap-x-4 text-xs">
+                    <div className="flex items-center gap-x-4">
                         <time dateTime={tx.txTime} className="text-muted-foreground">
                             {tx.txDate}
                         </time>
@@ -910,6 +919,25 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             {tx.articleObject.category || 'General'}
                         </Badge>
                     </div>
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger>
+                            <DotsHorizontalIcon />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuLabel>Action</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                            onClick={(e) => {
+                                muteNewContact('Muted user', tx.replyAddress, setMuteList, window);
+                            }}
+                            >
+                            <EyeNoneIcon className="h-4 w-4 mr-2" />
+                            Mute
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
                         <CardTitle>{tx.articleObject.title}</CardTitle>
                         <CardDescription></CardDescription>
                     
@@ -1030,18 +1058,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     </Popover>
                                 </div>
                             )}
-                            <div>
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="mr-2"
-                                    onClick={e => {
-                                        muteNewContact('Muted user', tx.replyAddress, setMuteList, window);
-                                    }}
-                                >
-                                    <MuteIcon className="h-4 w-4" />
-                                </Button>
-                            </div>
                         </div>
                         <div className="relative mt-2 flex items-center gap-x-2 ml-auto md:hidden">
                             <Popover>
