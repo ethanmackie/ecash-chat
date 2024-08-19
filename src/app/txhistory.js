@@ -9,7 +9,7 @@ import { isValidRecipient } from '../validation/validation';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { MagnifyingGlassIcon, ResetIcon, Link2Icon, Share1Icon } from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon, ResetIcon, Link2Icon, Share1Icon, EyeNoneIcon } from "@radix-ui/react-icons";
 import {
     DecryptionIcon,
     MoneyIcon,
@@ -17,7 +17,6 @@ import {
     ReplieduseravatarIcon,
     Arrowright2Icon,
     IdCardIcon,
-    MuteIcon,
 } from "@/components/ui/social";
 import {
   encodeBip2XecTip,
@@ -372,16 +371,7 @@ export default function TxHistory({ address, isMobile }) {
                                         </Badge>
                                           </div>
 
-                                          <Button
-                                            variant="outline"
-                                            size="icon"
-                                            className="mr-2"
-                                            onClick={e => {
-                                                muteNewContact('Muted user', tx.replyAddress, setMuteList);
-                                            }}
-                                        >
-                                            <MuteIcon className="h-4 w-4" />
-                                        </Button>
+                                       
                                       </div>
                                      
                                     </div>
@@ -696,10 +686,19 @@ export default function TxHistory({ address, isMobile }) {
                                   <IdCardIcon className="h-4 w-4" />
                                 </Button>
                               </Popover>
-                              
                             </div>
                             
                           )}
+                              <Button
+                             variant="outline"
+                             size="icon"
+                             className="ml-2"
+                             onClick={e => {
+                              muteNewContact('Muted user', tx.replyAddress, setMuteList);
+                                            }}
+                              >
+                             <EyeNoneIcon className="h-4 w-4" />
+                            </Button>
                            <div className='ml-2'>
                               <RenderTipping
                               address={tx.recipientAddress === address ? tx.replyAddress : tx.recipientAddress}
