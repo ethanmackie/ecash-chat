@@ -20,7 +20,15 @@ import {
     IdCardIcon,
     MuteIcon,
 } from "@/components/ui/social";
-import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon, ChatBubbleIcon, Share1Icon, Pencil1Icon } from '@radix-ui/react-icons';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+  } from "@/components/ui/dropdown-menu";
+import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon, ChatBubbleIcon, Share1Icon, Pencil1Icon, DotsHorizontalIcon, EyeNoneIcon} from '@radix-ui/react-icons';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
@@ -759,122 +767,137 @@ export default function TownHall({ address, isMobile }) {
                             <>
                                 <div className="flex flex-col items-center mt-2" key={"townhallTxHistory"+index}>
                                    <div className="flex flex-col max-w-xl gap-2 break-words hover:shadow w-full leading-1.5 p-6 rounded-2xl border bg-card text-card-foreground shadow-sm dark:bg-gray-700 transition-transform transform">
-                                   <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
-                                      <span>
-                                         {tx.replyAddress === address ? (
-                                             <>
-                                           <div className="flex items-center gap-2">
-                                                {tx.senderAvatarLink === false ? (
-                                                    <DefaultavatarIcon />
-                                                ) : (
-                                                    <Avatar className="h-9 w-9">
-                                                        <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
-                                                        <AvatarFallback><DefaultavatarIcon/></AvatarFallback>
-                                                    </Avatar>
-                                                )}
-                                                <Badge variant="outline" className="py-3px shadow-sm hover:bg-accent">
-                                                    <div className="font-medium leading-7 dark:text-white">
-                                                        <div onClick={() => {
-                                                            copy(tx.replyAddress);
-                                                            toast(`${tx.replyAddress} copied to clipboard`);
-                                                        }}>
-                                                            Your wallet
-                                                        </div>
-                                                    </div>
-                                                </Badge>
+                                   <div className="flex items-center justify-between space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
+                                <span className="flex items-center">
+                                    {tx.replyAddress === address ? (
+                                    <>
+                                        <div className="flex items-center gap-2">
+                                        {tx.senderAvatarLink === false ? (
+                                            <DefaultavatarIcon />
+                                        ) : (
+                                            <Avatar className="h-9 w-9">
+                                            <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
+                                            <AvatarFallback>
+                                                <DefaultavatarIcon />
+                                            </AvatarFallback>
+                                            </Avatar>
+                                        )}
+                                        <Badge variant="outline" className="py-3px shadow-sm hover:bg-accent">
+                                            <div className="font-medium leading-7 dark:text-white">
+                                            <div
+                                                onClick={() => {
+                                                copy(tx.replyAddress);
+                                                toast(`${tx.replyAddress} copied to clipboard`);
+                                                }}
+                                            >
+                                                Your wallet
                                             </div>
-                                             </>
-                                         ) :
-                                           (<>
-                                             <span>
-                                                <div className="flex items-center gap-2">
-                                                    {tx.senderAvatarLink === false ? (
-                                                        <DefaultavatarIcon/>
-                                                    ) : (
-                                                        <Avatar className="h-9 w-9">
-                                                        <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
-                                                        <AvatarFallback><DefaultavatarIcon/></AvatarFallback>
-                                                       </Avatar>
-                                                    )}
-                                                    <Badge variant="outline" className="py-3px shadow-sm hover:bg-accent">
-                                                    <div className="leading-7 [&:not(:first-child)]:mt-6">
-                                                        <div onClick={() => {
-                                                            copy(tx.replyAddress);
-                                                            toast(`${tx.replyAddress} copied to clipboard`);
-                                                        }}>
-                                                            {getContactNameIfExist(tx.replyAddress, contactList)}
-                                                        </div>
-                                                    </div>
-                                                    </Badge>
+                                            </div>
+                                        </Badge>
+                                        </div>
+                                    </>
+                                    ) : (
+                                    <>
+                                        <div className="flex items-center gap-2">
+                                        {tx.senderAvatarLink === false ? (
+                                            <DefaultavatarIcon />
+                                        ) : (
+                                            <Avatar className="h-9 w-9">
+                                            <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
+                                            <AvatarFallback>
+                                                <DefaultavatarIcon />
+                                            </AvatarFallback>
+                                            </Avatar>
+                                        )}
+                                        <Badge variant="outline" className="py-3px shadow-sm hover:bg-accent">
+                                            <div className="leading-7 [&:not(:first-child)]:mt-6">
+                                            <div
+                                                onClick={() => {
+                                                copy(tx.replyAddress);
+                                                toast(`${tx.replyAddress} copied to clipboard`);
+                                                }}
+                                            >
+                                                {getContactNameIfExist(tx.replyAddress, contactList)}
+                                            </div>
+                                            </div>
+                                        </Badge>
 
-                                                    {/* Tip XEC options */}
-                                                    <RenderTipping address={tx.replyAddress} sendXecTip={sendXecTip} />
+                                        <RenderTipping address={tx.replyAddress} sendXecTip={sendXecTip} />
 
-                                                    {/* Add contact popover to input the new contact name */}
-                                                    {isExistingContact(tx.replyAddress, contactList) === false && (
-                                                       <Popover>
-                                                       <PopoverTrigger asChild>
-                                                           <Button variant="outline" size="icon" className="mr-2">
-                                                               <IdCardIcon className="h-4 w-4" />
-                                                           </Button>
-                                                       </PopoverTrigger>
-                                                       <PopoverContent>
-                                                           <div className="space-y-2">
-                                                           <h4 className="flex items-center font-medium leading-none">
-                                                                <Pencil1Icon className="h-4 w-4 mr-1" />
-                                                                New contact
-                                                            </h4>
-                                                               <p className="text-sm text-muted-foreground break-words max-w-96">
-                                                                   Input contact name for <br />{tx.replyAddress}
-                                                               </p>
-                                                           </div>
-                                                           <div className="py-2">
-                                                               <Input
-                                                                   id="addContactName"
-                                                                   name="addContactName"
-                                                                   type="text"
-                                                                   value={contactListName}
-                                                                   required
-                                                                   placeholder="New contact name"
-                                                                   className="bg-gray-50"
-                                                                   maxLength="30"
-                                                                   onChange={e => setContactListName(e.target.value)}
-                                                               />
-                                                               <Button
-                                                                   type="button"
-                                                                   disabled={contactListName === ''}
-                                                                   className="mt-2"
-                                                                   onClick={e => {
-                                                                       addNewContact(contactListName, tx.replyAddress, refreshContactList);
-                                                                       setContactListName('');
-                                                                   }}
-                                                               >
-                                                                   Add Contact
-                                                               </Button>
-                                                           </div>
-                                                       </PopoverContent>
-                                                   </Popover>
-                                                    )}
-                                                 </div>
-
-                                                 <div>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="icon"
-                                                        className="mr-2"
-                                                        onClick={e => {
-                                                            muteNewContact('Muted user', tx.replyAddress, setMuteList, window);
-                                                        }}
-                                                    >
-                                                        <MuteIcon className="h-4 w-4" />
-                                                    </Button>
+                                        {isExistingContact(tx.replyAddress, contactList) === false && (
+                                            <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button variant="outline" size="icon" className="mr-2">
+                                                <IdCardIcon className="h-4 w-4" />
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent>
+                                                <div className="space-y-2">
+                                                <h4 className="flex items-center font-medium leading-none">
+                                                    <Pencil1Icon className="h-4 w-4 mr-1" />
+                                                    New contact
+                                                </h4>
+                                                <p className="text-sm text-muted-foreground break-words max-w-96">
+                                                    Input contact name for <br />
+                                                    {tx.replyAddress}
+                                                </p>
                                                 </div>
+                                                <div className="py-2">
+                                                <Input
+                                                    id="addContactName"
+                                                    name="addContactName"
+                                                    type="text"
+                                                    value={contactListName}
+                                                    required
+                                                    placeholder="New contact name"
+                                                    className="bg-gray-50"
+                                                    maxLength="30"
+                                                    onChange={(e) => setContactListName(e.target.value)}
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    disabled={contactListName === ''}
+                                                    className="mt-2"
+                                                    onClick={(e) => {
+                                                    addNewContact(
+                                                        contactListName,
+                                                        tx.replyAddress,
+                                                        refreshContactList
+                                                    );
+                                                    setContactListName('');
+                                                    }}
+                                                >
+                                                    Add Contact
+                                                </Button>
+                                                </div>
+                                            </PopoverContent>
+                                            </Popover>
+                                        )}
+                                        </div>
+                                    </>
+                                    )}
+                                </span>
 
-                                             </span>
-                                           </>)
-                                         }
-                                      </span>
-                                   </div>
+                                <div className="flex items-center space-x-2">
+                                <DropdownMenu>
+                            <DropdownMenuTrigger>
+                                <DotsHorizontalIcon />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuLabel>Action</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                onClick={(e) => {
+                                    muteNewContact('Muted user', tx.replyAddress, setMuteList, window);
+                                }}
+                                >
+                                <EyeNoneIcon className="h-4 w-4 mr-2" />
+                                Mute
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                            </DropdownMenu>
+                                </div>
+                                </div>
 
                                    {/* Render the op_return message */}
                                 <div className={(tx.opReturnMessage.trim() && tx.opReturnMessage !== '\0') ? "my-2" : "hidden"}>
