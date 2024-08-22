@@ -80,7 +80,6 @@ export default function ContactListPanel({ latestAvatars }) {
                 <SheetHeader>
                     <SheetTitle>Contact List</SheetTitle>
                 </SheetHeader>
-
                 <Card className="mt-2">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Manage your contacts</CardTitle>
@@ -222,9 +221,7 @@ export default function ContactListPanel({ latestAvatars }) {
                        <FileTextIcon className='mr-2'/> Export contacts
                     </Button>
                     </CardFooter>
-    
                 </Card>
-
                 <Card className="mt-2">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Muted accounts</CardTitle>
@@ -261,6 +258,15 @@ export default function ContactListPanel({ latestAvatars }) {
                               </Button>
                             </div>
                           </div>
+                          <div className="ml-auto flex sm:hidden items-center space-x-2">
+                          <Button variant="outline" size="icon"
+                                onClick={() => {
+                                  deleteMutedContact(thisContact.address, setMuteList, window);
+                              }}
+                              >
+                              <Cross2Icon className="h-4 w-4" />
+                              </Button>
+                            </div>
                         </div>
                     ))}
                     </CardContent>    
