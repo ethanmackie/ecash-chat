@@ -15,18 +15,27 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+  } from "@/components/ui/dropdown-menu";
+import {
     Popover,
     PopoverContent,
     PopoverTrigger,
   } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon, Pencil1Icon, ChatBubbleIcon} from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon, Pencil1Icon, ChatBubbleIcon, DotsHorizontalIcon, EyeNoneIcon} from "@radix-ui/react-icons";
 import { ImDownload3 } from "react-icons/im";
 import { RiSave3Fill } from "react-icons/ri";
 import {
     EncryptionIcon,
     UnlockIcon,
     IdCardIcon,
+    MuteIcon,
 } from "@/components/ui/social";
 import {
     Select,
@@ -78,6 +87,7 @@ import {
     getContactNameIfExist,
     RenderTipping,
     isExistingContact,
+    muteNewContact,
 } from '../utils/utils';
 import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, GraphchartIcon, Stats2Icon } from "@/components/ui/social";
 import { toast } from 'react-toastify';
@@ -133,6 +143,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const [showSearchBar, setshowSearchBar] = useState(false);
     const newContactNameInput = useRef('');
     const [contactList, setContactList] = useState('');
+    const [muteList, setMuteList] = useState('');
     const [curateByContacts, setCurateByContacts] = useState(false);
     const articleReplyInput = useRef('');
 
@@ -215,24 +226,39 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 }
             }
 
+        })();
+
+        (async () => {
             const updatedCache = await refreshUtxos(chronik, address);
             setXecBalance(updatedCache.xecBalance);
         })();
-    }, []);
+    }, [muteList]);
 
     const refreshContactList = async () => {
-        let contactList = await localforage.getItem(appConfig.localContactsParam);
-        setContactList(contactList);
+        setContactList(
+            await localforage.getItem(appConfig.localContactsParam),
+        );
     };
 
     // Retrieves the article listing
     // Set localLookup to true to retrieve paginated data locally
-    const getArticleHistoryByPage = async (pageNum = 0, localLookup = false, articleCache = false, curateByContacts = false) => {
+    const getArticleHistoryByPage = async (
+        pageNum = 0,
+        localLookup = false,
+        articleCache = false,
+        curateByContacts = false,
+    ) => {
         if (
             typeof pageNum !== "number" ||
             chronik === undefined
         ) {
             return;
+        }
+
+        // Retrieve muted addresses
+        let mutedList = await localforage.getItem(appConfig.localMuteParam);
+        if (!Array.isArray(mutedList)) {
+            mutedList = [];
         }
 
         if (localLookup) {
@@ -253,6 +279,19 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 }
                 localArticleHistory.txs = contactOnlyArticleHistoryTxs;
             }
+
+            // Remove muted addresses
+            const totalTxlHistoryTxsInclMuted = [];
+            for (const tx of localArticleHistory.txs) {
+                let txByContact = mutedList.find(
+                    contact => contact.address === tx.replyAddress,
+                );
+                // if a match was not found
+                if (typeof txByContact === 'undefined') {
+                    totalTxlHistoryTxsInclMuted.push(tx);
+                }
+            }
+            localArticleHistory.txs = totalTxlHistoryTxsInclMuted;
 
             const selectedPageHistory = getPaginatedHistoryPage(
                 localArticleHistory.txs,
@@ -866,16 +905,39 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 tx.articleObject && (
                 <Card key={index} className="max-w-xl w-full mt-2">
                     <CardHeader>
-                        <div className="flex items-center gap-x-4 text-xs">
-                            <time dateTime={tx.txTime} className="text-gray-500">
-                                {tx.txDate}
-                            </time>
+                    <div className="flex items-center justify-between gap-x-4 text-xs">
+                    <div className="flex items-center gap-x-4">
+                        <time dateTime={tx.txTime} className="text-muted-foreground">
+                            {tx.txDate}
+                        </time>
 
+                        <span className="text-muted-foreground">
                             {getEstiamtedReadingTime(tx.articleObject.content)} min read
-                            <Badge variant="secondary">
-                                {tx.articleObject.category || 'General'}
-                            </Badge>
-                        </div>
+                        </span>
+
+                        <Badge variant="secondary">
+                            {tx.articleObject.category || 'General'}
+                        </Badge>
+                    </div>
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger>
+                            <DotsHorizontalIcon />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuLabel>Action</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                            onClick={(e) => {
+                                muteNewContact('Muted user', tx.replyAddress, setMuteList, window);
+                            }}
+                            >
+                            <EyeNoneIcon className="h-4 w-4 mr-2" />
+                            Mute
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
                         <CardTitle>{tx.articleObject.title}</CardTitle>
                         <CardDescription></CardDescription>
                     

@@ -377,6 +377,71 @@ export const getPaywallLeaderboard = (paywallTxs) => {
     return sortedLeaderboardTop10;
 };
 
+// Add contact to local storage mute list
+export const muteNewContact = async (contactName, contactAddress, setMuteList, window) => {
+    let muteList = await localforage.getItem(appConfig.localMuteParam);
+
+    if (!Array.isArray(muteList)) {
+        muteList = [];
+    }
+
+    // Check to see if the contact exists
+    const contactExists = muteList.find(
+        contact => contact.address === contactAddress,
+    );
+
+    if (typeof contactExists !== 'undefined') {
+        // Contact exists
+        toast.error(
+            `${contactAddress} already exists in mute list`,
+        );
+    } else {
+        muteList.push({
+            name: contactName,
+            address: contactAddress,
+        });
+        // update localforage and state
+        await localforage.setItem(appConfig.localMuteParam, muteList);
+        toast.success(
+            `"${contactName}" (${contactAddress}) added to mute list, refreshing app...`,
+        );
+    }
+    if (setMuteList) {
+        setMuteList(muteList);
+    }
+
+    if (window) {
+        setTimeout(function (){
+            window.location.reload();
+        }, 2000);
+    }
+};
+
+// Delete contact from local storage must list
+export const deleteMutedContact = async (contactListAddressToDelete, setMuteList, window) => {
+    let muteList = await localforage.getItem(appConfig.localMuteParam);
+    if (!Array.isArray(muteList)) {
+        muteList = [];
+    }
+
+    // filter contact from local contact list array
+    const updatedMutetList = muteList.filter(
+        contact => contact.address !== contactListAddressToDelete,
+    );
+
+    // Update localforage and state
+    await localforage.setItem(appConfig.localMuteParam, updatedMutetList);
+    toast.success(`User unmuted, refreshing app...`);
+    if (setMuteList) {
+        setMuteList(updatedMutetList);
+    }
+    if (window) {
+        setTimeout(function (){
+            window.location.reload();
+        }, 2000);
+    }
+};
+
 // Add contact to local storage
 export const addNewContact = async (contactName, contactAddress, refreshCallback) => {
     let contactList = await localforage.getItem(appConfig.localContactsParam);

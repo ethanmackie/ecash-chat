@@ -31,4 +31,5 @@ export const appConfig = {
     localTownhallCacheParam: 'townhallCache',
     localArticleCacheParam: 'articleCache',
     localContactsParam: 'localContacts',
+    localMuteParam: 'localMute',
 };
