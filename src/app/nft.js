@@ -178,7 +178,7 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                         <div className="grid md:grid-cols-2 grid-cols-1 max-w-xl gap-2 mx-auto">
                             {childNftsObjsOwned && childNftsObjsOwned.length > 0 && childNftsObjsOwned.map((childNftObj, index) => (
                                 <Card key={childNftObj.tokenId + index}
-                                className="transition-shadow duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50"
+                                className="transition-shadow shadow-none duration-300 ease-in-out hover:shadow-sm hover:bg-slate-50"
                                 >
                                     <CardHeader>
                                         <CardTitle>{childNftObj.genesisInfo.tokenName} ({childNftObj.genesisInfo.tokenTicker})</CardTitle>

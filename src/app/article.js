@@ -515,7 +515,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             foundReplies.map(
                 (foundReply, index) => (
                     <>
-                    <div className="flex flex-col break-words space-y-1.5 gap-2 mt-2 w-full leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                    <div className="flex flex-col break-words space-y-1.5 gap-2 mt-2 w-full leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow-none dark:bg-gray-700 transition-transform transform">
                         <div className="flex justify-between items-center w-full" key={"article"+index}>
                             <div className="flex items-center gap-2">
                                 {foundReply.senderAvatarLink === false ? (
@@ -903,7 +903,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             latestArticleHistory.txs.length > 0 ? (
             latestArticleHistory.txs.map((tx, index) => (
                 tx.articleObject && (
-                <Card key={index} className="max-w-xl w-full mt-2">
+                <Card key={index} className="max-w-xl w-full mt-2 shadow-none">
                     <CardHeader>
                     <div className="flex items-center justify-between gap-x-4 text-xs">
                     <div className="flex items-center gap-x-4">
@@ -1231,7 +1231,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                     setArticle(value)
                                 }}
                                 height="400px"
-                                className=" px-2 py-2 rounded-xl mx-auto border max-w-3xl max-h-85vh my-auto bg-card text-card-foreground break-words shadow"
+                                className=" px-2 py-2 rounded-xl mx-auto border max-w-3xl max-h-85vh my-auto bg-card text-card-foreground break-words"
                             /> 
                             <p className="text-sm text-red-600 dark:text-red-500">{articleError !== false && articleError}</p>
                             <div className="flex flex-col sm:flex-row justify-between items-center mt-2">
