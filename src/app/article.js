@@ -110,6 +110,7 @@ import {
     CardHeader,
     CardTitle,
   } from "@/components/ui/card"
+import { FileUpload } from "@/components/ui/fileupload";
 import { isValidRecipient } from '../validation/validation';
 import { Badge } from "@/components/ui/badge";
 import localforage from 'localforage';
@@ -1183,6 +1184,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             <SelectItem value="News">News</SelectItem>
                             <SelectItem value="Opinion">Opinion</SelectItem>
                             <SelectItem value="Technical">Technical</SelectItem>
+                            <SelectItem value="Podcast">Podcast</SelectItem>
                         </SelectContent>
                         </Select>
                     </div>
@@ -1225,14 +1227,21 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 </div>
                         </fieldset>
                    
-                            <MarkdownEditor
-                                value={article}
-                                onChange={(value, viewUpdate) => {
-                                    setArticle(value)
-                                }}
-                                height="400px"
-                                className=" px-2 py-2 rounded-xl mx-auto border max-w-3xl max-h-85vh my-auto bg-card text-card-foreground break-words"
-                            /> 
+                        {articleCategory === "Podcast" ? (
+                        <FileUpload maxFileSize={1024000} />
+                        ) : (
+                        <MarkdownEditor
+                            value={article}
+                            onChange={(value, viewUpdate) => {
+                            setArticle(value);
+                            }}
+                            height="400px"
+                            className="px-2 py-2 rounded-xl mx-auto border max-w-3xl max-h-85vh my-auto bg-card text-card-foreground break-words"
+                        />
+                        )}
+                            <div>
+                           
+                            </div>
                             <p className="text-sm text-red-600 dark:text-red-500">{articleError !== false && articleError}</p>
                             <div className="flex flex-col sm:flex-row justify-between items-center mt-2">
                                 {/* Write article button*/}
