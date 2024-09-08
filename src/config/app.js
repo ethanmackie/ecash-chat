@@ -23,6 +23,7 @@ export const appConfig = {
     historyRefreshInterval: 60000,
     articleRefreshInterval: 120000,
     toastDuration: 2800,
+    ipfsAudioSizeLimitMb: 25,
     tokenIconsUrl: 'https://icons.etokens.cash',
     vercelKvParam: 'article1',
     localArticlesParam: 'localArticles',

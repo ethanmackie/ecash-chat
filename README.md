@@ -10,6 +10,7 @@
 - NFT showcase and use as avatars
 - Contacts management
 - Content curation based on contacts
+- IPFS integration
 - Displays only messaging transactions
 - Real time address specific filtering
 - XEC Tipping on addresses

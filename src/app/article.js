@@ -1312,7 +1312,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
                         {articleCategory === "Podcast" ? (
                             <FileUpload
-                                maxFileSize={26214400} // 25 megs
+                                maxFileSizeBytes={appConfig.ipfsAudioSizeLimitMb*1024*1024}
                                 setIsFileSelected={setIsFileSelected}
                                 setFileSelected={setFileSelected}
                             />

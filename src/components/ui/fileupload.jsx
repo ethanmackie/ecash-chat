@@ -8,12 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { appConfig } from '@/config/app';
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { UploadIcon, Cross1Icon } from "@radix-ui/react-icons";
 import { AttachmentIcon, Upload2Icon } from "@/components/ui/social";
 
-const FileUpload = ({ maxFileSize, setIsFileSelected, setFileSelected }) => {
+const FileUpload = ({ maxFileSizeBytes, setIsFileSelected, setFileSelected }) => {
   const fileInputRef = React.useRef(null);
   const [fileSize, setFileSize] = React.useState(null);
   const [error, setError] = React.useState(null);
@@ -28,8 +29,12 @@ const FileUpload = ({ maxFileSize, setIsFileSelected, setFileSelected }) => {
     const file = event.target.files[0];
     if (file) {
       const sizeInBytes = file.size;
-      if (sizeInBytes > maxFileSize) {
-        setError(`File size exceeds the limit of ${(maxFileSize / 1024).toFixed(2)} KB`);
+
+      if (file.name.split('.').pop() !== 'mp3') {
+        setError(`Only mp3 file types are supported`);
+        setFileSize(null);
+      } else if (sizeInBytes > maxFileSizeBytes) {
+        setError(`File size exceeds the limit of ${appConfig.ipfsAudioSizeLimitMb} MB`);
         setFileSize(null);
       } else {
         setError(null);
@@ -60,7 +65,7 @@ const FileUpload = ({ maxFileSize, setIsFileSelected, setFileSelected }) => {
       <CardContent>
         <div className="border-2 border-dashed border-muted rounded-lg h-52 px-2 flex flex-col items-center justify-center">
           <Badge variant="outline" className="h-12 justify-center w-12 px-0 shadow-lg"><Upload2Icon/></Badge>
-          <p className="text-sm font-semibold mb-4 mt-4">Permitted file types: .mp3, .wav, .flac, .aac & .ogg</p>
+          <p className="text-sm font-semibold mb-4 mt-4">Supported file type: .mp3</p>
           <p className="text-sm text-muted-foreground mb-4">Maximum size: 25MB</p>
           <Button variant="outline" onClick={handleButtonClick}>Choose File</Button>
           {error && <p className="text-red-500 mt-2 mb-2 text-sm">{error}</p>}
@@ -75,6 +80,7 @@ const FileUpload = ({ maxFileSize, setIsFileSelected, setFileSelected }) => {
             <Input
               type="file"
               ref={fileInputRef}
+              accept=".mp3"
               onChange={handleFileChange}
             />
             <p className="text-xs text-gray-500 mt-2">{fileSize ? `File size: ${fileSize}` : 'Upload your file'}</p>
