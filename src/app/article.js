@@ -72,6 +72,7 @@ import {
     getArticleListing,
     txListener,
     articleTxListener,
+    ipfsArticleTxListener,
     paywallTxListener,
     refreshUtxos,
 } from '../chronik/chronik';
@@ -118,8 +119,11 @@ import copy from 'copy-to-clipboard';
 import { Skeleton } from "@/components/ui/skeleton";
 import DOMPurify from 'dompurify';
 import MarkdownEditor from '@uiw/react-markdown-editor';
+import { PinataSDK } from "pinata";
 import { getStackArray } from 'ecash-script';
 import { BN } from 'slp-mdm';
+import AudioPlayer from 'react-h5-audio-player';
+import 'react-h5-audio-player/lib/styles.css';
 
 export default function Article( { chronik, address, isMobile, sharedArticleTxid, setXecBalance, setOpenSharedArticleLoader } ) {
     const [articleHistory, setArticleHistory] = useState('');  // current article history page
@@ -147,6 +151,12 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const [muteList, setMuteList] = useState('');
     const [curateByContacts, setCurateByContacts] = useState(false);
     const articleReplyInput = useRef('');
+    const [isFileSelected, setIsFileSelected] = useState(false);
+    const [fileSelected, setFileSelected] = useState(false);
+    const pinata = new PinataSDK({
+        pinataJwt: process.env.IPFS_API_KEY,
+        pinataGateway: process.env.IPFS_API,
+    });
 
     useEffect(() => {
         const handleResize = () => {
@@ -358,6 +368,68 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             return 1;
         }
         return Math.ceil(articleContent.split(" ").length / 200);
+    };
+
+    // Uploads the selected file to IPFS and sends an article tx BIP21 query string to cashtab extensions
+    const sendAudioArticle = async () => {
+        const crypto = require('crypto');
+        const articleHash = crypto.randomBytes(20).toString('hex')+new Date();
+
+        // Encode the op_return article script
+        const opReturnRaw = encodeBip21Article(articleHash);
+        const bip21Str = `${address}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`;
+
+        try {
+            toast('Uploading to IPFS, please wait...');
+            const ipfsHash = await pinata.upload.file(fileSelected);
+            toast('IPFS upload complete');
+
+            if (isMobile) {
+                window.open(
+                    `https://cashtab.com/#/send?bip21=${bip21Str}`,
+                    '_blank',
+                );
+            } else {
+                window.postMessage(
+                    {
+                        type: 'FROM_PAGE',
+                        text: 'Cashtab',
+                        txInfo: {
+                            bip21: `${bip21Str}`,
+                        },
+                    },
+                    '*',
+                );
+            }
+
+            const articleObject = {
+                hash: articleHash,
+                title: articleTitle,
+                content: '',
+                category: articleCategory,
+                paywallPrice: paywallAmountXec,
+                disbleReplies: disableArticleReplies,
+                ipfsHash: ipfsHash.IpfsHash,
+                date: Date.now(),
+            };
+
+            // if this article hash already exists, return with error toast
+            let updatedArticles = await localforage.getItem(appConfig.localArticlesParam);
+            let isDuplicateArticle = updatedArticles.some(function(thisArticle) {
+                return articleHash === thisArticle.hash;
+            });
+            if (isDuplicateArticle) {
+                toast('This audio article already exists.');
+                return;
+            }
+            updatedArticles.push(articleObject);
+
+            setArticle('');
+            setArticleTitle('');
+            ipfsArticleTxListener(chronik, address, updatedArticles, articleObject, getArticleHistoryByPage);
+        } catch (error) {
+            console.log('Error uploading to IPFS: ', error);
+        }
     };
 
     // Pass an article tx BIP21 query string to cashtab extensions
@@ -595,7 +667,12 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     };
 
     // Render the full article contents
-    const RenderArticle = ({ content }) => {
+    const RenderArticle = ({ content, ipfsAudioHash }) => {
+        if (ipfsAudioHash) {
+            return (<AudioPlayer
+                src={`https://gateway.pinata.cloud/ipfs/${ipfsAudioHash}`}
+            />);
+        }
         const renderedArticle = DOMPurify.sanitize(content);
         return (<MarkdownEditor.Markdown style={{ backgroundColor: 'transparent' }}  source={renderedArticle} />);
     };
@@ -778,7 +855,10 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             By: {getContactNameIfExist(currentArticleTxObj.replyAddress, contactList)}<br />
                             {currentArticleTxObj.txDate}
                         </time>
-                        <RenderArticle content={currentArticleTxObj.articleObject.content} />
+                        <RenderArticle
+                            content={currentArticleTxObj.articleObject.content}
+                            ipfsAudioHash={currentArticleTxObj.articleObject.ipfsHash}
+                        />
                     </div>
                     {/* Render corresponding replies for this article, ignore if disablReplies is set to true */}
                     {currentArticleTxObj.articleObject.disbleReplies !== true && (
@@ -979,7 +1059,10 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                             <Skeleton className="h-4 mt-2 w-1/2" />
                                         </>
                                     ) : (
-                                        <RenderArticle content={tx.articleObject.content} />
+                                        <RenderArticle
+                                            content={tx.articleObject.content}
+                                            ipfsAudioHash={tx.articleObject.ipfsHash}
+                                        />
                                     )}
                                 </p>
                             </div>
@@ -1156,18 +1239,18 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             </div>
                 {showEditor && (
                 <div className="max-w-xl w-full mt-2 mx-auto">
-                            {/* article input fields */}
-                            <Input
-                                className="bg-white"
-                                type="text"
-                                id="article-title"
-                                value={articleTitle}
-                                placeholder="Title..."
-                                onChange={e => setArticleTitle(e.target.value)}
-                                maxLength={150}
-                            />
+                {/* article input fields */}
+                <Input
+                    className="bg-white"
+                    type="text"
+                    id="article-title"
+                    value={articleTitle}
+                    placeholder="Title..."
+                    onChange={e => setArticleTitle(e.target.value)}
+                    maxLength={150}
+                />
 
-                            {/* Article category dropdown */}
+                {/* Article category dropdown */}
                 <div className="flex flex-col mt-2 sm:flex-row sm:gap-2">
                     <div className="flex flex-col gap-1.5 mt-2 sm:mt-0 ">
                         <Select
@@ -1226,32 +1309,47 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 <div className="space-y-5 py-1">     
                                 </div>
                         </fieldset>
-                   
+
                         {articleCategory === "Podcast" ? (
-                        <FileUpload maxFileSize={1024000} />
+                            <FileUpload
+                                maxFileSize={26214400} // 25 megs
+                                setIsFileSelected={setIsFileSelected}
+                                setFileSelected={setFileSelected}
+                            />
                         ) : (
                         <MarkdownEditor
                             value={article}
                             onChange={(value, viewUpdate) => {
-                            setArticle(value);
+                                setArticle(value);
                             }}
                             height="400px"
                             className="px-2 py-2 rounded-xl mx-auto border max-w-3xl max-h-85vh my-auto bg-card text-card-foreground break-words"
                         />
+
                         )}
-                            <div>
-                           
-                            </div>
+
                             <p className="text-sm text-red-600 dark:text-red-500">{articleError !== false && articleError}</p>
                             <div className="flex flex-col sm:flex-row justify-between items-center mt-2">
                                 {/* Write article button*/}
+
+                                {articleCategory !== "Podcast" ? (
                                 <Button
-                                type="button"
-                                disabled={article === '' || articleError || articleTitle === '' || paywallAmountXecError}                            
-                                onClick={() => sendArticle()}
+                                    type="button"
+                                    disabled={article === '' || articleError || articleTitle === '' || paywallAmountXecError}                            
+                                    onClick={() => sendArticle()}
                                 >
-                                <BiSolidNews />&nbsp;Post Article
+                                    <BiSolidNews />&nbsp;Post Article
                                 </Button>
+                                ) : (
+                                <Button
+                                    type="button"
+                                    disabled={articleError || articleTitle === '' || paywallAmountXecError || isFileSelected === false}
+                                    onClick={() => sendAudioArticle()}
+                                >
+                                    <BiSolidNews />&nbsp;Post Podcast
+                                </Button>
+                                )
+                                }
                                 <br />
                                 <div className="sm:flex">
                                
@@ -1270,7 +1368,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                         Disable replies to this article
                                         </Label>
                                     </div>
-                                    </div>
+                                </div>
                             </div>
                         </div>
                 )}

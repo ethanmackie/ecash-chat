@@ -23,6 +23,8 @@ const nextConfig = {
         TABLE_NAME: process.env.TABLE_NAME,
         MAP_HASH: process.env.MAP_HASH,
         AVATAR_TABLE_NAME: process.env.AVATAR_TABLE_NAME,
+        IPFS_API: process.env.IPFS_API,
+        IPFS_API_KEY: process.env.IPFS_API_KEY,
     },
 };
 

@@ -419,20 +419,12 @@ export const AttachmentIcon = () => {
     );
 };
 
-
 export const Upload2Icon = () => {
     return (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" data-reactroot="">
-<path stroke-linejoin="round" stroke-linecap="round" stroke-miterlimit="10" stroke-width="1" stroke="#2249B3" fill="none" d="M2 14.5C2 16.99 4.01 19 6.5 19H18.5C20.43 19 22 17.43 22 15.5C22 13.57 20.43 12 18.5 12C18.3 12 18.09 12.02 17.9 12.05C17.97 11.71 18 11.36 18 11C18 7.69 15.31 5 12 5C9.02 5 6.55 7.17 6.09 10.02C3.79 10.23 2 12.15 2 14.5Z"></path>
-<path stroke-linejoin="round" stroke-width="1" stroke="#2249B3" d="M12 10V16"></path>
-<path stroke-linecap="round" stroke-width="1" stroke="#2249B3" d="M12 10L11 11H13L12 10Z"></path>
+        <path stroke-linejoin="round" stroke-linecap="round" stroke-miterlimit="10" stroke-width="1" stroke="#2249B3" fill="none" d="M2 14.5C2 16.99 4.01 19 6.5 19H18.5C20.43 19 22 17.43 22 15.5C22 13.57 20.43 12 18.5 12C18.3 12 18.09 12.02 17.9 12.05C17.97 11.71 18 11.36 18 11C18 7.69 15.31 5 12 5C9.02 5 6.55 7.17 6.09 10.02C3.79 10.23 2 12.15 2 14.5Z"></path>
+        <path stroke-linejoin="round" stroke-width="1" stroke="#2249B3" d="M12 10V16"></path>
+        <path stroke-linecap="round" stroke-width="1" stroke="#2249B3" d="M12 10L11 11H13L12 10Z"></path>
 </svg>
     );
 };
-
-
-
-
-
-
-
