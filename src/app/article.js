@@ -542,10 +542,23 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     };
 
     // Pass a paywall payment tx BIP21 query string to cashtab extensions
-    const sendPaywallPayment = (recipient, articleTxid, paywallPrice) => {
+    const sendPaywallPayment = (
+        recipient,
+        articleTxid,
+        paywallPrice,
+        paywallProcessingFeeRatio = false,
+    ) => {
         // Encode the op_return message script
         const opReturnRaw = encodeBip21PaywallPayment(articleTxid);
-        const bip21Str = `${recipient}?amount=${paywallPrice}&op_return_raw=${opReturnRaw}`;
+
+        let bip21Str = `${recipient}?amount=${paywallPrice}&op_return_raw=${opReturnRaw}`;
+
+        if (paywallProcessingFeeRatio) {
+            const paywallProcessingFee = (Number(paywallPrice)*paywallProcessingFeeRatio).toFixed(2);
+            console.log('paywallProcessingFee: ', paywallProcessingFee)
+            bip21Str += `&addr=${appConfig.ipfsPaywallFeeAddress}&amount=${paywallProcessingFee}`;
+        }
+        console.log('bip21Str: ', bip21Str)
 
         if (isMobile) {
             window.open(
@@ -686,6 +699,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
         if (decimalPlaces > 2) {
             setPaywallAmountXecError(`Paywall amount must not exceed 2 decimal places`);
+        } else if (articleCategory === "Podcast" && value < 110) {
+            setPaywallAmountXecError(`Paywall amount for Podcasts must be equal or greater than 110 XEC`);
         } else if (value >= appConfig.dustXec || value === '') {
             setPaywallAmountXecError(false);
         } else {
@@ -814,6 +829,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     };
 
     const PaywallPaymentModal = () => {
+        const paywallProcessingFeeRatio = currentArticleTxObj.articleObject.ipfsHash && appConfig.ipfsPaywallFeeRatio;
+
         return (
             <Modal show={showPaywallPaymentModal} onClose={() => setShowPaywallPaymentModal(false)}>
                 <Modal.Header>{currentArticleTxObj.articleObject.title}</Modal.Header>
@@ -830,8 +847,9 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                         <Button onClick={() => sendPaywallPayment(
                             currentArticleTxObj.replyAddress,
                             currentArticleTxObj.txid,
-                            currentArticleTxObj.articleObject.paywallPrice)
-                        }>
+                            currentArticleTxObj.articleObject.paywallPrice,
+                            paywallProcessingFeeRatio,
+                        )}>
                             Pay
                         </Button>
                         <Button variant="secondary" onClick={() => setShowPaywallPaymentModal(false)}>
@@ -1344,7 +1362,13 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 <Button
                                     type="button"
                                     disabled={articleError || articleTitle === '' || paywallAmountXecError || isFileSelected === false}
-                                    onClick={() => sendAudioArticle()}
+                                    onClick={() => {
+                                        if (articleCategory === 'Podcast' && paywallAmountXec < 110) {
+                                            setPaywallAmountXecError(`Paywall amount for Podcasts must be equal or greater than 110 XEC`);
+                                            return;
+                                        }
+                                        sendAudioArticle()
+                                    }}
                                 >
                                     <BiSolidNews />&nbsp;Post Podcast
                                 </Button>
