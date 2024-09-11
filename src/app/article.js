@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Modal } from "flowbite-react";
 import { Button } from "@/components/ui/button";
 import { Activity } from "lucide-react";
+import Image from "next/image";
 import {
   Tooltip,
   TooltipContent,
@@ -90,7 +91,7 @@ import {
     isExistingContact,
     muteNewContact,
 } from '../utils/utils';
-import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, GraphchartIcon, Stats2Icon } from "@/components/ui/social";
+import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, GraphchartIcon, Stats2Icon, PodcastIcon } from "@/components/ui/social";
 import { toast } from 'react-toastify';
 import { Toggle } from "@/components/ui/toggle";
 import { BiSolidNews } from "react-icons/bi";
@@ -1076,6 +1077,21 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                             <Skeleton className="h-4 mt-2 w-2/3" />
                                             <Skeleton className="h-4 mt-2 w-1/2" />
                                         </>
+                                    ) : tx.articleObject.ipfsHash ? (
+                                        <div className="flex flex-col items-center"> 
+                                    <Image
+                                        src="/audiobook.png"
+                                        alt="ecash podcast"
+                                        width={156}
+                                        height={64}
+                                        priority
+                                        className="mx-auto mb-2"
+                                    />
+                                  <div className="flex items-center justify-center">
+                                    <PodcastIcon/>
+                                    <p className="text-sm text-muted-foreground">Click to listen this podcast</p>
+                                </div>
+                                </div>
                                     ) : (
                                         <RenderArticle
                                             content={tx.articleObject.content}
