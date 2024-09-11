@@ -91,7 +91,7 @@ import {
     isExistingContact,
     muteNewContact,
 } from '../utils/utils';
-import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, GraphchartIcon, Stats2Icon, PodcastIcon } from "@/components/ui/social";
+import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, GraphchartIcon, Stats2Icon, PodcastIcon, HeadphoneIcon } from "@/components/ui/social";
 import { toast } from 'react-toastify';
 import { Toggle } from "@/components/ui/toggle";
 import { BiSolidNews } from "react-icons/bi";
@@ -1055,30 +1055,52 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 }
                             }}
                         >
-                            {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) && (
-                                <Alert
-                                    className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-auto z-10 flex items-center justify-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/5"
-                                >
-                                    <AlertDescription className="flex items-center justify-center whitespace-nowrap">
-                                        <EncryptionIcon />
-                                        This article costs {formatBalance(tx.articleObject.paywallPrice, getUserLocale(navigator))} XEC to view
-                                    </AlertDescription>
-                                </Alert>
+                           {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) && (
+                        <Alert
+                        className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-auto z-10 flex items-center justify-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/5"
+                        >
+                        <AlertDescription className="flex items-center justify-center whitespace-nowrap">
+                            {tx.articleObject.ipfsHash ? (
+                            <>
+                                <HeadphoneIcon />
+                                {`This podcast costs ${formatBalance(tx.articleObject.paywallPrice, getUserLocale(navigator))} XEC to listen`}
+                            </>
+                            ) : (
+                            <>
+                                <EncryptionIcon />
+                                {`This article costs ${formatBalance(tx.articleObject.paywallPrice, getUserLocale(navigator))} XEC to view`}
+                            </>
                             )}
-                            <div className="line-clamp-3">
-                                <p
-                                    className={`mt-0 text-sm leading-6 text-gray-600 break-words max-h-80 ${
-                                        tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) ? 'blur-sm pt-6' : ''
-                                    }`}
-                                >
-                                    {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) ? (
-                                        <>
-                                            <Skeleton className="h-4 mt-2 w-full" />
-                                            <Skeleton className="h-4 mt-2 w-2/3" />
-                                            <Skeleton className="h-4 mt-2 w-1/2" />
-                                        </>
-                                    ) : tx.articleObject.ipfsHash ? (
-                                        <div className="flex flex-col items-center"> 
+                        </AlertDescription>
+                        </Alert>
+                    )}
+                         <div className="line-clamp-3">
+                        <p
+                            className={`mt-0 text-sm leading-6 text-gray-600 break-words max-h-80 ${
+                                tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) ? 'blur-sm pt-6 pb-2' : ''
+                            }`}
+                        >
+                            {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) ? (
+                                tx.articleObject.ipfsHash ? (
+                                    <>
+                                         <Image
+                                        src="/audiobook.png"
+                                        alt="ecash podcast"
+                                        width={156}
+                                        height={64}
+                                        priority
+                                        className="mx-auto mb-2"
+                                    />
+                                    </>
+                                ) : (
+                                    <>
+                                        <Skeleton className="h-4 mt-2 w-full" />
+                                        <Skeleton className="h-4 mt-2 w-2/3" />
+                                        <Skeleton className="h-4 mt-2 w-1/2" />
+                                    </>
+                                )
+                            ) : tx.articleObject.ipfsHash ? (
+                                <div className="flex flex-col items-center"> 
                                     <Image
                                         src="/audiobook.png"
                                         alt="ecash podcast"
@@ -1087,19 +1109,19 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                         priority
                                         className="mx-auto mb-2"
                                     />
-                                  <div className="flex items-center justify-center">
-                                    <PodcastIcon/>
-                                    <p className="text-sm text-muted-foreground">Click to listen this podcast</p>
+                                    <div className="flex items-center justify-center">
+                                        <PodcastIcon/>
+                                        <p className="text-sm text-muted-foreground">Click to listen this podcast</p>
+                                    </div>
                                 </div>
-                                </div>
-                                    ) : (
-                                        <RenderArticle
-                                            content={tx.articleObject.content}
-                                            ipfsAudioHash={tx.articleObject.ipfsHash}
-                                        />
-                                    )}
-                                </p>
-                            </div>
+                            ) : (
+                                <RenderArticle
+                                    content={tx.articleObject.content}
+                                    ipfsAudioHash={tx.articleObject.ipfsHash}
+                                />
+                            )}
+                        </p>
+                    </div>
                         </a>
                     </CardContent>
                     <CardFooter>

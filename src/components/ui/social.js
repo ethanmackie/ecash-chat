@@ -439,4 +439,21 @@ export const PodcastIcon = () => {
     );
 };
 
+export const HeadphoneIcon = () => {
+    return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-2" data-reactroot="">
+        <path stroke-linecap="round" stroke-width="1" stroke="#2249B3" d="M3 19L2 12.1685V12C2 6.47716 6.47715 2 12 2V2C17.5228 2 22 6.47715 22 12V12.1373L21 19"></path>
+        <path stroke-width="1" stroke="#2249B3" fill="#4382FF" d="M17.85 15H17.5V22H17.85C19.5897 22 21 20.433 21 18.5C21 16.567 19.5897 15 17.85 15Z" clip-rule="evenodd" fill-rule="evenodd"></path>
+        <path stroke-linecap="round" stroke-width="1" stroke="#2249B3" d="M16.5 15.5V21.5"></path>
+        <path stroke-width="1" stroke="#2249B3" fill="#4382FF" d="M6.15 15H6.5V22H6.15C4.4103 22 3 20.433 3 18.5C3 16.567 4.4103 15 6.15 15Z" clip-rule="evenodd" fill-rule="evenodd"></path>
+        <path stroke-linecap="round" stroke-width="1" stroke="#2249B3" d="M7.5 15.5V21.5"></path>
+        </svg>
+    );
+};
+
+
+
+
+
+
 
