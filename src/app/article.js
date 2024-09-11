@@ -1083,7 +1083,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) ? (
                                 tx.articleObject.ipfsHash ? (
                                     <>
-                                         <Image
+                                        <Image
                                         src="/audiobook.png"
                                         alt="ecash podcast"
                                         width={156}
