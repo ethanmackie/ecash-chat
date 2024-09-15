@@ -32,6 +32,7 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
     const [showNftModal, setShowNftModal] = useState(false);
     const [parentNftInFocus, setParentNftInFocus] = useState(null);
     const [fullNfts, setFullNfts] = useState([]);
+    const [manualRefresh, setManualRefresh] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -95,7 +96,7 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
             setNftParents(chatCache.parentNftList);
             setNftChilds(chatCache.childNftList);
         })();
-    }, []);
+    }, [manualRefresh]);
 
     // Pass an NFT showcase tx BIP21 query string to cashtab extensions
     const nftShowCasePost = (nftId, showcaseMsg) => {
@@ -235,6 +236,12 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                     Mint NFTs on cashtab
                 </Button>
             </a>
+            <Button
+                type="button"
+                onClick={() => setManualRefresh(!manualRefresh)}
+            >
+                Refresh NFTs
+            </Button>
             <br />
                 <div className="grid grid-cols-2 max-w-xl gap-2">
                     {nftParents && nftParents.length > 0 && nftParents.map(
