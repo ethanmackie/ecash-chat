@@ -158,6 +158,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         pinataJwt: process.env.IPFS_API_KEY,
         pinataGateway: process.env.IPFS_API,
     });
+    const [isUploading, setIsUploading] = useState(false);
 
     useEffect(() => {
         const handleResize = () => {
@@ -373,13 +374,14 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
     // Uploads the selected file to IPFS and sends an article tx BIP21 query string to cashtab extensions
     const sendAudioArticle = async () => {
+        
         const crypto = require('crypto');
         const articleHash = crypto.randomBytes(20).toString('hex')+new Date();
 
         // Encode the op_return article script
         const opReturnRaw = encodeBip21Article(articleHash);
         const bip21Str = `${address}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`;
-
+        setIsUploading(true);
         try {
             toast('Uploading to IPFS, please wait...');
             const ipfsHash = await pinata.upload.file(fileSelected);
@@ -430,7 +432,9 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             ipfsArticleTxListener(chronik, address, updatedArticles, articleObject, getArticleHistoryByPage);
         } catch (error) {
             console.log('Error uploading to IPFS: ', error);
-        }
+        } finally {
+            setIsUploading(false);
+          }
     };
 
     // Pass an article tx BIP21 query string to cashtab extensions
@@ -1011,9 +1015,15 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             {tx.txDate}
                         </time>
 
+                        {tx.articleObject.ipfsHash ? (
+                        <span className="text-muted-foreground">
+                            🎵
+                        </span>
+                    ) : (
                         <span className="text-muted-foreground">
                             {getEstiamtedReadingTime(tx.articleObject.content)} min read
                         </span>
+                    )}
 
                         <Badge variant="secondary">
                             {tx.articleObject.category || 'General'}
@@ -1408,7 +1418,16 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                         sendAudioArticle()
                                     }}
                                 >
+                                     {isUploading ? (
+                                <>
+                                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                                    Uploading... please wait
+                                </>
+                                ) : (
+                                <>
                                     <BiSolidNews />&nbsp;Post Podcast
+                                </>
+                                )}
                                 </Button>
                                 )
                                 }

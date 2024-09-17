@@ -25,6 +25,7 @@ import {
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu";
 import { toast } from 'react-toastify';
+import { ReloadIcon } from "@radix-ui/react-icons";
 
 export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) {
     const [nftParents, setNftParents] = useState([]);
@@ -33,9 +34,11 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
     const [parentNftInFocus, setParentNftInFocus] = useState(null);
     const [fullNfts, setFullNfts] = useState([]);
     const [manualRefresh, setManualRefresh] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
     useEffect(() => {
         (async () => {
+            setIsRefreshing(true);
             const chatCache = await localforage.getItem('chatCache');
             if (!chatCache || !chronik || typeof chatCache === 'undefined') {
                 return;
@@ -95,6 +98,7 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
             setFullNfts(thisFullNfts);
             setNftParents(chatCache.parentNftList);
             setNftChilds(chatCache.childNftList);
+            setIsRefreshing(false);
         })();
     }, [manualRefresh]);
 
@@ -229,19 +233,28 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
 
     return (
         <div className="flex w-full flex-col py-3 items-center">
+            <div class="flex items-center">
             <a href="https://cashtab.com/#/etokens" target="_blank">
                 <Button
                     type="button"
+                    variant="outline"
+                    className="mr-2"
                 >
                     Mint NFTs on cashtab
                 </Button>
             </a>
             <Button
                 type="button"
+                variant="outline" size="icon"
                 onClick={() => setManualRefresh(!manualRefresh)}
             >
-                Refresh NFTs
+                 {isRefreshing ? (
+                <ReloadIcon className="h-4 w-4 animate-spin" />
+                ) : (
+                <ReloadIcon className="h-4 w-4" />
+                )}
             </Button>
+            </div>
             <br />
                 <div className="grid grid-cols-2 max-w-xl gap-2">
                     {nftParents && nftParents.length > 0 && nftParents.map(
