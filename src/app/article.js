@@ -570,18 +570,19 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 `https://cashtab.com/#/send?bip21=${bip21Str}`,
                 '_blank',
             );
-        }
-
-        window.postMessage(
-            {
-                type: 'FROM_PAGE',
-                text: 'Cashtab',
-                txInfo: {
-                    bip21: `${recipient}?amount=${paywallPrice}&op_return_raw=${opReturnRaw}`,
+        } else {
+            window.postMessage(
+                {
+                    type: 'FROM_PAGE',
+                    text: 'Cashtab',
+                    txInfo: {
+                        bip21: bip21Str,
+                    },
                 },
-            },
-            '*',
-        );
+                '*',
+            );
+        };
+
         paywallTxListener(
             chronik,
             address,
@@ -688,6 +689,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const RenderArticle = ({ content, ipfsAudioHash }) => {
         if (ipfsAudioHash) {
             return (<AudioPlayer
+                autoPlay
                 src={`https://gateway.pinata.cloud/ipfs/${ipfsAudioHash}`}
             />);
         }
