@@ -66,7 +66,7 @@ const FileUpload = ({ maxFileSizeBytes, setIsFileSelected, setFileSelected }) =>
         <div className="border-2 border-dashed border-muted rounded-lg h-52 px-2 flex flex-col items-center justify-center">
           <Badge variant="outline" className="h-12 justify-center w-12 px-0 shadow-lg"><Upload2Icon/></Badge>
           <p className="text-sm font-semibold mb-4 mt-4">Supported file type: .mp3</p>
-          <p className="text-sm text-muted-foreground mb-4">Maximum size: 25MB</p>
+          <p className="text-sm text-muted-foreground mb-4">Maximum size: 50MB</p>
           <Button variant="outline" onClick={handleButtonClick}>Choose File</Button>
           {error && <p className="text-red-500 mt-2 mb-2 text-sm">{error}</p>}
         </div>
