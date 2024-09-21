@@ -689,7 +689,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const RenderArticle = ({ content, ipfsAudioHash }) => {
         if (ipfsAudioHash) {
             return (<AudioPlayer
-                autoPlay
                 src={`https://gateway.pinata.cloud/ipfs/${ipfsAudioHash}`}
             />);
         }
