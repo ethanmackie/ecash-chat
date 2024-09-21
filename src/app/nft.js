@@ -25,6 +25,7 @@ import {
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu";
 import { toast } from 'react-toastify';
+import { ReloadIcon } from "@radix-ui/react-icons";
 
 export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) {
     const [nftParents, setNftParents] = useState([]);
@@ -32,9 +33,12 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
     const [showNftModal, setShowNftModal] = useState(false);
     const [parentNftInFocus, setParentNftInFocus] = useState(null);
     const [fullNfts, setFullNfts] = useState([]);
+    const [manualRefresh, setManualRefresh] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
     useEffect(() => {
         (async () => {
+            setIsRefreshing(true);
             const chatCache = await localforage.getItem('chatCache');
             if (!chatCache || !chronik || typeof chatCache === 'undefined') {
                 return;
@@ -94,8 +98,9 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
             setFullNfts(thisFullNfts);
             setNftParents(chatCache.parentNftList);
             setNftChilds(chatCache.childNftList);
+            setIsRefreshing(false);
         })();
-    }, []);
+    }, [manualRefresh]);
 
     // Pass an NFT showcase tx BIP21 query string to cashtab extensions
     const nftShowCasePost = (nftId, showcaseMsg) => {
@@ -178,7 +183,7 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                         <div className="grid md:grid-cols-2 grid-cols-1 max-w-xl gap-2 mx-auto">
                             {childNftsObjsOwned && childNftsObjsOwned.length > 0 && childNftsObjsOwned.map((childNftObj, index) => (
                                 <Card key={childNftObj.tokenId + index}
-                                className="transition-shadow duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50"
+                                className="transition-shadow shadow-none duration-300 ease-in-out hover:shadow-sm hover:bg-slate-50"
                                 >
                                     <CardHeader>
                                         <CardTitle>{childNftObj.genesisInfo.tokenName} ({childNftObj.genesisInfo.tokenTicker})</CardTitle>
@@ -228,13 +233,28 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
 
     return (
         <div className="flex w-full flex-col py-3 items-center">
+            <div class="flex items-center">
             <a href="https://cashtab.com/#/etokens" target="_blank">
                 <Button
                     type="button"
+                    variant="outline"
+                    className="mr-2"
                 >
                     Mint NFTs on cashtab
                 </Button>
             </a>
+            <Button
+                type="button"
+                variant="outline" size="icon"
+                onClick={() => setManualRefresh(!manualRefresh)}
+            >
+                 {isRefreshing ? (
+                <ReloadIcon className="h-4 w-4 animate-spin" />
+                ) : (
+                <ReloadIcon className="h-4 w-4" />
+                )}
+            </Button>
+            </div>
             <br />
                 <div className="grid grid-cols-2 max-w-xl gap-2">
                     {nftParents && nftParents.length > 0 && nftParents.map(

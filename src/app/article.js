@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Modal } from "flowbite-react";
 import { Button } from "@/components/ui/button";
 import { Activity } from "lucide-react";
+import Image from "next/image";
 import {
   Tooltip,
   TooltipContent,
@@ -72,6 +73,7 @@ import {
     getArticleListing,
     txListener,
     articleTxListener,
+    ipfsArticleTxListener,
     paywallTxListener,
     refreshUtxos,
 } from '../chronik/chronik';
@@ -89,7 +91,7 @@ import {
     isExistingContact,
     muteNewContact,
 } from '../utils/utils';
-import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, GraphchartIcon, Stats2Icon } from "@/components/ui/social";
+import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, GraphchartIcon, Stats2Icon, PodcastIcon, HeadphoneIcon } from "@/components/ui/social";
 import { toast } from 'react-toastify';
 import { Toggle } from "@/components/ui/toggle";
 import { BiSolidNews } from "react-icons/bi";
@@ -110,6 +112,7 @@ import {
     CardHeader,
     CardTitle,
   } from "@/components/ui/card"
+import { FileUpload } from "@/components/ui/fileupload";
 import { isValidRecipient } from '../validation/validation';
 import { Badge } from "@/components/ui/badge";
 import localforage from 'localforage';
@@ -117,8 +120,11 @@ import copy from 'copy-to-clipboard';
 import { Skeleton } from "@/components/ui/skeleton";
 import DOMPurify from 'dompurify';
 import MarkdownEditor from '@uiw/react-markdown-editor';
+import { PinataSDK } from "pinata";
 import { getStackArray } from 'ecash-script';
 import { BN } from 'slp-mdm';
+import AudioPlayer from 'react-h5-audio-player';
+import 'react-h5-audio-player/lib/styles.css';
 
 export default function Article( { chronik, address, isMobile, sharedArticleTxid, setXecBalance, setOpenSharedArticleLoader } ) {
     const [articleHistory, setArticleHistory] = useState('');  // current article history page
@@ -146,6 +152,13 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const [muteList, setMuteList] = useState('');
     const [curateByContacts, setCurateByContacts] = useState(false);
     const articleReplyInput = useRef('');
+    const [isFileSelected, setIsFileSelected] = useState(false);
+    const [fileSelected, setFileSelected] = useState(false);
+    const pinata = new PinataSDK({
+        pinataJwt: process.env.IPFS_API_KEY,
+        pinataGateway: process.env.IPFS_API,
+    });
+    const [isUploading, setIsUploading] = useState(false);
 
     useEffect(() => {
         const handleResize = () => {
@@ -359,6 +372,71 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         return Math.ceil(articleContent.split(" ").length / 200);
     };
 
+    // Uploads the selected file to IPFS and sends an article tx BIP21 query string to cashtab extensions
+    const sendAudioArticle = async () => {
+        
+        const crypto = require('crypto');
+        const articleHash = crypto.randomBytes(20).toString('hex')+new Date();
+
+        // Encode the op_return article script
+        const opReturnRaw = encodeBip21Article(articleHash);
+        const bip21Str = `${address}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`;
+        setIsUploading(true);
+        try {
+            toast('Uploading to IPFS, please wait...');
+            const ipfsHash = await pinata.upload.file(fileSelected);
+            toast('IPFS upload complete');
+
+            if (isMobile) {
+                window.open(
+                    `https://cashtab.com/#/send?bip21=${bip21Str}`,
+                    '_blank',
+                );
+            } else {
+                window.postMessage(
+                    {
+                        type: 'FROM_PAGE',
+                        text: 'Cashtab',
+                        txInfo: {
+                            bip21: `${bip21Str}`,
+                        },
+                    },
+                    '*',
+                );
+            }
+
+            const articleObject = {
+                hash: articleHash,
+                title: articleTitle,
+                content: '',
+                category: articleCategory,
+                paywallPrice: paywallAmountXec,
+                disbleReplies: disableArticleReplies,
+                ipfsHash: ipfsHash.IpfsHash,
+                date: Date.now(),
+            };
+
+            // if this article hash already exists, return with error toast
+            let updatedArticles = await localforage.getItem(appConfig.localArticlesParam);
+            let isDuplicateArticle = updatedArticles.some(function(thisArticle) {
+                return articleHash === thisArticle.hash;
+            });
+            if (isDuplicateArticle) {
+                toast('This audio article already exists.');
+                return;
+            }
+            updatedArticles.push(articleObject);
+
+            setArticle('');
+            setArticleTitle('');
+            ipfsArticleTxListener(chronik, address, updatedArticles, articleObject, getArticleHistoryByPage);
+        } catch (error) {
+            console.log('Error uploading to IPFS: ', error);
+        } finally {
+            setIsUploading(false);
+          }
+    };
+
     // Pass an article tx BIP21 query string to cashtab extensions
     const sendArticle = async () => {
         const crypto = require('crypto');
@@ -469,28 +547,42 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     };
 
     // Pass a paywall payment tx BIP21 query string to cashtab extensions
-    const sendPaywallPayment = (recipient, articleTxid, paywallPrice) => {
+    const sendPaywallPayment = (
+        recipient,
+        articleTxid,
+        paywallPrice,
+        paywallProcessingFeeRatio = false,
+    ) => {
         // Encode the op_return message script
         const opReturnRaw = encodeBip21PaywallPayment(articleTxid);
-        const bip21Str = `${recipient}?amount=${paywallPrice}&op_return_raw=${opReturnRaw}`;
+
+        let bip21Str = `${recipient}?amount=${paywallPrice}&op_return_raw=${opReturnRaw}`;
+
+        if (paywallProcessingFeeRatio) {
+            const paywallProcessingFee = (Number(paywallPrice)*paywallProcessingFeeRatio).toFixed(2);
+            console.log('paywallProcessingFee: ', paywallProcessingFee)
+            bip21Str += `&addr=${appConfig.ipfsPaywallFeeAddress}&amount=${paywallProcessingFee}`;
+        }
+        console.log('bip21Str: ', bip21Str)
 
         if (isMobile) {
             window.open(
                 `https://cashtab.com/#/send?bip21=${bip21Str}`,
                 '_blank',
             );
-        }
-
-        window.postMessage(
-            {
-                type: 'FROM_PAGE',
-                text: 'Cashtab',
-                txInfo: {
-                    bip21: `${recipient}?amount=${paywallPrice}&op_return_raw=${opReturnRaw}`,
+        } else {
+            window.postMessage(
+                {
+                    type: 'FROM_PAGE',
+                    text: 'Cashtab',
+                    txInfo: {
+                        bip21: bip21Str,
+                    },
                 },
-            },
-            '*',
-        );
+                '*',
+            );
+        };
+
         paywallTxListener(
             chronik,
             address,
@@ -515,7 +607,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             foundReplies.map(
                 (foundReply, index) => (
                     <>
-                    <div className="flex flex-col break-words space-y-1.5 gap-2 mt-2 w-full leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                    <div className="flex flex-col break-words space-y-1.5 gap-2 mt-2 w-full leading-1.5 p-6 rounded-xl bg-card text-card-foreground shadow-none dark:bg-gray-700 transition-transform transform">
                         <div className="flex justify-between items-center w-full" key={"article"+index}>
                             <div className="flex items-center gap-2">
                                 {foundReply.senderAvatarLink === false ? (
@@ -594,7 +686,13 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     };
 
     // Render the full article contents
-    const RenderArticle = ({ content }) => {
+    const RenderArticle = ({ content, ipfsAudioHash }) => {
+        if (ipfsAudioHash) {
+            return (<AudioPlayer
+                autoPlay
+                src={`https://gateway.pinata.cloud/ipfs/${ipfsAudioHash}`}
+            />);
+        }
         const renderedArticle = DOMPurify.sanitize(content);
         return (<MarkdownEditor.Markdown style={{ backgroundColor: 'transparent' }}  source={renderedArticle} />);
     };
@@ -608,6 +706,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
         if (decimalPlaces > 2) {
             setPaywallAmountXecError(`Paywall amount must not exceed 2 decimal places`);
+        } else if (articleCategory === "Podcast" && value < 110) {
+            setPaywallAmountXecError(`Paywall amount for Podcasts must be equal or greater than 110 XEC`);
         } else if (value >= appConfig.dustXec || value === '') {
             setPaywallAmountXecError(false);
         } else {
@@ -736,6 +836,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     };
 
     const PaywallPaymentModal = () => {
+        const paywallProcessingFeeRatio = currentArticleTxObj.articleObject.ipfsHash && appConfig.ipfsPaywallFeeRatio;
+
         return (
             <Modal show={showPaywallPaymentModal} onClose={() => setShowPaywallPaymentModal(false)}>
                 <Modal.Header>{currentArticleTxObj.articleObject.title}</Modal.Header>
@@ -752,8 +854,9 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                         <Button onClick={() => sendPaywallPayment(
                             currentArticleTxObj.replyAddress,
                             currentArticleTxObj.txid,
-                            currentArticleTxObj.articleObject.paywallPrice)
-                        }>
+                            currentArticleTxObj.articleObject.paywallPrice,
+                            paywallProcessingFeeRatio,
+                        )}>
                             Pay
                         </Button>
                         <Button variant="secondary" onClick={() => setShowPaywallPaymentModal(false)}>
@@ -777,7 +880,10 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             By: {getContactNameIfExist(currentArticleTxObj.replyAddress, contactList)}<br />
                             {currentArticleTxObj.txDate}
                         </time>
-                        <RenderArticle content={currentArticleTxObj.articleObject.content} />
+                        <RenderArticle
+                            content={currentArticleTxObj.articleObject.content}
+                            ipfsAudioHash={currentArticleTxObj.articleObject.ipfsHash}
+                        />
                     </div>
                     {/* Render corresponding replies for this article, ignore if disablReplies is set to true */}
                     {currentArticleTxObj.articleObject.disbleReplies !== true && (
@@ -903,7 +1009,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             latestArticleHistory.txs.length > 0 ? (
             latestArticleHistory.txs.map((tx, index) => (
                 tx.articleObject && (
-                <Card key={index} className="max-w-xl w-full mt-2">
+                <Card key={index} className="max-w-xl w-full mt-2 shadow-none">
                     <CardHeader>
                     <div className="flex items-center justify-between gap-x-4 text-xs">
                     <div className="flex items-center gap-x-4">
@@ -911,9 +1017,15 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             {tx.txDate}
                         </time>
 
+                        {tx.articleObject.ipfsHash ? (
+                        <span className="text-muted-foreground">
+                            🎵
+                        </span>
+                    ) : (
                         <span className="text-muted-foreground">
                             {getEstiamtedReadingTime(tx.articleObject.content)} min read
                         </span>
+                    )}
 
                         <Badge variant="secondary">
                             {tx.articleObject.category || 'General'}
@@ -955,33 +1067,73 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 }
                             }}
                         >
-                            {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) && (
-                                <Alert
-                                    className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-auto z-10 flex items-center justify-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/5"
-                                >
-                                    <AlertDescription className="flex items-center justify-center whitespace-nowrap">
-                                        <EncryptionIcon />
-                                        This article costs {formatBalance(tx.articleObject.paywallPrice, getUserLocale(navigator))} XEC to view
-                                    </AlertDescription>
-                                </Alert>
+                           {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) && (
+                        <Alert
+                        className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-auto z-10 flex items-center justify-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/5"
+                        >
+                        <AlertDescription className="flex items-center justify-center whitespace-nowrap">
+                            {tx.articleObject.ipfsHash ? (
+                            <>
+                                <HeadphoneIcon />
+                                {`This podcast costs ${formatBalance(tx.articleObject.paywallPrice, getUserLocale(navigator))} XEC to listen`}
+                            </>
+                            ) : (
+                            <>
+                                <EncryptionIcon />
+                                {`This article costs ${formatBalance(tx.articleObject.paywallPrice, getUserLocale(navigator))} XEC to view`}
+                            </>
                             )}
-                            <div className="line-clamp-3">
-                                <p
-                                    className={`mt-0 text-sm leading-6 text-gray-600 break-words max-h-80 ${
-                                        tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) ? 'blur-sm pt-6' : ''
-                                    }`}
-                                >
-                                    {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) ? (
-                                        <>
-                                            <Skeleton className="h-4 mt-2 w-full" />
-                                            <Skeleton className="h-4 mt-2 w-2/3" />
-                                            <Skeleton className="h-4 mt-2 w-1/2" />
-                                        </>
-                                    ) : (
-                                        <RenderArticle content={tx.articleObject.content} />
-                                    )}
-                                </p>
-                            </div>
+                        </AlertDescription>
+                        </Alert>
+                    )}
+                         <div className="line-clamp-3">
+                        <p
+                            className={`mt-0 text-sm leading-6 text-gray-600 break-words max-h-80 ${
+                                tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) ? 'blur-sm pt-6 pb-2' : ''
+                            }`}
+                        >
+                            {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) ? (
+                                tx.articleObject.ipfsHash ? (
+                                    <>
+                                        <Image
+                                        src="/audiobook.png"
+                                        alt="ecash podcast"
+                                        width={156}
+                                        height={64}
+                                        priority
+                                        className="mx-auto mb-2"
+                                    />
+                                    </>
+                                ) : (
+                                    <>
+                                        <Skeleton className="h-4 mt-2 w-full" />
+                                        <Skeleton className="h-4 mt-2 w-2/3" />
+                                        <Skeleton className="h-4 mt-2 w-1/2" />
+                                    </>
+                                )
+                            ) : tx.articleObject.ipfsHash ? (
+                                <div className="flex flex-col items-center"> 
+                                    <Image
+                                        src="/audiobook.png"
+                                        alt="ecash podcast"
+                                        width={156}
+                                        height={64}
+                                        priority
+                                        className="mx-auto mb-2"
+                                    />
+                                    <div className="flex items-center justify-center">
+                                        <PodcastIcon/>
+                                        <p className="text-sm text-muted-foreground">Click to listen this podcast</p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <RenderArticle
+                                    content={tx.articleObject.content}
+                                    ipfsAudioHash={tx.articleObject.ipfsHash}
+                                />
+                            )}
+                        </p>
+                    </div>
                         </a>
                     </CardContent>
                     <CardFooter>
@@ -1155,18 +1307,18 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             </div>
                 {showEditor && (
                 <div className="max-w-xl w-full mt-2 mx-auto">
-                            {/* article input fields */}
-                            <Input
-                                className="bg-white"
-                                type="text"
-                                id="article-title"
-                                value={articleTitle}
-                                placeholder="Title..."
-                                onChange={e => setArticleTitle(e.target.value)}
-                                maxLength={150}
-                            />
+                {/* article input fields */}
+                <Input
+                    className="bg-white"
+                    type="text"
+                    id="article-title"
+                    value={articleTitle}
+                    placeholder="Title..."
+                    onChange={e => setArticleTitle(e.target.value)}
+                    maxLength={150}
+                />
 
-                            {/* Article category dropdown */}
+                {/* Article category dropdown */}
                 <div className="flex flex-col mt-2 sm:flex-row sm:gap-2">
                     <div className="flex flex-col gap-1.5 mt-2 sm:mt-0 ">
                         <Select
@@ -1183,6 +1335,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             <SelectItem value="News">News</SelectItem>
                             <SelectItem value="Opinion">Opinion</SelectItem>
                             <SelectItem value="Technical">Technical</SelectItem>
+                            <SelectItem value="Podcast">Podcast</SelectItem>
                         </SelectContent>
                         </Select>
                     </div>
@@ -1224,25 +1377,62 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 <div className="space-y-5 py-1">     
                                 </div>
                         </fieldset>
-                   
-                            <MarkdownEditor
-                                value={article}
-                                onChange={(value, viewUpdate) => {
-                                    setArticle(value)
-                                }}
-                                height="400px"
-                                className=" px-2 py-2 rounded-xl mx-auto border max-w-3xl max-h-85vh my-auto bg-card text-card-foreground break-words shadow"
-                            /> 
+
+                        {articleCategory === "Podcast" ? (
+                            <FileUpload
+                                maxFileSizeBytes={appConfig.ipfsAudioSizeLimitMb*1024*1024}
+                                setIsFileSelected={setIsFileSelected}
+                                setFileSelected={setFileSelected}
+                            />
+                        ) : (
+                        <MarkdownEditor
+                            value={article}
+                            onChange={(value, viewUpdate) => {
+                                setArticle(value);
+                            }}
+                            height="400px"
+                            className="px-2 py-2 rounded-xl mx-auto border max-w-3xl max-h-85vh my-auto bg-card text-card-foreground break-words"
+                        />
+
+                        )}
+
                             <p className="text-sm text-red-600 dark:text-red-500">{articleError !== false && articleError}</p>
                             <div className="flex flex-col sm:flex-row justify-between items-center mt-2">
                                 {/* Write article button*/}
+
+                                {articleCategory !== "Podcast" ? (
                                 <Button
-                                type="button"
-                                disabled={article === '' || articleError || articleTitle === '' || paywallAmountXecError}                            
-                                onClick={() => sendArticle()}
+                                    type="button"
+                                    disabled={article === '' || articleError || articleTitle === '' || paywallAmountXecError}                            
+                                    onClick={() => sendArticle()}
                                 >
-                                <BiSolidNews />&nbsp;Post Article
+                                    <BiSolidNews />&nbsp;Post Article
                                 </Button>
+                                ) : (
+                                <Button
+                                    type="button"
+                                    disabled={articleError || articleTitle === '' || paywallAmountXecError || isFileSelected === false}
+                                    onClick={() => {
+                                        if (articleCategory === 'Podcast' && paywallAmountXec < 110) {
+                                            setPaywallAmountXecError(`Paywall amount for Podcasts must be equal or greater than 110 XEC`);
+                                            return;
+                                        }
+                                        sendAudioArticle()
+                                    }}
+                                >
+                                     {isUploading ? (
+                                <>
+                                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                                    Uploading... please wait
+                                </>
+                                ) : (
+                                <>
+                                    <BiSolidNews />&nbsp;Post Podcast
+                                </>
+                                )}
+                                </Button>
+                                )
+                                }
                                 <br />
                                 <div className="sm:flex">
                                
@@ -1261,7 +1451,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                         Disable replies to this article
                                         </Label>
                                     </div>
-                                    </div>
+                                </div>
                             </div>
                         </div>
                 )}

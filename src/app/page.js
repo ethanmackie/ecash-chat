@@ -33,6 +33,20 @@ import {
     PopoverContent as PopoverContentShad,
     PopoverTrigger as PopoverTriggerShad,
   } from "@/components/ui/popover";
+  import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuPortal,
+    DropdownMenuSeparator,
+    DropdownMenuShortcut,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+  } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
     Card,
@@ -1144,11 +1158,11 @@ export default function Home() {
                     )}
                   </Tabs.Item>
 
-                  <Tabs.Item title="Town Hall" active icon={Home3Icon}>
+                  <Tabs.Item title="Town Hall" icon={Home3Icon}>
                     <Townhall address={address} isMobile={isMobile} />
                   </Tabs.Item>
 
-                  <Tabs.Item title="Articles" icon={File3Icon}>
+                  <Tabs.Item title="Articles" active icon={File3Icon}>
                     <Article
                       chronik={chronik}
                       address={address}
@@ -1195,6 +1209,7 @@ export default function Home() {
                           Message encryption option via AES 256 CBC algorithm
                         </li>
                         <li>NFT Showcases and use as avatars</li>
+                        <li>IPFS Integration</li>
                         <li>Displays only messaging transactions</li>
                         <li>Real time address specific filtering</li>
                         <li>XEC Tipping on addresses</li>

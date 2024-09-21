@@ -212,8 +212,6 @@
               var(--tw-shadow);
 }
 
-
-
 .gradient-outline-sm {
   position: relative;
 }
@@ -238,4 +236,12 @@
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), 
               var(--tw-ring-shadow, 0 0 #0000), 
               var(--tw-shadow);
+}
+
+.rhap_container {
+  border-radius: 12px;
+}
+
+.rhap_time {
+  color: hsl(var(--muted-foreground));
 }

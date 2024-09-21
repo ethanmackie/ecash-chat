@@ -767,6 +767,88 @@ export const getChildNftsFromParent = (
 };
 
 /**
+ * Subscribes to a given address and listens for new websocket events related to IPFS postings
+ *
+ * @param {string} chronik the chronik-client instance
+ * @param {string} address the eCash address of the active wallet
+ * @param {array} updatedArticles an array of article object including the newly posted article
+ * @param {object} articleObject the new article to be appending to the off-chain article map
+ * @param {callback fn} refreshCallback a callback function to either article history
+ * @throws {error} err chronik websocket subscription errors
+ */
+export const ipfsArticleTxListener = async (
+    chronik,
+    address,
+    updatedArticles,
+    articleObject,
+    refreshCallback = false,
+) => {
+    // Get type and hash
+    const { type, hash } = cashaddr.decode(address, true);
+
+    try {
+        const ws = chronik.ws({
+            onMessage: msg => {
+                if (msg.msgType === 'TX_ADDED_TO_MEMPOOL') {
+                    console.log('ipfsArticleTxListener: TX_ADDED_TO_MEMPOOL: ', msg);
+                    let mempoolTx;
+                    setTimeout(async() => { // temporary until Extension is refactored to allow direct passing of callback functions
+                        mempoolTx = await chronik.tx(msg.txid);
+                        if (!mempoolTx || typeof mempoolTx === 'undefined') {
+                            toast('Error parsing article tx details, please try again');
+                            console.log(`ipfsArticleTxListener: error in chronik.tx(${msg.txid}) call: `, mempoolTx);
+                            return;
+                        }
+                        const actualRecipient = cashaddr.encodeOutputScript(mempoolTx.outputs[1].outputScript);
+                        const actualSender = cashaddr.encodeOutputScript(mempoolTx.inputs[0].outputScript);
+
+                        if (
+                            address === actualRecipient &&
+                            address === actualSender
+                        ) {
+                            console.log('ipfsArticleTxListener: tx sender and recipient matches');
+                            try {
+                                const command = new PutCommand({
+                                    TableName: process.env.TABLE_NAME,
+                                    Item: articleObject,
+                                });
+                                await docClient.send(command);
+                                await localforage.setItem(appConfig.localArticlesParam, updatedArticles);
+                                toast(`Article posted`);
+                            } catch (err) {
+                                toast(`Error committing article, please try again`);
+                                console.log('ipfsArticleTxListener: error committing article to DB', err.message);
+                            }
+
+                            // Unsubscribe and close websocket
+                            ws.unsubscribeFromScript(type, hash);
+                            ws.close();
+
+                            // Refresh article listing history
+                            if (refreshCallback) {
+                                refreshCallback(0);
+                            }
+                        } else {
+                            console.log('Detected mempool event is not an article tx, skipping: ', mempoolTx);
+                        }
+                    }, 500);
+                }
+            },
+        });
+
+        // Wait for WS to be connected:
+        await ws.waitForOpen();
+
+        // Subscript to script
+        ws.subscribeToScript(type, hash);
+    } catch (err) {
+        console.log(
+            'articleTxListener: Error in chronik websocket subscription: ' + err,
+        );
+    }
+};
+
+/**
  * Subscribes to a given address and listens for new websocket events related to article postings
  *
  * @param {string} chronik the chronik-client instance

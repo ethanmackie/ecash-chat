@@ -27,6 +27,8 @@ import { totalPaywallEarnedByAddress, getPaywallLeaderboard, getNFTAvatarLink, g
 import { DefaultavatarsmallIcon, DefaultavatarIcon, GraphchartIcon} from "@/components/ui/social";
 import localforage from 'localforage';
 
+import copy from 'copy-to-clipboard';
+
 export default function ProfilePanel({ address, avatarLink, xecBalance, latestAvatars }) {
     const [paywallRevenueXec, setPaywallRevenueXec] = useState('');
     const [paywallRevenueCount, setPaywallRevenueCount] = useState('');
@@ -125,7 +127,9 @@ export default function ProfilePanel({ address, avatarLink, xecBalance, latestAv
               </AvatarFallback>
             </Avatar>
             <div className="ml-3">
-              <p className="font-semibold leading-none tracking-tight">{getContactNameIfExist(earner[0], contactList)}</p>
+              <p className="font-semibold leading-none tracking-tight"
+                onClick={() => copy(earner[0])}
+              >{getContactNameIfExist(earner[0], contactList)}</p>
               <p className="text-sm text-muted-foreground max-w-lg break-words text-balance leading-relaxed">{earner[1]} unlocks</p>
             </div>
           </div>

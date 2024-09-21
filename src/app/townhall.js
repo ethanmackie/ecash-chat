@@ -766,7 +766,7 @@ export default function TownHall({ address, isMobile }) {
                           (tx, index) => (
                             <>
                                 <div className="flex flex-col items-center mt-2" key={"townhallTxHistory"+index}>
-                                   <div className="flex flex-col max-w-xl gap-2 break-words hover:shadow w-full leading-1.5 p-6 rounded-2xl border bg-card text-card-foreground shadow-sm dark:bg-gray-700 transition-transform transform">
+                                   <div className="flex flex-col max-w-xl gap-2 break-words hover:shadow w-full leading-1.5 p-6 rounded-2xl border bg-card text-card-foreground dark:bg-gray-700 transition-transform transform">
                                    <div className="flex items-center justify-between space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
                                 <span className="flex items-center">
                                     {tx.replyAddress === address ? (
@@ -782,7 +782,7 @@ export default function TownHall({ address, isMobile }) {
                                             </AvatarFallback>
                                             </Avatar>
                                         )}
-                                        <Badge variant="outline" className="py-3px shadow-sm hover:bg-accent">
+                                        <Badge variant="outline" className="py-3px hover:bg-accent">
                                             <div className="font-medium leading-7 dark:text-white">
                                             <div
                                                 onClick={() => {

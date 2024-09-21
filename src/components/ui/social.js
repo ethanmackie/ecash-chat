@@ -410,3 +410,50 @@ export const MuteIcon = () => {
         </svg>
     );
 };
+
+export const AttachmentIcon = () => {
+    return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" data-reactroot="">
+<path fill="#4382FF" d="M10 3C8.35228 3 7 4.35228 7 6V16C7 18.7477 9.25229 21 12 21C14.7477 21 17 18.7477 17 16V9C17 8.44772 17.4477 8 18 8C18.5523 8 19 8.44772 19 9V16C19 19.8523 15.8523 23 12 23C8.14772 23 5 19.8523 5 16V6C5 3.24772 7.24772 1 10 1C12.5835 1 14.8596 3.09157 14.9846 5.6854C14.9882 5.71978 14.99 5.75468 14.99 5.79001L15 14.9989C15.0001 15.0475 14.9966 15.0952 14.99 15.142V16.1C14.99 17.7023 13.6923 19 12.09 19C10.3877 19 9 17.6123 9 15.91V7.00001C9 6.44772 9.44772 6.00001 10 6.00001C10.5523 6.00001 11 6.44772 11 7.00001V15.91C11 16.5077 11.4923 17 12.09 17C12.5877 17 12.99 16.5977 12.99 16.1V5.91C12.99 4.36661 11.6024 3 10 3Z" undefined="1"></path>
+</svg>
+    );
+};
+
+export const Upload2Icon = () => {
+    return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" data-reactroot="">
+        <path stroke-linejoin="round" stroke-linecap="round" stroke-miterlimit="10" stroke-width="1" stroke="#2249B3" fill="none" d="M2 14.5C2 16.99 4.01 19 6.5 19H18.5C20.43 19 22 17.43 22 15.5C22 13.57 20.43 12 18.5 12C18.3 12 18.09 12.02 17.9 12.05C17.97 11.71 18 11.36 18 11C18 7.69 15.31 5 12 5C9.02 5 6.55 7.17 6.09 10.02C3.79 10.23 2 12.15 2 14.5Z"></path>
+        <path stroke-linejoin="round" stroke-width="1" stroke="#2249B3" d="M12 10V16"></path>
+        <path stroke-linecap="round" stroke-width="1" stroke="#2249B3" d="M12 10L11 11H13L12 10Z"></path>
+</svg>
+    );
+};
+
+
+export const PodcastIcon = () => {
+    return (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"  className="mr-2" data-reactroot="">
+        <path stroke-width="1" stroke="#ffffff" fill="#000000" d="M12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22Z"></path>
+        <path stroke-linejoin="round" stroke-linecap="round" stroke-width="1" stroke="#ffffff" fill="#000000" d="M9 7.99992V15.9999C9 16.3899 9.40974 16.6299 9.74953 16.4399L16.7452 12.4399C17.0849 12.2499 17.0849 11.7599 16.7452 11.5699L9.74953 7.56992C9.40974 7.37992 9 7.61992 9 7.99992Z"></path>
+        </svg>
+    );
+};
+
+export const HeadphoneIcon = () => {
+    return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="mr-2" data-reactroot="">
+        <path stroke-linecap="round" stroke-width="1" stroke="#2249B3" d="M3 19L2 12.1685V12C2 6.47716 6.47715 2 12 2V2C17.5228 2 22 6.47715 22 12V12.1373L21 19"></path>
+        <path stroke-width="1" stroke="#2249B3" fill="#4382FF" d="M17.85 15H17.5V22H17.85C19.5897 22 21 20.433 21 18.5C21 16.567 19.5897 15 17.85 15Z" clip-rule="evenodd" fill-rule="evenodd"></path>
+        <path stroke-linecap="round" stroke-width="1" stroke="#2249B3" d="M16.5 15.5V21.5"></path>
+        <path stroke-width="1" stroke="#2249B3" fill="#4382FF" d="M6.15 15H6.5V22H6.15C4.4103 22 3 20.433 3 18.5C3 16.567 4.4103 15 6.15 15Z" clip-rule="evenodd" fill-rule="evenodd"></path>
+        <path stroke-linecap="round" stroke-width="1" stroke="#2249B3" d="M7.5 15.5V21.5"></path>
+        </svg>
+    );
+};
+
+
+
+
+
+
+
