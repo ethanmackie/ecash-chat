@@ -191,9 +191,6 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
             setIsLoading(false);
 
-            // On-chain refresh of article history
-            await getArticleHistoryByPage(0);
-
             // If this app was triggered by a shared article link
             if (sharedArticleTxid !== false) {
                 let articleTx;
@@ -239,6 +236,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 }
             }
 
+            // On-chain refresh of article history
+            await getArticleHistoryByPage(0);
         })();
 
         (async () => {

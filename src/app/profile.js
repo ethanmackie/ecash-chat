@@ -38,12 +38,15 @@ export default function ProfilePanel({ address, avatarLink, xecBalance, latestAv
     useEffect(() => {
         (async () => {
             const paywallTxs = await localforage.getItem(appConfig.localpaywallTxsParam);
-            const paywallResponse = totalPaywallEarnedByAddress(address, paywallTxs);
-            setPaywallRevenueXec(paywallResponse.xecEarned);
-            setPaywallRevenueCount(paywallResponse.unlocksEarned);
-            setPaywallLeaderboard(getPaywallLeaderboard(paywallTxs));
-            let contactList = await localforage.getItem(appConfig.localContactsParam);
-            setContactList(contactList);
+
+            if (paywallTxs !== null) {
+              const paywallResponse = totalPaywallEarnedByAddress(address, paywallTxs);
+              setPaywallRevenueXec(paywallResponse.xecEarned);
+              setPaywallRevenueCount(paywallResponse.unlocksEarned);
+              setPaywallLeaderboard(getPaywallLeaderboard(paywallTxs));
+              let contactList = await localforage.getItem(appConfig.localContactsParam);
+              setContactList(contactList);
+            }
         })();
     }, []);
 
