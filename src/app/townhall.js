@@ -856,7 +856,7 @@ export default function TownHall({ address, isMobile }) {
                 mvpPosts.length > 0 &&
                 mvpPosts.map(
                     (tx, index) => (
-                        <b>
+                        <b key={index}>
                             Premium message {index+1}<br />
                             {tx.opReturnMessage}
                         </b>
