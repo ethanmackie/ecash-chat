@@ -35,4 +35,5 @@ export const appConfig = {
     localArticleCacheParam: 'articleCache',
     localContactsParam: 'localContacts',
     localMuteParam: 'localMute',
+    maxTownhallMvpPostDisplay: 2,
 };

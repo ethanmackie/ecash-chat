@@ -176,7 +176,7 @@ export const encodeBip21PaywallPayment = replyTxid => {
 };
 
 // Encode the op_return post script
-export const encodeBip21Post = post => {
+export const encodeBip21Post = (post, premiumPostFlag) => {
     if (typeof post !== 'string') {
         return '';
     }
@@ -186,8 +186,13 @@ export const encodeBip21Post = post => {
         // Push eCash Chat protocol identifier
         script.push(Buffer.from(opreturnConfig.appPrefixesHex.eCashChat, 'hex'));
 
-        // Push eCash Chat post identifier
-        script.push(Buffer.from(opreturnConfig.townhallPostPrefixHex, 'hex'));
+        if (premiumPostFlag) {
+            // Push eCash Chat premium MVP post identifier
+            script.push(Buffer.from(opreturnConfig.townhallMvpPostPrefixHex, 'hex'));
+        } else {
+            // Push eCash Chat post identifier
+            script.push(Buffer.from(opreturnConfig.townhallPostPrefixHex, 'hex'));
+        }
 
         // eCash Chat messages are utf8 encoded
         const eCashChatMsgScript = Buffer.from(post, 'utf8');

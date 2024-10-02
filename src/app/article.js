@@ -559,10 +559,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
         if (paywallProcessingFeeRatio) {
             const paywallProcessingFee = (Number(paywallPrice)*paywallProcessingFeeRatio).toFixed(2);
-            console.log('paywallProcessingFee: ', paywallProcessingFee)
             bip21Str += `&addr=${appConfig.ipfsPaywallFeeAddress}&amount=${paywallProcessingFee}`;
         }
-        console.log('bip21Str: ', bip21Str)
 
         if (isMobile) {
             window.open(
