@@ -1389,6 +1389,7 @@ export const parseChronikTx = (tx, address, latestAvatars = false) => {
     let senderAvatarLink = false;
     let receiverAvatarLink = false;
     let authenticationTx = false;
+    let iseCashChatPremiumPost = false;
 
     if (tx.isCoinbase) {
         // Note that coinbase inputs have `undefined` for `thisInput.outputScript`
@@ -1574,6 +1575,9 @@ export const parseChronikTx = (tx, address, latestAvatars = false) => {
                         if (stackArray[1] === opreturnConfig.townhallPostPrefixHex) {
                             opReturnMessage = Buffer.from(stackArray[2], 'hex');
                             iseCashChatPost = true;
+                        } else if (stackArray[1] === opreturnConfig.townhallMvpPostPrefixHex) {
+                            opReturnMessage = Buffer.from(stackArray[2], 'hex');
+                            iseCashChatPremiumPost = true;
                         } else if (stackArray[1] === opreturnConfig.townhallReplyPostPrefixHex) {
                             replyTxid = stackArray[2];
                             opReturnMessage = Buffer.from(stackArray[3], 'hex');
@@ -1799,6 +1803,7 @@ export const parseChronikTx = (tx, address, latestAvatars = false) => {
             senderAvatarLink,
             receiverAvatarLink,
             authenticationTx,
+            iseCashChatPremiumPost,
         };
     }
     // Otherwise do not include these fields
@@ -1836,6 +1841,7 @@ export const parseChronikTx = (tx, address, latestAvatars = false) => {
         senderAvatarLink,
         receiverAvatarLink,
         authenticationTx,
+        iseCashChatPremiumPost,
     };
 };
 

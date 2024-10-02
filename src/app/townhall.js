@@ -100,6 +100,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { addNewContact } from '../utils/utils';
 import localforage from 'localforage';
+import { opReturn as opreturnConfig } from '../config/opreturn';
 
 export default function TownHall({ address, isMobile }) {
     const [townHallHistory, setTownHallHistory] = useState(''); // current history rendered on screen
@@ -110,6 +111,7 @@ export default function TownHall({ address, isMobile }) {
     const [replyPostError, setReplyPostError] = useState(false);
     const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
     const [showMessagePreview, setShowMessagePreview] = useState(false);
+    const [showPremiumMessagePreview, setShowPremiumMessagePreview] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here
     const [contactList, setContactList] = useState('');
@@ -117,6 +119,8 @@ export default function TownHall({ address, isMobile }) {
     const newReplierContactNameInput = useRef('');
     const [curateByContacts, setCurateByContacts] = useState(false);
     const [muteList, setMuteList] = useState('');
+    const [hasTownhallMvpNft, setHasTownhallMvpNft] = useState(false);
+    const [mvpPosts, setMpvPosts] = useState([]);
 
     useEffect(() => {
       const handleResize = () => {
@@ -143,8 +147,23 @@ export default function TownHall({ address, isMobile }) {
 
             // Subsequent refresh based on on-chain source
             await getTownhallHistoryByPage(0);
+
+            await hasMvpTownhallNft();
         })();
     }, [muteList]);
+
+    const hasMvpTownhallNft = async () => {
+        const chatCache = await localforage.getItem('chatCache');
+        if (!chatCache || !chronik || typeof chatCache === 'undefined') {
+            return;
+        }
+        const nftList = chatCache.childNftList;
+        for (const thisNft of nftList) {
+            if (opreturnConfig.townhallMvpTokenIds.includes(thisNft.token.tokenId)) {
+                setHasTownhallMvpNft(true);
+            }
+        }
+    };
 
     const refreshContactList = async () => {
         let contactList = await localforage.getItem(appConfig.localContactsParam);
@@ -207,11 +226,11 @@ export default function TownHall({ address, isMobile }) {
                 localFullTownHallHistory.txs,
                 pageNum,
             );
-
             setTownHallHistory({
                 txs: selectedPageHistory,
                 numPages: localFullTownHallHistory.numPages,
                 replies: localFullTownHallHistory.replies,
+                mvpTxs: getMvpPosts(localFullTownHallHistory.txs),
             });
         } else {
             const txHistoryResp = await getTxHistory(chronik, appConfig.townhallAddress, pageNum);
@@ -220,17 +239,33 @@ export default function TownHall({ address, isMobile }) {
                     txHistoryResp.txs,
                     pageNum,
                 );
-
                 setTownHallHistory({
                     txs: firstPageHistory,
                     numPages: txHistoryResp.numPages,
                     replies: txHistoryResp.replies,
+                    mvpTxs: getMvpPosts(txHistoryResp.txs),
                 });
                 setFullTownHallHistory(txHistoryResp);
                 await localforage.setItem(appConfig.localTownhallCacheParam, txHistoryResp);
             }
         }
     };
+
+    const getMvpPosts = (txs) => {
+        if (!Array.isArray(txs) && txs.length < 1) {
+            return [];
+        }
+        let mvpTxs = [];
+        for (const thisTxs of txs) {
+            if (mvpTxs.length === appConfig.maxTownhallMvpPostDisplay) {
+                break;
+            }
+            if (thisTxs.iseCashChatPremiumPost === true) {
+                mvpTxs.push(thisTxs);
+            }
+        }
+        setMpvPosts(mvpTxs);
+    }
 
     // Validate the reply post
     // Note: at some point this function will diverge in functionality with handlePostChange()
@@ -306,7 +341,7 @@ export default function TownHall({ address, isMobile }) {
     };
 
     // Pass a post tx BIP21 query string to cashtab extensions
-    const sendPost = () => {
+    const sendPost = (premiumPostFlag = false) => {
         // Parse the message for any media tags
         let parsedPost= post;
         // If youtube embedding is present
@@ -353,7 +388,7 @@ export default function TownHall({ address, isMobile }) {
         }
 
         // Encode the op_return post script
-        const opReturnRaw = encodeBip21Post(parsedPost);
+        const opReturnRaw = encodeBip21Post(parsedPost, premiumPostFlag);
         const bip21Str = `${appConfig.townhallAddress}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`;
 
         if (isMobile) {
@@ -446,6 +481,55 @@ export default function TownHall({ address, isMobile }) {
                         Post now
                     </Button>
                     <Button onClick={() => setShowMessagePreview(false)}>
+                        Cancel
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        );
+    };
+
+    const PremiumMessagePreviewModal = () => {
+        return (
+            <Modal show={showPremiumMessagePreview} onClose={() => setShowPremiumMessagePreview(false)}>
+                <Modal.Header>Premium Post Preview</Modal.Header>
+                <Modal.Body>
+                    <div className="space-y-6">
+                        <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                            {(
+                                <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white text-ellipsis break-words min-w-0">
+                                    {post}
+                                </p>
+                            )}
+                            <br />Media Preview:
+                            {/* Render any media content within the message */}
+                            {post.includes('[img]') && post.includes('[/img]') && (
+                                <img src={post.substring(post.indexOf('[img]') + 5, post.lastIndexOf('[/img]'))} />
+                            )}
+                            {post.includes('[yt]') && post.includes('[/yt]') && !post.includes('https://www.youtube.com/shorts/') && (
+                                <LiteYouTubeEmbed id={YouTubeVideoId(post.substring(post.indexOf('[yt]') + 4, post.lastIndexOf('[/yt]')))} />
+                            )}
+                            {post.includes('[yt]') && post.includes('[/yt]') && post.includes('https://www.youtube.com/shorts/') && (
+                                <LiteYouTubeEmbed id={YouTubeVideoId((post.substring(post.indexOf('[yt]') + 4, post.lastIndexOf('[/yt]'))).split('https://www.youtube.com/shorts/')[1])} />
+                            )}
+                            {post.includes('[twt]') && post.includes('[/twt]') && !post.includes('tweeturl') && (
+                                <Tweet id={getTweetId(post)} />
+                            )}
+                            {post.includes('[url]') && post.includes('[/url]') && (
+                                <a href={post.substring(post.indexOf('[url]') + 5, post.lastIndexOf('[/url]'))} target="_blank">
+                                    {post.substring(post.indexOf('[url]') + 5, post.lastIndexOf('[/url]'))}
+                                </a>
+                            )}
+                        </p>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={() => {
+                        setShowPremiumMessagePreview(false)
+                        sendPost(true)
+                    }}>
+                        Post now
+                    </Button>
+                    <Button onClick={() => setShowPremiumMessagePreview(false)}>
                         Cancel
                     </Button>
                 </Modal.Footer>
@@ -610,6 +694,7 @@ export default function TownHall({ address, isMobile }) {
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px]">
             <MessagePreviewModal />
+            <PremiumMessagePreviewModal />
               <>
                 <div className="max-w-xl w-full mx-auto overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring">
                     {/* Post input field */}
@@ -671,6 +756,15 @@ export default function TownHall({ address, isMobile }) {
                         >
                         <PostIcon className="mr-1" />Post
                         </Button>
+                        {hasTownhallMvpNft === true && (
+                            <Button
+                            type="button"
+                            disabled={post === '' || postError}
+                            onClick={() => { isMobile ? sendPost(true) : setShowPremiumMessagePreview(true) }}
+                            >
+                            <PostIcon className="mr-1" />Premium Post
+                            </Button>)
+                        }
                         </div>
                     </div>
                 </>
@@ -758,6 +852,18 @@ export default function TownHall({ address, isMobile }) {
                     </Pagination>
                 </span>
             <div>
+            {mvpPosts &&
+                mvpPosts.length > 0 &&
+                mvpPosts.map(
+                    (tx, index) => (
+                        <b>
+                            Premium message {index+1}<br />
+                            {tx.opReturnMessage}
+                        </b>
+                    )
+                )
+            }
+
             {
                 townHallHistory &&
                   townHallHistory.txs &&
