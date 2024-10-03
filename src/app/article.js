@@ -1039,7 +1039,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 mvpArticles.length > 0 &&
                 mvpArticles.map(
                     (tx, index) => (
-                        <b>
+                        <b key={index}>
                             Premium article {index+1}<br />
                             {tx.articleObject.title}
                         </b>
