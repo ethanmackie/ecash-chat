@@ -226,11 +226,11 @@ export default function TownHall({ address, isMobile }) {
                 localFullTownHallHistory.txs,
                 pageNum,
             );
+            getMvpPosts(localFullTownHallHistory.txs);
             setTownHallHistory({
                 txs: selectedPageHistory,
                 numPages: localFullTownHallHistory.numPages,
                 replies: localFullTownHallHistory.replies,
-                mvpTxs: getMvpPosts(localFullTownHallHistory.txs),
             });
         } else {
             const txHistoryResp = await getTxHistory(chronik, appConfig.townhallAddress, pageNum);
@@ -239,11 +239,11 @@ export default function TownHall({ address, isMobile }) {
                     txHistoryResp.txs,
                     pageNum,
                 );
+                getMvpPosts(txHistoryResp.txs);
                 setTownHallHistory({
                     txs: firstPageHistory,
                     numPages: txHistoryResp.numPages,
                     replies: txHistoryResp.replies,
-                    mvpTxs: getMvpPosts(txHistoryResp.txs),
                 });
                 setFullTownHallHistory(txHistoryResp);
                 await localforage.setItem(appConfig.localTownhallCacheParam, txHistoryResp);

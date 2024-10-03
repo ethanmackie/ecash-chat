@@ -159,6 +159,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         pinataGateway: process.env.IPFS_API,
     });
     const [isUploading, setIsUploading] = useState(false);
+    const [hasArticleMvpNft, setHasArticleMvpNft] = useState(false);
+    const [mvpArticles, setMvpArticles] = useState([]);
 
     useEffect(() => {
         const handleResize = () => {
@@ -238,6 +240,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
             // On-chain refresh of article history
             await getArticleHistoryByPage(0);
+
+            await hasMvpArticleNft();
         })();
 
         (async () => {
@@ -245,6 +249,22 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             setXecBalance(updatedCache.xecBalance);
         })();
     }, [muteList]);
+
+    const getMvpArticles = (txs) => {
+        if (!Array.isArray(txs) && txs.length < 1) {
+            return [];
+        }
+        let mvpTxs = [];
+        for (const thisTxs of txs) {
+            if (mvpTxs.length === appConfig.maxArticleMvpPostDisplay) {
+                break;
+            }
+            if (thisTxs.articleObject && thisTxs.articleObject.premiumFlag === true) {
+                mvpTxs.push(thisTxs);
+            }
+        }
+        setMvpArticles(mvpTxs);
+    }
 
     const refreshContactList = async () => {
         setContactList(
@@ -309,7 +329,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 localArticleHistory.txs,
                 pageNum,
             );
-
+            getMvpArticles(localArticleHistory.txs);
             setArticleHistory({
                 txs: selectedPageHistory,
                 numPages: localArticleHistory.numPages,
@@ -330,11 +350,24 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                     replies: txHistoryResp.replies,
                     paywallTxs: txHistoryResp.paywallTxs,
                 };
-
+                getMvpArticles(txHistoryResp.txs);
                 setArticleHistory(currentArticleHistoryPage);
                 setFullArticleHistory(txHistoryResp);
                 await localforage.setItem(appConfig.localArticleCacheParam, txHistoryResp);
                 return currentArticleHistoryPage;
+            }
+        }
+    };
+
+    const hasMvpArticleNft = async () => {
+        const chatCache = await localforage.getItem('chatCache');
+        if (!chatCache || !chronik || typeof chatCache === 'undefined') {
+            return;
+        }
+        const nftList = chatCache.childNftList;
+        for (const thisNft of nftList) {
+            if (opreturnConfig.articleMvpTokenIds.includes(thisNft.token.tokenId)) {
+                setHasArticleMvpNft(true);
             }
         }
     };
@@ -372,7 +405,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     };
 
     // Uploads the selected file to IPFS and sends an article tx BIP21 query string to cashtab extensions
-    const sendAudioArticle = async () => {
+    const sendAudioArticle = async (premiumArticleFlag = false) => {
         
         const crypto = require('crypto');
         const articleHash = crypto.randomBytes(20).toString('hex')+new Date();
@@ -412,6 +445,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 paywallPrice: paywallAmountXec,
                 disbleReplies: disableArticleReplies,
                 ipfsHash: ipfsHash.IpfsHash,
+                premiumFlag: premiumArticleFlag,
                 date: Date.now(),
             };
 
@@ -437,7 +471,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     };
 
     // Pass an article tx BIP21 query string to cashtab extensions
-    const sendArticle = async () => {
+    const sendArticle = async (premiumArticleFlag = false) => {
         const crypto = require('crypto');
         const articleHash = crypto.createHash('sha1').update(article).digest('hex');
 
@@ -470,6 +504,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             category: articleCategory,
             paywallPrice: paywallAmountXec,
             disbleReplies: disableArticleReplies,
+            premiumFlag: premiumArticleFlag,
             date: Date.now(),
         };
 
@@ -1000,6 +1035,18 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
         return (
             <div className="max-w-xl w-full mx-auto">
+            {mvpArticles &&
+                mvpArticles.length > 0 &&
+                mvpArticles.map(
+                    (tx, index) => (
+                        <b>
+                            Premium article {index+1}<br />
+                            {tx.articleObject.title}
+                        </b>
+                    )
+                )
+            }
+
             {latestArticleHistory &&
             latestArticleHistory.txs &&
             latestArticleHistory.txs.length > 0 ? (
@@ -1402,36 +1449,74 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 {/* Write article button*/}
 
                                 {articleCategory !== "Podcast" ? (
-                                <Button
-                                    type="button"
-                                    disabled={article === '' || articleError || articleTitle === '' || paywallAmountXecError}                            
-                                    onClick={() => sendArticle()}
-                                >
-                                    <BiSolidNews />&nbsp;Post Article
-                                </Button>
-                                ) : (
-                                <Button
-                                    type="button"
-                                    disabled={articleError || articleTitle === '' || paywallAmountXecError || isFileSelected === false}
-                                    onClick={() => {
-                                        if (articleCategory === 'Podcast' && paywallAmountXec < 110) {
-                                            setPaywallAmountXecError(`Paywall amount for Podcasts must be equal or greater than 110 XEC`);
-                                            return;
-                                        }
-                                        sendAudioArticle()
-                                    }}
-                                >
-                                     {isUploading ? (
                                 <>
-                                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                                    Uploading... please wait
+                                    <Button
+                                        type="button"
+                                        disabled={article === '' || articleError || articleTitle === '' || paywallAmountXecError}
+                                        onClick={() => sendArticle()}
+                                    >
+                                        <BiSolidNews />&nbsp;Post Article
+                                    </Button>
+                                    {hasArticleMvpNft === true && (
+                                    <Button
+                                        type="button"
+                                        disabled={article === '' || articleError || articleTitle === '' || paywallAmountXecError}
+                                        onClick={() => sendArticle(true)}
+                                    >
+                                        <BiSolidNews />&nbsp;Post Premium Article
+                                    </Button>
+                                    )}
                                 </>
                                 ) : (
                                 <>
-                                    <BiSolidNews />&nbsp;Post Podcast
+                                    <Button
+                                        type="button"
+                                        disabled={articleError || articleTitle === '' || paywallAmountXecError || isFileSelected === false}
+                                        onClick={() => {
+                                            if (articleCategory === 'Podcast' && paywallAmountXec < 110) {
+                                                setPaywallAmountXecError(`Paywall amount for Podcasts must be equal or greater than 110 XEC`);
+                                                return;
+                                            }
+                                            sendAudioArticle()
+                                        }}
+                                    >
+                                        {isUploading ? (
+                                    <>
+                                        <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                                        Uploading... please wait
+                                    </>
+                                    ) : (
+                                    <>
+                                        <BiSolidNews />&nbsp;Post Podcast
+                                    </>
+                                    )}
+                                    </Button>
+
+                                    {hasArticleMvpNft === true && (
+                                    <Button
+                                        type="button"
+                                        disabled={articleError || articleTitle === '' || paywallAmountXecError || isFileSelected === false}
+                                        onClick={() => {
+                                            if (articleCategory === 'Podcast' && paywallAmountXec < 110) {
+                                                setPaywallAmountXecError(`Paywall amount for Podcasts must be equal or greater than 110 XEC`);
+                                                return;
+                                            }
+                                            sendAudioArticle(true)
+                                        }}
+                                    >
+                                        {isUploading ? (
+                                    <>
+                                        <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                                        Uploading... please wait
+                                    </>
+                                    ) : (
+                                    <>
+                                        <BiSolidNews />&nbsp;Post Premium Podcast
+                                    </>
+                                    )}
+                                    </Button>
+                                    )}
                                 </>
-                                )}
-                                </Button>
                                 )
                                 }
                                 <br />

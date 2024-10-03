@@ -8,6 +8,7 @@
 - Message encryption option via AES 256 CBC algorithm
 - Full length articles with paywall functionality
 - NFT showcase and use as avatars
+- Exclusive posting privileges for Premium NFT holders
 - Contacts management
 - Content curation based on contacts
 - IPFS integration

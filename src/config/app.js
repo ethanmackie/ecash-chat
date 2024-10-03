@@ -36,4 +36,5 @@ export const appConfig = {
     localContactsParam: 'localContacts',
     localMuteParam: 'localMute',
     maxTownhallMvpPostDisplay: 2,
+    maxArticleMvpPostDisplay: 2,
 };
