@@ -1387,6 +1387,11 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                             value={article}
                             onChange={(value, viewUpdate) => {
                                 setArticle(value);
+                                if (value.toString().includes("xecfaucet.com/?ref=")) {
+                                    setArticleError('Please use the Town Hall to share faucet links.');
+                                } else {
+                                    setArticleError('');
+                                }
                             }}
                             height="400px"
                             className="px-2 py-2 rounded-xl mx-auto border max-w-3xl max-h-85vh my-auto bg-card text-card-foreground break-words"
