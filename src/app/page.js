@@ -127,6 +127,7 @@ export default function Home() {
     const [latestAvatars, setLatestAvatars] = useState([]);
     const [openSharedArticleLoader, setOpenSharedArticleLoader] = useState(false);
     const [showDustTxAuthenticationLoader, setShowDustTxAuthenticationLoader] = useState(false);
+    const [syncronizingState, setsSyncronizingState] = useState(false);
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
@@ -647,6 +648,13 @@ export default function Home() {
                 <span className="font-bold sm:inline-block">eCashChat</span>
               </a>
             </div>
+
+            {syncronizingState && (
+              <>
+              <ReloadIcon className="h-4 w-4 animate-spin" />Checking for new on-chain content...
+              </>
+            )}
+
             <div className="flex">
         
             {isLoggedIn && (
@@ -1170,6 +1178,7 @@ export default function Home() {
                       sharedArticleTxid={sharedArticleTxid}
                       setXecBalance={setXecBalance}
                       setOpenSharedArticleLoader={setOpenSharedArticleLoader}
+                      setsSyncronizingState={setsSyncronizingState}
                     />
                   </Tabs.Item>
 
