@@ -1848,7 +1848,7 @@ export const parseChronikTx = (tx, address, latestAvatars = false) => {
 // Retrieves all articles from API
 export const getArticleListing = async () => {
     let articles = [];
-    const scanCommand = new ScanCommand({
+    let scanCommand = new ScanCommand({
         TableName: process.env.TABLE_NAME,
     });
 
@@ -1861,14 +1861,34 @@ export const getArticleListing = async () => {
                 articles = articles.concat([itemObj]);
             }
         }
+
+        // Temporary fix - aws scan function is capped at 1MB which then passes a LastEvaluatedKey
+        // To be refactored
+        if (items.LastEvaluatedKey) {
+            scanCommand = new ScanCommand({
+                TableName: process.env.TABLE_NAME,
+                ExclusiveStartKey: items.LastEvaluatedKey,
+            });
+            items = await docClient.send(scanCommand);
+            for (const itemObj of items.Items) {
+                if (Array.isArray(itemObj.article)) {
+                    articles = articles.concat(itemObj.article);
+                } else {
+                    articles = articles.concat([itemObj]);
+                }
+            }
+        }
+
         if (!Array.isArray(articles)) {
             articles = [];
         }
+
+        console.log('articles: ', articles)
     } catch (err) {
         console.log(`Error in getArticleListing: `, err);
     }
 
-    console.log('articles count: ', articles.length);
+
 
     return articles;
 };
