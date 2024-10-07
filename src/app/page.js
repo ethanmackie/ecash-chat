@@ -128,6 +128,7 @@ export default function Home() {
     const [openSharedArticleLoader, setOpenSharedArticleLoader] = useState(false);
     const [showDustTxAuthenticationLoader, setShowDustTxAuthenticationLoader] = useState(false);
     const [syncronizingState, setsSyncronizingState] = useState(false);
+    const [townhallTabEntry, setTownhallTabEntry] = useState(false);
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
@@ -967,6 +968,7 @@ export default function Home() {
                   aria-label="eCash Chat"
                   style="default"
                   className="z-10 !border-b-0 focus:ring-0 relative mt-4 justify-center"
+                  onActiveTabChange={() => setTownhallTabEntry(true)}
                 >
                   <Tabs.Item title="Message" icon={Send3Icon}>
                     <div style={{ display: isLoggedIn ? "block" : "none" }}>
@@ -1166,8 +1168,16 @@ export default function Home() {
                     )}
                   </Tabs.Item>
 
-                  <Tabs.Item title="Town Hall" icon={Home3Icon}>
-                    <Townhall address={address} isMobile={isMobile} />
+                  <Tabs.Item
+                    title="Town Hall"
+                    icon={Home3Icon}
+                  >
+                    <Townhall
+                      address={address}
+                      isMobile={isMobile}
+                      tabEntry={townhallTabEntry}
+                      setsSyncronizingState={setsSyncronizingState}
+                    />
                   </Tabs.Item>
 
                   <Tabs.Item title="Articles" active icon={File3Icon}>

@@ -102,7 +102,7 @@ import { addNewContact } from '../utils/utils';
 import localforage from 'localforage';
 import { opReturn as opreturnConfig } from '../config/opreturn';
 
-export default function TownHall({ address, isMobile }) {
+export default function TownHall({ address, isMobile, tabEntry, setsSyncronizingState }) {
     const [townHallHistory, setTownHallHistory] = useState(''); // current history rendered on screen
     const [fullTownHallHistory, setFullTownHallHistory] = useState(''); // full history array
     const [post, setPost] = useState('');
@@ -145,12 +145,16 @@ export default function TownHall({ address, isMobile }) {
                 getTownhallHistoryByPage(0, true, townhallCache, curateByContacts);
             }
 
-            // Subsequent refresh based on on-chain source
-            await getTownhallHistoryByPage(0);
+            // Subsequent refresh based on on-chain source if it was a user triggered tab navigation
+            if (tabEntry) {
+                setsSyncronizingState(true);
+                await getTownhallHistoryByPage(0);
+                setsSyncronizingState(false);
+            }
 
             await hasMvpTownhallNft();
         })();
-    }, [muteList]);
+    }, [muteList, tabEntry]);
 
     const hasMvpTownhallNft = async () => {
         const chatCache = await localforage.getItem('chatCache');

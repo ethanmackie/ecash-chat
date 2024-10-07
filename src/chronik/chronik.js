@@ -1882,13 +1882,9 @@ export const getArticleListing = async () => {
         if (!Array.isArray(articles)) {
             articles = [];
         }
-
-        console.log('articles: ', articles)
     } catch (err) {
         console.log(`Error in getArticleListing: `, err);
     }
-
-
 
     return articles;
 };
