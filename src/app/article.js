@@ -126,7 +126,15 @@ import { BN } from 'slp-mdm';
 import AudioPlayer from 'react-h5-audio-player';
 import 'react-h5-audio-player/lib/styles.css';
 
-export default function Article( { chronik, address, isMobile, sharedArticleTxid, setXecBalance, setOpenSharedArticleLoader } ) {
+export default function Article( {
+    chronik,
+    address,
+    isMobile,
+    sharedArticleTxid,
+    setXecBalance,
+    setOpenSharedArticleLoader,
+    setsSyncronizingState,
+} ) {
     const [articleHistory, setArticleHistory] = useState('');  // current article history page
     const [fullArticleHistory, setFullArticleHistory] = useState('');  // current article history page
     const [articleTitle, setArticleTitle] = useState(''); // title of the article being drafted
@@ -238,10 +246,11 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 }
             }
 
+            setsSyncronizingState(true);
             // On-chain refresh of article history
             await getArticleHistoryByPage(0);
-
             await hasMvpArticleNft();
+            setsSyncronizingState(false);
         })();
 
         (async () => {
