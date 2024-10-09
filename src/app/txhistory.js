@@ -780,7 +780,7 @@ export default function TxHistory({ address, isMobile }) {
                 <div className="max-w-xl mt-2 w-full mx-auto">
                   <div className="flex items-center space-x-2">
 
-                  <div className="relative w-1/2">
+                  <div className="relative w-full">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4" />
                     <Input
                         id="address"
@@ -805,6 +805,7 @@ export default function TxHistory({ address, isMobile }) {
                       type="button"
                       variant="outline"
                       size="icon"
+                      className="px-3 w-auto"
                       onClick={() => {
                         setTxHistoryByAddress('');
                         setAddressToSearch('');
