@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Modal } from "flowbite-react";
 import { Button } from "@/components/ui/button";
-import { Activity } from "lucide-react";
+import { Search, UserRoundSearch, Activity } from "lucide-react"
 import Image from "next/image";
 import {
   Tooltip,
@@ -759,15 +759,15 @@ export default function Article( {
     // Validates the author address being filtered for
     const handleAddressChange = e => {
         const { value } = e.target;
-        if (
-            isValidRecipient(value) === true &&
-            value.trim() !== ''
-        ) {
-            setAddressToSearchError(false);
-        } else {
+        setAddressToSearch(value);
+    
+        if (value.trim() === '') {
+            setAddressToSearchError(false); 
+        } else if (isValidRecipient(value) === true) {
+            setAddressToSearchError(false); 
+        } else if (value.length >= 10) { 
             setAddressToSearchError('Invalid eCash address');
         }
-        setAddressToSearch(value);
     };
 
    // Filters articleHistory for txs where the author address matches
@@ -1550,22 +1550,6 @@ export default function Article( {
                             </div>
                         </div>
                 )}
-               
-                <div className="relative flex items-start mt-2 mb-2">
-                    <div className="flex h-6 items-center py-2">
-                        <Checkbox
-                        id="curateByContacts"
-                        checked={curateByContacts}
-                        onCheckedChange={() => handleCurateByContactsChange(!curateByContacts)}
-                        className="rounded"
-                        />
-                    </div>
-                    <div className="ml-3 text-sm leading-6">
-                        <Label htmlFor="curateByContacts" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Only show articles by your contacts
-                        </Label>
-                    </div>
-                </div>
 
                 {/*Set up pagination menu*/}
                 <span>
@@ -1634,49 +1618,62 @@ export default function Article( {
                 
                 {/* Filter by article author */}
                 {showSearchBar && (
-                <form className="space-y-6" action="#" method="POST">
                     <div>
                         <div className="max-w-xl mt-2 w-full mx-auto">
                             <div className="flex items-center space-x-2">
-                                <Input
+                            <div className="relative w-full">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4" />
+                            <Input
                                 id="address"
                                 name="address"
-                                type="text"
+                                type="search"
                                 value={addressToSearch}
                                 required
-                                className="bg-gray-50"
-                                placeholder='Search By Author Address'
-                                onChange={e => handleAddressChange(e)}
-                                />
-
-                                <Button
-                                type="button"
-                                variant="outline"
-                                disabled={addressToSearchError}
-                                onClick={e => {
-                                    getTxHistoryByAddress(e);
+                                className="pl-8 bg-white"
+                                placeholder="Search By Address"
+                                onChange={handleAddressChange}
+                                onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault(); 
+                                    getTxHistoryByAddress(); 
+                                }
                                 }}
-                                >
-                                <MagnifyingGlassIcon className="h-4 w-4" />
-                                </Button>
+                                onBlur={getTxHistoryByAddress} 
+                            />
+                        </div>
 
-                                <Button
-                                type="button"
+                             <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="px-3 w-auto"
+                            onClick={() => {
+                                setTxHistoryByAddress('');
+                                setAddressToSearch('');
+                                setCurateByContacts(false); 
+                                setAddressToSearchError(false);
+                            }}
+                            >
+                            <ResetIcon className="h-4 w-4"/>
+                            </Button>
+                  
+                                <Toggle
                                 variant="outline"
-                                onClick={() => {
-                                    setTxHistoryByAddress('');
-                                    setAddressToSearch('');
-                                }}
-                                >
-                                <ResetIcon />
-                                </Button>
+                                className="bg-white"
+                                aria-label="Only show messages by your contacts"
+                                pressed={curateByContacts}
+                                onPressedChange={(state) => handleCurateByContactsChange(state)}
+                            >
+                                <UserRoundSearch className="h-4 w-4"/>
+                            </Toggle>
+                            
+                               
                             </div>
                             <p className="mt-2 text-sm text-red-600 dark:text-red-500">
                                 {addressToSearchError !== false && addressToSearchError}
                             </p>
                         </div>
                     </div>
-                </form>
                 )}
 
                 {/* Render article listings */}
