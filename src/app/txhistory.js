@@ -324,7 +324,7 @@ export default function TxHistory({ address, isMobile }) {
              ? latestTxHistory.txs.map(
                    (tx, index) => (
                      <>
-                     <div className="flex flex-col items-center mt-2" key={"txHistory"+index}>
+                     <div className="flex flex-col items-center mt-2 lg:min-w-[576px]" key={"txHistory"+index}>
                         <div className="flex flex-col w-full gap-2 max-w-xl break-words leading-1.5 p-5 sm:p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
                         <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white break-words">
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -780,7 +780,7 @@ export default function TxHistory({ address, isMobile }) {
                 <div className="max-w-xl mt-2 w-full mx-auto">
                   <div className="flex items-center space-x-2">
 
-                  <div className="relative w-full">
+                  <div className="relative w-1/2">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4" />
                     <Input
                         id="address"
