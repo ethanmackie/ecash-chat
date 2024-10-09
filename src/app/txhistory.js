@@ -238,17 +238,17 @@ export default function TxHistory({ address, isMobile }) {
 
     // Validates the address being filtered for
     const handleAddressChange = e => {
-        const { value } = e.target;
-        if (
-            isValidRecipient(value) === true &&
-            value.trim() !== ''
-        ) {
-            setAddressToSearch(value);
-            setAddressToSearchError(false);
-        } else {
-            setAddressToSearchError('Invalid eCash address');
-        }
-    };
+      const { value } = e.target;
+      if (
+          isValidRecipient(value) === true &&
+          value.trim() !== ''
+      ) {
+          setAddressToSearchError(false);
+      } else {
+          setAddressToSearchError('Invalid eCash address');
+      }
+      setAddressToSearch(value);
+  };
 
     // Handles the input of the decryption key
     const handleDecryptionInput = e => {
