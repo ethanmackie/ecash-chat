@@ -3,12 +3,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { appConfig } from '../config/app';
 import { getTxHistory, txListener } from '../chronik/chronik';
 import { chronik as chronikConfig } from '../config/chronik';
+import { Search, UserRoundSearch } from "lucide-react"
 import { ChronikClientNode } from 'chronik-client';
 import cashaddr from 'ecashaddrjs';
 import { isValidRecipient } from '../validation/validation';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Toggle } from "@/components/ui/toggle";
 import { MagnifyingGlassIcon, ResetIcon, Link2Icon, Share1Icon, EyeNoneIcon } from "@radix-ui/react-icons";
 import {
     DecryptionIcon,
@@ -239,15 +241,15 @@ export default function TxHistory({ address, isMobile }) {
     // Validates the address being filtered for
     const handleAddressChange = e => {
       const { value } = e.target;
-      if (
-          isValidRecipient(value) === true &&
-          value.trim() !== ''
-      ) {
-          setAddressToSearchError(false);
-      } else {
+      setAddressToSearch(value);
+  
+      if (value.trim() === '') {
+          setAddressToSearchError(false); 
+      } else if (isValidRecipient(value) === true) {
+          setAddressToSearchError(false); 
+      } else if (value.length >= 10) { 
           setAddressToSearchError('Invalid eCash address');
       }
-      setAddressToSearch(value);
   };
 
     // Handles the input of the decryption key
@@ -720,24 +722,8 @@ export default function TxHistory({ address, isMobile }) {
          <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
          {txHistory && txHistory !== '' ? (
             <>
-            <div className="relative flex items-start mt-2 mb-2">
-              <div className="flex h-6 items-center py-2">
-                  <Checkbox
-                  id="curateByContacts"
-                  checked={curateByContacts}
-                  onCheckedChange={() => handleCurateByContactsChange(!curateByContacts)}
-                  className="rounded"
-                  />
-              </div>
-              <div className="ml-3 text-sm leading-6">
-                  <Label htmlFor="curateByContacts" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      Only show messages by your contacts
-                  </Label>
-              </div>
-            </div>
 
             {/*Set up pagination menu*/}
-
             <span>
                 <Pagination>
                   <PaginationContent>
@@ -789,49 +775,64 @@ export default function TxHistory({ address, isMobile }) {
                   </PaginationContent>
                 </Pagination>
             </span>
-            <form className="space-y-6" action="#" method="POST">
+
               <div>
                 <div className="max-w-xl mt-2 w-full mx-auto">
                   <div className="flex items-center space-x-2">
+
+                  <div className="relative w-full">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4" />
                     <Input
-                      id="address"
-                      name="address"
-                      type="text"
-                      value={addressToSearch}
-                      required
-                      className="bg-white"
-                      placeholder='Search By Address'
-                      onChange={e => handleAddressChange(e)}
-                    />
+                        id="address"
+                        name="address"
+                        type="search"
+                        value={addressToSearch}
+                        required
+                        className="pl-8 bg-white"
+                        placeholder="Search By Address"
+                        onChange={handleAddressChange}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault(); 
+                            getTxHistoryByAddress(); 
+                          }
+                        }}
+                        onBlur={getTxHistoryByAddress} 
+                      />
+                  </div>
 
-                    <Button
+                  <Button
                       type="button"
                       variant="outline"
-                      disabled={addressToSearchError}
-                      onClick={e => {
-                        getTxHistoryByAddress(e);
-                      }}
-                    >
-                      <MagnifyingGlassIcon className="h-4 w-4" />
-                    </Button>
-
-                    <Button
-                      type="button"
-                      variant="outline"
+                      size="icon"
                       onClick={() => {
                         setTxHistoryByAddress('');
                         setAddressToSearch('');
+                        setCurateByContacts(false); 
+                        setAddressToSearchError(false);
                       }}
                     >
-                      <ResetIcon />
+                      <ResetIcon className="h-4 w-4"/>
                     </Button>
+
+                    <Toggle
+                    variant="outline"
+                    className="bg-white"
+                    aria-label="Only show messages by your contacts"
+                    pressed={curateByContacts}
+                    onPressedChange={(state) => handleCurateByContactsChange(state)}
+                  >
+                    <UserRoundSearch className="h-4 w-4"/>
+                  </Toggle>
+
+                  
                   </div>
                     <p className="mt-2 text-sm text-red-600 dark:text-red-500">
                       {addressToSearchError !== false && addressToSearchError}
                     </p>
                   </div>
               </div>
-            </form>
+  
           <RenderTxHistory />
           </>
            ) : 
