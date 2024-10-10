@@ -881,16 +881,17 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                         <div className="flex flex-col items-center mt-2 " key={"mvpPost"+index}>
                             <div className="flex flex-col max-w-xl gap-2 break-words hover:shadow w-full leading-1.5 p-6 rounded-2xl border bg-card text-card-foreground dark:bg-gray-700 transition-transform transform">
                                 {/* Premium Post Indicator */}
-                                <div className="flex items-center justify-between space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
+                                <div className="flex items-start justify-between space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
                                     <span className="flex items-center">
                                         {tx.replyAddress === address ? (
                                             <>
+                                              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
                                                 <div className="flex items-center gap-2">
                                                     {tx.senderAvatarLink === false ? (
                                                         <DefaultavatarIcon />
                                                     ) : (
                                                         <Avatar className="h-9 w-9">
-                                                            <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
+                                                            <AvatarImage src={tx.senderAvatarLink} alt="用户头像" />
                                                             <AvatarFallback>
                                                                 <DefaultavatarIcon />
                                                             </AvatarFallback>
@@ -901,100 +902,102 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                                                             <div
                                                                 onClick={() => {
                                                                     copy(tx.replyAddress);
-                                                                    toast(`${tx.replyAddress} copied to clipboard`);
+                                                                    toast(`${tx.replyAddress} copied`);
                                                                 }}
                                                             >
                                                                 Your Wallet
                                                             </div>
                                                         </div>
                                                     </Badge>
-                                                    <Badge variant="secondary" className="text-primary-foreground border-none bg-gradient-to-br from-purple-100 via-blue-200 to-purple-100 h-9">
+                                                </div>
+                                                <Badge variant="secondary" className="text-primary-foreground border-none bg-gradient-to-br from-purple-100 via-blue-200 to-purple-100 h-9">
                                                     <Zap className="h-4 w-4 mr-2" /> Premium
                                                 </Badge>
-                                                </div>
+                                            </div>
                                             </>
                                         ) : (
                                             <>
-                                                <div className="flex items-center gap-2">
-                                                    {tx.senderAvatarLink === false ? (
-                                                        <DefaultavatarIcon />
-                                                    ) : (
-                                                        <Avatar className="h-9 w-9">
-                                                            <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
-                                                            <AvatarFallback>
-                                                                <DefaultavatarIcon />
-                                                            </AvatarFallback>
-                                                        </Avatar>
-                                                    )}
-                                                    <Badge variant="outline" className="py-3px shadow-sm hover:bg-accent">
-                                                        <div className="leading-7 [&:not(:first-child)]:mt-6">
-                                                            <div
-                                                                onClick={() => {
-                                                                    copy(tx.replyAddress);
-                                                                    toast(`${tx.replyAddress} copied to clipboard`);
-                                                                }}
-                                                            >
-                                                                {getContactNameIfExist(tx.replyAddress, contactList)}
-                                                            </div>
-                                                        </div>
-                                                    </Badge>
+                                               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                                <div className="flex flex-wrap items-center gap-2">
+                                    {tx.senderAvatarLink === false ? (
+                                        <DefaultavatarIcon />
+                                    ) : (
+                                        <Avatar className="h-9 w-9">
+                                            <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
+                                            <AvatarFallback>
+                                                <DefaultavatarIcon />
+                                            </AvatarFallback>
+                                        </Avatar>
+                                    )}
+                                    <Badge variant="outline" className="py-3px shadow-sm hover:bg-accent">
+                                        <div className="leading-7">
+                                            <div
+                                                onClick={() => {
+                                                    copy(tx.replyAddress);
+                                                    toast(`${tx.replyAddress} copied to clipboard`);
+                                                }}
+                                            >
+                                                {getContactNameIfExist(tx.replyAddress, contactList)}
+                                            </div>
+                                        </div>
+                                    </Badge>
 
-                                                    <RenderTipping address={tx.replyAddress} sendXecTip={sendXecTip} />
+                                    <RenderTipping address={tx.replyAddress} sendXecTip={sendXecTip} />
 
-                                                    {isExistingContact(tx.replyAddress, contactList) === false && (
-                                                        <Popover>
-                                                        <PopoverTrigger asChild>
-                                                            <Button variant="outline" size="icon" className="">
-                                                            <IdCardIcon className="h-4 w-4" />
-                                                            </Button>
-                                                        </PopoverTrigger>
-                                                        <PopoverContent>
-                                                            <div className="space-y-2">
-                                                            <h4 className="flex items-center font-medium leading-none">
-                                                                <Pencil1Icon className="h-4 w-4 mr-1" />
-                                                                New Contact
-                                                            </h4>
-                                                            <p className="text-sm text-muted-foreground break-words max-w-96">
-                                                                Enter contact name:<br />
-                                                                {tx.replyAddress}
-                                                            </p>
-                                                            </div>
-                                                            <div className="py-2">
-                                                            <Input
-                                                                id="addContactName"
-                                                                name="addContactName"
-                                                                type="text"
-                                                                value={contactListName}
-                                                                required
-                                                                placeholder="New contact name"
-                                                                className="bg-gray-50"
-                                                                maxLength="30"
-                                                                onChange={(e) => setContactListName(e.target.value)}
-                                                            />
-                                                            <Button
-                                                                type="button"
-                                                                disabled={contactListName === ''}
-                                                                className="mt-2"
-                                                                onClick={(e) => {
-                                                                addNewContact(
-                                                                    contactListName,
-                                                                    tx.replyAddress,
-                                                                    refreshContactList
-                                                                );
-                                                                setContactListName('');
-                                                                }}
-                                                            >
-                                                                Add Contact
-                                                            </Button>
-                                                            </div>
-                                                        </PopoverContent>
-                                                        </Popover>
-                                                    )}
-                                                    {/* Add Premium Post badge */}
-                                                    <Badge variant="secondary" className="text-primary-foreground border-none bg-gradient-to-br from-purple-100 via-blue-200 to-purple-100 h-9">
-                                                    <Zap className="h-4 w-4 mr-2" /> Premium
-                                                </Badge>
+                                    {isExistingContact(tx.replyAddress, contactList) === false && (
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button variant="outline" size="icon">
+                                                    <IdCardIcon className="h-4 w-4" />
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent>
+                                                <div className="space-y-2">
+                                                    <h4 className="flex items-center font-medium leading-none">
+                                                        <Pencil1Icon className="h-4 w-4 mr-1" />
+                                                        New Contact
+                                                    </h4>
+                                                    <p className="text-sm text-muted-foreground break-words max-w-96">
+                                                        Enter contact name:<br />
+                                                        {tx.replyAddress}
+                                                    </p>
                                                 </div>
+                                                <div className="py-2">
+                                                    <Input
+                                                        id="addContactName"
+                                                        name="addContactName"
+                                                        type="text"
+                                                        value={contactListName}
+                                                        required
+                                                        placeholder="New contact name"
+                                                        className="bg-gray-50"
+                                                        maxLength="30"
+                                                        onChange={(e) => setContactListName(e.target.value)}
+                                                    />
+                                                    <Button
+                                                        type="button"
+                                                        disabled={contactListName === ''}
+                                                        className="mt-2"
+                                                        onClick={(e) => {
+                                                            addNewContact(
+                                                                contactListName,
+                                                                tx.replyAddress,
+                                                                refreshContactList
+                                                            );
+                                                            setContactListName('');
+                                                        }}
+                                                    >
+                                                        Add Contact
+                                                    </Button>
+                                                </div>
+                                            </PopoverContent>
+                                        </Popover>
+                                    )}
+                                </div>
+                                <Badge variant="secondary" className="text-primary-foreground border-none bg-gradient-to-br from-purple-100 via-blue-200 to-purple-100 h-9">
+                                    <Zap className="h-4 w-4 mr-2" /> Premium
+                                </Badge>
+                            </div>
                                             </>
                                         )}
                                     </span>
