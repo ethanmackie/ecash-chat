@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { postHasErrors, replyHasErrors, isValidRecipient } from '../validation/validation';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator"
-import { Zap } from "lucide-react"
+import { Zap, BookDashed } from "lucide-react"
 import {
     Avatar,
     AvatarFallback,
@@ -447,7 +447,7 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
     const MessagePreviewModal = () => {
         return (
             <Modal show={showMessagePreview} onClose={() => setShowMessagePreview(false)}>
-                <Modal.Header>Post Preview</Modal.Header>
+                <Modal.Header className='border-b-0'><BookDashed/></Modal.Header>
                 <Modal.Body>
                     <div className="space-y-6">
                         <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
@@ -500,7 +500,7 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
     const PremiumMessagePreviewModal = () => {
         return (
             <Modal show={showPremiumMessagePreview} onClose={() => setShowPremiumMessagePreview(false)}>
-                <Modal.Header>Premium Post Preview</Modal.Header>
+                <Modal.Header className='border-b-0'><BookDashed/></Modal.Header>
                 <Modal.Body>
                     <div className="space-y-6">
                         <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
@@ -547,7 +547,6 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                             bg-gradient-to-br from-purple-300 via-blue-400 to-purple-300
                             hover:from-purple-200 hover:via-blue-300 hover:to-purple-200
                             transition-all duration-500 ease-in-out
-                            font-semibold 
                         "
                     >
                         <Zap className="mr-1 w-4 h-4"/>Post
@@ -881,17 +880,320 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                 </span>
             <div>
             {mvpPosts &&
-                mvpPosts.length > 0 &&
-                mvpPosts.map(
-                    (tx, index) => (
-                        <b key={index}>
-                            Premium message {index+1}<br />
-                            {tx.opReturnMessage}
-                        </b>
-                    )
-                )
-            }
+                 mvpPosts.length > 0 &&
+                mvpPosts.map((tx, index) => (
+                    <>
+                        <div className="flex flex-col items-center mt-2 " key={"mvpPost"+index}>
+                            <div className="flex flex-col max-w-xl gap-2 break-words hover:shadow w-full leading-1.5 p-6 rounded-2xl border bg-card text-card-foreground dark:bg-gray-700 transition-transform transform">
+                                {/* Premium Post Indicator */}
+                                <div className="flex items-center justify-between space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
+                                    <span className="flex items-center">
+                                        {tx.replyAddress === address ? (
+                                            <>
+                                                <div className="flex items-center gap-2">
+                                                    {tx.senderAvatarLink === false ? (
+                                                        <DefaultavatarIcon />
+                                                    ) : (
+                                                        <Avatar className="h-9 w-9">
+                                                            <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
+                                                            <AvatarFallback>
+                                                                <DefaultavatarIcon />
+                                                            </AvatarFallback>
+                                                        </Avatar>
+                                                    )}
+                                                    <Badge variant="outline" className="py-3px hover:bg-accent">
+                                                        <div className="font-medium leading-7 dark:text-white">
+                                                            <div
+                                                                onClick={() => {
+                                                                    copy(tx.replyAddress);
+                                                                    toast(`${tx.replyAddress} copied to clipboard`);
+                                                                }}
+                                                            >
+                                                                Your Wallet
+                                                            </div>
+                                                        </div>
+                                                    </Badge>
+                                                    <Badge variant="secondary" className="text-primary-foreground border-none bg-gradient-to-br from-purple-100 via-blue-200 to-purple-100 h-9">
+                                                    <Zap className="h-4 w-4 mr-2" /> Premium
+                                                </Badge>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className="flex items-center gap-2">
+                                                    {tx.senderAvatarLink === false ? (
+                                                        <DefaultavatarIcon />
+                                                    ) : (
+                                                        <Avatar className="h-9 w-9">
+                                                            <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
+                                                            <AvatarFallback>
+                                                                <DefaultavatarIcon />
+                                                            </AvatarFallback>
+                                                        </Avatar>
+                                                    )}
+                                                    <Badge variant="outline" className="py-3px shadow-sm hover:bg-accent">
+                                                        <div className="leading-7 [&:not(:first-child)]:mt-6">
+                                                            <div
+                                                                onClick={() => {
+                                                                    copy(tx.replyAddress);
+                                                                    toast(`${tx.replyAddress} copied to clipboard`);
+                                                                }}
+                                                            >
+                                                                {getContactNameIfExist(tx.replyAddress, contactList)}
+                                                            </div>
+                                                        </div>
+                                                    </Badge>
 
+                                                    <RenderTipping address={tx.replyAddress} sendXecTip={sendXecTip} />
+
+                                                    {isExistingContact(tx.replyAddress, contactList) === false && (
+                                                        <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <Button variant="outline" size="icon" className="">
+                                                            <IdCardIcon className="h-4 w-4" />
+                                                            </Button>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent>
+                                                            <div className="space-y-2">
+                                                            <h4 className="flex items-center font-medium leading-none">
+                                                                <Pencil1Icon className="h-4 w-4 mr-1" />
+                                                                New Contact
+                                                            </h4>
+                                                            <p className="text-sm text-muted-foreground break-words max-w-96">
+                                                                Enter contact name:<br />
+                                                                {tx.replyAddress}
+                                                            </p>
+                                                            </div>
+                                                            <div className="py-2">
+                                                            <Input
+                                                                id="addContactName"
+                                                                name="addContactName"
+                                                                type="text"
+                                                                value={contactListName}
+                                                                required
+                                                                placeholder="New contact name"
+                                                                className="bg-gray-50"
+                                                                maxLength="30"
+                                                                onChange={(e) => setContactListName(e.target.value)}
+                                                            />
+                                                            <Button
+                                                                type="button"
+                                                                disabled={contactListName === ''}
+                                                                className="mt-2"
+                                                                onClick={(e) => {
+                                                                addNewContact(
+                                                                    contactListName,
+                                                                    tx.replyAddress,
+                                                                    refreshContactList
+                                                                );
+                                                                setContactListName('');
+                                                                }}
+                                                            >
+                                                                Add Contact
+                                                            </Button>
+                                                            </div>
+                                                        </PopoverContent>
+                                                        </Popover>
+                                                    )}
+                                                    {/* Add Premium Post badge */}
+                                                    <Badge variant="secondary" className="text-primary-foreground border-none bg-gradient-to-br from-purple-100 via-blue-200 to-purple-100 h-9">
+                                                    <Zap className="h-4 w-4 mr-2" /> Premium
+                                                </Badge>
+                                                </div>
+                                            </>
+                                        )}
+                                    </span>
+
+                                    <div className="flex items-center space-x-2">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger>
+                                                <DotsHorizontalIcon />
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent>
+                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem
+                                                    onClick={(e) => {
+                                                        muteNewContact('Muted user', tx.replyAddress, setMuteList, window);
+                                                    }}
+                                                >
+                                                    <EyeNoneIcon className="h-4 w-4 mr-2" />
+                                                    Mute 
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                </div>
+
+                                {/* Render op_return message */}
+                                <div className={(tx.opReturnMessage.trim() && tx.opReturnMessage !== '\0') ? "my-2" : "hidden"}>
+                                    <p className="leading-7" key={index}>
+                                        {(tx.opReturnMessage.trim() && tx.opReturnMessage !== '\0') ? tx.opReturnMessage : ' '}
+                                    </p>
+                                </div>
+                                {/* Render any media content in the message */}
+                                {tx.nftShowcaseId !== false && tx.nftShowcaseId !== undefined && (
+                                    <>
+                                        <Card className="max-w-md w-full mx-auto transition-shadow duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50">
+                                            <CardHeader>
+                                                <CardTitle>NFT Showcase</CardTitle>
+                                                <CardDescription>
+                                                    <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
+                                                        <span onClick={() => {
+                                                            copy(tx.nftShowcaseId);
+                                                            toast(`${tx.nftShowcaseId} copied to clipboard`);
+                                                        }}>
+                                                            <span className="hidden sm:inline">
+                                                                ID: {tx.nftShowcaseId.substring(0,15)}...{tx.nftShowcaseId.substring(tx.nftShowcaseId.length - 10)}
+                                                            </span>
+                                                            <span className="sm:hidden">
+                                                                ID: {tx.nftShowcaseId.substring(0,8)}...{tx.nftShowcaseId.substring(tx.nftShowcaseId.length - 5)}
+                                                            </span>
+                                                        </span>
+                                                        <a 
+                                                            href={`${appConfig.blockExplorerUrl}/tx/${tx.nftShowcaseId}`} 
+                                                            target="_blank" 
+                                                            className="ml-2 dark:text-white font-medium" 
+                                                        >
+                                                            <Link2Icon />
+                                                        </a>
+                                                    </div>
+                                                    Last sale price: N/A
+                                                </CardDescription>
+                                            </CardHeader>
+                                            <CardContent>
+                                                <img src={`${appConfig.tokenIconsUrl}/256/${tx.nftShowcaseId}.png`} className="rounded-lg w-full object-cover"/>
+                                            </CardContent>
+                                            <CardFooter>
+                                            </CardFooter>
+                                        </Card>
+                                    </>
+                                )}
+                                {tx.imageSrc !== false && (<img src={tx.imageSrc} className="rounded-lg object-cover"/>)}
+                                {tx.videoId !== false && (<LiteYouTubeEmbed id={tx.videoId} />)}
+                                {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
+                                <p className="line-clamp-1">
+                                {tx.url !== false && (
+                                    <Alert color="info" className="flex-nowrap text-sm text-muted-foreground break-words">
+                                        <a href={tx.url} target="_blank" className="break-words">{tx.url}</a>
+                                    </Alert>
+                                )}
+                                </p>
+                                {/* Date and timestamp */}
+                                <span className="text-sm text-muted-foreground">
+                                    {tx.txDate}&nbsp;at&nbsp;{tx.txTime}
+                                </span>
+
+                                {/* Reply actions */}
+                                <div>    
+                                    {/* Reply popup */}
+                                    <Popover>
+                                        <PopoverTrigger>
+                                            <Button variant="outline" size="icon" className="mr-2">
+                                                <ChatBubbleIcon className="h-4 w-4" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className='min-w-96'>
+                                            <div >
+                                                <div className="space-y-2 ">
+                                                    <h4 className="font-medium leading-none">Reply to: </h4>
+                                                    <p className="text-sm text-muted-foreground break-words">
+                                                        {tx.replyAddress}
+                                                    </p>
+                                                </div>
+                                                <div className="py-2">
+                                                    <Textarea
+                                                        id="reply-post"
+                                                        value={replyPost}
+                                                        placeholder="Post your reply..."
+                                                        required
+                                                        onChange={e => handleReplyPostChange(e)}
+                                                        rows={4}
+                                                    />
+                                                    <p className="mt-2 text-sm text-red-600 dark:text-red-500">{replyPostError !== false && replyPostError}</p>
+                                                    <Button
+                                                        type="button"
+                                                        disabled={replyPostError || replyPost === ''}
+                                                        onClick={e => {
+                                                            replytoPost(tx.txid, replyPost)
+                                                        }}
+                                                    >
+                                                        Post Reply
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </PopoverContent>
+                                    </Popover>
+                                    {/* Social media share buttons */}
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button variant="outline" size="icon">
+                                                <Share1Icon className="h-4 w-4" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-30">
+                                            <div className="space-y-2">
+                                                <h4 className="font-medium text-gray-900 leading-none">Choose Platform</h4>
+                                            </div>
+                                            <div className="pt-2">
+                                                <TwitterShareButton
+                                                    url={
+                                                        tx.imageSrc !== false ? tx.imageSrc
+                                                            : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                                            : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                                            : 'https://ecashchat.com'
+                                                    }
+                                                    title={`[Share from eCashChat.com] - ${tx.opReturnMessage}`}
+                                                >
+                                                    <TwitterIcon size={25} round />
+                                                </TwitterShareButton>
+                                                &nbsp;
+                                                <FacebookShareButton
+                                                    url={
+                                                        tx.imageSrc !== false ? tx.imageSrc
+                                                            : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                                            : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                                            : 'https://ecashchat.com'
+                                                    }
+                                                    quote={`[Share from eCashChat.com] - ${tx.opReturnMessage}`}
+                                                >
+                                                    <FacebookIcon size={25} round />
+                                                </FacebookShareButton>
+                                                &nbsp;
+                                                <RedditShareButton
+                                                    url={
+                                                        tx.imageSrc !== false ? tx.imageSrc
+                                                            : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                                            : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                                            : 'https://ecashchat.com'
+                                                    }
+                                                    title={`[Share from eCashChat.com] - ${tx.opReturnMessage}`}
+                                                >
+                                                    <RedditIcon size={25} round />
+                                                </RedditShareButton>
+                                                &nbsp;
+                                                <TelegramShareButton
+                                                    url={
+                                                        tx.imageSrc !== false ? tx.imageSrc
+                                                            : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                                            : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                                            : 'https://ecashchat.com'
+                                                    }
+                                                    title={`[Share from eCashChat.com] - ${tx.opReturnMessage}`}
+                                                >
+                                                    <TelegramIcon size={25} round />
+                                                </TelegramShareButton>
+                                            </div>
+                                        </PopoverContent>
+                                    </Popover>
+                                    {/* Render replies to this post */}
+                                    {<RenderReplies txid={tx.txid} replies={townHallHistory.replies} />}
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                ))
+            }
             {
                 townHallHistory &&
                   townHallHistory.txs &&
