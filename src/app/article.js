@@ -1049,8 +1049,9 @@ export default function Article( {
                     tx.articleObject && (
                         <Card key={index} className="max-w-xl w-full mt-2 shadow-none">
                             <CardHeader>
-                                <div className="flex items-center justify-between gap-x-4 text-xs">
-                                    <div className="flex items-center gap-x-4">
+                                <div className="flex items-start justify-between gap-x-4 text-xs">
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-y-2 sm:gap-x-4 text-xs">
+                                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                                         <time dateTime={tx.txTime} className="text-muted-foreground">
                                             {tx.txDate}
                                         </time>
@@ -1064,14 +1065,17 @@ export default function Article( {
                                                 {getEstiamtedReadingTime(tx.articleObject.content)} min read
                                             </span>
                                         )}
-
-                                        <Badge variant="secondary">
-                                            {tx.articleObject.category || 'General'}
-                                        </Badge>
-                                        <Badge variant="secondary" className="text-primary-foreground border-none bg-gradient-to-br from-purple-100 via-blue-200 to-purple-100">
-                                         <Zap className="h-4 w-4 mr-1" /> Premium
-                                       </Badge>
                                     </div>
+                                    <div className="flex items-center gap-2">
+                                    <Badge variant="secondary">
+                                        {tx.articleObject.category || 'General'}
+                                    </Badge>
+
+                                    <Badge variant="secondary" className="text-primary-foreground border-none bg-gradient-to-br from-purple-100 via-blue-200 to-purple-100">
+                                        <Zap className="h-4 w-4 mr-1" /> Premium
+                                    </Badge>
+                                </div>
+                                </div>
 
                                     <DropdownMenu>
                                         <DropdownMenuTrigger>
