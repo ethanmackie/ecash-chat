@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { postHasErrors, replyHasErrors, isValidRecipient } from '../validation/validation';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator"
+import { Zap } from "lucide-react"
 import {
     Avatar,
     AvatarFallback,
@@ -477,16 +478,20 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                         </p>
                     </div>
                 </Modal.Body>
-                <Modal.Footer>
+                <Modal.Footer className="flex justify-end space-x-2">
+                      <Button 
+                    onClick={() => setShowMessagePreview(false)}
+                    variant="secondary"
+                    >
+                        Cancel
+                    </Button>
                     <Button onClick={() => {
                         setShowMessagePreview(false)
                         sendPost()
                     }}>
-                        Post now
+                       <PostIcon  />  Post
                     </Button>
-                    <Button onClick={() => setShowMessagePreview(false)}>
-                        Cancel
-                    </Button>
+          
                 </Modal.Footer>
             </Modal>
         );
@@ -526,16 +531,28 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                         </p>
                     </div>
                 </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick={() => {
-                        setShowPremiumMessagePreview(false)
-                        sendPost(true)
-                    }}>
-                        Post now
-                    </Button>
-                    <Button onClick={() => setShowPremiumMessagePreview(false)}>
+                <Modal.Footer className="flex justify-end space-x-2">
+                        <Button
+                        onClick={() => setShowPremiumMessagePreview(false)}
+                        variant="secondary"
+                    >
                         Cancel
                     </Button>
+                    <Button
+                        onClick={() => {
+                            setShowPremiumMessagePreview(false)
+                            sendPost(true)
+                        }}
+                        className="
+                            bg-gradient-to-br from-purple-300 via-blue-400 to-purple-300
+                            hover:from-purple-200 hover:via-blue-300 hover:to-purple-200
+                            transition-all duration-500 ease-in-out
+                            font-semibold 
+                        "
+                    >
+                        <Zap className="mr-1 w-4 h-4"/>Post
+                    </Button>
+                
                 </Modal.Footer>
             </Modal>
         );
@@ -753,22 +770,29 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                         </Tooltip>
                         </div>
                         {/* well this is post button*/}
+                        <div className="flex gap-2 justify-end">
                         <Button
-                        type="button"
-                        disabled={post === '' || postError}
-                        onClick={() => { isMobile ? sendPost() : setShowMessagePreview(true) }}
-                        >
-                        <PostIcon className="mr-1" />Post
-                        </Button>
-                        {hasTownhallMvpNft === true && (
-                            <Button
                             type="button"
                             disabled={post === '' || postError}
-                            onClick={() => { isMobile ? sendPost(true) : setShowPremiumMessagePreview(true) }}
-                            >
-                            <PostIcon className="mr-1" />Premium Post
-                            </Button>)
-                        }
+                            onClick={() => { isMobile ? sendPost() : setShowMessagePreview(true) }}
+                        >
+                            <PostIcon  />Post
+                        </Button>
+                        {hasTownhallMvpNft === true && (
+                    <Button
+                    type="button"
+                    disabled={post === '' || postError}
+                    onClick={() => { isMobile ? sendPost(true) : setShowPremiumMessagePreview(true) }}
+                    className={`
+                    bg-gradient-to-br from-purple-300 via-blue-400 to-purple-300
+                    ${(post === '' || postError) ? 'opacity-20 cursor-not-allowed' : 'hover:from-purple-200 hover:via-blue-300 hover:to-purple-200'}
+                    transition-all duration-500 ease-in-out
+                    `}
+                >
+                    <Zap className="mr-1 w-4 h-4"/>Premium Post
+                </Button>
+                        )}
+                    </div>
                         </div>
                     </div>
                 </>
