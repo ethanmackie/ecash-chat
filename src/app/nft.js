@@ -266,7 +266,7 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                             setParentNftInFocus(nftParent);
                             setShowNftModal(true);
                         }}
-                        className="transition-shadow duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50"
+                        className="transition-shadow shadow-none duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50"
                     >
                         <CardHeader>
                             <CardTitle>{nftParent.genesisInfo.tokenName} {nftParent.genesisInfo.tokenTicker}</CardTitle>

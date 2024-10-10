@@ -642,7 +642,7 @@ export default function Home() {
         </div>
 
         <header className="fixed mt-4 flex top-0 z-50 w-full justify-center ">
-          <div className="container flex items-center justify-between rounded-lg flex bg-black w-full h-14 mx-4 md:mx-auto md:max-w-xl lg:max-w-3xl border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/40">
+          <div className="container flex items-center justify-between rounded-lg flex bg-black w-full h-14 mx-4 md:mx-auto md:max-w-xl lg:max-w-3xl border-b border-border/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/40">
             <div className="sm:flex">
               <a className="flex items-center space-x-2" href="#">
                 <EcashchatIcon />
