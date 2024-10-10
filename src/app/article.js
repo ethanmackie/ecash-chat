@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Modal } from "flowbite-react";
 import { Button } from "@/components/ui/button";
-import { Search, UserRoundSearch, Activity } from "lucide-react"
+import { Search, UserRoundSearch, Activity, BookOpenCheck, PenLine, MessageCircleOff, MicVocal, Podcast, Save} from "lucide-react"
 import Image from "next/image";
 import {
   Tooltip,
@@ -31,7 +31,6 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon, Pencil1Icon, ChatBubbleIcon, DotsHorizontalIcon, EyeNoneIcon} from "@radix-ui/react-icons";
 import { ImDownload3 } from "react-icons/im";
-import { RiSave3Fill } from "react-icons/ri";
 import {
     EncryptionIcon,
     UnlockIcon,
@@ -1399,24 +1398,38 @@ export default function Article( {
                         id="value-input"
                         aria-describedby="helper-text-explanation"
                         placeholder="Pay-to-read in XEC -optional"
-                        className="bg-white w-[240px]"
+                        className="bg-white md:w-[240px]"
                         value={paywallAmountXec}
                         onChange={e => handlePaywallAmountChange(e)}
                         />
-                          <Button
+                             <Button
                                 type="button"
-                                variant="outline" size="icon"
+                                variant="outline"
+                                className="px-3 w-auto"
                                 onClick={() => savedDraftArticleToLocalStorage()}
                                 >
-                                <RiSave3Fill />
+                                <Save className="h-4 w-4" />
                                 </Button>
+
                                 <Button
                                 type="button"
-                                variant="outline" size="icon"
+                                variant="outline" 
+                                className="px-3 w-auto"
                                 onClick={() => loadDraftArticleFromLocalStorage()}
                                 >
                                 <ImDownload3 />
                                 </Button>
+                                
+                                <Toggle
+                                id="disableReplies"
+                                variant="outline"
+                                className="bg-white"
+                                aria-label="Disable replies to this article"
+                                pressed={disableArticleReplies}
+                                onPressedChange={(state) => setDisableArticleReplies(state)}
+                            >
+                                <MessageCircleOff className="h-4 w-4" />
+                            </Toggle>
                     </div>
                   
                     </div>
@@ -1454,7 +1467,7 @@ export default function Article( {
                         )}
 
                             <p className="text-sm text-red-600 dark:text-red-500">{articleError !== false && articleError}</p>
-                            <div className="flex flex-col sm:flex-row justify-between items-center mt-2">
+                            <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row justify-between items-center mt-2">
                                 {/* Write article button*/}
 
                                 {articleCategory !== "Podcast" ? (
@@ -1464,16 +1477,21 @@ export default function Article( {
                                         disabled={article === '' || articleError || articleTitle === '' || paywallAmountXecError}
                                         onClick={() => sendArticle()}
                                     >
-                                        <BiSolidNews />&nbsp;Post Article
+                                        <BookOpenCheck className="mr-2 w-4 h-4" />Post Article
                                     </Button>
                                     {hasArticleMvpNft === true && (
-                                    <Button
-                                        type="button"
-                                        disabled={article === '' || articleError || articleTitle === '' || paywallAmountXecError}
-                                        onClick={() => sendArticle(true)}
-                                    >
-                                        <BiSolidNews />&nbsp;Post Premium Article
-                                    </Button>
+                                  <Button
+                                  type="button"
+                                  disabled={article === '' || articleError || articleTitle === '' || paywallAmountXecError}
+                                  onClick={() => sendArticle(true)}
+                                  className={`
+                                      bg-gradient-to-br from-purple-300 via-blue-400 to-purple-300
+                                      ${(article === '' || articleError || articleTitle === '' || paywallAmountXecError) ? 'opacity-20 cursor-not-allowed' : 'hover:from-purple-200 hover:via-blue-300 hover:to-purple-200'}
+                                      transition-all duration-500 ease-in-out
+                                  `}
+                              >
+                                  <PenLine className="mr-2 w-4 h-4"/>Post Premium Article
+                              </Button>
                                     )}
                                 </>
                                 ) : (
@@ -1496,57 +1514,43 @@ export default function Article( {
                                     </>
                                     ) : (
                                     <>
-                                        <BiSolidNews />&nbsp;Post Podcast
+                                        <MicVocal className="mr-2 w-4 h-4" />Post Podcast
                                     </>
                                     )}
                                     </Button>
 
                                     {hasArticleMvpNft === true && (
-                                    <Button
-                                        type="button"
-                                        disabled={articleError || articleTitle === '' || paywallAmountXecError || isFileSelected === false}
-                                        onClick={() => {
-                                            if (articleCategory === 'Podcast' && paywallAmountXec < 110) {
-                                                setPaywallAmountXecError(`Paywall amount for Podcasts must be equal or greater than 110 XEC`);
-                                                return;
-                                            }
-                                            sendAudioArticle(true)
-                                        }}
-                                    >
-                                        {isUploading ? (
-                                    <>
-                                        <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                                        Uploading... please wait
-                                    </>
-                                    ) : (
-                                    <>
-                                        <BiSolidNews />&nbsp;Post Premium Podcast
-                                    </>
-                                    )}
-                                    </Button>
+                                  <Button
+                                  type="button"
+                                  disabled={articleError || articleTitle === '' || paywallAmountXecError || isFileSelected === false}
+                                  onClick={() => {
+                                      if (articleCategory === 'Podcast' && paywallAmountXec < 110) {
+                                          setPaywallAmountXecError(`Paywall amount for Podcasts must be equal or greater than 110 XEC`);
+                                          return;
+                                      }
+                                      sendAudioArticle(true)
+                                  }}
+                                  className={`
+                                      bg-gradient-to-br from-purple-300 via-blue-400 to-purple-300
+                                      ${(articleError || articleTitle === '' || paywallAmountXecError || isFileSelected === false) ? 'opacity-20 cursor-not-allowed' : 'hover:from-purple-200 hover:via-blue-300 hover:to-purple-200'}
+                                      transition-all duration-500 ease-in-out
+                                  `}
+                              >
+                                  {isUploading ? (
+                                  <>
+                                      <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                                      Uploading... please wait
+                                  </>
+                                  ) : (
+                                  <>
+                                      <Podcast className="mr-2 w-4 h-4" />Post Premium Podcast
+                                  </>
+                                  )}
+                              </Button>
                                     )}
                                 </>
                                 )
                                 }
-                                <br />
-                                <div className="sm:flex">
-                               
-                                </div>
-                                <div className="relative flex items-start mt-2">
-                                    <div className="flex h-6 items-center py-2">
-                                        <Checkbox
-                                        id="comments"
-                                        checked={disableArticleReplies}
-                                        onCheckedChange={() => setDisableArticleReplies(!disableArticleReplies)}
-                                        className="rounded"
-                                        />
-                                    </div>
-                                    <div className="ml-3 text-sm leading-6">
-                                        <Label htmlFor="comments" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                        Disable replies to this article
-                                        </Label>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                 )}
