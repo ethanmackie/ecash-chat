@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Modal } from "flowbite-react";
 import { Button } from "@/components/ui/button";
-import { Search, UserRoundSearch, Activity, BookOpenCheck, PenLine, MessageCircleOff, MicVocal, Podcast, Save} from "lucide-react"
+import { Search, UserRoundSearch, Activity, BookOpenCheck, PenLine, MessageCircleOff, MicVocal, Podcast, Save, Zap} from "lucide-react"
 import Image from "next/image";
 import {
   Tooltip,
@@ -1043,16 +1043,278 @@ export default function Article( {
 
         return (
             <div className="max-w-xl w-full mx-auto">
-            {mvpArticles &&
+               {mvpArticles &&
                 mvpArticles.length > 0 &&
-                mvpArticles.map(
-                    (tx, index) => (
-                        <b key={index}>
-                            Premium article {index+1}<br />
-                            {tx.articleObject.title}
-                        </b>
+                mvpArticles.map((tx, index) => (
+                    tx.articleObject && (
+                        <Card key={index} className="max-w-xl w-full mt-2 shadow-none">
+                            <CardHeader>
+                                <div className="flex items-center justify-between gap-x-4 text-xs">
+                                    <div className="flex items-center gap-x-4">
+                                        <time dateTime={tx.txTime} className="text-muted-foreground">
+                                            {tx.txDate}
+                                        </time>
+
+                                        {tx.articleObject.ipfsHash ? (
+                                            <span className="text-muted-foreground">
+                                                🎵
+                                            </span>
+                                        ) : (
+                                            <span className="text-muted-foreground">
+                                                {getEstiamtedReadingTime(tx.articleObject.content)} min read
+                                            </span>
+                                        )}
+
+                                        <Badge variant="secondary">
+                                            {tx.articleObject.category || 'General'}
+                                        </Badge>
+                                        <Badge variant="secondary" className="text-primary-foreground border-none bg-gradient-to-br from-purple-100 via-blue-200 to-purple-100">
+                                         <Zap className="h-4 w-4 mr-1" /> Premium
+                                       </Badge>
+                                    </div>
+
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger>
+                                            <DotsHorizontalIcon />
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent>
+                                            <DropdownMenuLabel>Action</DropdownMenuLabel>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem
+                                                onClick={(e) => {
+                                                    muteNewContact('Muted user', tx.replyAddress, setMuteList, window);
+                                                }}
+                                            >
+                                                <EyeNoneIcon className="h-4 w-4 mr-2" />
+                                                Mute
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
+                                <CardTitle>{tx.articleObject.title}</CardTitle>
+                                <CardDescription></CardDescription>
+                            </CardHeader>
+                            <CardContent className="relative">
+                                <a
+                                    href="#"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        setCurrentArticleTxObj(tx);
+                                        if (tx.articleObject.paywallPrice > 0) {
+                                            handlePaywallStatus(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress);
+                                        } else {
+                                            setShowArticleModal(true);
+                                        }
+                                    }}
+                                >
+                                    {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) && (
+                                        <Alert
+                                            className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-auto z-10 flex items-center justify-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/5"
+                                        >
+                                            <AlertDescription className="flex items-center justify-center whitespace-nowrap">
+                                                {tx.articleObject.ipfsHash ? (
+                                                    <>
+                                                        <HeadphoneIcon />
+                                                        {`This podcast costs ${formatBalance(tx.articleObject.paywallPrice, getUserLocale(navigator))} XEC to listen`}
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <EncryptionIcon />
+                                                        {`This article costs ${formatBalance(tx.articleObject.paywallPrice, getUserLocale(navigator))} XEC to view`}
+                                                    </>
+                                                )}
+                                            </AlertDescription>
+                                        </Alert>
+                                    )}
+                                    <div className="line-clamp-3">
+                                        <p
+                                            className={`mt-0 text-sm leading-6 text-gray-600 break-words max-h-80 ${
+                                                tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) ? 'blur-sm pt-6 pb-2' : ''
+                                            }`}
+                                        >
+                                            {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) ? (
+                                                tx.articleObject.ipfsHash ? (
+                                                    <>
+                                                        <Image
+                                                            src="/audiobook.png"
+                                                            alt="ecash podcast"
+                                                            width={156}
+                                                            height={64}
+                                                            priority
+                                                            className="mx-auto mb-2"
+                                                        />
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Skeleton className="h-4 mt-2 w-full" />
+                                                        <Skeleton className="h-4 mt-2 w-2/3" />
+                                                        <Skeleton className="h-4 mt-2 w-1/2" />
+                                                    </>
+                                                )
+                                            ) : tx.articleObject.ipfsHash ? (
+                                                <div className="flex flex-col items-center">
+                                                    <Image
+                                                        src="/audiobook.png"
+                                                        alt="ecash podcast"
+                                                        width={156}
+                                                        height={64}
+                                                        priority
+                                                        className="mx-auto mb-2"
+                                                    />
+                                                    <div className="flex items-center justify-center">
+                                                        <PodcastIcon />
+                                                        <p className="text-sm text-muted-foreground">Click to listen to this podcast</p>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <RenderArticle
+                                                    content={tx.articleObject.content}
+                                                    ipfsAudioHash={tx.articleObject.ipfsHash}
+                                                />
+                                            )}
+                                        </p>
+                                    </div>
+                                </a>
+                            </CardContent>
+                            <CardFooter>
+                                <div className="relative mt-2 flex items-center gap-x-2">
+                                    {tx.senderAvatarLink === false ? (
+                                        <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
+                                    ) : (
+                                        <Avatar className="h-9 w-9">
+                                            <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
+                                            <AvatarFallback><DefaultavatarIcon /></AvatarFallback>
+                                        </Avatar>
+                                    )}
+                                    <div className="text-sm leading-6">
+                                        <p className="font-semibold text-gray-900">
+                                            <Badge variant="outline" className="py-3px">
+                                                <div
+                                                    className="leading-7 [&:not(:first-child)]:mt-6"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        copy(tx.replyAddress);
+                                                        toast(`${tx.replyAddress} copied to clipboard`);
+                                                    }}
+                                                >
+                                                    {getContactNameIfExist(tx.replyAddress, contactList)}
+                                                </div>
+                                            </Badge>
+                                        </p>
+                                    </div>
+                                    {/* Add contact popover to input the new contact name */}
+                                    {isExistingContact(tx.replyAddress, contactList) === false && (
+                                        <div
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                            }}
+                                        >
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <Button variant="outline" size="icon" className="mr-2">
+                                                        <IdCardIcon className="h-4 w-4" />
+                                                    </Button>
+                                                </PopoverTrigger>
+                                                <PopoverContent>
+                                                    <div className="space-y-2">
+                                                        <h4 className="flex items-center font-medium leading-none">
+                                                            <Pencil1Icon className="h-4 w-4 mr-1" />
+                                                            New contact
+                                                        </h4>
+                                                        <p className="text-sm text-muted-foreground max-w-96 break-words">
+                                                            Input contact name for <br />{tx.replyAddress}
+                                                        </p>
+                                                    </div>
+                                                    <div className="py-2">
+                                                        <Input
+                                                            id="addContactName"
+                                                            name="addContactName"
+                                                            type="text"
+                                                            ref={newContactNameInput}
+                                                            placeholder="New contact name"
+                                                            className="bg-gray-50"
+                                                            maxLength="30"
+                                                        />
+                                                        <Button
+                                                            type="button"
+                                                            disabled={newContactNameInput?.current?.value === ''}
+                                                            className="mt-2"
+                                                            onClick={e => {
+                                                                addNewContact(newContactNameInput?.current?.value, tx.replyAddress, refreshContactList);
+                                                            }}
+                                                        >
+                                                            Add Contact
+                                                        </Button>
+                                                    </div>
+                                                </PopoverContent>
+                                            </Popover>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="relative mt-2 flex items-center gap-x-2 ml-auto md:hidden">
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button variant="ghost" size="icon" className="mr-2">
+                                                <Activity className="h-4 w-4 text-muted-foreground" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-120">
+                                            <div className="flex flex-col items-start space-y-1 ml-2">
+                                                <div className="flex items-center space-x-1">
+                                                    <ChatBubbleIcon />
+                                                    <span>{getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}</span>
+                                                </div>
+                                                <div className="flex items-center space-x-1">
+                                                    <GraphchartIcon />
+                                                    <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} `}</span>
+                                                </div>
+                                                <p>
+                                                    {getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned.gt(0) &&
+                                                        `Earned ${formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))} XEC`}
+                                                </p>
+                                            </div>
+                                        </PopoverContent>
+                                    </Popover>
+                                </div>
+                                <div className="relative mt-2 flex items-center gap-x-2 ml-auto hidden md:flex">
+                                    {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) && (
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger>
+                                                    <UnlockIcon />
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>This article has been paid.</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    )}
+                                    <div className="flex items-center space-x-1 ml-2 ">
+                                        <ChatBubbleIcon />
+                                        <span>{getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}</span>
+                                    </div>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <div className="flex items-center space-x-1 ml-2">
+                                                    <GraphchartIcon />
+                                                    <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} `}</span>
+                                                </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>
+                                                    {`Earned ${formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))} XEC`}
+                                                    <br />
+                                                    {`from ${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} unlocks`}
+                                                </p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
+                            </CardFooter>
+                        </Card>
                     )
-                )
+                ))
             }
 
             {latestArticleHistory &&
