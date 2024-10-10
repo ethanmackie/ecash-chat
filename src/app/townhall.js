@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { postHasErrors, replyHasErrors, isValidRecipient } from '../validation/validation';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator"
-import { Zap, BookDashed } from "lucide-react"
+import { Toggle } from "@/components/ui/toggle";
+import { Zap, BookDashed, UserRoundSearch } from "lucide-react"
 import {
     Avatar,
     AvatarFallback,
@@ -795,23 +796,17 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                         </div>
                     </div>
                 </>
-             <Separator className="my-2" />
             {/* Townhall Post History */}
-
-            <div className="relative flex items-start mt-2 mb-2">
-                <div className="flex h-6 items-center py-2">
-                    <Checkbox
-                    id="curateByContacts"
-                    checked={curateByContacts}
-                    onCheckedChange={() => handleCurateByContactsChange(!curateByContacts)}
-                    className="rounded"
-                    />
-                </div>
-                <div className="ml-3 text-sm leading-6">
-                    <Label htmlFor="curateByContacts" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                        Only show posts by your contacts
-                    </Label>
-                </div>
+            <div className="flex justify-end my-2">
+            <Toggle
+                variant="outline"
+                className="bg-white"
+                aria-label="Only show messages by your contacts"
+                pressed={curateByContacts}
+                onPressedChange={(state) => handleCurateByContactsChange(state)}
+            >
+                <UserRoundSearch className="h-4 w-4"/>
+            </Toggle>
             </div>
 
             {/*Set up pagination menu*/}
