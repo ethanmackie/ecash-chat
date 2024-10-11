@@ -8,6 +8,7 @@ import { Modal } from "flowbite-react";
 import { encodeBip21NftShowcase, formatDate } from '../utils/utils';
 import { Button } from "@/components/ui/button";
 import { MagicIcon} from "@/components/ui/social";
+import { Loader, RefreshCcw } from "lucide-react"
 import {
     Card,
     CardContent,
@@ -249,9 +250,9 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                 onClick={() => setManualRefresh(!manualRefresh)}
             >
                  {isRefreshing ? (
-                <ReloadIcon className="h-4 w-4 animate-spin" />
+                <Loader className="h-4 w-4 animate-spin" />
                 ) : (
-                <ReloadIcon className="h-4 w-4" />
+                <RefreshCcw className="h-4 w-4" />
                 )}
             </Button>
             </div>
