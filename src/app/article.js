@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Modal } from "flowbite-react";
 import { Button } from "@/components/ui/button";
-import { Search, UserRoundSearch, Activity, BookOpenCheck, PenLine, MessageCircleOff, MicVocal, Podcast, Save, Zap} from "lucide-react"
+import { Search, UserRoundSearch, Activity, BookOpenCheck, PenLine, MessageCircleOff, MicVocal, Podcast, Save, Zap, MessageCircle, ChartNoAxesColumnIncreasing} from "lucide-react"
 import Image from "next/image";
 import {
   Tooltip,
@@ -29,7 +29,7 @@ import {
     PopoverTrigger,
   } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon, Pencil1Icon, ChatBubbleIcon, DotsHorizontalIcon, EyeNoneIcon} from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon, Pencil1Icon, DotsHorizontalIcon, EyeNoneIcon} from "@radix-ui/react-icons";
 import { ImDownload3 } from "react-icons/im";
 import {
     EncryptionIcon,
@@ -90,7 +90,7 @@ import {
     isExistingContact,
     muteNewContact,
 } from '../utils/utils';
-import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, GraphchartIcon, Stats2Icon, PodcastIcon, HeadphoneIcon } from "@/components/ui/social";
+import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, Stats2Icon, PodcastIcon, HeadphoneIcon } from "@/components/ui/social";
 import { toast } from 'react-toastify';
 import { Toggle } from "@/components/ui/toggle";
 import { BiSolidNews } from "react-icons/bi";
@@ -1265,11 +1265,11 @@ export default function Article( {
                                         <PopoverContent className="w-120">
                                             <div className="flex flex-col items-start space-y-1 ml-2">
                                                 <div className="flex items-center space-x-1">
-                                                    <ChatBubbleIcon />
+                                                    <MessageCircle className="w-4 h-4" />
                                                     <span>{getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}</span>
                                                 </div>
                                                 <div className="flex items-center space-x-1">
-                                                    <GraphchartIcon />
+                                                    <ChartNoAxesColumnIncreasing className="w-4 h-4"/>
                                                     <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} `}</span>
                                                 </div>
                                                 <p>
@@ -1294,14 +1294,14 @@ export default function Article( {
                                         </TooltipProvider>
                                     )}
                                     <div className="flex items-center space-x-1 ml-2 ">
-                                        <ChatBubbleIcon />
+                                        <MessageCircle className="w-4 h-4" />
                                         <span>{getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}</span>
                                     </div>
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger>
                                                 <div className="flex items-center space-x-1 ml-2">
-                                                    <GraphchartIcon />
+                                                    <ChartNoAxesColumnIncreasing className="w-4 h-4"/>
                                                     <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} `}</span>
                                                 </div>
                                             </TooltipTrigger>
@@ -1538,11 +1538,11 @@ export default function Article( {
                                     <PopoverContent className="w-120">
                                     <div className="flex flex-col items-start space-y-1 ml-2">
                             <div className="flex items-center space-x-1">
-                                <ChatBubbleIcon />
+                                <MessageCircle className="w-4 h-4" />
                                 <span>{getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}</span>
                             </div>
                             <div className="flex items-center space-x-1">
-                            <GraphchartIcon />
+                            <ChartNoAxesColumnIncreasing className="w-4 h-4"/>
                             <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} `}</span>
                             </div>
                             <p>
@@ -1566,7 +1566,7 @@ export default function Article( {
                               </TooltipProvider>
                             )}
                               <div className="flex items-center space-x-1 ml-2 ">
-                            <ChatBubbleIcon />
+                            <MessageCircle className="w-4 h-4" />
                             <span>{getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}</span>
                             </div>
                             
@@ -1575,7 +1575,7 @@ export default function Article( {
                             <TooltipTrigger>
                             
                             <div className="flex items-center space-x-1 ml-2">
-                            <GraphchartIcon />
+                            <ChartNoAxesColumnIncreasing className="w-4 h-4" />
                             <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} `}</span>
                          </div>
                             </TooltipTrigger>

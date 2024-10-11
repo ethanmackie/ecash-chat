@@ -13,6 +13,7 @@ import ContactListPanel from './contact';
 import { queryAliasServer } from '../alias/alias-server';
 import { encodeBip21Message, getTweetId, getNFTAvatarLink, encodeBip21Auth } from '../utils/utils';
 import { Toggle } from "@/components/ui/toggle";
+import { Search, Loader } from "lucide-react"
 import {
     Accordion,
     AccordionContent,
@@ -652,7 +653,7 @@ export default function Home() {
 
             {syncronizingState && (
               <>
-              <ReloadIcon className="h-4 w-4 animate-spin" />Checking for new on-chain content...
+              <Loader className="h-4 w-4 animate-spin" />
               </>
             )}
 
@@ -822,7 +823,7 @@ export default function Home() {
                     >
                         {showLoadingSpinner ? (
                         <div className="flex justify-center">
-                            <LoadingSpinner className="h-2 w-2 animate-spin" />
+                            <Loader className="h-4 w-4 animate-spin" />
                         </div>
                         ) : (
                         <div className="flex items-center justify-center">
@@ -844,7 +845,7 @@ export default function Home() {
                         <>
                         <div className="flex w-full items-center">
                           <Button disabled className="flex w-full mr-2">
-                            <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                            <Loader className="mr-2 h-4 w-4 animate-spin" />
                             Authentication in progress
                           </Button>
                           <Button
