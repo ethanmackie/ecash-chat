@@ -270,7 +270,19 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                 mvpTxs.push(thisTxs);
             }
         }
-        setMpvPosts(mvpTxs);
+
+        // Remove MVP posts when it has been > 24 hours
+        const currentTime = Date.now();
+        const parsedMvpTxs = [];
+        for (const thisMvpTx of mvpTxs) {
+            const thisDate = new Date(thisMvpTx.txDate + ' ' + thisMvpTx.txTime);
+            const thisDateSinceArticle = (currentTime - thisDate.getTime()) / 3600000;
+            if (thisDateSinceArticle < 24) {
+                parsedMvpTxs.push(thisMvpTx);
+            }
+        }
+
+        setMpvPosts(parsedMvpTxs);
     }
 
     // Validate the reply post
