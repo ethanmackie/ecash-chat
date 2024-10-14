@@ -35,7 +35,6 @@ import {
     EncryptionIcon,
     UnlockIcon,
     IdCardIcon,
-    MuteIcon,
 } from "@/components/ui/social";
 import {
     Select,
@@ -91,7 +90,7 @@ import {
     muteNewContact,
 } from '../utils/utils';
 import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, Stats2Icon, PodcastIcon, HeadphoneIcon } from "@/components/ui/social";
-import { toast } from 'react-toastify';
+import { useToast } from "@/hooks/use-toast";
 import { Toggle } from "@/components/ui/toggle";
 import { BiSolidNews } from "react-icons/bi";
 import {
@@ -168,6 +167,7 @@ export default function Article( {
     const [isUploading, setIsUploading] = useState(false);
     const [hasArticleMvpNft, setHasArticleMvpNft] = useState(false);
     const [mvpArticles, setMvpArticles] = useState([]);
+    const { toast } = useToast();
 
     useEffect(() => {
         const handleResize = () => {
@@ -217,7 +217,11 @@ export default function Article( {
                     }
                 } catch (err) {
                     console.log(`Error retrieving tx details for ${sharedArticleTxid}`, err);
-                    toast(err.message);
+                    toast({
+                        title: 'error',
+                        description: `${err.message}`,
+                        variant: 'destructive',
+                      });
                 }
 
                 // Retrieve full artcle info via content hash
@@ -435,9 +439,15 @@ export default function Article( {
         const bip21Str = `${address}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`;
         setIsUploading(true);
         try {
-            toast('Uploading to IPFS, please wait...');
+            toast({
+                title: "Uploading",
+                description: `Uploading to IPFS, please wait...`,
+              });
             const ipfsHash = await pinata.upload.file(fileSelected);
-            toast('IPFS upload complete');
+            toast({
+                title: "✅Complete",
+                description: `IPFS upload complete`,
+              });
 
             if (isMobile) {
                 window.open(
@@ -475,7 +485,10 @@ export default function Article( {
                 return articleHash === thisArticle.hash;
             });
             if (isDuplicateArticle) {
-                toast('This audio article already exists.');
+                toast({
+                    title: "oops",
+                    description: `This audio article already exists.`,
+                  });
                 return;
             }
             updatedArticles.push(articleObject);
@@ -534,7 +547,10 @@ export default function Article( {
             return articleHash === thisArticle.hash;
         });
         if (isDuplicateArticle) {
-            toast('This article already exists.');
+            toast({
+                title: "oops",
+                description: `This article already exists.`,
+              });
             return;
         }
         updatedArticles.push(articleObject);
@@ -672,7 +688,10 @@ export default function Article( {
                                 )}
                                 <div className="font-medium dark:text-white" onClick={() => {
                                     copy(foundReply.replyAddress);
-                                    toast(`${foundReply.replyAddress} copied to clipboard`);
+                                    toast({
+                                        title: "✅Clipboard",
+                                        description: `${foundReply.replyAddress} copied to clipboard`,
+                                      });
                                 }}>
                                     <Badge className="leading-7 [&:not(:first-child)]:mt-6 py-3px" variant="outline">
                                         {getContactNameIfExist(foundReply.replyAddress, contactList)}
@@ -803,9 +822,16 @@ export default function Article( {
     const savedDraftArticleToLocalStorage = async () => {
         try {
             await localforage.setItem('draftArticle', article);
-            toast('Draft article saved');
+            toast({
+                title: '✅Saved',
+                description: 'Draft article saved',
+              });
         } catch (err) {
-            toast('Failed to save draft article to local storage');
+            toast({
+                title: 'error',
+                description: 'Failed to save draft article to local storage',
+                variant: 'destructive',
+              });
         }
     };
 
@@ -815,10 +841,17 @@ export default function Article( {
             const draftArticle = await localforage.getItem('draftArticle');
             if (draftArticle) {
                 setArticle(draftArticle);
-                toast('Draft article loaded');
+                toast({
+                    title: '✅Loaded',
+                    description: 'Draft article loaded',
+                  });
             }
         } catch (err) {
-            toast('Failed to load draft article from local storage');
+            toast({
+                title: 'error',
+                description: 'Failed to load draft article from local storage',
+                variant: 'destructive',
+              });
         }
     };
 
@@ -1210,7 +1243,10 @@ export default function Article( {
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         copy(tx.replyAddress);
-                                                        toast(`${tx.replyAddress} copied to clipboard`);
+                                                        toast({
+                                                            title: '✅Clipboard',
+                                                            description: `${tx.replyAddress} copied to clipboard`,
+                                                          });
                                                     }}
                                                 >
                                                     {getContactNameIfExist(tx.replyAddress, contactList)}
@@ -1450,7 +1486,10 @@ export default function Article( {
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         copy(tx.replyAddress);
-                                                        toast(`${tx.replyAddress} copied to clipboard`);
+                                                        toast({
+                                                            title: '✅Clipboard',
+                                                            description: `${tx.replyAddress} copied to clipboard`,
+                                                          });
                                                     }}
                                                 >
                                                     {getContactNameIfExist(tx.replyAddress, contactList)}

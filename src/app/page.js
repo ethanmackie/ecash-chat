@@ -576,7 +576,10 @@ export default function Home() {
             onClick={() => {
                 setShowFullAddress(!showFullAddress);
                 copy(address);
-                toast(`${address} copied to clipboard`);
+                toast({
+                  title: "✅Clipboard",
+                  description: `${address} copied to clipboard`,
+                });
               }}
             >
           {showFullAddress ? address : `${address.substring(0, 10)} **** **** ${address.substring(address.length - 5)}`}
