@@ -31,7 +31,7 @@ import {
   deleteMutedContact,
 } from '../utils/utils';
 import { DefaultavatarIcon, IdCardIcon} from "@/components/ui/social";
-import { toast } from 'react-toastify';
+import { useToast } from "@/hooks/use-toast";
 import copy from 'copy-to-clipboard';
 import { Input } from "@/components/ui/input";
 import {
@@ -45,6 +45,7 @@ export default function ContactListPanel({ latestAvatars }) {
     const [contactList, setContactList] = useState([]);
     const [muteList, setMuteList] = useState([]);
     const [contactListName, setContactListName] = useState('');
+    const { toast } = useToast();
 
     useEffect(() => {
         (async () => {
@@ -100,7 +101,10 @@ export default function ContactListPanel({ latestAvatars }) {
                                 className="text-sm text-muted-foreground max-w-lg break-words text-balance leading-relaxed"
                                 onClick={() => {
                                 copy(thisContact.address);
-                                toast(`${thisContact.address} copied to clipboard`);
+                                toast({
+                                  title: "✅Clipboard",
+                                  description: `${thisContact.address} copied to clipboard`,
+                                });
                                 }}
                             >
                                 {`${thisContact.address.substring(0, 11)}...${thisContact.address.substring(thisContact.address.length - 5)}`}
@@ -242,7 +246,10 @@ export default function ContactListPanel({ latestAvatars }) {
                                   className="text-sm text-muted-foreground max-w-lg break-words text-balance leading-relaxed"
                                   onClick={() => {
                                   copy(thisContact.address);
-                                  toast(`${thisContact.address} copied to clipboard`);
+                                  toast({
+                                    title: "✅Clipboard",
+                                    description: `${thisContact.address} copied to clipboard`,
+                                  });
                                   }}
                               >
                                   {`${thisContact.address.substring(0, 11)}...${thisContact.address.substring(thisContact.address.length - 5)}`}
