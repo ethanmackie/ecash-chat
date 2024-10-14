@@ -25,7 +25,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu";
-import { toast } from 'react-toastify';
+  import { useToast } from "@/hooks/use-toast";
 import { ReloadIcon } from "@radix-ui/react-icons";
 
 export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) {
@@ -36,6 +36,7 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
     const [fullNfts, setFullNfts] = useState([]);
     const [manualRefresh, setManualRefresh] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const { toast } = useToast();
 
     useEffect(() => {
         (async () => {
@@ -141,7 +142,10 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
         try {
             await addAvatar(latestAvatars, newAvatar);
             setShowNftModal(false);
-            toast(`Avatar updated, refreshing app`);
+            toast({
+                title: '✅Updated',
+                description: `Avatar updated, refreshing app`,
+              });
             updateAvatars(setLatestAvatars);
             setTimeout(function (){
                 window.location.reload();
