@@ -396,29 +396,38 @@ export default function Article( {
         }
     };
 
-    // Handle the checkbox to curate posts from contacts only
-    const handleCurateByContactsChange = async (newState) => {
-        setCurateByContacts(newState);
-        const articleCache = await localforage.getItem(appConfig.localArticleCacheParam);
-        if (newState === true) {
-            await refreshContactList();
-            setCurrentPage(0);
-            await getArticleHistoryByPage(
-                0,
-                true, // filter on local cache only
-                articleCache,
-                true, // flag for contact filter
-            );
-        } else {
-            setCurrentPage(0);
-            await getArticleHistoryByPage(
-                0,
-                true, // filter on local cache only
-                articleCache,
-                false,
-            );
-        }
-    };
+  // Handle the checkbox to curate posts from contacts only
+        const handleCurateByContactsChange = async (newState) => {
+            setCurateByContacts(newState);
+            const articleCache = await localforage.getItem(appConfig.localArticleCacheParam);
+            if (newState === true) {
+                await refreshContactList();
+                setCurrentPage(0);
+                await getArticleHistoryByPage(
+                    0,
+                    true, // filter on local cache only
+                    articleCache,
+                    true, // flag for contact filter
+                );
+                toast({
+                    title: "Contact filtering is on",
+                    description: "Now only showing articles from your contacts",
+                });
+            } else {
+                setCurrentPage(0);
+                await getArticleHistoryByPage(
+                    0,
+                    true, // filter on local cache only
+                    articleCache,
+                    false,
+                );
+                toast({
+                    title: "Contact filtering is off",
+                    description: "Now showing all articles",
+                });
+            }
+        };
+
 
     // Calculates article reading time in minutes
     const getEstiamtedReadingTime = (articleContent) => {

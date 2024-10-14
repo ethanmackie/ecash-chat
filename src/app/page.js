@@ -664,7 +664,14 @@ export default function Home() {
             <div className="sm:flex">
               <a className="flex items-center space-x-2" href="#">
                 <EcashchatIcon />
-                <span className="font-bold sm:inline-block">eCashChat</span>
+                <Image
+                  src="/ecashchat.png" 
+                  alt="eCashChat"
+                  width={90} 
+                  height={24}
+                  priority
+                  className="hidden sm:inline-block" 
+                />
               </a>
             </div>
 

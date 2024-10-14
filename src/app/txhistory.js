@@ -228,6 +228,10 @@ export default function TxHistory({ address, isMobile }) {
               true, // filter on local cache only
               true, // flag for contact filter
           );
+          toast({
+              title: "Contact filtering is on",
+              description: "Now only showing transactions from your contacts",
+          });
       } else {
           setCurrentPage(0);
           await getTxHistoryByPage(
@@ -235,8 +239,12 @@ export default function TxHistory({ address, isMobile }) {
               false, // filter on local cache only
               false,
           );
+          toast({
+              title: "Contact filtering is off",
+              description: "Now showing all transactions",
+          });
       }
-    };
+  };
 
     // Validates the address being filtered for
     const handleAddressChange = e => {
