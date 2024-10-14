@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Modal } from "flowbite-react";
 import { Button } from "@/components/ui/button";
-import { Search, UserRoundSearch, Activity, BookOpenCheck, PenLine, MessageCircleOff, MicVocal, Podcast, Save, Zap, MessageCircle, ChartNoAxesColumnIncreasing} from "lucide-react"
+import { Search, UserRoundSearch, Activity, BookOpenCheck, PenLine, MessageCircleOff, MicVocal, Podcast, Save, Zap, MessageCircle, ChartNoAxesColumnIncreasing, HandCoins} from "lucide-react"
 import Image from "next/image";
 import {
   Tooltip,
@@ -1192,8 +1192,8 @@ export default function Article( {
                                     </div>
                                 </a>
                             </CardContent>
-                            <CardFooter>
-                                <div className="relative mt-2 flex items-center gap-x-2">
+                            <CardFooter className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                                <div className="relative mt-2 flex items-center w-full justify-start gap-x-2">
                                     {tx.senderAvatarLink === false ? (
                                         <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
                                     ) : (
@@ -1267,32 +1267,7 @@ export default function Article( {
                                         </div>
                                     )}
                                 </div>
-                                <div className="relative mt-2 flex items-center gap-x-2 ml-auto md:hidden">
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button variant="ghost" size="icon" className="mr-2">
-                                                <Activity className="h-4 w-4 text-muted-foreground" />
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-120">
-                                            <div className="flex flex-col items-start space-y-1 ml-2">
-                                                <div className="flex items-center space-x-1">
-                                                    <MessageCircle className="w-4 h-4" />
-                                                    <span>{getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}</span>
-                                                </div>
-                                                <div className="flex items-center space-x-1">
-                                                    <ChartNoAxesColumnIncreasing className="w-4 h-4"/>
-                                                    <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} `}</span>
-                                                </div>
-                                                <p>
-                                                    {getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned.gt(0) &&
-                                                        `Earned ${formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))} XEC`}
-                                                </p>
-                                            </div>
-                                        </PopoverContent>
-                                    </Popover>
-                                </div>
-                                <div className="relative mt-2 flex items-center gap-x-2 ml-auto hidden md:flex">
+                                <div className="relative mt-2 sm:mt-0 flex items-center justify-between sm:justify-end w-full sm:w-auto">
                                     {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) && (
                                         <TooltipProvider>
                                             <Tooltip>
@@ -1309,23 +1284,15 @@ export default function Article( {
                                         <MessageCircle className="w-4 h-4" />
                                         <span>{getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}</span>
                                     </div>
-                                    <TooltipProvider>
-                                        <Tooltip>
-                                            <TooltipTrigger>
-                                                <div className="flex items-center space-x-1 ml-2">
-                                                    <ChartNoAxesColumnIncreasing className="w-4 h-4"/>
-                                                    <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} `}</span>
-                                                </div>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p>
-                                                    {`Earned ${formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))} XEC`}
-                                                    <br />
-                                                    {`from ${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} unlocks`}
-                                                </p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
+
+                                    <div className="flex items-center space-x-1 ml-2">
+                               <ChartNoAxesColumnIncreasing className="w-4 h-4" />
+                                    <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount}`}</span>
+                                </div>
+                                <div className="flex items-center space-x-1 ml-2">
+                                    <HandCoins className="w-4 h-4" /> 
+                                    <span>{formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))}</span>
+                                </div>
                                 </div>
                             </CardFooter>
                         </Card>
@@ -1465,145 +1432,109 @@ export default function Article( {
                     </div>
                         </a>
                     </CardContent>
-                    <CardFooter>
-                    <div className="relative mt-2 flex items-center gap-x-2">
-                            {tx.senderAvatarLink === false ? (
-                                <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
-                            ) : (
-                                <Avatar className="h-9 w-9">
-                                    <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
-                                    <AvatarFallback><DefaultavatarIcon /></AvatarFallback>
-                                </Avatar>
-                            )}
-                            <div className="text-sm leading-6">
-                                <p className="font-semibold text-gray-900">
-                                    <Badge variant="outline" className="py-3px">
-                                        <div
-                                            className="leading-7 [&:not(:first-child)]:mt-6"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                copy(tx.replyAddress);
-                                                toast(`${tx.replyAddress} copied to clipboard`);
-                                            }}
-                                        >
-                                            {getContactNameIfExist(tx.replyAddress, contactList)}
-                                        </div>
-                                    </Badge>
-                                </p>
-                            </div>
-                            {/* Add contact popover to input the new contact name */}
-                            {isExistingContact(tx.replyAddress, contactList) === false && (
-                                <div
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                    }}
-                                >
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button variant="outline" size="icon" className="mr-2">
-                                                <IdCardIcon className="h-4 w-4" />
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent>
-                                            <div className="space-y-2">
-                                            <h4 className="flex items-center font-medium leading-none">
-                                                <Pencil1Icon className="h-4 w-4 mr-1" />
-                                                New contact
-                                            </h4>
-                                                <p className="text-sm text-muted-foreground max-w-96 break-words">
-                                                    Input contact name for <br />{tx.replyAddress}
-                                                </p>
-                                            </div>
-                                            <div className="py-2">
-                                                <Input
-                                                    id="addContactName"
-                                                    name="addContactName"
-                                                    type="text"
-                                                    ref={newContactNameInput}
-                                                    placeholder="New contact name"
-                                                    className="bg-gray-50"
-                                                    maxLength="30"
-                                                />
-                                                <Button
-                                                    type="button"
-                                                    disabled={newContactNameInput?.current?.value === ''}
-                                                    className="mt-2"
-                                                    onClick={e => {
-                                                        addNewContact(newContactNameInput?.current?.value, tx.replyAddress, refreshContactList);
+                    <CardFooter className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                                <div className="relative mt-2 flex items-center w-full justify-start gap-x-2">
+                                    {tx.senderAvatarLink === false ? (
+                                        <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
+                                    ) : (
+                                        <Avatar className="h-9 w-9">
+                                            <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
+                                            <AvatarFallback><DefaultavatarIcon /></AvatarFallback>
+                                        </Avatar>
+                                    )}
+                                    <div className="text-sm leading-6">
+                                        <p className="font-semibold text-gray-900">
+                                            <Badge variant="outline" className="py-3px">
+                                                <div
+                                                    className="leading-7 [&:not(:first-child)]:mt-6"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        copy(tx.replyAddress);
+                                                        toast(`${tx.replyAddress} copied to clipboard`);
                                                     }}
                                                 >
-                                                    Add Contact
-                                                </Button>
-                                            </div>
-                                        </PopoverContent>
-                                    </Popover>
+                                                    {getContactNameIfExist(tx.replyAddress, contactList)}
+                                                </div>
+                                            </Badge>
+                                        </p>
+                                    </div>
+                                    {/* Add contact popover to input the new contact name */}
+                                    {isExistingContact(tx.replyAddress, contactList) === false && (
+                                        <div
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                            }}
+                                        >
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <Button variant="outline" size="icon" className="mr-2">
+                                                        <IdCardIcon className="h-4 w-4" />
+                                                    </Button>
+                                                </PopoverTrigger>
+                                                <PopoverContent>
+                                                    <div className="space-y-2">
+                                                        <h4 className="flex items-center font-medium leading-none">
+                                                            <Pencil1Icon className="h-4 w-4 mr-1" />
+                                                            New contact
+                                                        </h4>
+                                                        <p className="text-sm text-muted-foreground max-w-96 break-words">
+                                                            Input contact name for <br />{tx.replyAddress}
+                                                        </p>
+                                                    </div>
+                                                    <div className="py-2">
+                                                        <Input
+                                                            id="addContactName"
+                                                            name="addContactName"
+                                                            type="text"
+                                                            ref={newContactNameInput}
+                                                            placeholder="New contact name"
+                                                            className="bg-gray-50"
+                                                            maxLength="30"
+                                                        />
+                                                        <Button
+                                                            type="button"
+                                                            disabled={newContactNameInput?.current?.value === ''}
+                                                            className="mt-2"
+                                                            onClick={e => {
+                                                                addNewContact(newContactNameInput?.current?.value, tx.replyAddress, refreshContactList);
+                                                            }}
+                                                        >
+                                                            Add Contact
+                                                        </Button>
+                                                    </div>
+                                                </PopoverContent>
+                                            </Popover>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </div>
-                        <div className="relative mt-2 flex items-center gap-x-2 ml-auto md:hidden">
-                            <Popover>
-                                    <PopoverTrigger asChild>
-                                        <Button variant="ghost" size="icon" className="mr-2">
-                                        <Activity className="h-4 w-4 text-muted-foreground" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-120">
-                                    <div className="flex flex-col items-start space-y-1 ml-2">
-                            <div className="flex items-center space-x-1">
-                                <MessageCircle className="w-4 h-4" />
-                                <span>{getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}</span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                            <ChartNoAxesColumnIncreasing className="w-4 h-4"/>
-                            <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} `}</span>
-                            </div>
-                            <p>
-                                {getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned.gt(0) && 
-                                `Earned ${formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))} XEC`}
-                            </p>
-                            </div>
-                         </PopoverContent>
-                         </Popover>
-                      </div>
-                        <div className="relative mt-2 flex items-center gap-x-2 ml-auto hidden md:flex">
-                          
-                            {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) && (
-                                <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger> <UnlockIcon /></TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>This article has been paid.</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            )}
-                              <div className="flex items-center space-x-1 ml-2 ">
-                            <MessageCircle className="w-4 h-4" />
-                            <span>{getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}</span>
-                            </div>
-                            
-                            <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger>
-                            
-                            <div className="flex items-center space-x-1 ml-2">
-                            <ChartNoAxesColumnIncreasing className="w-4 h-4" />
-                            <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} `}</span>
-                         </div>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                            <p>
-                            {`Earned ${formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))} XEC`}
-                            <br />
-                            {` from ${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} unlocks`}
-                        </p>
-                            </TooltipContent>
-                        </Tooltip>
-                        </TooltipProvider>        
-                        <div>
-                      </div>
-                        </div>
-                    </CardFooter>
+                                <div className="relative mt-2 sm:mt-0 flex items-center justify-between sm:justify-end w-full sm:w-auto">
+                                    {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) && (
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger>
+                                                    <UnlockIcon />
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>This article has been paid.</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    )}
+                                    <div className="flex items-center space-x-1 ml-2 ">
+                                        <MessageCircle className="w-4 h-4" />
+                                        <span>{getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}</span>
+                                    </div>
+
+                                    <div className="flex items-center space-x-1 ml-2">
+                               <ChartNoAxesColumnIncreasing className="w-4 h-4" />
+                                    <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount}`}</span>
+                                </div>
+                                <div className="flex items-center space-x-1 ml-2">
+                                    <HandCoins className="w-4 h-4" /> 
+                                    <span>{formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))}</span>
+                                </div>
+                                </div>
+                            </CardFooter>
                 </Card>
                 )
             ))

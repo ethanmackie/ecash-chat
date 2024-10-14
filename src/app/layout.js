@@ -2,6 +2,7 @@ import "./globals.css";
 import { Inter as FontSans } from "next/font/google"
 import { cn } from "@/lib/utils"
 import { Analytics } from '@vercel/analytics/react';
+import { Toaster } from "@/components/ui/toaster";
 
 
 const fontSans = FontSans({
@@ -43,6 +44,7 @@ export default function RootLayout({ children }) {
         )}>
             {children}
             <Analytics />
+            <Toaster />
       </body>
     </html>
   );

@@ -13,7 +13,7 @@ import ContactListPanel from './contact';
 import { queryAliasServer } from '../alias/alias-server';
 import { encodeBip21Message, getTweetId, getNFTAvatarLink, encodeBip21Auth } from '../utils/utils';
 import { Toggle } from "@/components/ui/toggle";
-import { Loader, LockKeyhole } from "lucide-react"
+import { Loader, LockKeyhole, SendHorizontal } from "lucide-react"
 import {
     Accordion,
     AccordionContent,
@@ -518,8 +518,9 @@ export default function Home() {
 
     const CreditCardHeader = () => {
         const cardStyling = isMobile 
-        ? "max-w-xs mx-auto rounded-2xl mt-14 break-words gradient-outline !shadow-none relative transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s  " 
-        : "max-w-xs mx-auto rounded-2xl mt-14 break-words gradient-outline !shadow-none relative transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s ";
+        ? "max-w-xs mx-auto rounded-2xl mt-14 break-words gradient-outline !shadow-none relative transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s" 
+        : "max-w-xs mx-auto rounded-2xl mt-14 break-words gradient-outline !shadow-none relative transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s";
+
 
         return (
             <>
@@ -1113,8 +1114,8 @@ export default function Home() {
                                       setShowMessagePreview(true);
                                     }}
                                   >
-                                    <SendIcon />
-                                    &nbsp;Send Message
+                                    <SendHorizontal className="w-4 h-4 mr-2" />
+                                    Send Message
                                   </Button>
                                 </div>
                               </div>

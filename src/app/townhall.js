@@ -1,7 +1,7 @@
 "use client";
 import  React, { useState, useEffect, useRef } from 'react';
 import { appConfig } from '../config/app';
-import { Tooltip, Alert, Modal } from "flowbite-react";
+import { Tooltip, Alert as InfoBox, Modal } from "flowbite-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { postHasErrors, replyHasErrors, isValidRecipient } from '../validation/validation';
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator"
 import { Toggle } from "@/components/ui/toggle";
 import { Zap, BookDashed, UserRoundSearch } from "lucide-react"
+import { useToast } from "@/hooks/use-toast";
 import {
     Avatar,
     AvatarFallback,
@@ -30,7 +31,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu";
-import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon, ChatBubbleIcon, Share1Icon, Pencil1Icon, DotsHorizontalIcon, EyeNoneIcon} from '@radix-ui/react-icons';
+import { FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon, ChatBubbleIcon, Share1Icon, Pencil1Icon, DotsHorizontalIcon, EyeNoneIcon} from '@radix-ui/react-icons';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
@@ -80,8 +81,11 @@ import {
     getTxDetails,
 } from '../chronik/chronik';
 import copy from 'copy-to-clipboard';
-import { toast } from 'react-toastify';
-import { Alert as ShadcnAlert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+    Alert,
+    AlertDescription,
+    AlertTitle,
+  } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
@@ -123,6 +127,7 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
     const [muteList, setMuteList] = useState('');
     const [hasTownhallMvpNft, setHasTownhallMvpNft] = useState(false);
     const [mvpPosts, setMpvPosts] = useState([]);
+     const { toast } = useToast();
 
     useEffect(() => {
       const handleResize = () => {
@@ -583,6 +588,10 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                 townhallCache,
                 true, // flag for contact filter
             );
+            toast({
+                title: "Contact filtering is on",
+                description: "Now only show messages from your contacts",
+            });
         } else {
             setCurrentPage(0);
             await getTownhallHistoryByPage(
@@ -591,6 +600,10 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                 townhallCache,
                 false,
             );
+            toast({
+                title: "Contact filtering is off",
+                description: "Show all posts now",
+            });
         }
     };
 
@@ -655,7 +668,10 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                                             className="font-medium dark:text-white"
                                             onClick={() => {
                                             copy(foundReply.replyAddress);
-                                            toast(`${foundReply.replyAddress} copied to clipboard`);
+                                            toast({
+                                                title: "✅ Copied",
+                                                description: `${foundReply.replyAddress} copied to clipboard`,
+                                              });
                                             }}
                                         >
                                             <Badge className="leading-7 shadow-sm hover:bg-accent [&:not(:first-child)]:mt-6 py-3px" variant="outline" >
@@ -914,7 +930,10 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                                                             <div
                                                                 onClick={() => {
                                                                     copy(tx.replyAddress);
-                                                                    toast(`${tx.replyAddress} copied`);
+                                                                    toast({
+                                                                        title: "✅ Copied",
+                                                                        description: `${tx.replyAddress} copied to clipboard`,
+                                                                      });
                                                                 }}
                                                             >
                                                                 Your Wallet
@@ -946,7 +965,10 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                                             <div
                                                 onClick={() => {
                                                     copy(tx.replyAddress);
-                                                    toast(`${tx.replyAddress} copied to clipboard`);
+                                                    toast({
+                                                        title: "✅ Copied",
+                                                        description: `${tx.replyAddress} copied to clipboard`,
+                                                      });
                                                 }}
                                             >
                                                 {getContactNameIfExist(tx.replyAddress, contactList)}
@@ -1051,7 +1073,10 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                                                     <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
                                                         <span onClick={() => {
                                                             copy(tx.nftShowcaseId);
-                                                            toast(`${tx.nftShowcaseId} copied to clipboard`);
+                                                            toast({
+                                                                title: "✅ Copied",
+                                                                description: `${tx.nftShowcaseId} copied to clipboard`,
+                                                              });
                                                         }}>
                                                             <span className="hidden sm:inline">
                                                                 ID: {tx.nftShowcaseId.substring(0,15)}...{tx.nftShowcaseId.substring(tx.nftShowcaseId.length - 10)}
@@ -1084,9 +1109,9 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                                 {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
                                 <p className="line-clamp-1">
                                 {tx.url !== false && (
-                                    <Alert color="info" className="flex-nowrap text-sm text-muted-foreground break-words">
-                                        <a href={tx.url} target="_blank" className="break-words">{tx.url}</a>
-                                    </Alert>
+                                  <InfoBox color="info" className="flex-nowrap bg-muted text-sm text-muted-foreground break-words">
+                                  <a href={tx.url} target="_blank" className="break-words">{tx.url}</a>
+                                 </InfoBox>
                                 )}
                                 </p>
                                 {/* Date and timestamp */}
@@ -1233,7 +1258,10 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                                             <div
                                                 onClick={() => {
                                                 copy(tx.replyAddress);
-                                                toast(`${tx.replyAddress} copied to clipboard`);
+                                                toast({
+                                                    title: "✅ Copied",
+                                                    description: `${tx.replyAddress} copied to clipboard`,
+                                                  });
                                                 }}
                                             >
                                                 Your wallet
@@ -1260,7 +1288,10 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                                             <div
                                                 onClick={() => {
                                                 copy(tx.replyAddress);
-                                                toast(`${tx.replyAddress} copied to clipboard`);
+                                                toast({
+                                                    title: "✅ Copied",
+                                                    description: `${tx.replyAddress} copied to clipboard`,                                          
+                                                  });
                                                 }}
                                             >
                                                 {getContactNameIfExist(tx.replyAddress, contactList)}
@@ -1361,7 +1392,10 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                                         <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
                                         <span onClick={() => {
                                             copy(tx.nftShowcaseId);
-                                            toast(`${tx.nftShowcaseId} copied to clipboard`);
+                                            toast({
+                                                title: "✅ Copied",
+                                                description: `${tx.nftShowcaseId} copied to clipboard`,
+                                              });
                                         }}>
                                         <span className="hidden sm:inline">
                                             ID: {tx.nftShowcaseId.substring(0,15)}...{tx.nftShowcaseId.substring(tx.nftShowcaseId.length - 10)}
@@ -1394,9 +1428,9 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                                    {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
                                    <p className="line-clamp-1">
                                    {tx.url !== false && (
-                                        <Alert color="info" className="flex-nowrap text-sm text-muted-foreground break-words">
-                                            <a href={tx.url} target="_blank" className="break-words">{tx.url}</a>
-                                        </Alert>
+                                   <InfoBox color="info" className="flex-nowrap text-sm bg-muted text-muted-foreground break-words">
+                                       <a href={tx.url} target="_blank" className="break-words">{tx.url}</a>
+                                   </InfoBox>
                                     )}
                                    </p>
                                    {/* Date and timestamp */}
