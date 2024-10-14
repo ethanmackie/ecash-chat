@@ -67,7 +67,7 @@ import {
 } from 'next-share';
 const crypto = require('crypto');
 import copy from 'copy-to-clipboard';
-import { toast } from 'react-toastify';
+import { useToast } from "@/hooks/use-toast";
 import { addNewContact } from '../utils/utils';
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -93,6 +93,7 @@ export default function TxHistory({ address, isMobile }) {
     const newReplierContactNameInput = useRef('');
     const [curateByContacts, setCurateByContacts] = useState(false);
     const [muteList, setMuteList] = useState('');
+    const { toast } = useToast();
 
     useEffect(() => {
       const handleResize = () => {
@@ -295,9 +296,16 @@ export default function TxHistory({ address, isMobile }) {
             const decipher = crypto.createDecipher('aes-256-cbc', decryptionInput);
             let decryptedMessage = decipher.update(encryptedMessage, 'hex', 'utf8');
             decryptedMessage += decipher.final('utf8');
-            toast(`Decrypted message: ${decryptedMessage}`);
+            toast({
+              title: 'Decrypted',
+              description: `Decrypted message: ${decryptedMessage}`,
+            });
         } catch (err) {
-            toast(`Decryption error: ${err.message}`);
+          toast({
+            title: 'error',
+            description: `Decryption error: ${err.message}`,
+            variant: 'destructive',
+          });
         }
         setEncryptedMessage('');
         setDecryptionInput('');
@@ -341,7 +349,10 @@ export default function TxHistory({ address, isMobile }) {
                                       <div className="font-medium dark:text-white">
                                           <div onClick={() => {
                                               copy(tx.replyAddress);
-                                              toast(`${tx.replyAddress} copied to clipboard`);
+                                              toast({
+                                                title: '✅Clipboard',
+                                                description: `${tx.replyAddress} copied to clipboard`,
+                                              });
                                           }}
                                           ><Badge className="leading-7 shadow-sm hover:bg-accent py-3px" variant="outline">
                                                  <span className="hidden sm:block">Your wallet</span>
@@ -365,7 +376,10 @@ export default function TxHistory({ address, isMobile }) {
                                       <div className="font-medium dark:text-white">
                                           <div onClick={() => {
                                               copy(tx.replyAddress);
-                                              toast(`${tx.replyAddress} copied to clipboard`);
+                                              toast({
+                                                title: '✅Clipboard',
+                                                description: `${tx.replyAddress} copied to clipboard`,
+                                              });
                                           }}>
                                         <Badge className="leading-7 shadow-sm hover:bg-accent py-3px" variant="outline">
                                              {getContactNameIfExist(tx.replyAddress, contactList)}
@@ -396,7 +410,10 @@ export default function TxHistory({ address, isMobile }) {
                                             <div className="font-medium dark:text-white"
                                                 onClick={() => {
                                                    copy(tx.recipientAddress);
-                                                   toast(`${tx.recipientAddress} copied to clipboard`);
+                                                   toast({
+                                                    title: '✅Clipboard',
+                                                    description: `${tx.recipientAddress} copied to clipboard`,
+                                                  });
                                                 }}
                                             >
                                                 <div>
@@ -424,7 +441,10 @@ export default function TxHistory({ address, isMobile }) {
                                        <div className="font-medium dark:text-white">
                                            <div onClick={() => {
                                                copy(tx.recipientAddress);
-                                               toast(`${tx.recipientAddress} copied to clipboard`);
+                                               toast({
+                                                title: '✅Clipboard',
+                                                description: `${tx.recipientAddress} copied to clipboard`,
+                                              });
                                            }}>
                                             <Badge className="leading-7 shadow-sm hover:bg-accent py-3px" variant="outline">
                                             {getContactNameIfExist(tx.recipientAddress, contactList)}
@@ -484,7 +504,10 @@ export default function TxHistory({ address, isMobile }) {
                                <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
                                         <span onClick={() => {
                                             copy(tx.nftShowcaseId);
-                                            toast(`${tx.nftShowcaseId} copied to clipboard`);
+                                            toast({
+                                              title: '✅Clipboard',
+                                              description: `${tx.nftShowcaseId} copied to clipboard`,
+                                            });
                                         }}>
                                             ID: {tx.nftShowcaseId.substring(0,15)}...{tx.nftShowcaseId.substring(tx.nftShowcaseId.length - 10)}
                                         </span>

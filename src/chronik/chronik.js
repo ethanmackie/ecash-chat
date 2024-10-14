@@ -994,7 +994,7 @@ export const txListener = async (
                         ) {
                             // Notify user
                             toast({
-                                title: "✅ Sent",
+                                title: "✅Sent",
                                 description: `${txType} sent`,
                               });
 
@@ -1057,7 +1057,7 @@ export const authTxListener = async (
                         if (mempoolTx.outputs[0].outputScript.includes(authenticationHex)) {
                             // Notify user
                             toast({
-                                title: "✅ Logging",
+                                title: "✅Logging",
                                 description: `Validation successful, logging in as ${authenticatingUser}`,
                               });
 
@@ -1141,7 +1141,7 @@ export const paywallTxListener = async (
                         ) {
                             // Notify user
                             toast({
-                                title: "✅ Sent",
+                                title: "✅Sent",
                                 description: `${txType} sent`,
                             });
 

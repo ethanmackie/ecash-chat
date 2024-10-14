@@ -25,7 +25,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu";
-  import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { ReloadIcon } from "@radix-ui/react-icons";
 
 export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) {
