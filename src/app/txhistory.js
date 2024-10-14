@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { appConfig } from '../config/app';
 import { getTxHistory, txListener } from '../chronik/chronik';
 import { chronik as chronikConfig } from '../config/chronik';
-import { Search, UserRoundSearch } from "lucide-react"
+import { Search, UserRoundSearch, ArrowRightLeft} from "lucide-react"
 import { ChronikClientNode } from 'chronik-client';
 import cashaddr from 'ecashaddrjs';
 import { isValidRecipient } from '../validation/validation';
@@ -11,10 +11,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Toggle } from "@/components/ui/toggle";
-import { MagnifyingGlassIcon, ResetIcon, Link2Icon, Share1Icon, EyeNoneIcon } from "@radix-ui/react-icons";
+import { ResetIcon, Link2Icon, Share1Icon, EyeNoneIcon } from "@radix-ui/react-icons";
 import {
     DecryptionIcon,
-    MoneyIcon,
     DefaultavatarIcon, 
     ReplieduseravatarIcon,
     Arrowright2Icon,
@@ -43,7 +42,7 @@ import {
 } from "@/components/ui/avatar";
 import { HiInformationCircle } from "react-icons/hi";
 import { Input } from "@/components/ui/input"
-import { Popover, Alert, Modal } from "flowbite-react";
+import { Popover, Alert as InfoBox, Modal } from "flowbite-react";
 import {
   Card,
   CardContent,
@@ -444,10 +443,10 @@ export default function TxHistory({ address, isMobile }) {
                         {/* Render the op_return message */}
                         {tx.isEcashChatEncrypted ? (
                             <>
-                                <Alert className="leading-7 my-4" color="failure" icon={HiInformationCircle}>
-                                    &nbsp;&nbsp;<b>Encrypted Message</b><br />
-                                    &nbsp;&nbsp;{tx.opReturnMessage ? `${tx.opReturnMessage}`.substring(0,40)+'...' : ' '}
-                                </Alert>
+                         <InfoBox className="leading-7 my-4 bg-muted text-muted-foreground" icon={HiInformationCircle}>
+                          &nbsp;&nbsp;<b>Encrypted Message</b><br />
+                          &nbsp;&nbsp;{tx.opReturnMessage ? `${tx.opReturnMessage}`.substring(0,40)+'...' : ' '}
+                        </InfoBox>
                             </>
                             ) : (
                               <>
@@ -463,17 +462,17 @@ export default function TxHistory({ address, isMobile }) {
 
                         {/* XEC Tip rendering */}
                         {tx.isXecTip && (
-                          <Alert className="leading-7 my-2" color="success">
-                              <div className="flex items-center space-x-2">
-                                  <MoneyIcon className="h-5 w-5 text-blue-500" />
-                                  <span>
-                                      {tx.recipientAddress === address ? 
-                                          `Received ${tx.xecAmount} XEC tip from eCash Chat` :
-                                          `Sent ${tx.xecAmount} XEC tip via eCash Chat`
-                                      }
-                                  </span>
-                              </div>
-                          </Alert>
+                          <InfoBox className="leading-7 my-2 bg-muted text-muted-foreground">
+                          <div className="flex items-center space-x-2">
+                            <ArrowRightLeft className="w-5 h-5 text-blue-500" />
+                            <span>
+                              {tx.recipientAddress === address ? 
+                                `Received ${tx.xecAmount} XEC tip from eCash Chat` :
+                                `Sent ${tx.xecAmount} XEC tip via eCash Chat`
+                              }
+                            </span>
+                          </div>
+                        </InfoBox>
                       )}
 
                         {/* Render any media content within the message */}
@@ -510,7 +509,11 @@ export default function TxHistory({ address, isMobile }) {
                         {tx.imageSrc !== false && (<img src={tx.imageSrc} className="rounded-lg w-full object-cover"/>)}
                         {tx.videoId !== false && (<LiteYouTubeEmbed id={tx.videoId} />)}
                         {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
-                        {tx.url !== false && (<Alert color="info"><a href={tx.url} target="_blank" >{tx.url}</a></Alert>)}
+                        {tx.url !== false && (
+                           <InfoBox className="bg-muted text-muted-foreground">
+                           <a href={tx.url} target="_blank" rel="noopener noreferrer">{tx.url}</a>
+                         </InfoBox>
+                        )}
 
                         <div className="flex my-2 h-5 items-center space-x-4 text-sm text-muted-foreground">
                         <div>{tx.isCashtabMessage ? 'Cashtab Message' :
@@ -544,7 +547,7 @@ export default function TxHistory({ address, isMobile }) {
                                                   Please input the password used by the sender to decrypt this message.
                                               </p>
                                               <p>
-                                                  <Alert>{tx.opReturnMessage}</Alert>
+                                              <InfoBox className="bg-muted text-muted-foreground">{tx.opReturnMessage}</InfoBox>
                                               </p>
                                               <p className="leading-7 ">
                                                   {/* Decryption input */}
