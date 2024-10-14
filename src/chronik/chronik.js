@@ -6,7 +6,7 @@ import { appConfig } from '../config/app';
 import { formatDate, toXec, getNFTAvatarLink } from '../utils/utils';
 import { getStackArray } from 'ecash-script';
 import { BN } from 'slp-mdm';
-import { toast } from 'react-toastify';
+import { useToast, toast } from "@/hooks/use-toast";
 import localforage from 'localforage';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, GetCommand, ScanCommand, UpdateCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
@@ -798,7 +798,11 @@ export const ipfsArticleTxListener = async (
                     setTimeout(async() => { // temporary until Extension is refactored to allow direct passing of callback functions
                         mempoolTx = await chronik.tx(msg.txid);
                         if (!mempoolTx || typeof mempoolTx === 'undefined') {
-                            toast('Error parsing article tx details, please try again');
+                        toast({
+                        title: 'error',
+                        description: 'Error parsing article transaction details, please try again.',
+                        variant: 'destructive',
+                        });
                             console.log(`ipfsArticleTxListener: error in chronik.tx(${msg.txid}) call: `, mempoolTx);
                             return;
                         }
@@ -817,9 +821,16 @@ export const ipfsArticleTxListener = async (
                                 });
                                 await docClient.send(command);
                                 await localforage.setItem(appConfig.localArticlesParam, updatedArticles);
-                                toast(`Article posted`);
+                                toast({
+                                    title: "✅ Published",
+                                    description: 'The article has been published.',
+                                  });
                             } catch (err) {
-                                toast(`Error committing article, please try again`);
+                                toast({
+                                    title: 'error',
+                                    description: 'Error submitting the article, please try again.',
+                                    variant: 'destructive',
+                                  });
                                 console.log('ipfsArticleTxListener: error committing article to DB', err.message);
                             }
 
@@ -880,7 +891,11 @@ export const articleTxListener = async (
                     setTimeout(async() => { // temporary until Extension is refactored to allow direct passing of callback functions
                         mempoolTx = await chronik.tx(msg.txid);
                         if (!mempoolTx || typeof mempoolTx === 'undefined') {
-                            toast('Error parsing article tx details, please try again');
+                            toast({
+                                title: 'error',
+                                description: 'Error parsing article transaction details, please try again.',
+                                variant: 'destructive',
+                              });
                             console.log(`articleTxListener: error in chronik.tx(${msg.txid}) call: `, mempoolTx);
                             return;
                         }
@@ -899,9 +914,16 @@ export const articleTxListener = async (
                                 });
                                 await docClient.send(command);
                                 await localforage.setItem(appConfig.localArticlesParam, updatedArticles);
-                                toast(`Article posted`);
+                                toast({
+                                    title: "✅ Published",
+                                    description: 'The article has been published.',
+                                  });
                             } catch (err) {
-                                toast(`Error committing article, please try again`);
+                                toast({
+                                    title: 'error',
+                                    description: 'Error submitting the article, please try again.',
+                                    variant: 'destructive',
+                                  });
                                 console.log('articleTxListener: error committing article to DB', err.message);
                             }
 
@@ -971,7 +993,10 @@ export const txListener = async (
                             address === actualSender
                         ) {
                             // Notify user
-                            toast(`${txType} sent`);
+                            toast({
+                                title: "✅ Sent",
+                                description: `${txType} sent`,
+                              });
 
                             // Unsubscribe and close websocket
                             ws.unsubscribeFromScript(type, hash);
@@ -1031,7 +1056,10 @@ export const authTxListener = async (
                         const authenticatingUser = cashaddr.encodeOutputScript(mempoolTx.inputs[0].outputScript);
                         if (mempoolTx.outputs[0].outputScript.includes(authenticationHex)) {
                             // Notify user
-                            toast(`Authentication successful, logging in as ${authenticatingUser}`);
+                            toast({
+                                title: "✅ Logging",
+                                description: `Validation successful, logging in as ${authenticatingUser}`,
+                              });
 
                             // Unsubscribe and close websocket
                             ws.unsubscribeFromScript(type, hash);
@@ -1112,7 +1140,10 @@ export const paywallTxListener = async (
                             address === paywallPayer
                         ) {
                             // Notify user
-                            toast(`${txType} sent`);
+                            toast({
+                                title: "✅ Sent",
+                                description: `${txType} sent`,
+                            });
 
                             // Unsubscribe and close websocket
                             ws.unsubscribeFromScript(type, hash);
@@ -1209,7 +1240,9 @@ export const nftTxListener = async (chronik, address, toastMsg, refreshCallback 
                 if (msg.msgType === 'TX_ADDED_TO_MEMPOOL') {
 
                     // Notify user
-                    toast(toastMsg);
+                    toast({
+                        description: toastMsg,
+                      });
 
                     // Unsubscribe and close websocket
                     ws.unsubscribeFromScript(type, hash);
@@ -1936,7 +1969,11 @@ export const addAvatar = async (updatedAvatars, newAvatar) => {
         await docClient.send(command);
         await localforage.setItem(appConfig.localAvatarsParam, updatedAvatars);
     } catch (err) {
-        toast(`Error updating avatar, please try again`);
+        toast({
+            title: 'errow',
+            description: 'Error updating the profile picture, please try again.',
+            variant: 'destructive',
+          });
         console.log('setAvatar: error committing avatar reference to DB', err.message);
     }
 };

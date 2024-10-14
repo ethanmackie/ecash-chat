@@ -14,6 +14,8 @@ import { queryAliasServer } from '../alias/alias-server';
 import { encodeBip21Message, getTweetId, getNFTAvatarLink, encodeBip21Auth } from '../utils/utils';
 import { Toggle } from "@/components/ui/toggle";
 import { Loader, LockKeyhole, SendHorizontal } from "lucide-react"
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {
     Accordion,
     AccordionContent,
@@ -70,10 +72,9 @@ import QRCode from "react-qr-code";
 import copy from 'copy-to-clipboard';
 import { Tooltip, Tabs, Alert, Modal, Popover } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
-import { ToastContainer, toast } from 'react-toastify';
-import { FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon, ReloadIcon, Cross2Icon } from '@radix-ui/react-icons';
-import 'react-toastify/dist/ReactToastify.css';
-import { YoutubeIcon, EcashchatIcon, LoadingSpinner, Home3Icon, File3Icon, Nft3Icon, Inbox3Icon, Send3Icon, Info3icon, User3icon, QrcodeIcon, Logout3Icon } from "@/components/ui/social";
+import { useToast } from "@/hooks/use-toast";
+import { FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon, Cross2Icon } from '@radix-ui/react-icons';
+import { YoutubeIcon, EcashchatIcon, Home3Icon, File3Icon, Nft3Icon, Send3Icon, Info3icon, User3icon, QrcodeIcon, Logout3Icon } from "@/components/ui/social";
 import {
     SendIcon,
     EncryptionIcon,
@@ -130,6 +131,7 @@ export default function Home() {
     const [showDustTxAuthenticationLoader, setShowDustTxAuthenticationLoader] = useState(false);
     const [syncronizingState, setsSyncronizingState] = useState(false);
     const [townhallTabEntry, setTownhallTabEntry] = useState(false);
+    const { toast } = useToast();
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
@@ -228,30 +230,41 @@ export default function Home() {
 
     // Checks whether the mobile user's address matches their signature
     const verifySignature = () => {
-        let verification;
-
-        try {
-            verification = xecMessage.verify(
-                'ecashchat',
-                cashaddr.toLegacy(recipient),
-                signature,
-                utxolib.networks.ecash.messagePrefix,
-            );
-        } catch (err) {
-            toast.error(`${err}`);
-        }
-        if (verification) {
-            setOpenSaveLoginModal(true);
-            viewAddress(recipient);
-        } else {
-            toast.error(`Signature does not match address`);
-        }
+      let verification;
+    
+      try {
+        verification = xecMessage.verify(
+          'ecashchat',
+          cashaddr.toLegacy(recipient),
+          signature,
+          utxolib.networks.ecash.messagePrefix,
+        );
+      } catch (err) {
+        toast({
+          title: 'error',
+          description: `${err}`,
+          variant: 'destructive',
+        });
+      }
+      if (verification) {
+        setOpenSaveLoginModal(true);
+        viewAddress(recipient);
+      } else {
+        toast({
+          title: 'error',
+          description: 'Signature does not match address',
+          variant: 'destructive',
+        });
+      }
     };
 
     // Saves the verified login address to local storage to avoid needing to login again
     const saveLoginAddressToLocalStorage = async () => {
         await localforage.setItem('savedLoginAddress', address);
-        toast(`Login info saved for ${address}`);
+        toast({
+          title: '✅Saved',
+          description: `Login info saved for ${address}`,
+        });
         setOpenSaveLoginModal(false);
     }
 
@@ -636,7 +649,6 @@ export default function Home() {
     return (
       <>
         <ToastContainer autoClose={appConfig.toastDuration} />
-
         {openSaveLoginModal === true && <RenderSaveLoginModal />}
 
         <div className="sm:flex flex-col items-center justify-center p-5 relative z-10">
@@ -690,7 +702,10 @@ export default function Home() {
                       setIsLoggedIn(false);
                       setSavedLogin(false);
                       await localforage.setItem("savedLoginAddress", false);
-                      toast(`Logged out of ${address}`);
+                      toast({
+                        title: "👋",
+                        description: `Logged out of ${address}`,
+                      });
                     }}
                     variant="outline"
                     size="icon"
@@ -711,7 +726,10 @@ export default function Home() {
                                 "savedLoginAddress",
                                 false
                               );
-                              toast(`Logged out of ${address}`);
+                              toast({
+                                title: "👋",
+                                description: `Logged out of ${address}`,
+                              });
                             }
                           : () => getAddress()
                       }

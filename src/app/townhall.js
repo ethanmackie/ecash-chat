@@ -127,7 +127,7 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
     const [muteList, setMuteList] = useState('');
     const [hasTownhallMvpNft, setHasTownhallMvpNft] = useState(false);
     const [mvpPosts, setMpvPosts] = useState([]);
-     const { toast } = useToast();
+    const { toast } = useToast();
 
     useEffect(() => {
       const handleResize = () => {
