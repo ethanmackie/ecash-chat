@@ -3,6 +3,7 @@ import { Inter as FontSans } from "next/font/google"
 import { cn } from "@/lib/utils"
 import { Analytics } from '@vercel/analytics/react';
 import { Toaster } from "@/components/ui/toaster";
+import { ThemeProvider } from "@/components/theme-provider";
 
 
 const fontSans = FontSans({
@@ -42,9 +43,16 @@ export default function RootLayout({ children }) {
           "h-full font-sans",
           fontSans.variable
         )}>
+           <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
             {children}
             <Analytics />
             <Toaster />
+            </ThemeProvider>
       </body>
     </html>
   );

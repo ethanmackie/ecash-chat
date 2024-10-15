@@ -16,6 +16,7 @@ import { Toggle } from "@/components/ui/toggle";
 import { Loader, LockKeyhole, SendHorizontal } from "lucide-react"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 import {
     Accordion,
     AccordionContent,
@@ -73,7 +74,8 @@ import copy from 'copy-to-clipboard';
 import { Tooltip, Tabs, Alert, Modal, Popover } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
 import { useToast } from "@/hooks/use-toast";
-import { FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon, Cross2Icon } from '@radix-ui/react-icons';
+import { FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon, Cross2Icon, MoonIcon, SunIcon } from '@radix-ui/react-icons';
+import { useTheme } from "next-themes"
 import { YoutubeIcon, EcashchatIcon, Home3Icon, File3Icon, Nft3Icon, Send3Icon, Info3icon, User3icon, QrcodeIcon, Logout3Icon } from "@/components/ui/social";
 import {
     SendIcon,
@@ -132,6 +134,7 @@ export default function Home() {
     const [syncronizingState, setsSyncronizingState] = useState(false);
     const [townhallTabEntry, setTownhallTabEntry] = useState(false);
     const { toast } = useToast();
+    const { setTheme } = useTheme()
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
