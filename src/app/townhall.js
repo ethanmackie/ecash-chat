@@ -8,7 +8,7 @@ import { postHasErrors, replyHasErrors, isValidRecipient } from '../validation/v
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator"
 import { Toggle } from "@/components/ui/toggle";
-import { Zap, BookDashed, UserRoundSearch } from "lucide-react"
+import { Zap, BookDashed, UserRoundSearch, User } from "lucide-react"
 import { useToast } from "@/hooks/use-toast";
 import {
     Avatar,
