@@ -919,7 +919,7 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                                                         <DefaultavatarIcon />
                                                     ) : (
                                                         <Avatar className="h-9 w-9">
-                                                            <AvatarImage src={tx.senderAvatarLink} alt="用户头像" />
+                                                            <AvatarImage src={tx.senderAvatarLink} alt="useravatar" />
                                                             <AvatarFallback>
                                                                 <DefaultavatarIcon />
                                                             </AvatarFallback>
