@@ -280,13 +280,12 @@ export default function Article( {
         const currentTime = Date.now();
         const parsedMvpTxs = [];
         for (const thisMvpTx of mvpTxs) {
-            const thisDate = new Date(thisMvpTx.txDate + ' ' + thisMvpTx.txTime);
-            const thisDateSinceArticle = (currentTime - thisDate.getTime()) / 3600000;
+            const thisDate = thisMvpTx.timestamp*1000;
+            const thisDateSinceArticle = (currentTime - thisDate) / 3600000;
             if (thisDateSinceArticle < 24) {
                 parsedMvpTxs.push(thisMvpTx);
             }
         }
-
         setMvpArticles(parsedMvpTxs);
     }
 
@@ -971,7 +970,7 @@ export default function Article( {
                     <div className="space-y-2 flex flex-col max-w-xl gap-2 break-words w-full leading-1.5 p-6">
                         <time dateTime={currentArticleTxObj.txTime} className="text-gray-500">
                             By: {getContactNameIfExist(currentArticleTxObj.replyAddress, contactList)}<br />
-                            {currentArticleTxObj.txDate}
+                            {currentArticleTxObj.txDate} {currentArticleTxObj.txTime}
                         </time>
                         <RenderArticle
                             content={currentArticleTxObj.articleObject.content}

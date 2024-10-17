@@ -75,7 +75,8 @@ export const mockParsedXecEncryptedSendTxWithOpReturn = {
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
     "authenticationTx": false,
-    "iseCashChatPremiumPost": false
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1713836952
 };
 
 export const mockXecSendTxWithOpReturnTweet = {
@@ -154,7 +155,8 @@ export const mockParsedXecSendTxWithOpReturnTweet = {
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
     "authenticationTx": false,
-    "iseCashChatPremiumPost": false
+    "iseCashChatPremiumPost": false,
+    "timestamp": false
 };
 
 export const mockXecSendTxWithOpReturnEmoji = {
@@ -229,7 +231,8 @@ export const mockParsedXecSendTxWithOpReturnEmoji = {
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
     "authenticationTx": false,
-    "iseCashChatPremiumPost": false
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1711415298
 };
 
 export const mockXecSendTxWithOpReturnVideo = {
@@ -304,7 +307,8 @@ export const mockParsedXecSendTxWithOpReturnVideo = {
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
     "authenticationTx": false,
-    "iseCashChatPremiumPost": false
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1711415207
 };
 
 export const mockXecSendTxWithOpReturnImage = {
@@ -379,7 +383,8 @@ export const mockParsedXecSendTxWithOpReturnImage = {
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
     "authenticationTx": false,
-    "iseCashChatPremiumPost": false
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1711415040
 };
 
 export const mockXecSendTxWithOpReturn = {
@@ -454,7 +459,8 @@ export const mockParsedXecSendTxWithOpReturn = {
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
     "authenticationTx": false,
-    "iseCashChatPremiumPost": false
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1711414909
 };
 
 export const mockXecSendTxWithOpReturnTownhallPost = {
@@ -534,7 +540,8 @@ export const mockParsedXecSendTxWithOpReturnTownhallPost = {
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
     "authenticationTx": false,
-    "iseCashChatPremiumPost": false
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1712201369
 };
 
 export const mockXecSendTxWithOpReturnTownhallReplyPost = {
@@ -614,7 +621,8 @@ export const mockParsedXecSendTxWithOpReturnTownhallReplyPost = {
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
     "authenticationTx": false,
-    "iseCashChatPremiumPost": false
+    "iseCashChatPremiumPost": false,
+    "timestamp": false
 };
 
 export const mockXecSendTxWithOpReturnNftShowcase = {
@@ -694,7 +702,8 @@ export const mockParsedXecSendTxWithOpReturnNftShowcase = {
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
     "authenticationTx": false,
-    "iseCashChatPremiumPost": false
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1714995866
 };
 
 export const mockXecSendTxWithOpReturnArticle = {
@@ -779,7 +788,8 @@ export const mockParsedXecSendTxWithOpReturnArticle = {
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
     "authenticationTx": false,
-    "iseCashChatPremiumPost": false
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1717642255
 };
 
 export const mockXecSendTxWithOpReturnArticleReply = {
@@ -850,7 +860,8 @@ export const mockParsedXecSendTxWithOpReturnArticleReply = {
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
     "authenticationTx": false,
-    "iseCashChatPremiumPost": false
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1717642506
 };
 
 export const mockXecSendTxWithOpReturnPaywallPayment = {
@@ -948,7 +959,8 @@ export const mockParsedXecSendTxWithOpReturnPaywallPayment = {
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
     "authenticationTx": false,
-    "iseCashChatPremiumPost": false
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1716987086
 };
 
 export const mockXecSendTxWithOpReturnArticleXecTip = {
@@ -1023,6 +1035,7 @@ export const mockParsedXecSendTxWithOpReturnArticleXecTip = {
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
     "authenticationTx": false,
-    "iseCashChatPremiumPost": false
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1717042206
 };
 
