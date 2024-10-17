@@ -280,13 +280,12 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
         const currentTime = Date.now();
         const parsedMvpTxs = [];
         for (const thisMvpTx of mvpTxs) {
-            const thisDate = new Date(thisMvpTx.txDate + ' ' + thisMvpTx.txTime);
-            const thisDateSinceArticle = (currentTime - thisDate.getTime()) / 3600000;
+            const thisDate = thisMvpTx.timestamp*1000;
+            const thisDateSinceArticle = (currentTime - thisDate) / 3600000;
             if (thisDateSinceArticle < 24) {
                 parsedMvpTxs.push(thisMvpTx);
             }
         }
-
         setMpvPosts(parsedMvpTxs);
     }
 

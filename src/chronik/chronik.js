@@ -217,9 +217,6 @@ export const getArticleHistory = async (chronik, address, page = 0) => {
         const paywallPaymentHistoryPromises = [];
         if (paywallPaymentsHistory && paywallPaymentsHistory.numPages > 1) {
             for (let i = 1; i < paywallPaymentsHistory.numPages; i += 1) {
-                if (i > chronikConfig.chronikPaywallPageCap) {
-                    break;
-                }
                 const thisPaywallHistoryPromise = new Promise((resolve, reject) => {
                     chronik
                     .lokadId(
@@ -1427,6 +1424,8 @@ export const parseChronikTx = (tx, address, latestAvatars = false) => {
     let authenticationTx = false;
     let iseCashChatPremiumPost = false;
 
+    let timestamp = tx.block && tx.block.timestamp > 0 ? tx.block.timestamp : tx.timeFirstSeen;
+
     if (tx.isCoinbase) {
         // Note that coinbase inputs have `undefined` for `thisInput.outputScript`
         incoming = true;
@@ -1840,6 +1839,7 @@ export const parseChronikTx = (tx, address, latestAvatars = false) => {
             receiverAvatarLink,
             authenticationTx,
             iseCashChatPremiumPost,
+            timestamp,
         };
     }
     // Otherwise do not include these fields
@@ -1878,6 +1878,7 @@ export const parseChronikTx = (tx, address, latestAvatars = false) => {
         receiverAvatarLink,
         authenticationTx,
         iseCashChatPremiumPost,
+        timestamp,
     };
 };
 

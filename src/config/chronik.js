@@ -10,5 +10,4 @@ export const chronik = {
     articleHistoryPageSize: 25,
     townhallHistoryPageSize: 25,
     chronikHistoryPageCap: 6,
-    chronikPaywallPageCap: 10,
 };
