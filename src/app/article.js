@@ -1124,9 +1124,21 @@ export default function Article( {
                                         {tx.articleObject.category || 'General'}
                                     </Badge>
 
-                                    <Badge variant="secondary" className="text-primary-foreground border-none bg-gradient-to-br from-purple-100 via-blue-200 to-purple-100">
-                                        <Zap className="h-4 w-4 mr-1" /> Premium
-                                    </Badge>
+                                    <Popover>
+                            <PopoverTrigger>
+                                <Badge variant="secondary" className="text-primary-foreground border-none bg-gradient-to-br from-purple-100 via-blue-200 to-purple-100 h-9 cursor-pointer">
+                                    <Zap className="h-4 w-4 mr-2" /> Premium
+                                </Badge>
+                            </PopoverTrigger>
+                            <PopoverContent>
+                                <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
+                                    What is premium article
+                                </h4>
+                                <p className="leading-7 [&:not(:first-child)]:mt-6">
+                                This is a premium article promoted through the use of the eCashChat Article MVP NFT. It expires after 24 hours
+                                </p>
+                            </PopoverContent>
+                        </Popover>
                                 </div>
                                 </div>
 
@@ -1324,20 +1336,34 @@ export default function Article( {
                                             </Tooltip>
                                         </TooltipProvider>
                                     )}
-                                    <div className="flex items-center space-x-1 ml-2 ">
-                                        <MessageCircle className="w-4 h-4" />
-                                        <span>{getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}</span>
-                                    </div>
+                                    <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <div className="flex items-center space-x-1 ml-2">
+                                                <ChartNoAxesColumnIncreasing className="w-4 h-4" />
+                                                <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount}`}</span>
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>The amount of unlocks on this article</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
 
-                                    <div className="flex items-center space-x-1 ml-2">
-                               <ChartNoAxesColumnIncreasing className="w-4 h-4" />
-                                    <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount}`}</span>
-                                </div>
-                                <div className="flex items-center space-x-1 ml-2">
-                                    <HandCoins className="w-4 h-4" /> 
-                                    <span>{formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))}</span>
-                                </div>
-                                </div>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <div className="flex items-center space-x-1 ml-2">
+                                                <HandCoins className="w-4 h-4" /> 
+                                                <span>{formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))}</span>
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>The amount of XEC earned from this article</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </div>
                             </CardFooter>
                         </Card>
                     )
@@ -1572,15 +1598,34 @@ export default function Article( {
                                         <span>{getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}</span>
                                     </div>
 
-                                    <div className="flex items-center space-x-1 ml-2">
-                               <ChartNoAxesColumnIncreasing className="w-4 h-4" />
-                                    <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount}`}</span>
-                                </div>
-                                <div className="flex items-center space-x-1 ml-2">
-                                    <HandCoins className="w-4 h-4" /> 
-                                    <span>{formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))}</span>
-                                </div>
-                                </div>
+                                    <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <div className="flex items-center space-x-1 ml-2">
+                                                <ChartNoAxesColumnIncreasing className="w-4 h-4" />
+                                                <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount}`}</span>
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>The amount of unlocks on this article</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <div className="flex items-center space-x-1 ml-2">
+                                                <HandCoins className="w-4 h-4" /> 
+                                                <span>{formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))}</span>
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>The amount of XEC earned from this article</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </div>
                             </CardFooter>
                 </Card>
                 )
