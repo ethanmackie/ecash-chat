@@ -1727,7 +1727,20 @@ export default function Article( {
                                 className="bg-white"
                                 aria-label="Disable replies to this article"
                                 pressed={disableArticleReplies}
-                                onPressedChange={(state) => setDisableArticleReplies(state)}
+                                onPressedChange={(state) => {
+                                    setDisableArticleReplies(state);
+                                    if (state) {
+                                        toast({
+                                            title: "🙅Disabled",
+                                            description: "Comments not allowed",
+                                        });
+                                    } else {
+                                        toast({
+                                            title: "✅Enabled",
+                                            description: "Comments allowed on articles",
+                                        });
+                                    }
+                                }}
                             >
                                 <MessageCircleOff className="h-4 w-4" />
                             </Toggle>
