@@ -1022,7 +1022,7 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                                 </PopoverTrigger>
                                 <PopoverContent>
                                   <h4 className="font-semibold text-sm">
-                                    What is premium post
+                                    What is a premium post
                                   </h4>
                                   <p className="text-sm">
                                   This is a premium article promoted through the use of the eCashChat Article MVP NFT. It expires after 24 hours
@@ -1142,7 +1142,7 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                                 </PopoverTrigger>
                                 <PopoverContent>
                                   <h4 className="font-semibold text-sm">
-                                    What is premium post
+                                    What is a premium post
                                   </h4>
                                   <p className="text-sm">
                                   This is a premium article promoted through the use of the eCashChat Article MVP NFT. It expires after 24 hours
