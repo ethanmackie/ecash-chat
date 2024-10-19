@@ -1132,7 +1132,7 @@ export default function Article( {
                             </PopoverTrigger>
                             <PopoverContent>
                                 <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
-                                    What is premium article
+                                    What is a premium article
                                 </h4>
                                 <p className="leading-7 [&:not(:first-child)]:mt-6">
                                 This is a premium article promoted through the use of the eCashChat Article MVP NFT. It expires after 24 hours

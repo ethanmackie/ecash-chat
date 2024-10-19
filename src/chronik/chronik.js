@@ -1899,21 +1899,21 @@ export const getArticleListing = async () => {
             }
         }
 
-        // Temporary fix - aws scan function is capped at 1MB which then passes a LastEvaluatedKey
-        // To be refactored
         if (items.LastEvaluatedKey) {
-            scanCommand = new ScanCommand({
-                TableName: process.env.TABLE_NAME,
-                ExclusiveStartKey: items.LastEvaluatedKey,
-            });
-            items = await docClient.send(scanCommand);
-            for (const itemObj of items.Items) {
-                if (Array.isArray(itemObj.article)) {
-                    articles = articles.concat(itemObj.article);
-                } else {
-                    articles = articles.concat([itemObj]);
+            do {
+                scanCommand = new ScanCommand({
+                    TableName: process.env.TABLE_NAME,
+                    ExclusiveStartKey: items.LastEvaluatedKey,
+                });
+                items = await docClient.send(scanCommand);
+                for (const itemObj of items.Items) {
+                    if (Array.isArray(itemObj.article)) {
+                        articles = articles.concat(itemObj.article);
+                    } else {
+                        articles = articles.concat([itemObj]);
+                    }
                 }
-            }
+            } while (items.LastEvaluatedKey);
         }
 
         if (!Array.isArray(articles)) {
