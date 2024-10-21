@@ -8,7 +8,7 @@ import { postHasErrors, replyHasErrors, isValidRecipient } from '../validation/v
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator"
 import { Toggle } from "@/components/ui/toggle";
-import { Zap, BookDashed, UserRoundSearch, User } from "lucide-react"
+import { Zap, BookDashed, UserRoundSearch, User, SmilePlus, Link, FileImage, Youtube, Twitter} from "lucide-react"
 import { useToast } from "@/hooks/use-toast";
 import {
     Avatar,
@@ -17,11 +17,9 @@ import {
   } from "@/components/ui/avatar";
 import {
     PostIcon,
-    YoutubeIcon,
     DefaultavatarIcon,
     ReplieduseravatarIcon,
     IdCardIcon,
-    MuteIcon,
 } from "@/components/ui/social";
 import {
     DropdownMenu,
@@ -31,7 +29,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu";
-import { FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon, ChatBubbleIcon, Share1Icon, Pencil1Icon, DotsHorizontalIcon, EyeNoneIcon} from '@radix-ui/react-icons';
+import { Link2Icon, ChatBubbleIcon, Share1Icon, Pencil1Icon, DotsHorizontalIcon, EyeNoneIcon} from '@radix-ui/react-icons';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
@@ -767,7 +765,7 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                       variant="ghost"
                       onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}
                     >
-                      <FaceIcon />
+                      <SmilePlus className="w-4 h-4" />
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-0 h-0 p-0">
@@ -787,7 +785,7 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                     variant="ghost"
                     onClick={() => insertMarkupTags("[url]theurl[/url]")}
                   >
-                    <Link2Icon />
+                    <Link className="w-4 h-4" />
                   </Button>
                 </Tooltip>
                 <Tooltip
@@ -798,7 +796,7 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                     variant="ghost"
                     onClick={() => insertMarkupTags("[img]imageurl[/img]")}
                   >
-                    <ImageIcon />
+                    <FileImage className="w-4 h-4" />
                   </Button>
                 </Tooltip>
                 <Tooltip
@@ -809,7 +807,7 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                     variant="ghost"
                     onClick={() => insertMarkupTags("[yt]youtubeurl[/yt]")}
                   >
-                    <YoutubeIcon />
+                    <Youtube className="w-4 h-4" />
                   </Button>
                 </Tooltip>
                 <Tooltip
@@ -820,7 +818,7 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                     variant="ghost"
                     onClick={() => insertMarkupTags("[twt]tweeturl[/twt]")}
                   >
-                    <UITwitterIcon />
+                    <Twitter className="w-4 h-4" />
                   </Button>
                 </Tooltip>
               </div>

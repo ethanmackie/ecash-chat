@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Modal } from "flowbite-react";
 import { Button } from "@/components/ui/button";
-import { Search, UserRoundSearch, Activity, BookOpenCheck, PenLine, MessageCircleOff, MicVocal, Podcast, Save, Zap, MessageCircle, ChartNoAxesColumnIncreasing, HandCoins} from "lucide-react"
+import { Search, UserRoundSearch, Activity, BookOpenCheck, PenLine, MessageCircleOff, MicVocal, Podcast, Save, Zap, MessageCircle, ChartNoAxesColumnIncreasing, HandCoins, CirclePlay} from "lucide-react"
 import Image from "next/image";
 import {
   Tooltip,
@@ -89,7 +89,7 @@ import {
     isExistingContact,
     muteNewContact,
 } from '../utils/utils';
-import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, Stats2Icon, PodcastIcon, HeadphoneIcon } from "@/components/ui/social";
+import { DefaultavatarIcon, ReplieduseravatarIcon, HeadphoneIcon } from "@/components/ui/social";
 import { useToast } from "@/hooks/use-toast";
 import { Toggle } from "@/components/ui/toggle";
 import { BiSolidNews } from "react-icons/bi";
@@ -1231,7 +1231,7 @@ export default function Article( {
                                                         className="mx-auto mb-2"
                                                     />
                                                     <div className="flex items-center justify-center">
-                                                        <PodcastIcon />
+                                                        <CirclePlay className="w-4 h-4 mr-1" />
                                                         <p className="text-sm text-muted-foreground">Click to listen to this podcast</p>
                                                     </div>
                                                 </div>
@@ -1488,7 +1488,7 @@ export default function Article( {
                                         className="mx-auto mb-2"
                                     />
                                     <div className="flex items-center justify-center">
-                                        <PodcastIcon/>
+                                    <CirclePlay className="w-4 h-4 mr-1" />
                                         <p className="text-sm text-muted-foreground">Click to listen this podcast</p>
                                     </div>
                                 </div>

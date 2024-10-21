@@ -77,10 +77,6 @@ import { useToast } from "@/hooks/use-toast";
 import { FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon, Cross2Icon, MoonIcon, SunIcon } from '@radix-ui/react-icons';
 import { useTheme } from "next-themes"
 import { YoutubeIcon, EcashchatIcon, Home3Icon, File3Icon, Nft3Icon, Send3Icon, Info3icon, User3icon, QrcodeIcon, Logout3Icon } from "@/components/ui/social";
-import {
-    SendIcon,
-    EncryptionIcon,
-} from "@/components/ui/social";
 const crypto = require('crypto');
 import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
