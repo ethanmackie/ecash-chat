@@ -518,7 +518,9 @@ export default function Article( {
 
         // Encode the op_return article script
         const opReturnRaw = encodeBip21Article(articleHash);
-        const bip21Str = `${address}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`;
+        const bip21Str = premiumArticleFlag
+            ? `${address}?amount=${appConfig.premiumArticleFee}&op_return_raw=${opReturnRaw}`
+            : `${address}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`;
 
         if (isMobile) {
             window.open(
