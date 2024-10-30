@@ -409,7 +409,9 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
 
         // Encode the op_return post script
         const opReturnRaw = encodeBip21Post(parsedPost, premiumPostFlag);
-        const bip21Str = `${appConfig.townhallAddress}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`;
+        const bip21Str = premiumArticleFlag
+          ? `${appConfig.premiumTownhallFee}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`
+          : `${appConfig.townhallAddress}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`;
 
         if (isMobile) {
             window.open(
