@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { getNfts, nftTxListener, addAvatar, updateAvatars } from '../chronik/chronik';
 import Image from "next/image";
 import { appConfig } from '../config/app';
+import { opReturn as opreturnConfig } from '../config/opreturn';
 import localforage from 'localforage';
 import { Modal } from "flowbite-react";
 import { encodeBip21NftShowcase, formatDate } from '../utils/utils';
@@ -62,6 +63,7 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
 
             // Add any standlone child NFTs
             const standaloneNfts = [];
+            const eccPremiumNfts = [];
             for (const nftChild of chatCache.childNftList) {
                 // If this childNft does not have a parentNft in this wallet
                 if (!childNftIds.includes(nftChild.token.tokenId)) {
@@ -72,9 +74,18 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                     if (fullNftInfo.block && fullNftInfo.block.timestamp) {
                         nftChild.standaloneTimestamp = fullNftInfo.block.timestamp;
                     }
-                    standaloneNfts.push(nftChild);
+
+                    if (
+                        opreturnConfig.townhallMvpTokenIds.includes(nftChild.token.tokenId) ||
+                        opreturnConfig.articleMvpTokenIds.includes(nftChild.token.tokenId)
+                    ) {
+                        eccPremiumNfts.push(nftChild);
+                    } else {
+                        standaloneNfts.push(nftChild);
+                    }
                 }
             }
+
             if (standaloneNfts.length > 0) {
                 // Set a generic parent collection for the standalone child NFTs
                 const standaloneNftParent = {
@@ -97,6 +108,29 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                     childNft: standaloneNfts,
                 });
             }
+            if (eccPremiumNfts.length > 0) {
+                // Set a generic parent collection for the standalone premium ECC NFTs
+                const standaloneEccNftParent = {
+                    tokenId: 1,
+                    genesisInfo: {
+                        tokenName: 'Premium eCashChat NFTs',
+                        tokenTicker: '',
+                        url: '',
+                    },
+                    genesisOutputScripts: {
+                        timeFirstSeen: '',
+                    },
+                    genesisSupply: 0,
+                };
+                chatCache.parentNftList.push(standaloneEccNftParent);
+
+                // Append standalone NFTs under the generic parent
+                thisFullNfts.push({
+                    parentNft: standaloneEccNftParent,
+                    childNft: eccPremiumNfts,
+                });
+            }
+
             setFullNfts(thisFullNfts);
             setNftParents(chatCache.parentNftList);
             setNftChilds(chatCache.childNftList);
@@ -279,7 +313,7 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                         </CardHeader>
                         <CardContent>
                             <img
-                                src={nftParent.tokenId === 0 ? '/ecash-chat-logo.png' : `${appConfig.tokenIconsUrl}/256/${nftParent.tokenId}.png`}
+                                src={nftParent.tokenId === 1 && nftParent.genesisInfo.tokenName === 'Premium eCashChat NFTs' ? '/eccNFTParent.jpeg' : nftParent.tokenId === 0 ? '/ecash-chat-logo.png' : `${appConfig.tokenIconsUrl}/256/${nftParent.tokenId}.png`}
                                 width={256}
                                 height={256}
                                 className="rounded-lg object-cover"
