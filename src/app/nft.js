@@ -233,7 +233,7 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                                     </CardHeader>
                                     <CardContent>
                                         <img
-                                            src={`${appConfig.tokenIconsUrl}/256/${childNftObj.tokenId}.png`}
+                                            src={opreturnConfig.townhallMvpTokenIds.includes(childNftObj.tokenId) || opreturnConfig.articleMvpTokenIds.includes(childNftObj.tokenId) ? `${appConfig.tokenIconsUrl}/${childNftObj.tokenId}.gif` : `${appConfig.tokenIconsUrl}/256/${childNftObj.tokenId}.png`}
                                             alt=""
                                             className="block w-full h-auto rounded-lg object-cover"
                                         />
