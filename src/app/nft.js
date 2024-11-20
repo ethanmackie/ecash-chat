@@ -309,7 +309,7 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                     >
                         <CardHeader>
                         <CardTitle>
-                            <span className="break-all">
+                            <span className="text-sm break-word">
                                 {nftParent.genesisInfo.tokenName} {nftParent.genesisInfo.tokenTicker}
                             </span>
                         </CardTitle>
