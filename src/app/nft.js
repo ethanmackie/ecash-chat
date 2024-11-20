@@ -308,8 +308,18 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                         className="transition-shadow shadow-none duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50"
                     >
                         <CardHeader>
-                            <CardTitle>{nftParent.genesisInfo.tokenName} {nftParent.genesisInfo.tokenTicker}</CardTitle>
-                            <CardDescription>{nftParent.tokenId !== 0 && `Url: ${nftParent.genesisInfo.url}`}</CardDescription>
+                        <CardTitle>
+                            <span className="break-all">
+                                {nftParent.genesisInfo.tokenName} {nftParent.genesisInfo.tokenTicker}
+                            </span>
+                        </CardTitle>
+                            <CardDescription>
+                        {nftParent.tokenId !== 0 && (
+                            <span className="break-all">
+                                Url: {nftParent.genesisInfo.url}
+                            </span>
+                        )}
+                    </CardDescription>
                         </CardHeader>
                         <CardContent>
                             <img
