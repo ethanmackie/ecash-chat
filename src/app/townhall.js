@@ -1,12 +1,15 @@
 "use client";
 import  React, { useState, useEffect, useRef } from 'react';
 import { appConfig } from '../config/app';
-import { Tooltip, Alert, Modal } from "flowbite-react";
+import { Tooltip, Alert as InfoBox, Modal } from "flowbite-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { postHasErrors, replyHasErrors, isValidRecipient } from '../validation/validation';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator"
+import { Toggle } from "@/components/ui/toggle";
+import { Zap, BookDashed, UserRoundSearch, User, SmilePlus, Link, FileImage, Youtube, Twitter} from "lucide-react"
+import { useToast } from "@/hooks/use-toast";
 import {
     Avatar,
     AvatarFallback,
@@ -14,11 +17,9 @@ import {
   } from "@/components/ui/avatar";
 import {
     PostIcon,
-    YoutubeIcon,
     DefaultavatarIcon,
     ReplieduseravatarIcon,
     IdCardIcon,
-    MuteIcon,
 } from "@/components/ui/social";
 import {
     DropdownMenu,
@@ -28,7 +29,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu";
-import { PersonIcon, FaceIcon, Link2Icon, ImageIcon, TwitterLogoIcon as UITwitterIcon, ChatBubbleIcon, Share1Icon, Pencil1Icon, DotsHorizontalIcon, EyeNoneIcon} from '@radix-ui/react-icons';
+import { Link2Icon, ChatBubbleIcon, Share1Icon, Pencil1Icon, DotsHorizontalIcon, EyeNoneIcon} from '@radix-ui/react-icons';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { Tweet } from 'react-tweet';
@@ -78,8 +79,11 @@ import {
     getTxDetails,
 } from '../chronik/chronik';
 import copy from 'copy-to-clipboard';
-import { toast } from 'react-toastify';
-import { Alert as ShadcnAlert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+    Alert,
+    AlertDescription,
+    AlertTitle,
+  } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
@@ -100,8 +104,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { addNewContact } from '../utils/utils';
 import localforage from 'localforage';
+import { opReturn as opreturnConfig } from '../config/opreturn';
 
-export default function TownHall({ address, isMobile }) {
+export default function TownHall({ address, isMobile, tabEntry, setsSyncronizingState }) {
     const [townHallHistory, setTownHallHistory] = useState(''); // current history rendered on screen
     const [fullTownHallHistory, setFullTownHallHistory] = useState(''); // full history array
     const [post, setPost] = useState('');
@@ -110,6 +115,7 @@ export default function TownHall({ address, isMobile }) {
     const [replyPostError, setReplyPostError] = useState(false);
     const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
     const [showMessagePreview, setShowMessagePreview] = useState(false);
+    const [showPremiumMessagePreview, setShowPremiumMessagePreview] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here
     const [contactList, setContactList] = useState('');
@@ -117,6 +123,9 @@ export default function TownHall({ address, isMobile }) {
     const newReplierContactNameInput = useRef('');
     const [curateByContacts, setCurateByContacts] = useState(false);
     const [muteList, setMuteList] = useState('');
+    const [hasTownhallMvpNft, setHasTownhallMvpNft] = useState(false);
+    const [mvpPosts, setMpvPosts] = useState([]);
+    const { toast } = useToast();
 
     useEffect(() => {
       const handleResize = () => {
@@ -141,10 +150,29 @@ export default function TownHall({ address, isMobile }) {
                 getTownhallHistoryByPage(0, true, townhallCache, curateByContacts);
             }
 
-            // Subsequent refresh based on on-chain source
-            await getTownhallHistoryByPage(0);
+            // Subsequent refresh based on on-chain source if it was a user triggered tab navigation
+            if (tabEntry) {
+                setsSyncronizingState(true);
+                await getTownhallHistoryByPage(0);
+                setsSyncronizingState(false);
+            }
+
+            await hasMvpTownhallNft();
         })();
-    }, [muteList]);
+    }, [muteList, tabEntry]);
+
+    const hasMvpTownhallNft = async () => {
+        const chatCache = await localforage.getItem('chatCache');
+        if (!chatCache || !chronik || typeof chatCache === 'undefined') {
+            return;
+        }
+        const nftList = chatCache.childNftList;
+        for (const thisNft of nftList) {
+            if (opreturnConfig.townhallMvpTokenIds.includes(thisNft.token.tokenId)) {
+                setHasTownhallMvpNft(true);
+            }
+        }
+    };
 
     const refreshContactList = async () => {
         let contactList = await localforage.getItem(appConfig.localContactsParam);
@@ -207,7 +235,7 @@ export default function TownHall({ address, isMobile }) {
                 localFullTownHallHistory.txs,
                 pageNum,
             );
-
+            getMvpPosts(localFullTownHallHistory.txs);
             setTownHallHistory({
                 txs: selectedPageHistory,
                 numPages: localFullTownHallHistory.numPages,
@@ -220,7 +248,7 @@ export default function TownHall({ address, isMobile }) {
                     txHistoryResp.txs,
                     pageNum,
                 );
-
+                getMvpPosts(txHistoryResp.txs);
                 setTownHallHistory({
                     txs: firstPageHistory,
                     numPages: txHistoryResp.numPages,
@@ -231,6 +259,33 @@ export default function TownHall({ address, isMobile }) {
             }
         }
     };
+
+    const getMvpPosts = (txs) => {
+        if (!Array.isArray(txs) && txs.length < 1) {
+            return [];
+        }
+        let mvpTxs = [];
+        for (const thisTxs of txs) {
+            if (mvpTxs.length === appConfig.maxTownhallMvpPostDisplay) {
+                break;
+            }
+            if (thisTxs.iseCashChatPremiumPost === true) {
+                mvpTxs.push(thisTxs);
+            }
+        }
+
+        // Remove MVP posts when it has been > 24 hours
+        const currentTime = Date.now();
+        const parsedMvpTxs = [];
+        for (const thisMvpTx of mvpTxs) {
+            const thisDate = thisMvpTx.timestamp*1000;
+            const thisDateSinceArticle = (currentTime - thisDate) / 3600000;
+            if (thisDateSinceArticle < 24) {
+                parsedMvpTxs.push(thisMvpTx);
+            }
+        }
+        setMpvPosts(parsedMvpTxs);
+    }
 
     // Validate the reply post
     // Note: at some point this function will diverge in functionality with handlePostChange()
@@ -306,7 +361,7 @@ export default function TownHall({ address, isMobile }) {
     };
 
     // Pass a post tx BIP21 query string to cashtab extensions
-    const sendPost = () => {
+    const sendPost = (premiumPostFlag = false) => {
         // Parse the message for any media tags
         let parsedPost= post;
         // If youtube embedding is present
@@ -353,8 +408,10 @@ export default function TownHall({ address, isMobile }) {
         }
 
         // Encode the op_return post script
-        const opReturnRaw = encodeBip21Post(parsedPost);
-        const bip21Str = `${appConfig.townhallAddress}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`;
+        const opReturnRaw = encodeBip21Post(parsedPost, premiumPostFlag);
+        const bip21Str = premiumPostFlag
+          ? `${appConfig.townhallAddress}?amount=${appConfig.premiumTownhallFee}&op_return_raw=${opReturnRaw}`
+          : `${appConfig.townhallAddress}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`;
 
         if (isMobile) {
             window.open(
@@ -407,7 +464,7 @@ export default function TownHall({ address, isMobile }) {
     const MessagePreviewModal = () => {
         return (
             <Modal show={showMessagePreview} onClose={() => setShowMessagePreview(false)}>
-                <Modal.Header>Post Preview</Modal.Header>
+                <Modal.Header className='border-b-0'><BookDashed/></Modal.Header>
                 <Modal.Body>
                     <div className="space-y-6">
                         <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
@@ -438,16 +495,80 @@ export default function TownHall({ address, isMobile }) {
                         </p>
                     </div>
                 </Modal.Body>
-                <Modal.Footer>
+                <Modal.Footer className="flex justify-end space-x-2">
+                      <Button 
+                    onClick={() => setShowMessagePreview(false)}
+                    variant="secondary"
+                    >
+                        Cancel
+                    </Button>
                     <Button onClick={() => {
                         setShowMessagePreview(false)
                         sendPost()
                     }}>
-                        Post now
+                       <PostIcon  />  Post
                     </Button>
-                    <Button onClick={() => setShowMessagePreview(false)}>
+          
+                </Modal.Footer>
+            </Modal>
+        );
+    };
+
+    const PremiumMessagePreviewModal = () => {
+        return (
+            <Modal show={showPremiumMessagePreview} onClose={() => setShowPremiumMessagePreview(false)}>
+                <Modal.Header className='border-b-0'><BookDashed/></Modal.Header>
+                <Modal.Body>
+                    <div className="space-y-6">
+                        <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                            {(
+                                <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white text-ellipsis break-words min-w-0">
+                                    {post}
+                                </p>
+                            )}
+                            <br />Media Preview:
+                            {/* Render any media content within the message */}
+                            {post.includes('[img]') && post.includes('[/img]') && (
+                                <img src={post.substring(post.indexOf('[img]') + 5, post.lastIndexOf('[/img]'))} />
+                            )}
+                            {post.includes('[yt]') && post.includes('[/yt]') && !post.includes('https://www.youtube.com/shorts/') && (
+                                <LiteYouTubeEmbed id={YouTubeVideoId(post.substring(post.indexOf('[yt]') + 4, post.lastIndexOf('[/yt]')))} />
+                            )}
+                            {post.includes('[yt]') && post.includes('[/yt]') && post.includes('https://www.youtube.com/shorts/') && (
+                                <LiteYouTubeEmbed id={YouTubeVideoId((post.substring(post.indexOf('[yt]') + 4, post.lastIndexOf('[/yt]'))).split('https://www.youtube.com/shorts/')[1])} />
+                            )}
+                            {post.includes('[twt]') && post.includes('[/twt]') && !post.includes('tweeturl') && (
+                                <Tweet id={getTweetId(post)} />
+                            )}
+                            {post.includes('[url]') && post.includes('[/url]') && (
+                                <a href={post.substring(post.indexOf('[url]') + 5, post.lastIndexOf('[/url]'))} target="_blank">
+                                    {post.substring(post.indexOf('[url]') + 5, post.lastIndexOf('[/url]'))}
+                                </a>
+                            )}
+                        </p>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer className="flex justify-end space-x-2">
+                        <Button
+                        onClick={() => setShowPremiumMessagePreview(false)}
+                        variant="secondary"
+                    >
                         Cancel
                     </Button>
+                    <Button
+                        onClick={() => {
+                            setShowPremiumMessagePreview(false)
+                            sendPost(true)
+                        }}
+                        className="
+                            bg-gradient-to-br from-purple-300 via-blue-400 to-purple-300
+                            hover:from-purple-200 hover:via-blue-300 hover:to-purple-200
+                            transition-all duration-500 ease-in-out
+                        "
+                    >
+                        <Zap className="mr-1 w-4 h-4"/>Post
+                    </Button>
+                
                 </Modal.Footer>
             </Modal>
         );
@@ -466,6 +587,10 @@ export default function TownHall({ address, isMobile }) {
                 townhallCache,
                 true, // flag for contact filter
             );
+            toast({
+                title: "Contact filtering is on",
+                description: "Now only show messages from your contacts",
+            });
         } else {
             setCurrentPage(0);
             await getTownhallHistoryByPage(
@@ -474,6 +599,10 @@ export default function TownHall({ address, isMobile }) {
                 townhallCache,
                 false,
             );
+            toast({
+                title: "Contact filtering is off",
+                description: "Show all posts now",
+            });
         }
     };
 
@@ -538,7 +667,10 @@ export default function TownHall({ address, isMobile }) {
                                             className="font-medium dark:text-white"
                                             onClick={() => {
                                             copy(foundReply.replyAddress);
-                                            toast(`${foundReply.replyAddress} copied to clipboard`);
+                                            toast({
+                                                title: "✅ Copied",
+                                                description: `${foundReply.replyAddress} copied to clipboard`,
+                                              });
                                             }}
                                         >
                                             <Badge className="leading-7 shadow-sm hover:bg-accent [&:not(:first-child)]:mt-6 py-3px" variant="outline" >
@@ -608,476 +740,1111 @@ export default function TownHall({ address, isMobile }) {
     };
 
     return (
-        <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px]">
-            <MessagePreviewModal />
-              <>
-                <div className="max-w-xl w-full mx-auto overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring">
-                    {/* Post input field */}
-                    <Textarea
-                      className="bg-white resize-none border-0 p-3 shadow-none focus-visible:ring-0"
-                          id="post"
-                          value={post}
-                          placeholder="Post your thoughts to the public town hall..."
-                          required
-                          onChange={e => handlePostChange(e)}
-                          rows={4}
+      <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px]">
+        <MessagePreviewModal />
+        <PremiumMessagePreviewModal />
+        <>
+          <div className="max-w-xl w-full mx-auto overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring">
+            {/* Post input field */}
+            <Textarea
+              className="bg-white resize-none border-0 p-3 shadow-none focus-visible:ring-0"
+              id="post"
+              value={post}
+              placeholder="Post your thoughts to the public town hall..."
+              required
+              onChange={(e) => handlePostChange(e)}
+              rows={4}
+            />
+            <p className="text-sm text-red-600 px-3 dark:text-red-500">
+              {postError !== false && postError}
+            </p>
+            <div className="flex flex-col sm:flex-row justify-between items-center mt-2 p-3 pt-0">
+              {/* this is icons, buttons on left */}
+              <div className="flex gap-2 mb-2 sm:mb-0">
+                <Popover>
+                  <PopoverTrigger>
+                    <Button
+                      variant="ghost"
+                      onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}
+                    >
+                      <SmilePlus className="w-4 h-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-0 h-0 p-0">
+                    <Picker
+                      data={data}
+                      onEmojiSelect={(e) => {
+                        setPost(post + e.native);
+                      }}
                     />
-                    <p className="text-sm text-red-600 px-3 dark:text-red-500">{postError !== false && postError}</p>
-                    <div className="flex flex-col sm:flex-row justify-between items-center mt-2 p-3 pt-0">
-
-                        {/* this is icons, buttons on left */}
-                        <div className="flex gap-2 mb-2 sm:mb-0">
-                        <Popover>
-                        <PopoverTrigger>
-                            <Button variant="ghost" onClick={() => setRenderEmojiPicker(!renderEmojiPicker)}>
-                                <FaceIcon />
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-0 h-0 p-0"> 
-                            <Picker
-                                data={data}
-                                onEmojiSelect={(e) => {
-                                    setPost(post + e.native);
-                                }}
-                            />
-                        </PopoverContent>
-                    </Popover>
-                        <Tooltip content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]" style="light">
-                            <Button variant="ghost" onClick={() => insertMarkupTags('[url]theurl[/url]')}>
-                            <Link2Icon/>
-                            </Button>
-                        </Tooltip>
-                        <Tooltip content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]" style="light">
-                            <Button variant="ghost" onClick={() => insertMarkupTags('[img]imageurl[/img]')}>
-                            <ImageIcon/>
-                            </Button>
-                        </Tooltip>
-                        <Tooltip content="e.g. [yt]https://www.youtube.com/watch?v=1234[/yt]" style="light">
-                            <Button variant="ghost" onClick={() => insertMarkupTags('[yt]youtubeurl[/yt]')}>
-                                <YoutubeIcon/>
-                            </Button>
-                        </Tooltip>
-                        <Tooltip content="e.g. [twt]https://x.com/yourid/status/1234[/twt]" style="light">
-                            <Button variant="ghost" onClick={() => insertMarkupTags('[twt]tweeturl[/twt]')}>
-                            <UITwitterIcon/>
-                            </Button>
-                        </Tooltip>
-                        </div>
-                        {/* well this is post button*/}
-                        <Button
-                        type="button"
-                        disabled={post === '' || postError}
-                        onClick={() => { isMobile ? sendPost() : setShowMessagePreview(true) }}
-                        >
-                        <PostIcon className="mr-1" />Post
-                        </Button>
-                        </div>
-                    </div>
-                </>
-             <Separator className="my-2" />
-            {/* Townhall Post History */}
-
-            <div className="relative flex items-start mt-2 mb-2">
-                <div className="flex h-6 items-center py-2">
-                    <Checkbox
-                    id="curateByContacts"
-                    checked={curateByContacts}
-                    onCheckedChange={() => handleCurateByContactsChange(!curateByContacts)}
-                    className="rounded"
-                    />
-                </div>
-                <div className="ml-3 text-sm leading-6">
-                    <Label htmlFor="curateByContacts" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                        Only show posts by your contacts
-                    </Label>
-                </div>
+                  </PopoverContent>
+                </Popover>
+                <Tooltip
+                  content="e.g. [url]https://i.imgur.com/YMjGMzF.jpeg[/url]"
+                  style="light"
+                >
+                  <Button
+                    variant="ghost"
+                    onClick={() => insertMarkupTags("[url]theurl[/url]")}
+                  >
+                    <Link className="w-4 h-4" />
+                  </Button>
+                </Tooltip>
+                <Tooltip
+                  content="e.g. [img]https://i.imgur.com/YMjGMzF.jpeg[/img]"
+                  style="light"
+                >
+                  <Button
+                    variant="ghost"
+                    onClick={() => insertMarkupTags("[img]imageurl[/img]")}
+                  >
+                    <FileImage className="w-4 h-4" />
+                  </Button>
+                </Tooltip>
+                <Tooltip
+                  content="e.g. [yt]https://www.youtube.com/watch?v=1234[/yt]"
+                  style="light"
+                >
+                  <Button
+                    variant="ghost"
+                    onClick={() => insertMarkupTags("[yt]youtubeurl[/yt]")}
+                  >
+                    <Youtube className="w-4 h-4" />
+                  </Button>
+                </Tooltip>
+                <Tooltip
+                  content="e.g. [twt]https://x.com/yourid/status/1234[/twt]"
+                  style="light"
+                >
+                  <Button
+                    variant="ghost"
+                    onClick={() => insertMarkupTags("[twt]tweeturl[/twt]")}
+                  >
+                    <Twitter className="w-4 h-4" />
+                  </Button>
+                </Tooltip>
+              </div>
+              {/* well this is post button*/}
+              <div className="flex gap-2 justify-end">
+                <Button
+                  type="button"
+                  disabled={post === "" || postError}
+                  onClick={() => {
+                    isMobile ? sendPost() : setShowMessagePreview(true);
+                  }}
+                >
+                  <PostIcon />
+                  Post
+                </Button>
+                {hasTownhallMvpNft === true && (
+                  <Button
+                    type="button"
+                    disabled={post === "" || postError}
+                    onClick={() => {
+                      isMobile
+                        ? sendPost(true)
+                        : setShowPremiumMessagePreview(true);
+                    }}
+                    className={`
+                    bg-gradient-to-br from-purple-300 via-blue-400 to-purple-300
+                    ${
+                      post === "" || postError
+                        ? "opacity-20 cursor-not-allowed"
+                        : "hover:from-purple-200 hover:via-blue-300 hover:to-purple-200"
+                    }
+                    transition-all duration-500 ease-in-out
+                    `}
+                  >
+                    <Zap className="mr-1 w-4 h-4" />
+                    Premium Post
+                  </Button>
+                )}
+              </div>
             </div>
+          </div>
+        </>
+        {/* Townhall Post History */}
+        <div className="flex justify-end my-2">
+          <Toggle
+            variant="outline"
+            className="bg-white"
+            aria-label="Only show messages by your contacts"
+            pressed={curateByContacts}
+            onPressedChange={(state) => handleCurateByContactsChange(state)}
+          >
+            <UserRoundSearch className="h-4 w-4" />
+          </Toggle>
+        </div>
 
-            {/*Set up pagination menu*/}
-                <span>
-                    <Pagination>
-                        <PaginationContent>
-                            {/* Previous button */}
-                            <PaginationItem>
-                            <PaginationPrevious
-                                href="#"
-                                onClick={(e) => {
-                                e.preventDefault();
-                                setCurrentPage(old => Math.max(0, old - 1));
-                                getTownhallHistoryByPage(Math.max(0, currentPage - 1), true, false, curateByContacts);
-                                }}
-                                disabled={currentPage === 0}
-                            />
-                            </PaginationItem>
+        {/*Set up pagination menu*/}
+        <span>
+          <Pagination>
+            <PaginationContent>
+              {/* Previous button */}
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentPage((old) => Math.max(0, old - 1));
+                    getTownhallHistoryByPage(
+                      Math.max(0, currentPage - 1),
+                      true,
+                      false,
+                      curateByContacts
+                    );
+                  }}
+                  disabled={currentPage === 0}
+                />
+              </PaginationItem>
 
-                            {/* Numbered page links with dynamic display logic */}
-                            {Array.from({ length: townHallHistory.numPages }, (_, i) => i)
-                            .filter(i => {
-                                if (townHallHistory.numPages <= maxPagesToShow) return true;
-                                if (currentPage <= halfMaxPages) return i < maxPagesToShow;
-                                if (currentPage >= townHallHistory.numPages - halfMaxPages) return i >= townHallHistory.numPages - maxPagesToShow;
-                                return i >= currentPage - halfMaxPages && i <= currentPage + halfMaxPages;
-                            })
-                            .map(i => (
-                                <PaginationItem key={i}>
-                                <PaginationLink
-                                    href="#"
-                                    onClick={(e) => {
-                                    e.preventDefault();
-                                    getTownhallHistoryByPage(i, true, false, curateByContacts);
-                                    setCurrentPage(i);
-                                    }}
-                                    isActive={currentPage === i}
-                                    key={"pagination"+i}
+              {/* Numbered page links with dynamic display logic */}
+              {Array.from({ length: townHallHistory.numPages }, (_, i) => i)
+                .filter((i) => {
+                  if (townHallHistory.numPages <= maxPagesToShow) return true;
+                  if (currentPage <= halfMaxPages) return i < maxPagesToShow;
+                  if (currentPage >= townHallHistory.numPages - halfMaxPages)
+                    return i >= townHallHistory.numPages - maxPagesToShow;
+                  return (
+                    i >= currentPage - halfMaxPages &&
+                    i <= currentPage + halfMaxPages
+                  );
+                })
+                .map((i) => (
+                  <PaginationItem key={i}>
+                    <PaginationLink
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        getTownhallHistoryByPage(
+                          i,
+                          true,
+                          false,
+                          curateByContacts
+                        );
+                        setCurrentPage(i);
+                      }}
+                      isActive={currentPage === i}
+                      key={"pagination" + i}
+                    >
+                      {i + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+
+              {/* Optional ellipsis for overflow, modifying to appear conditionally */}
+              {townHallHistory.numPages > maxPagesToShow &&
+                currentPage < townHallHistory.numPages - halfMaxPages && (
+                  <PaginationItem>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                )}
+
+              {/* Next button */}
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentPage((old) =>
+                      Math.min(townHallHistory.numPages - 1, old + 1)
+                    );
+                    getTownhallHistoryByPage(
+                      Math.min(townHallHistory.numPages - 1, currentPage + 1),
+                      true,
+                      false,
+                      curateByContacts
+                    );
+                  }}
+                  disabled={currentPage === townHallHistory.numPages - 1}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </span>
+        <div>
+          {mvpPosts &&
+            mvpPosts.length > 0 &&
+            mvpPosts.map((tx, index) => (
+              <>
+                <div
+                  className="flex flex-col items-center mt-2 "
+                  key={"mvpPost" + index}
+                >
+                  <div className="flex flex-col max-w-xl gap-2 break-words hover:shadow w-full leading-1.5 p-6 rounded-2xl border bg-card text-card-foreground dark:bg-gray-700 transition-transform transform">
+                    {/* Premium Post Indicator */}
+                    <div className="flex items-start justify-between space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
+                      <span className="flex items-center">
+                        {tx.replyAddress === address ? (
+                          <>
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                              <div className="flex items-center gap-2">
+                                {tx.senderAvatarLink === false ? (
+                                  <DefaultavatarIcon />
+                                ) : (
+                                  <Avatar className="h-9 w-9">
+                                    <AvatarImage
+                                      src={tx.senderAvatarLink}
+                                      alt="useravatar"
+                                    />
+                                    <AvatarFallback>
+                                      <DefaultavatarIcon />
+                                    </AvatarFallback>
+                                  </Avatar>
+                                )}
+                                <Badge
+                                  variant="outline"
+                                  className="py-3px hover:bg-accent"
                                 >
-                                    {i + 1}
-                                </PaginationLink>
-                                </PaginationItem>
-                            ))}
-
-                            {/* Optional ellipsis for overflow, modifying to appear conditionally */}
-                            {(townHallHistory.numPages > maxPagesToShow && currentPage < townHallHistory.numPages - halfMaxPages) && (
-                            <PaginationItem>
-                                <PaginationEllipsis />
-                            </PaginationItem>
-                            )}
-
-                            {/* Next button */}
-                            <PaginationItem>
-                            <PaginationNext
-                                href="#"
-                                onClick={(e) => {
-                                e.preventDefault();
-                                setCurrentPage(old => Math.min(townHallHistory.numPages - 1, old + 1));
-                                getTownhallHistoryByPage(Math.min(townHallHistory.numPages - 1, currentPage + 1), true, false, curateByContacts);
-                                }}
-                                disabled={currentPage === townHallHistory.numPages - 1}
-                            />
-                            </PaginationItem>
-                        </PaginationContent>
-                    </Pagination>
-                </span>
-            <div>
-            {
-                townHallHistory &&
-                  townHallHistory.txs &&
-                    townHallHistory.txs.length > 0
-                    ? townHallHistory.txs.map(
-                          (tx, index) => (
-                            <>
-                                <div className="flex flex-col items-center mt-2" key={"townhallTxHistory"+index}>
-                                   <div className="flex flex-col max-w-xl gap-2 break-words hover:shadow w-full leading-1.5 p-6 rounded-2xl border bg-card text-card-foreground dark:bg-gray-700 transition-transform transform">
-                                   <div className="flex items-center justify-between space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
-                                <span className="flex items-center">
-                                    {tx.replyAddress === address ? (
-                                    <>
-                                        <div className="flex items-center gap-2">
-                                        {tx.senderAvatarLink === false ? (
-                                            <DefaultavatarIcon />
-                                        ) : (
-                                            <Avatar className="h-9 w-9">
-                                            <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
-                                            <AvatarFallback>
-                                                <DefaultavatarIcon />
-                                            </AvatarFallback>
-                                            </Avatar>
-                                        )}
-                                        <Badge variant="outline" className="py-3px hover:bg-accent">
-                                            <div className="font-medium leading-7 dark:text-white">
-                                            <div
-                                                onClick={() => {
-                                                copy(tx.replyAddress);
-                                                toast(`${tx.replyAddress} copied to clipboard`);
-                                                }}
-                                            >
-                                                Your wallet
-                                            </div>
-                                            </div>
-                                        </Badge>
-                                        </div>
-                                    </>
-                                    ) : (
-                                    <>
-                                        <div className="flex items-center gap-2">
-                                        {tx.senderAvatarLink === false ? (
-                                            <DefaultavatarIcon />
-                                        ) : (
-                                            <Avatar className="h-9 w-9">
-                                            <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
-                                            <AvatarFallback>
-                                                <DefaultavatarIcon />
-                                            </AvatarFallback>
-                                            </Avatar>
-                                        )}
-                                        <Badge variant="outline" className="py-3px shadow-sm hover:bg-accent">
-                                            <div className="leading-7 [&:not(:first-child)]:mt-6">
-                                            <div
-                                                onClick={() => {
-                                                copy(tx.replyAddress);
-                                                toast(`${tx.replyAddress} copied to clipboard`);
-                                                }}
-                                            >
-                                                {getContactNameIfExist(tx.replyAddress, contactList)}
-                                            </div>
-                                            </div>
-                                        </Badge>
-
-                                        <RenderTipping address={tx.replyAddress} sendXecTip={sendXecTip} />
-
-                                        {isExistingContact(tx.replyAddress, contactList) === false && (
-                                            <Popover>
-                                            <PopoverTrigger asChild>
-                                                <Button variant="outline" size="icon" className="mr-2">
-                                                <IdCardIcon className="h-4 w-4" />
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent>
-                                                <div className="space-y-2">
-                                                <h4 className="flex items-center font-medium leading-none">
-                                                    <Pencil1Icon className="h-4 w-4 mr-1" />
-                                                    New contact
-                                                </h4>
-                                                <p className="text-sm text-muted-foreground break-words max-w-96">
-                                                    Input contact name for <br />
-                                                    {tx.replyAddress}
-                                                </p>
-                                                </div>
-                                                <div className="py-2">
-                                                <Input
-                                                    id="addContactName"
-                                                    name="addContactName"
-                                                    type="text"
-                                                    value={contactListName}
-                                                    required
-                                                    placeholder="New contact name"
-                                                    className="bg-gray-50"
-                                                    maxLength="30"
-                                                    onChange={(e) => setContactListName(e.target.value)}
-                                                />
-                                                <Button
-                                                    type="button"
-                                                    disabled={contactListName === ''}
-                                                    className="mt-2"
-                                                    onClick={(e) => {
-                                                    addNewContact(
-                                                        contactListName,
-                                                        tx.replyAddress,
-                                                        refreshContactList
-                                                    );
-                                                    setContactListName('');
-                                                    }}
-                                                >
-                                                    Add Contact
-                                                </Button>
-                                                </div>
-                                            </PopoverContent>
-                                            </Popover>
-                                        )}
-                                        </div>
-                                    </>
-                                    )}
-                                </span>
-
-                                <div className="flex items-center space-x-2">
-                                <DropdownMenu>
-                            <DropdownMenuTrigger>
-                                <DotsHorizontalIcon />
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <DropdownMenuLabel>Action</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                onClick={(e) => {
-                                    muteNewContact('Muted user', tx.replyAddress, setMuteList, window);
-                                }}
-                                >
-                                <EyeNoneIcon className="h-4 w-4 mr-2" />
-                                Mute 
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                            </DropdownMenu>
-                                </div>
-                                </div>
-
-                                   {/* Render the op_return message */}
-                                <div className={(tx.opReturnMessage.trim() && tx.opReturnMessage !== '\0') ? "my-2" : "hidden"}>
-                                    <p className="leading-7" key={index}>
-                                        {(tx.opReturnMessage.trim() && tx.opReturnMessage !== '\0') ? tx.opReturnMessage : ' '}
-                                    </p>
-                                </div>
-                                   {/* Render any media content within the message */}
-                                   {tx.nftShowcaseId !== false && tx.nftShowcaseId !== undefined && (
-                                        <>
-                                <Card className="max-w-md w-full mx-auto transition-shadow duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50">
-                                    <CardHeader>
-                                        <CardTitle>NFT Showcase</CardTitle>
-                                        <CardDescription>
-                                        <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
-                                        <span onClick={() => {
-                                            copy(tx.nftShowcaseId);
-                                            toast(`${tx.nftShowcaseId} copied to clipboard`);
-                                        }}>
-                                        <span className="hidden sm:inline">
-                                            ID: {tx.nftShowcaseId.substring(0,15)}...{tx.nftShowcaseId.substring(tx.nftShowcaseId.length - 10)}
-                                        </span>
-                                        <span className="sm:hidden">
-                                            ID: {tx.nftShowcaseId.substring(0,8)}...{tx.nftShowcaseId.substring(tx.nftShowcaseId.length - 5)}
-                                        </span>
-                                        </span>
-                                        <a 
-                                            href={`${appConfig.blockExplorerUrl}/tx/${tx.nftShowcaseId}`} 
-                                            target="_blank" 
-                                            className="ml-2 dark:text-white font-medium" 
-                                        >
-                                            <Link2Icon />
-                                        </a>
+                                  <div className="font-medium leading-7 dark:text-white">
+                                    <div
+                                      onClick={() => {
+                                        copy(tx.replyAddress);
+                                        toast({
+                                          title: "✅ Copied",
+                                          description: `${tx.replyAddress} copied to clipboard`,
+                                        });
+                                      }}
+                                    >
+                                      Your Wallet
                                     </div>
-                                            Last sale price: N/A
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <img src={`${appConfig.tokenIconsUrl}/256/${tx.nftShowcaseId}.png`} className="rounded-lg w-full object-cover"/>
-                                    </CardContent>
-                                    <CardFooter>
-                                    </CardFooter>
-                                </Card>
-                                        </>
-                                    )}
-                                   {tx.imageSrc !== false && (<img src={tx.imageSrc} className="rounded-lg object-cover"/>)}
-                                   {tx.videoId !== false && (<LiteYouTubeEmbed id={tx.videoId} />)}
-                                   {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
-                                   <p className="line-clamp-1">
-                                   {tx.url !== false && (
-                                        <Alert color="info" className="flex-nowrap text-sm text-muted-foreground break-words">
-                                            <a href={tx.url} target="_blank" className="break-words">{tx.url}</a>
-                                        </Alert>
-                                    )}
-                                   </p>
-                                   {/* Date and timestamp */}
-                                   <span className="text-sm text-muted-foreground">
-                                      {tx.txDate}&nbsp;at&nbsp;{tx.txTime}
-                                   </span>
-
-                                   {/* Reply action to a townhall post */}
-                                   <div>    
-                                       {/* Reply popover to input the reply content */}
-                                <Popover>
-                                <PopoverTrigger>
-                                    <Button variant="outline" size="icon" className="mr-2">
-                                        <ChatBubbleIcon className="h-4 w-4" />
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className='min-w-96'>
-                                    <div >
-                                        <div className="space-y-2 ">
-                                                <h4 className="font-medium leading-none">Reply to: </h4>
-                                                <p className="text-sm text-muted-foreground break-words">
-                                                {tx.replyAddress}
-                                                </p>
-                                            </div>
-                                        <div className="py-2">
-                                            <Textarea
-                                                id="reply-post"
-                                                value={replyPost}
-                                                placeholder="Post your reply..."
-                                                required
-                                                onChange={e => handleReplyPostChange(e)}
-                                                rows={4}
-                                            />
-                                            <p className="mt-2 text-sm text-red-600 dark:text-red-500">{replyPostError !== false && replyPostError}</p>
-                                            <Button
-                                                type="button"
-                                                disabled={replyPostError || replyPost === ''}
-                                                onClick={e => {
-                                                    replytoPost(tx.txid, replyPost)
-                                                }}
-                                            >
-                                                Post Reply
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </PopoverContent>
-                            </Popover>
-                                       {/* Share buttons with other social platforms */}
-                                       <Popover>
-                                    <PopoverTrigger asChild>
-                                        <Button variant="outline" size="icon">
-                                            <Share1Icon className="h-4 w-4" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-30">
-                                    <div className="space-y-2">
-                                        <h4 className="font-medium text-gray-900 leading-none">Select Platform</h4>
-                                    </div>
-                                        <div className="pt-2">
-                                            <TwitterShareButton
-                                                url={
-                                                    tx.imageSrc !== false ? tx.imageSrc
-                                                        : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
-                                                        : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
-                                                        : 'https://ecashchat.com'
-                                                }
-                                                title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
-                                            >
-                                                <TwitterIcon size={25} round />
-                                            </TwitterShareButton>
-                                            &nbsp;
-                                            <FacebookShareButton
-                                                url={
-                                                    tx.imageSrc !== false ? tx.imageSrc
-                                                        : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
-                                                        : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
-                                                        : 'https://ecashchat.com'
-                                                }
-                                                quote={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
-                                            >
-                                                <FacebookIcon size={25} round />
-                                            </FacebookShareButton>
-                                            &nbsp;
-                                            <RedditShareButton
-                                                url={
-                                                    tx.imageSrc !== false ? tx.imageSrc
-                                                        : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
-                                                        : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
-                                                        : 'https://ecashchat.com'
-                                                }
-                                                title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
-                                            >
-                                                <RedditIcon size={25} round />
-                                            </RedditShareButton>
-                                            &nbsp;
-                                            <TelegramShareButton
-                                                url={
-                                                    tx.imageSrc !== false ? tx.imageSrc
-                                                        : tx.videoId !== false ? `https://www.youtube.com/watch?v=${tx.videoId}`
-                                                        : tx.tweetId !== false ? `https://twitter.com/i/web/status/${tx.tweetId}`
-                                                        : 'https://ecashchat.com'
-                                                }
-                                                title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
-                                            >
-                                                <TelegramIcon size={25} round />
-                                            </TelegramShareButton>
-                                        </div>
-                                    </PopoverContent>
-                                </Popover>
-                                            {/* Render corresponding replies for this post */}
-                                            {<RenderReplies txid={tx.txid} replies={townHallHistory.replies} />}
-                                   </div>
                                   </div>
-                               </div>
-                           </>
-                          ),
-                      )
-                    :  <div className="flex flex-col space-y-3">
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-[400px]" />
-                      <Skeleton className="h-4 w-[350px]" />
-                      <Skeleton className="h-4 w-[300px]" />
+                                </Badge>
+                              </div>
+                              <Popover>
+                                <PopoverTrigger>
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-primary-foreground border-none bg-gradient-to-br from-purple-100 via-blue-200 to-purple-100 h-9 cursor-pointer"
+                                  >
+                                    <Zap className="h-4 w-4 mr-2" /> Premium
+                                  </Badge>
+                                </PopoverTrigger>
+                                <PopoverContent>
+                                  <h4 className="font-semibold text-sm">
+                                    What is a premium post
+                                  </h4>
+                                  <p className="text-sm">
+                                  This is a premium article promoted through the use of the eCashChat Article MVP NFT. It expires after 24 hours
+                                  </p>
+                                </PopoverContent>
+                              </Popover>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                              <div className="flex flex-wrap items-center gap-2">
+                                {tx.senderAvatarLink === false ? (
+                                  <DefaultavatarIcon />
+                                ) : (
+                                  <Avatar className="h-9 w-9">
+                                    <AvatarImage
+                                      src={tx.senderAvatarLink}
+                                      alt="User Avatar"
+                                    />
+                                    <AvatarFallback>
+                                      <DefaultavatarIcon />
+                                    </AvatarFallback>
+                                  </Avatar>
+                                )}
+                                <Badge
+                                  variant="outline"
+                                  className="py-3px shadow-sm hover:bg-accent"
+                                >
+                                  <div className="leading-7">
+                                    <div
+                                      onClick={() => {
+                                        copy(tx.replyAddress);
+                                        toast({
+                                          title: "✅ Copied",
+                                          description: `${tx.replyAddress} copied to clipboard`,
+                                        });
+                                      }}
+                                    >
+                                      {getContactNameIfExist(
+                                        tx.replyAddress,
+                                        contactList
+                                      )}
+                                    </div>
+                                  </div>
+                                </Badge>
+
+                                <RenderTipping
+                                  address={tx.replyAddress}
+                                  sendXecTip={sendXecTip}
+                                />
+
+                                {isExistingContact(
+                                  tx.replyAddress,
+                                  contactList
+                                ) === false && (
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <Button variant="outline" size="icon">
+                                        <IdCardIcon className="h-4 w-4" />
+                                      </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent>
+                                      <div className="space-y-2">
+                                        <h4 className="flex items-center font-medium leading-none">
+                                          <Pencil1Icon className="h-4 w-4 mr-1" />
+                                          New Contact
+                                        </h4>
+                                        <p className="text-sm text-muted-foreground break-words max-w-96">
+                                          Enter contact name:
+                                          <br />
+                                          {tx.replyAddress}
+                                        </p>
+                                      </div>
+                                      <div className="py-2">
+                                        <Input
+                                          id="addContactName"
+                                          name="addContactName"
+                                          type="text"
+                                          value={contactListName}
+                                          required
+                                          placeholder="New contact name"
+                                          className="bg-gray-50"
+                                          maxLength="30"
+                                          onChange={(e) =>
+                                            setContactListName(e.target.value)
+                                          }
+                                        />
+                                        <Button
+                                          type="button"
+                                          disabled={contactListName === ""}
+                                          className="mt-2"
+                                          onClick={(e) => {
+                                            addNewContact(
+                                              contactListName,
+                                              tx.replyAddress,
+                                              refreshContactList
+                                            );
+                                            setContactListName("");
+                                          }}
+                                        >
+                                          Add Contact
+                                        </Button>
+                                      </div>
+                                    </PopoverContent>
+                                  </Popover>
+                                )}
+                              </div>
+                              <Popover>
+                                <PopoverTrigger>
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-primary-foreground border-none bg-gradient-to-br from-purple-100 via-blue-200 to-purple-100 h-9 cursor-pointer"
+                                  >
+                                    <Zap className="h-4 w-4 mr-2" /> Premium
+                                  </Badge>
+                                </PopoverTrigger>
+                                <PopoverContent>
+                                  <h4 className="font-semibold text-sm">
+                                    What is a premium post
+                                  </h4>
+                                  <p className="text-sm">
+                                  This is a premium article promoted through the use of the eCashChat Article MVP NFT. It expires after 24 hours
+                                  </p>
+                                </PopoverContent>
+                              </Popover>
+                            </div>
+                          </>
+                        )}
+                      </span>
+
+                      <div className="flex items-center space-x-2">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger>
+                            <DotsHorizontalIcon />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                muteNewContact(
+                                  "Muted user",
+                                  tx.replyAddress,
+                                  setMuteList,
+                                  window
+                                );
+                              }}
+                            >
+                              <EyeNoneIcon className="h-4 w-4 mr-2" />
+                              Mute
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+
+                    {/* Render op_return message */}
+                    <div
+                      className={
+                        tx.opReturnMessage.trim() && tx.opReturnMessage !== "\0"
+                          ? "my-2"
+                          : "hidden"
+                      }
+                    >
+                      <p className="leading-7" key={index}>
+                        {tx.opReturnMessage.trim() &&
+                        tx.opReturnMessage !== "\0"
+                          ? tx.opReturnMessage
+                          : " "}
+                      </p>
+                    </div>
+                    {/* Render any media content in the message */}
+                    {tx.nftShowcaseId !== false &&
+                      tx.nftShowcaseId !== undefined && (
+                        <>
+                          <Card className="max-w-md w-full mx-auto transition-shadow duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50">
+                            <CardHeader>
+                              <CardTitle>NFT Showcase</CardTitle>
+                              <CardDescription>
+                                <div
+                                  className="flex items-center"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <span
+                                    onClick={() => {
+                                      copy(tx.nftShowcaseId);
+                                      toast({
+                                        title: "✅ Copied",
+                                        description: `${tx.nftShowcaseId} copied to clipboard`,
+                                      });
+                                    }}
+                                  >
+                                    <span className="hidden sm:inline">
+                                      ID: {tx.nftShowcaseId.substring(0, 15)}...
+                                      {tx.nftShowcaseId.substring(
+                                        tx.nftShowcaseId.length - 10
+                                      )}
+                                    </span>
+                                    <span className="sm:hidden">
+                                      ID: {tx.nftShowcaseId.substring(0, 8)}...
+                                      {tx.nftShowcaseId.substring(
+                                        tx.nftShowcaseId.length - 5
+                                      )}
+                                    </span>
+                                  </span>
+                                  <a
+                                    href={`${appConfig.blockExplorerUrl}/tx/${tx.nftShowcaseId}`}
+                                    target="_blank"
+                                    className="ml-2 dark:text-white font-medium"
+                                  >
+                                    <Link2Icon />
+                                  </a>
+                                </div>
+                                Last sale price: N/A
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <img
+                                src={`${appConfig.tokenIconsUrl}/256/${tx.nftShowcaseId}.png`}
+                                className="rounded-lg w-full object-cover"
+                              />
+                            </CardContent>
+                            <CardFooter></CardFooter>
+                          </Card>
+                        </>
+                      )}
+                    {tx.imageSrc !== false && (
+                      <img
+                        src={tx.imageSrc}
+                        className="rounded-lg object-cover"
+                      />
+                    )}
+                    {tx.videoId !== false && (
+                      <LiteYouTubeEmbed id={tx.videoId} />
+                    )}
+                    {tx.tweetId !== false && <Tweet id={tx.tweetId} />}
+                    <p className="line-clamp-1">
+                      {tx.url !== false && (
+                        <InfoBox
+                          color="info"
+                          className="flex-nowrap bg-muted text-sm text-muted-foreground break-words"
+                        >
+                          <a
+                            href={tx.url}
+                            target="_blank"
+                            className="break-words"
+                          >
+                            {tx.url}
+                          </a>
+                        </InfoBox>
+                      )}
+                    </p>
+                    {/* Date and timestamp */}
+                    <span className="text-sm text-muted-foreground">
+                      {tx.txDate}&nbsp;at&nbsp;{tx.txTime}
+                    </span>
+
+                    {/* Reply actions */}
+                    <div>
+                      {/* Reply popup */}
+                      <Popover>
+                        <PopoverTrigger>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="mr-2"
+                          >
+                            <ChatBubbleIcon className="h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="min-w-96">
+                          <div>
+                            <div className="space-y-2 ">
+                              <h4 className="font-medium leading-none">
+                                Reply to:{" "}
+                              </h4>
+                              <p className="text-sm text-muted-foreground break-words">
+                                {tx.replyAddress}
+                              </p>
+                            </div>
+                            <div className="py-2">
+                              <Textarea
+                                id="reply-post"
+                                value={replyPost}
+                                placeholder="Post your reply..."
+                                required
+                                onChange={(e) => handleReplyPostChange(e)}
+                                rows={4}
+                              />
+                              <p className="mt-2 text-sm text-red-600 dark:text-red-500">
+                                {replyPostError !== false && replyPostError}
+                              </p>
+                              <Button
+                                type="button"
+                                disabled={replyPostError || replyPost === ""}
+                                onClick={(e) => {
+                                  replytoPost(tx.txid, replyPost);
+                                }}
+                              >
+                                Post Reply
+                              </Button>
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                      {/* Social media share buttons */}
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" size="icon">
+                            <Share1Icon className="h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-30">
+                          <div className="space-y-2">
+                            <h4 className="font-medium text-gray-900 leading-none">
+                              Choose Platform
+                            </h4>
+                          </div>
+                          <div className="pt-2">
+                            <TwitterShareButton
+                              url={
+                                tx.imageSrc !== false
+                                  ? tx.imageSrc
+                                  : tx.videoId !== false
+                                  ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                  : tx.tweetId !== false
+                                  ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                  : "https://ecashchat.com"
+                              }
+                              title={`[Share from eCashChat.com] - ${tx.opReturnMessage}`}
+                            >
+                              <TwitterIcon size={25} round />
+                            </TwitterShareButton>
+                            &nbsp;
+                            <FacebookShareButton
+                              url={
+                                tx.imageSrc !== false
+                                  ? tx.imageSrc
+                                  : tx.videoId !== false
+                                  ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                  : tx.tweetId !== false
+                                  ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                  : "https://ecashchat.com"
+                              }
+                              quote={`[Share from eCashChat.com] - ${tx.opReturnMessage}`}
+                            >
+                              <FacebookIcon size={25} round />
+                            </FacebookShareButton>
+                            &nbsp;
+                            <RedditShareButton
+                              url={
+                                tx.imageSrc !== false
+                                  ? tx.imageSrc
+                                  : tx.videoId !== false
+                                  ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                  : tx.tweetId !== false
+                                  ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                  : "https://ecashchat.com"
+                              }
+                              title={`[Share from eCashChat.com] - ${tx.opReturnMessage}`}
+                            >
+                              <RedditIcon size={25} round />
+                            </RedditShareButton>
+                            &nbsp;
+                            <TelegramShareButton
+                              url={
+                                tx.imageSrc !== false
+                                  ? tx.imageSrc
+                                  : tx.videoId !== false
+                                  ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                  : tx.tweetId !== false
+                                  ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                  : "https://ecashchat.com"
+                              }
+                              title={`[Share from eCashChat.com] - ${tx.opReturnMessage}`}
+                            >
+                              <TelegramIcon size={25} round />
+                            </TelegramShareButton>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                      {/* Render replies to this post */}
+                      {
+                        <RenderReplies
+                          txid={tx.txid}
+                          replies={townHallHistory.replies}
+                        />
+                      }
                     </div>
                   </div>
-                }
+                </div>
+              </>
+            ))}
+          {townHallHistory &&
+          townHallHistory.txs &&
+          townHallHistory.txs.length > 0 ? (
+            townHallHistory.txs.map((tx, index) => (
+              <>
+                <div
+                  className="flex flex-col lg:min-w-[576px] items-center mt-2"
+                  key={"townhallTxHistory" + index}
+                >
+                  <div className="flex flex-col max-w-xl gap-2 break-words hover:shadow w-full leading-1.5 p-6 rounded-2xl border bg-card text-card-foreground dark:bg-gray-700 transition-transform transform">
+                    <div className="flex items-center justify-between space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white">
+                      <span className="flex items-center">
+                        {tx.replyAddress === address ? (
+                          <>
+                            <div className="flex items-center gap-2">
+                              {tx.senderAvatarLink === false ? (
+                                <DefaultavatarIcon />
+                              ) : (
+                                <Avatar className="h-9 w-9">
+                                  <AvatarImage
+                                    src={tx.senderAvatarLink}
+                                    alt="User Avatar"
+                                  />
+                                  <AvatarFallback>
+                                    <DefaultavatarIcon />
+                                  </AvatarFallback>
+                                </Avatar>
+                              )}
+                              <Badge
+                                variant="outline"
+                                className="py-3px hover:bg-accent"
+                              >
+                                <div className="font-medium leading-7 dark:text-white">
+                                  <div
+                                    onClick={() => {
+                                      copy(tx.replyAddress);
+                                      toast({
+                                        title: "✅ Copied",
+                                        description: `${tx.replyAddress} copied to clipboard`,
+                                      });
+                                    }}
+                                  >
+                                    Your wallet
+                                  </div>
+                                </div>
+                              </Badge>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="flex items-center gap-2">
+                              {tx.senderAvatarLink === false ? (
+                                <DefaultavatarIcon />
+                              ) : (
+                                <Avatar className="h-9 w-9">
+                                  <AvatarImage
+                                    src={tx.senderAvatarLink}
+                                    alt="User Avatar"
+                                  />
+                                  <AvatarFallback>
+                                    <DefaultavatarIcon />
+                                  </AvatarFallback>
+                                </Avatar>
+                              )}
+                              <Badge
+                                variant="outline"
+                                className="py-3px shadow-sm hover:bg-accent"
+                              >
+                                <div className="leading-7 [&:not(:first-child)]:mt-6">
+                                  <div
+                                    onClick={() => {
+                                      copy(tx.replyAddress);
+                                      toast({
+                                        title: "✅ Copied",
+                                        description: `${tx.replyAddress} copied to clipboard`,
+                                      });
+                                    }}
+                                  >
+                                    {getContactNameIfExist(
+                                      tx.replyAddress,
+                                      contactList
+                                    )}
+                                  </div>
+                                </div>
+                              </Badge>
+
+                              <RenderTipping
+                                address={tx.replyAddress}
+                                sendXecTip={sendXecTip}
+                              />
+
+                              {isExistingContact(
+                                tx.replyAddress,
+                                contactList
+                              ) === false && (
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      size="icon"
+                                      className="mr-2"
+                                    >
+                                      <IdCardIcon className="h-4 w-4" />
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent>
+                                    <div className="space-y-2">
+                                      <h4 className="flex items-center font-medium leading-none">
+                                        <Pencil1Icon className="h-4 w-4 mr-1" />
+                                        New contact
+                                      </h4>
+                                      <p className="text-sm text-muted-foreground break-words max-w-96">
+                                        Input contact name for <br />
+                                        {tx.replyAddress}
+                                      </p>
+                                    </div>
+                                    <div className="py-2">
+                                      <Input
+                                        id="addContactName"
+                                        name="addContactName"
+                                        type="text"
+                                        value={contactListName}
+                                        required
+                                        placeholder="New contact name"
+                                        className="bg-gray-50"
+                                        maxLength="30"
+                                        onChange={(e) =>
+                                          setContactListName(e.target.value)
+                                        }
+                                      />
+                                      <Button
+                                        type="button"
+                                        disabled={contactListName === ""}
+                                        className="mt-2"
+                                        onClick={(e) => {
+                                          addNewContact(
+                                            contactListName,
+                                            tx.replyAddress,
+                                            refreshContactList
+                                          );
+                                          setContactListName("");
+                                        }}
+                                      >
+                                        Add Contact
+                                      </Button>
+                                    </div>
+                                  </PopoverContent>
+                                </Popover>
+                              )}
+                            </div>
+                          </>
+                        )}
+                      </span>
+
+                      <div className="flex items-center space-x-2">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger>
+                            <DotsHorizontalIcon />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuLabel>Action</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                muteNewContact(
+                                  "Muted user",
+                                  tx.replyAddress,
+                                  setMuteList,
+                                  window
+                                );
+                              }}
+                            >
+                              <EyeNoneIcon className="h-4 w-4 mr-2" />
+                              Mute
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+
+                    {/* Render the op_return message */}
+                    <div
+                      className={
+                        tx.opReturnMessage.trim() && tx.opReturnMessage !== "\0"
+                          ? "my-2"
+                          : "hidden"
+                      }
+                    >
+                      <p className="leading-7" key={index}>
+                        {tx.opReturnMessage.trim() &&
+                        tx.opReturnMessage !== "\0"
+                          ? tx.opReturnMessage
+                          : " "}
+                      </p>
+                    </div>
+                    {/* Render any media content within the message */}
+                    {tx.nftShowcaseId !== false &&
+                      tx.nftShowcaseId !== undefined && (
+                        <>
+                          <Card className="max-w-md w-full mx-auto transition-shadow duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50">
+                            <CardHeader>
+                              <CardTitle>NFT Showcase</CardTitle>
+                              <CardDescription>
+                                <div
+                                  className="flex items-center"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <span
+                                    onClick={() => {
+                                      copy(tx.nftShowcaseId);
+                                      toast({
+                                        title: "✅ Copied",
+                                        description: `${tx.nftShowcaseId} copied to clipboard`,
+                                      });
+                                    }}
+                                  >
+                                    <span className="hidden sm:inline">
+                                      ID: {tx.nftShowcaseId.substring(0, 15)}...
+                                      {tx.nftShowcaseId.substring(
+                                        tx.nftShowcaseId.length - 10
+                                      )}
+                                    </span>
+                                    <span className="sm:hidden">
+                                      ID: {tx.nftShowcaseId.substring(0, 8)}...
+                                      {tx.nftShowcaseId.substring(
+                                        tx.nftShowcaseId.length - 5
+                                      )}
+                                    </span>
+                                  </span>
+                                  <a
+                                    href={`${appConfig.blockExplorerUrl}/tx/${tx.nftShowcaseId}`}
+                                    target="_blank"
+                                    className="ml-2 dark:text-white font-medium"
+                                  >
+                                    <Link2Icon />
+                                  </a>
+                                </div>
+                                Last sale price: N/A
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <img
+                                src={`${appConfig.tokenIconsUrl}/256/${tx.nftShowcaseId}.png`}
+                                className="rounded-lg w-full object-cover"
+                              />
+                            </CardContent>
+                            <CardFooter></CardFooter>
+                          </Card>
+                        </>
+                      )}
+                    {tx.imageSrc !== false && (
+                      <img
+                        src={tx.imageSrc}
+                        className="rounded-lg object-cover"
+                      />
+                    )}
+                    {tx.videoId !== false && (
+                      <LiteYouTubeEmbed id={tx.videoId} />
+                    )}
+                    {tx.tweetId !== false && <Tweet id={tx.tweetId} />}
+                    <p className="line-clamp-1">
+                      {tx.url !== false && (
+                        <InfoBox
+                          color="info"
+                          className="flex-nowrap text-sm bg-muted text-muted-foreground break-words"
+                        >
+                          <a
+                            href={tx.url}
+                            target="_blank"
+                            className="break-words"
+                          >
+                            {tx.url}
+                          </a>
+                        </InfoBox>
+                      )}
+                    </p>
+                    {/* Date and timestamp */}
+                    <span className="text-sm text-muted-foreground">
+                      {tx.txDate}&nbsp;at&nbsp;{tx.txTime}
+                    </span>
+
+                    {/* Reply action to a townhall post */}
+                    <div>
+                      {/* Reply popover to input the reply content */}
+                      <Popover>
+                        <PopoverTrigger>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="mr-2"
+                          >
+                            <ChatBubbleIcon className="h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="min-w-96">
+                          <div>
+                            <div className="space-y-2 ">
+                              <h4 className="font-medium leading-none">
+                                Reply to:{" "}
+                              </h4>
+                              <p className="text-sm text-muted-foreground break-words">
+                                {tx.replyAddress}
+                              </p>
+                            </div>
+                            <div className="py-2">
+                              <Textarea
+                                id="reply-post"
+                                value={replyPost}
+                                placeholder="Post your reply..."
+                                required
+                                onChange={(e) => handleReplyPostChange(e)}
+                                rows={4}
+                              />
+                              <p className="mt-2 text-sm text-red-600 dark:text-red-500">
+                                {replyPostError !== false && replyPostError}
+                              </p>
+                              <Button
+                                type="button"
+                                disabled={replyPostError || replyPost === ""}
+                                onClick={(e) => {
+                                  replytoPost(tx.txid, replyPost);
+                                }}
+                              >
+                                Post Reply
+                              </Button>
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                      {/* Share buttons with other social platforms */}
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" size="icon">
+                            <Share1Icon className="h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-30">
+                          <div className="space-y-2">
+                            <h4 className="font-medium text-gray-900 leading-none">
+                              Select Platform
+                            </h4>
+                          </div>
+                          <div className="pt-2">
+                            <TwitterShareButton
+                              url={
+                                tx.imageSrc !== false
+                                  ? tx.imageSrc
+                                  : tx.videoId !== false
+                                  ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                  : tx.tweetId !== false
+                                  ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                  : "https://ecashchat.com"
+                              }
+                              title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
+                            >
+                              <TwitterIcon size={25} round />
+                            </TwitterShareButton>
+                            &nbsp;
+                            <FacebookShareButton
+                              url={
+                                tx.imageSrc !== false
+                                  ? tx.imageSrc
+                                  : tx.videoId !== false
+                                  ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                  : tx.tweetId !== false
+                                  ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                  : "https://ecashchat.com"
+                              }
+                              quote={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
+                            >
+                              <FacebookIcon size={25} round />
+                            </FacebookShareButton>
+                            &nbsp;
+                            <RedditShareButton
+                              url={
+                                tx.imageSrc !== false
+                                  ? tx.imageSrc
+                                  : tx.videoId !== false
+                                  ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                  : tx.tweetId !== false
+                                  ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                  : "https://ecashchat.com"
+                              }
+                              title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
+                            >
+                              <RedditIcon size={25} round />
+                            </RedditShareButton>
+                            &nbsp;
+                            <TelegramShareButton
+                              url={
+                                tx.imageSrc !== false
+                                  ? tx.imageSrc
+                                  : tx.videoId !== false
+                                  ? `https://www.youtube.com/watch?v=${tx.videoId}`
+                                  : tx.tweetId !== false
+                                  ? `https://twitter.com/i/web/status/${tx.tweetId}`
+                                  : "https://ecashchat.com"
+                              }
+                              title={`[Shared from eCashChat.com] - ${tx.opReturnMessage}`}
+                            >
+                              <TelegramIcon size={25} round />
+                            </TelegramShareButton>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                      {/* Render corresponding replies for this post */}
+                      {
+                        <RenderReplies
+                          txid={tx.txid}
+                          replies={townHallHistory.replies}
+                        />
+                      }
+                    </div>
+                  </div>
+                </div>
+              </>
+            ))
+          ) : (
+            <div className="flex flex-col space-y-3">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-[400px]" />
+                <Skeleton className="h-4 w-[350px]" />
+                <Skeleton className="h-4 w-[300px]" />
+              </div>
             </div>
+          )}
         </div>
+      </div>
     );
 };
 

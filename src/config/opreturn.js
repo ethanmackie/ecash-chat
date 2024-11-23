@@ -40,6 +40,7 @@ export const opReturn = {
     encryptedMessagePrefixHex: '70617373',
     encryptedMessageByteLimit: 95,
     xecTipPrefixHex: '74697073',
+    townhallMvpPostPrefixHex: '6e667470',
     nftShowcasePrefixHex: '6e667473',
     nftShowcaseMessageByteLimit: 177,
     // Airdrop spec is <OP_RETURN> <Airdrop protocol identifier> <tokenId> <optionalMsg>
@@ -47,4 +48,6 @@ export const opReturn = {
     // airdropMsgByteLimit = 182 = 223 - 1 - 5 - 33 - 2
     airdropMsgByteLimit: 182,
     opreturnParamByteLimit: 222,
+    townhallMvpTokenIds: ['9c5174f551fb7974f0fb140d862079800405b3a2d8064199b21be47f16ba465c', '6b5df2d33a356cf24dc034ed9ef266dd448a93555114a77e5fda22e25976c1d1'],
+    articleMvpTokenIds: ['dc355e54901ed2cd258e858e84ed1062e71d61aae1e67762d4826920b0a7f7ee', 'b82f09f639db12d76cafe3af5641ec08961a9eef17763697fb864a7f51f62baf'],
 };

@@ -13,6 +13,10 @@ import ContactListPanel from './contact';
 import { queryAliasServer } from '../alias/alias-server';
 import { encodeBip21Message, getTweetId, getNFTAvatarLink, encodeBip21Auth } from '../utils/utils';
 import { Toggle } from "@/components/ui/toggle";
+import { Loader, LockKeyhole, SendHorizontal } from "lucide-react"
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import {
     Accordion,
     AccordionContent,
@@ -69,14 +73,10 @@ import QRCode from "react-qr-code";
 import copy from 'copy-to-clipboard';
 import { Tooltip, Tabs, Alert, Modal, Popover } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
-import { ToastContainer, toast } from 'react-toastify';
-import { FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon, ReloadIcon, Cross2Icon } from '@radix-ui/react-icons';
-import 'react-toastify/dist/ReactToastify.css';
-import { YoutubeIcon, EcashchatIcon, LoadingSpinner, Home3Icon, File3Icon, Nft3Icon, Inbox3Icon, Send3Icon, Info3icon, User3icon, QrcodeIcon, Logout3Icon } from "@/components/ui/social";
-import {
-    SendIcon,
-    EncryptionIcon,
-} from "@/components/ui/social";
+import { useToast } from "@/hooks/use-toast";
+import { FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon, Cross2Icon, MoonIcon, SunIcon } from '@radix-ui/react-icons';
+import { useTheme } from "next-themes"
+import { YoutubeIcon, EcashchatIcon, Home3Icon, File3Icon, Nft3Icon, Send3Icon, Info3icon, User3icon, QrcodeIcon, Logout3Icon } from "@/components/ui/social";
 const crypto = require('crypto');
 import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClientNode } from 'chronik-client';
@@ -127,6 +127,10 @@ export default function Home() {
     const [latestAvatars, setLatestAvatars] = useState([]);
     const [openSharedArticleLoader, setOpenSharedArticleLoader] = useState(false);
     const [showDustTxAuthenticationLoader, setShowDustTxAuthenticationLoader] = useState(false);
+    const [syncronizingState, setsSyncronizingState] = useState(false);
+    const [townhallTabEntry, setTownhallTabEntry] = useState(false);
+    const { toast } = useToast();
+    const { setTheme } = useTheme()
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
@@ -225,30 +229,41 @@ export default function Home() {
 
     // Checks whether the mobile user's address matches their signature
     const verifySignature = () => {
-        let verification;
-
-        try {
-            verification = xecMessage.verify(
-                'ecashchat',
-                cashaddr.toLegacy(recipient),
-                signature,
-                utxolib.networks.ecash.messagePrefix,
-            );
-        } catch (err) {
-            toast.error(`${err}`);
-        }
-        if (verification) {
-            setOpenSaveLoginModal(true);
-            viewAddress(recipient);
-        } else {
-            toast.error(`Signature does not match address`);
-        }
+      let verification;
+    
+      try {
+        verification = xecMessage.verify(
+          'ecashchat',
+          cashaddr.toLegacy(recipient),
+          signature,
+          utxolib.networks.ecash.messagePrefix,
+        );
+      } catch (err) {
+        toast({
+          title: 'error',
+          description: `${err}`,
+          variant: 'destructive',
+        });
+      }
+      if (verification) {
+        setOpenSaveLoginModal(true);
+        viewAddress(recipient);
+      } else {
+        toast({
+          title: 'error',
+          description: 'Signature does not match address',
+          variant: 'destructive',
+        });
+      }
     };
 
     // Saves the verified login address to local storage to avoid needing to login again
     const saveLoginAddressToLocalStorage = async () => {
         await localforage.setItem('savedLoginAddress', address);
-        toast(`Login info saved for ${address}`);
+        toast({
+          title: '✅Saved',
+          description: `Login info saved for ${address}`,
+        });
         setOpenSaveLoginModal(false);
     }
 
@@ -515,8 +530,9 @@ export default function Home() {
 
     const CreditCardHeader = () => {
         const cardStyling = isMobile 
-        ? "max-w-xs mx-auto rounded-2xl mt-14 break-words gradient-outline !shadow-none relative transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s  " 
-        : "max-w-xs mx-auto rounded-2xl mt-14 break-words gradient-outline !shadow-none relative transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s ";
+        ? "max-w-xs mx-auto rounded-2xl mt-14 break-words gradient-outline !shadow-none relative transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s" 
+        : "max-w-xs mx-auto rounded-2xl mt-14 break-words gradient-outline !shadow-none relative transition all 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) 0s";
+
 
         return (
             <>
@@ -559,7 +575,10 @@ export default function Home() {
             onClick={() => {
                 setShowFullAddress(!showFullAddress);
                 copy(address);
-                toast(`${address} copied to clipboard`);
+                toast({
+                  title: "✅Clipboard",
+                  description: `${address} copied to clipboard`,
+                });
               }}
             >
           {showFullAddress ? address : `${address.substring(0, 10)} **** **** ${address.substring(address.length - 5)}`}
@@ -632,21 +651,35 @@ export default function Home() {
     return (
       <>
         <ToastContainer autoClose={appConfig.toastDuration} />
-
         {openSaveLoginModal === true && <RenderSaveLoginModal />}
 
         <div className="sm:flex flex-col items-center justify-center p-5 relative z-10">
           <div className="background_content"></div>
         </div>
 
+
         <header className="fixed mt-4 flex top-0 z-50 w-full justify-center ">
-          <div className="container flex items-center justify-between rounded-lg flex bg-black w-full h-14 mx-4 md:mx-auto md:max-w-xl lg:max-w-3xl border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/40">
+          <div className="container flex items-center justify-between rounded-lg flex bg-black w-full h-14 mx-4 md:mx-auto md:max-w-xl lg:max-w-3xl border-b border-border/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/40">
             <div className="sm:flex">
               <a className="flex items-center space-x-2" href="#">
                 <EcashchatIcon />
-                <span className="font-bold sm:inline-block">eCashChat</span>
+                <Image
+                  src="/ecashchat.png" 
+                  alt="eCashChat"
+                  width={90} 
+                  height={24}
+                  priority
+                  className="hidden sm:inline-block" 
+                />
               </a>
             </div>
+
+            {syncronizingState && (
+              <>
+              <Loader className="h-4 w-4 animate-spin" />
+              </>
+            )}
+
             <div className="flex">
         
             {isLoggedIn && (
@@ -678,7 +711,10 @@ export default function Home() {
                       setIsLoggedIn(false);
                       setSavedLogin(false);
                       await localforage.setItem("savedLoginAddress", false);
-                      toast(`Logged out of ${address}`);
+                      toast({
+                        title: "👋",
+                        description: `Logged out of ${address}`,
+                      });
                     }}
                     variant="outline"
                     size="icon"
@@ -699,7 +735,10 @@ export default function Home() {
                                 "savedLoginAddress",
                                 false
                               );
-                              toast(`Logged out of ${address}`);
+                              toast({
+                                title: "👋",
+                                description: `Logged out of ${address}`,
+                              });
                             }
                           : () => getAddress()
                       }
@@ -813,7 +852,7 @@ export default function Home() {
                     >
                         {showLoadingSpinner ? (
                         <div className="flex justify-center">
-                            <LoadingSpinner className="h-2 w-2 animate-spin" />
+                            <Loader className="h-4 w-4 animate-spin" />
                         </div>
                         ) : (
                         <div className="flex items-center justify-center">
@@ -835,7 +874,7 @@ export default function Home() {
                         <>
                         <div className="flex w-full items-center">
                           <Button disabled className="flex w-full mr-2">
-                            <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                            <Loader className="mr-2 h-4 w-4 animate-spin" />
                             Authentication in progress
                           </Button>
                           <Button
@@ -959,6 +998,7 @@ export default function Home() {
                   aria-label="eCash Chat"
                   style="default"
                   className="z-10 !border-b-0 focus:ring-0 relative mt-4 justify-center"
+                  onActiveTabChange={() => setTownhallTabEntry(true)}
                 >
                   <Tabs.Item title="Message" icon={Send3Icon}>
                     <div style={{ display: isLoggedIn ? "block" : "none" }}>
@@ -1101,8 +1141,8 @@ export default function Home() {
                                       setShowMessagePreview(true);
                                     }}
                                   >
-                                    <SendIcon />
-                                    &nbsp;Send Message
+                                    <SendHorizontal className="w-4 h-4 mr-2" />
+                                    Send Message
                                   </Button>
                                 </div>
                               </div>
@@ -1131,8 +1171,7 @@ export default function Home() {
                               />
                               <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                               <span className="ml-2 gap-1 flex items-center text-sm font-medium text-gray-900 dark:text-gray-300">
-                                <EncryptionIcon />
-                                Encrypt with password (optional):
+                                <LockKeyhole className="w-4 h-4" />
                               </span>
                             </label>
                             {encryptionMode && (
@@ -1158,8 +1197,16 @@ export default function Home() {
                     )}
                   </Tabs.Item>
 
-                  <Tabs.Item title="Town Hall" icon={Home3Icon}>
-                    <Townhall address={address} isMobile={isMobile} />
+                  <Tabs.Item
+                    title="Town Hall"
+                    icon={Home3Icon}
+                  >
+                    <Townhall
+                      address={address}
+                      isMobile={isMobile}
+                      tabEntry={townhallTabEntry}
+                      setsSyncronizingState={setsSyncronizingState}
+                    />
                   </Tabs.Item>
 
                   <Tabs.Item title="Articles" active icon={File3Icon}>
@@ -1170,6 +1217,7 @@ export default function Home() {
                       sharedArticleTxid={sharedArticleTxid}
                       setXecBalance={setXecBalance}
                       setOpenSharedArticleLoader={setOpenSharedArticleLoader}
+                      setsSyncronizingState={setsSyncronizingState}
                     />
                   </Tabs.Item>
 

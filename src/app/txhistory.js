@@ -3,16 +3,17 @@ import React, { useState, useEffect, useRef } from 'react';
 import { appConfig } from '../config/app';
 import { getTxHistory, txListener } from '../chronik/chronik';
 import { chronik as chronikConfig } from '../config/chronik';
+import { Search, UserRoundSearch, ArrowRightLeft} from "lucide-react"
 import { ChronikClientNode } from 'chronik-client';
 import cashaddr from 'ecashaddrjs';
 import { isValidRecipient } from '../validation/validation';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { MagnifyingGlassIcon, ResetIcon, Link2Icon, Share1Icon, EyeNoneIcon } from "@radix-ui/react-icons";
+import { Toggle } from "@/components/ui/toggle";
+import { ResetIcon, Link2Icon, Share1Icon, EyeNoneIcon } from "@radix-ui/react-icons";
 import {
     DecryptionIcon,
-    MoneyIcon,
     DefaultavatarIcon, 
     ReplieduseravatarIcon,
     Arrowright2Icon,
@@ -41,7 +42,7 @@ import {
 } from "@/components/ui/avatar";
 import { HiInformationCircle } from "react-icons/hi";
 import { Input } from "@/components/ui/input"
-import { Popover, Alert, Modal } from "flowbite-react";
+import { Popover, Alert as InfoBox, Modal } from "flowbite-react";
 import {
   Card,
   CardContent,
@@ -66,7 +67,7 @@ import {
 } from 'next-share';
 const crypto = require('crypto');
 import copy from 'copy-to-clipboard';
-import { toast } from 'react-toastify';
+import { useToast } from "@/hooks/use-toast";
 import { addNewContact } from '../utils/utils';
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -92,6 +93,7 @@ export default function TxHistory({ address, isMobile }) {
     const newReplierContactNameInput = useRef('');
     const [curateByContacts, setCurateByContacts] = useState(false);
     const [muteList, setMuteList] = useState('');
+    const { toast } = useToast();
 
     useEffect(() => {
       const handleResize = () => {
@@ -226,6 +228,10 @@ export default function TxHistory({ address, isMobile }) {
               true, // filter on local cache only
               true, // flag for contact filter
           );
+          toast({
+              title: "Contact filtering is on",
+              description: "Now only showing transactions from your contacts",
+          });
       } else {
           setCurrentPage(0);
           await getTxHistoryByPage(
@@ -233,22 +239,26 @@ export default function TxHistory({ address, isMobile }) {
               false, // filter on local cache only
               false,
           );
+          toast({
+              title: "Contact filtering is off",
+              description: "Now showing all transactions",
+          });
       }
-    };
+  };
 
     // Validates the address being filtered for
     const handleAddressChange = e => {
-        const { value } = e.target;
-        if (
-            isValidRecipient(value) === true &&
-            value.trim() !== ''
-        ) {
-            setAddressToSearch(value);
-            setAddressToSearchError(false);
-        } else {
-            setAddressToSearchError('Invalid eCash address');
-        }
-    };
+      const { value } = e.target;
+      setAddressToSearch(value);
+  
+      if (value.trim() === '') {
+          setAddressToSearchError(false); 
+      } else if (isValidRecipient(value) === true) {
+          setAddressToSearchError(false); 
+      } else if (value.length >= 10) { 
+          setAddressToSearchError('Invalid eCash address');
+      }
+  };
 
     // Handles the input of the decryption key
     const handleDecryptionInput = e => {
@@ -294,9 +304,16 @@ export default function TxHistory({ address, isMobile }) {
             const decipher = crypto.createDecipher('aes-256-cbc', decryptionInput);
             let decryptedMessage = decipher.update(encryptedMessage, 'hex', 'utf8');
             decryptedMessage += decipher.final('utf8');
-            toast(`Decrypted message: ${decryptedMessage}`);
+            toast({
+              title: 'Decrypted',
+              description: `Decrypted message: ${decryptedMessage}`,
+            });
         } catch (err) {
-            toast(`Decryption error: ${err.message}`);
+          toast({
+            title: 'error',
+            description: `Decryption error: ${err.message}`,
+            variant: 'destructive',
+          });
         }
         setEncryptedMessage('');
         setDecryptionInput('');
@@ -322,8 +339,8 @@ export default function TxHistory({ address, isMobile }) {
              ? latestTxHistory.txs.map(
                    (tx, index) => (
                      <>
-                     <div className="flex flex-col items-center mt-2" key={"txHistory"+index}>
-                        <div className="flex flex-col w-full gap-2 max-w-xl break-words leading-1.5 p-5 sm:p-6 rounded-xl border bg-card text-card-foreground shadow dark:bg-gray-700 transition-transform transform">
+                     <div className="flex flex-col items-center mt-2 lg:min-w-[576px]" key={"txHistory"+index}>
+                        <div className="flex flex-col w-full gap-2 max-w-xl break-words leading-1.5 p-5 sm:p-6 rounded-xl border bg-card text-card-foreground dark:bg-gray-700 transition-transform transform">
                         <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm font-semibold text-gray-900 dark:text-white break-words">
                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
                               {tx.replyAddress === address ? (
@@ -340,7 +357,10 @@ export default function TxHistory({ address, isMobile }) {
                                       <div className="font-medium dark:text-white">
                                           <div onClick={() => {
                                               copy(tx.replyAddress);
-                                              toast(`${tx.replyAddress} copied to clipboard`);
+                                              toast({
+                                                title: '✅Clipboard',
+                                                description: `${tx.replyAddress} copied to clipboard`,
+                                              });
                                           }}
                                           ><Badge className="leading-7 shadow-sm hover:bg-accent py-3px" variant="outline">
                                                  <span className="hidden sm:block">Your wallet</span>
@@ -364,7 +384,10 @@ export default function TxHistory({ address, isMobile }) {
                                       <div className="font-medium dark:text-white">
                                           <div onClick={() => {
                                               copy(tx.replyAddress);
-                                              toast(`${tx.replyAddress} copied to clipboard`);
+                                              toast({
+                                                title: '✅Clipboard',
+                                                description: `${tx.replyAddress} copied to clipboard`,
+                                              });
                                           }}>
                                         <Badge className="leading-7 shadow-sm hover:bg-accent py-3px" variant="outline">
                                              {getContactNameIfExist(tx.replyAddress, contactList)}
@@ -395,7 +418,10 @@ export default function TxHistory({ address, isMobile }) {
                                             <div className="font-medium dark:text-white"
                                                 onClick={() => {
                                                    copy(tx.recipientAddress);
-                                                   toast(`${tx.recipientAddress} copied to clipboard`);
+                                                   toast({
+                                                    title: '✅Clipboard',
+                                                    description: `${tx.recipientAddress} copied to clipboard`,
+                                                  });
                                                 }}
                                             >
                                                 <div>
@@ -423,7 +449,10 @@ export default function TxHistory({ address, isMobile }) {
                                        <div className="font-medium dark:text-white">
                                            <div onClick={() => {
                                                copy(tx.recipientAddress);
-                                               toast(`${tx.recipientAddress} copied to clipboard`);
+                                               toast({
+                                                title: '✅Clipboard',
+                                                description: `${tx.recipientAddress} copied to clipboard`,
+                                              });
                                            }}>
                                             <Badge className="leading-7 shadow-sm hover:bg-accent py-3px" variant="outline">
                                             {getContactNameIfExist(tx.recipientAddress, contactList)}
@@ -442,10 +471,10 @@ export default function TxHistory({ address, isMobile }) {
                         {/* Render the op_return message */}
                         {tx.isEcashChatEncrypted ? (
                             <>
-                                <Alert className="leading-7 my-4" color="failure" icon={HiInformationCircle}>
-                                    &nbsp;&nbsp;<b>Encrypted Message</b><br />
-                                    &nbsp;&nbsp;{tx.opReturnMessage ? `${tx.opReturnMessage}`.substring(0,40)+'...' : ' '}
-                                </Alert>
+                         <InfoBox className="leading-7 my-4 bg-muted text-muted-foreground" icon={HiInformationCircle}>
+                          &nbsp;&nbsp;<b>Encrypted Message</b><br />
+                          &nbsp;&nbsp;{tx.opReturnMessage ? `${tx.opReturnMessage}`.substring(0,40)+'...' : ' '}
+                        </InfoBox>
                             </>
                             ) : (
                               <>
@@ -461,17 +490,17 @@ export default function TxHistory({ address, isMobile }) {
 
                         {/* XEC Tip rendering */}
                         {tx.isXecTip && (
-                          <Alert className="leading-7 my-2" color="success">
-                              <div className="flex items-center space-x-2">
-                                  <MoneyIcon className="h-5 w-5 text-blue-500" />
-                                  <span>
-                                      {tx.recipientAddress === address ? 
-                                          `Received ${tx.xecAmount} XEC tip from eCash Chat` :
-                                          `Sent ${tx.xecAmount} XEC tip via eCash Chat`
-                                      }
-                                  </span>
-                              </div>
-                          </Alert>
+                          <InfoBox className="leading-7 my-2 bg-muted text-muted-foreground">
+                          <div className="flex items-center space-x-2">
+                            <ArrowRightLeft className="w-5 h-5 text-blue-500" />
+                            <span>
+                              {tx.recipientAddress === address ? 
+                                `Received ${tx.xecAmount} XEC tip from eCash Chat` :
+                                `Sent ${tx.xecAmount} XEC tip via eCash Chat`
+                              }
+                            </span>
+                          </div>
+                        </InfoBox>
                       )}
 
                         {/* Render any media content within the message */}
@@ -483,7 +512,10 @@ export default function TxHistory({ address, isMobile }) {
                                <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
                                         <span onClick={() => {
                                             copy(tx.nftShowcaseId);
-                                            toast(`${tx.nftShowcaseId} copied to clipboard`);
+                                            toast({
+                                              title: '✅Clipboard',
+                                              description: `${tx.nftShowcaseId} copied to clipboard`,
+                                            });
                                         }}>
                                             ID: {tx.nftShowcaseId.substring(0,15)}...{tx.nftShowcaseId.substring(tx.nftShowcaseId.length - 10)}
                                         </span>
@@ -508,7 +540,11 @@ export default function TxHistory({ address, isMobile }) {
                         {tx.imageSrc !== false && (<img src={tx.imageSrc} className="rounded-lg w-full object-cover"/>)}
                         {tx.videoId !== false && (<LiteYouTubeEmbed id={tx.videoId} />)}
                         {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
-                        {tx.url !== false && (<Alert color="info"><a href={tx.url} target="_blank" >{tx.url}</a></Alert>)}
+                        {tx.url !== false && (
+                           <InfoBox className="bg-muted text-muted-foreground">
+                           <a href={tx.url} target="_blank" rel="noopener noreferrer">{tx.url}</a>
+                         </InfoBox>
+                        )}
 
                         <div className="flex my-2 h-5 items-center space-x-4 text-sm text-muted-foreground">
                         <div>{tx.isCashtabMessage ? 'Cashtab Message' :
@@ -542,7 +578,7 @@ export default function TxHistory({ address, isMobile }) {
                                                   Please input the password used by the sender to decrypt this message.
                                               </p>
                                               <p>
-                                                  <Alert>{tx.opReturnMessage}</Alert>
+                                              <InfoBox className="bg-muted text-muted-foreground">{tx.opReturnMessage}</InfoBox>
                                               </p>
                                               <p className="leading-7 ">
                                                   {/* Decryption input */}
@@ -720,24 +756,8 @@ export default function TxHistory({ address, isMobile }) {
          <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px] min-w-96">
          {txHistory && txHistory !== '' ? (
             <>
-            <div className="relative flex items-start mt-2 mb-2">
-              <div className="flex h-6 items-center py-2">
-                  <Checkbox
-                  id="curateByContacts"
-                  checked={curateByContacts}
-                  onCheckedChange={() => handleCurateByContactsChange(!curateByContacts)}
-                  className="rounded"
-                  />
-              </div>
-              <div className="ml-3 text-sm leading-6">
-                  <Label htmlFor="curateByContacts" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      Only show messages by your contacts
-                  </Label>
-              </div>
-            </div>
 
             {/*Set up pagination menu*/}
-
             <span>
                 <Pagination>
                   <PaginationContent>
@@ -789,49 +809,65 @@ export default function TxHistory({ address, isMobile }) {
                   </PaginationContent>
                 </Pagination>
             </span>
-            <form className="space-y-6" action="#" method="POST">
+
               <div>
                 <div className="max-w-xl mt-2 w-full mx-auto">
                   <div className="flex items-center space-x-2">
+
+                  <div className="relative w-full">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4" />
                     <Input
-                      id="address"
-                      name="address"
-                      type="text"
-                      value={addressToSearch}
-                      required
-                      className="bg-white"
-                      placeholder='Search By Address'
-                      onChange={e => handleAddressChange(e)}
-                    />
+                        id="address"
+                        name="address"
+                        type="search"
+                        value={addressToSearch}
+                        required
+                        className="pl-8 bg-white"
+                        placeholder="Search By Address"
+                        onChange={handleAddressChange}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault(); 
+                            getTxHistoryByAddress(); 
+                          }
+                        }}
+                        onBlur={getTxHistoryByAddress} 
+                      />
+                  </div>
 
-                    <Button
+                  <Button
                       type="button"
                       variant="outline"
-                      disabled={addressToSearchError}
-                      onClick={e => {
-                        getTxHistoryByAddress(e);
-                      }}
-                    >
-                      <MagnifyingGlassIcon className="h-4 w-4" />
-                    </Button>
-
-                    <Button
-                      type="button"
-                      variant="outline"
+                      size="icon"
+                      className="px-3 w-auto"
                       onClick={() => {
                         setTxHistoryByAddress('');
                         setAddressToSearch('');
+                        setCurateByContacts(false); 
+                        setAddressToSearchError(false);
                       }}
                     >
-                      <ResetIcon />
+                      <ResetIcon className="h-4 w-4"/>
                     </Button>
+
+                    <Toggle
+                    variant="outline"
+                    className="bg-white"
+                    aria-label="Only show messages by your contacts"
+                    pressed={curateByContacts}
+                    onPressedChange={(state) => handleCurateByContactsChange(state)}
+                  >
+                    <UserRoundSearch className="h-4 w-4"/>
+                  </Toggle>
+
+                  
                   </div>
                     <p className="mt-2 text-sm text-red-600 dark:text-red-500">
                       {addressToSearchError !== false && addressToSearchError}
                     </p>
                   </div>
               </div>
-            </form>
+  
           <RenderTxHistory />
           </>
            ) : 

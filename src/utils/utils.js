@@ -4,7 +4,7 @@ import { chronik as chronikConfig } from '../config/chronik';
 import localforage from 'localforage';
 import { BN } from 'slp-mdm';
 import { appConfig } from '../config/app';
-import { toast } from 'react-toastify';
+import { useToast, toast } from "@/hooks/use-toast";
 import { AlitacoffeeIcon } from "@/components/ui/social";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -176,7 +176,7 @@ export const encodeBip21PaywallPayment = replyTxid => {
 };
 
 // Encode the op_return post script
-export const encodeBip21Post = post => {
+export const encodeBip21Post = (post, premiumPostFlag) => {
     if (typeof post !== 'string') {
         return '';
     }
@@ -186,8 +186,13 @@ export const encodeBip21Post = post => {
         // Push eCash Chat protocol identifier
         script.push(Buffer.from(opreturnConfig.appPrefixesHex.eCashChat, 'hex'));
 
-        // Push eCash Chat post identifier
-        script.push(Buffer.from(opreturnConfig.townhallPostPrefixHex, 'hex'));
+        if (premiumPostFlag) {
+            // Push eCash Chat premium MVP post identifier
+            script.push(Buffer.from(opreturnConfig.townhallMvpPostPrefixHex, 'hex'));
+        } else {
+            // Push eCash Chat post identifier
+            script.push(Buffer.from(opreturnConfig.townhallPostPrefixHex, 'hex'));
+        }
 
         // eCash Chat messages are utf8 encoded
         const eCashChatMsgScript = Buffer.from(post, 'utf8');
@@ -392,9 +397,10 @@ export const muteNewContact = async (contactName, contactAddress, setMuteList, w
 
     if (typeof contactExists !== 'undefined') {
         // Contact exists
-        toast.error(
-            `${contactAddress} already exists in mute list`,
-        );
+        toast({
+            title: "oops",
+            description: `${contactAddress} already exists in mute list`,
+          });
     } else {
         muteList.push({
             name: contactName,
@@ -402,9 +408,10 @@ export const muteNewContact = async (contactName, contactAddress, setMuteList, w
         });
         // update localforage and state
         await localforage.setItem(appConfig.localMuteParam, muteList);
-        toast.success(
-            `"${contactName}" (${contactAddress}) added to mute list, refreshing app...`,
-        );
+        toast({
+            title: "✅Added",
+            description: `${contactName}" (${contactAddress}) added to mute list, refreshing app...`,
+          });
     }
     if (setMuteList) {
         setMuteList(muteList);
@@ -431,7 +438,10 @@ export const deleteMutedContact = async (contactListAddressToDelete, setMuteList
 
     // Update localforage and state
     await localforage.setItem(appConfig.localMuteParam, updatedMutetList);
-    toast.success(`User unmuted, refreshing app...`);
+    toast({
+        title: "✅Unmuted",
+        description: `User unmuted, refreshing app...`,
+      });
     if (setMuteList) {
         setMuteList(updatedMutetList);
     }
@@ -457,9 +467,10 @@ export const addNewContact = async (contactName, contactAddress, refreshCallback
 
     if (typeof contactExists !== 'undefined') {
         // Contact exists
-        toast.error(
-            `${contactAddress} already exists in Contacts`,
-        );
+        toast({
+            title: 'error',
+            description: `${contactAddress} already exists in Contacts`,
+          });
     } else {
         contactList.push({
             name: contactName,
@@ -467,9 +478,10 @@ export const addNewContact = async (contactName, contactAddress, refreshCallback
         });
         // update localforage and state
         await localforage.setItem(appConfig.localContactsParam, contactList);
-        toast.success(
-            `"${contactName}" (${contactAddress}) added to Contacts`,
-        );
+        toast({
+            title: "✅Added",
+            description: `${contactName}" (${contactAddress}) added to Contacts`,
+          });
     }
     if (refreshCallback) {
         await refreshCallback();
@@ -491,7 +503,10 @@ export const deleteContact = async (contactListAddressToDelete, setContactList, 
     // Update localforage and state
     await localforage.setItem(appConfig.localContactsParam, updatedContactList);
     setContactList(updatedContactList);
-    toast.success(`"${contactListAddressToDelete}" removed from Contacts`);
+    toast({
+        title: "✅Removed",
+        description: `${contactListAddressToDelete}" removed from Contacts`,
+      });
     if (refreshCallback) {
         await refreshCallback();
     }
@@ -512,11 +527,15 @@ export const renameContact = async (contactListAddressToRename, setContactList, 
 
         // Update localforage and state
         await localforage.setItem(appConfig.localContactsParam, contactList);
-        toast.success(
-            `Contact renamed to "${newName}"`,
-        );
+        toast({
+            title: "✅Renamed",
+            description: `Contact renamed to "${newName}"`,
+          });
     } else {
-        toast.error(`Unable to find contact`);
+        toast({
+            title: 'oops',
+            description: `Unable to find contact`,
+          });
     }
     setContactList(contactList);
     if (refreshCallback) {
@@ -527,7 +546,11 @@ export const renameContact = async (contactListAddressToRename, setContactList, 
 // Export contacts from local storage
 export const exportContacts = contactListArray => {
     if (!contactListArray) {
-        toast.error('Unable to export contact list');
+        toast({
+            title: 'error',
+            description: `Unable to export contact list`,
+            variant: 'destructive',
+          });
         return;
     }
 

@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Modal } from "flowbite-react";
 import { Button } from "@/components/ui/button";
-import { Activity } from "lucide-react";
+import { Search, UserRoundSearch, Activity, BookOpenCheck, PenLine, MessageCircleOff, MicVocal, Podcast, Save, Zap, MessageCircle, ChartNoAxesColumnIncreasing, HandCoins, CirclePlay} from "lucide-react"
 import Image from "next/image";
 import {
   Tooltip,
@@ -29,14 +29,12 @@ import {
     PopoverTrigger,
   } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon, Pencil1Icon, ChatBubbleIcon, DotsHorizontalIcon, EyeNoneIcon} from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon, Pencil1Icon, DotsHorizontalIcon, EyeNoneIcon} from "@radix-ui/react-icons";
 import { ImDownload3 } from "react-icons/im";
-import { RiSave3Fill } from "react-icons/ri";
 import {
     EncryptionIcon,
     UnlockIcon,
     IdCardIcon,
-    MuteIcon,
 } from "@/components/ui/social";
 import {
     Select,
@@ -91,8 +89,8 @@ import {
     isExistingContact,
     muteNewContact,
 } from '../utils/utils';
-import { AlitacoffeeIcon, DefaultavatarIcon, ReplieduseravatarIcon, GraphchartIcon, Stats2Icon, PodcastIcon, HeadphoneIcon } from "@/components/ui/social";
-import { toast } from 'react-toastify';
+import { DefaultavatarIcon, ReplieduseravatarIcon, HeadphoneIcon } from "@/components/ui/social";
+import { useToast } from "@/hooks/use-toast";
 import { Toggle } from "@/components/ui/toggle";
 import { BiSolidNews } from "react-icons/bi";
 import {
@@ -126,7 +124,15 @@ import { BN } from 'slp-mdm';
 import AudioPlayer from 'react-h5-audio-player';
 import 'react-h5-audio-player/lib/styles.css';
 
-export default function Article( { chronik, address, isMobile, sharedArticleTxid, setXecBalance, setOpenSharedArticleLoader } ) {
+export default function Article( {
+    chronik,
+    address,
+    isMobile,
+    sharedArticleTxid,
+    setXecBalance,
+    setOpenSharedArticleLoader,
+    setsSyncronizingState,
+} ) {
     const [articleHistory, setArticleHistory] = useState('');  // current article history page
     const [fullArticleHistory, setFullArticleHistory] = useState('');  // current article history page
     const [articleTitle, setArticleTitle] = useState(''); // title of the article being drafted
@@ -159,6 +165,9 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         pinataGateway: process.env.IPFS_API,
     });
     const [isUploading, setIsUploading] = useState(false);
+    const [hasArticleMvpNft, setHasArticleMvpNft] = useState(false);
+    const [mvpArticles, setMvpArticles] = useState([]);
+    const { toast } = useToast();
 
     useEffect(() => {
         const handleResize = () => {
@@ -208,7 +217,11 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                     }
                 } catch (err) {
                     console.log(`Error retrieving tx details for ${sharedArticleTxid}`, err);
-                    toast(err.message);
+                    toast({
+                        title: 'error',
+                        description: `${err.message}`,
+                        variant: 'destructive',
+                      });
                 }
 
                 // Retrieve full artcle info via content hash
@@ -236,8 +249,11 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 }
             }
 
+            setsSyncronizingState(true);
             // On-chain refresh of article history
             await getArticleHistoryByPage(0);
+            await hasMvpArticleNft();
+            setsSyncronizingState(false);
         })();
 
         (async () => {
@@ -245,6 +261,33 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             setXecBalance(updatedCache.xecBalance);
         })();
     }, [muteList]);
+
+    const getMvpArticles = (txs) => {
+        if (!Array.isArray(txs) && txs.length < 1) {
+            return [];
+        }
+        let mvpTxs = [];
+        for (const thisTxs of txs) {
+            if (mvpTxs.length === appConfig.maxArticleMvpPostDisplay) {
+                break;
+            }
+            if (thisTxs.articleObject && thisTxs.articleObject.premiumFlag === true) {
+                mvpTxs.push(thisTxs);
+            }
+        }
+
+        // Remove MVP articles when it has been > 24 hours
+        const currentTime = Date.now();
+        const parsedMvpTxs = [];
+        for (const thisMvpTx of mvpTxs) {
+            const thisDate = thisMvpTx.timestamp*1000;
+            const thisDateSinceArticle = (currentTime - thisDate) / 3600000;
+            if (thisDateSinceArticle < 24) {
+                parsedMvpTxs.push(thisMvpTx);
+            }
+        }
+        setMvpArticles(parsedMvpTxs);
+    }
 
     const refreshContactList = async () => {
         setContactList(
@@ -309,7 +352,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 localArticleHistory.txs,
                 pageNum,
             );
-
+            getMvpArticles(localArticleHistory.txs);
             setArticleHistory({
                 txs: selectedPageHistory,
                 numPages: localArticleHistory.numPages,
@@ -330,7 +373,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                     replies: txHistoryResp.replies,
                     paywallTxs: txHistoryResp.paywallTxs,
                 };
-
+                getMvpArticles(txHistoryResp.txs);
                 setArticleHistory(currentArticleHistoryPage);
                 setFullArticleHistory(txHistoryResp);
                 await localforage.setItem(appConfig.localArticleCacheParam, txHistoryResp);
@@ -339,29 +382,51 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         }
     };
 
-    // Handle the checkbox to curate posts from contacts only
-    const handleCurateByContactsChange = async (newState) => {
-        setCurateByContacts(newState);
-        const articleCache = await localforage.getItem(appConfig.localArticleCacheParam);
-        if (newState === true) {
-            await refreshContactList();
-            setCurrentPage(0);
-            await getArticleHistoryByPage(
-                0,
-                true, // filter on local cache only
-                articleCache,
-                true, // flag for contact filter
-            );
-        } else {
-            setCurrentPage(0);
-            await getArticleHistoryByPage(
-                0,
-                true, // filter on local cache only
-                articleCache,
-                false,
-            );
+    const hasMvpArticleNft = async () => {
+        const chatCache = await localforage.getItem('chatCache');
+        if (!chatCache || !chronik || typeof chatCache === 'undefined') {
+            return;
+        }
+        const nftList = chatCache.childNftList;
+        for (const thisNft of nftList) {
+            if (opreturnConfig.articleMvpTokenIds.includes(thisNft.token.tokenId)) {
+                setHasArticleMvpNft(true);
+            }
         }
     };
+
+  // Handle the checkbox to curate posts from contacts only
+        const handleCurateByContactsChange = async (newState) => {
+            setCurateByContacts(newState);
+            const articleCache = await localforage.getItem(appConfig.localArticleCacheParam);
+            if (newState === true) {
+                await refreshContactList();
+                setCurrentPage(0);
+                await getArticleHistoryByPage(
+                    0,
+                    true, // filter on local cache only
+                    articleCache,
+                    true, // flag for contact filter
+                );
+                toast({
+                    title: "Contact filtering is on",
+                    description: "Now only showing articles from your contacts",
+                });
+            } else {
+                setCurrentPage(0);
+                await getArticleHistoryByPage(
+                    0,
+                    true, // filter on local cache only
+                    articleCache,
+                    false,
+                );
+                toast({
+                    title: "Contact filtering is off",
+                    description: "Now showing all articles",
+                });
+            }
+        };
+
 
     // Calculates article reading time in minutes
     const getEstiamtedReadingTime = (articleContent) => {
@@ -372,7 +437,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     };
 
     // Uploads the selected file to IPFS and sends an article tx BIP21 query string to cashtab extensions
-    const sendAudioArticle = async () => {
+    const sendAudioArticle = async (premiumArticleFlag = false) => {
         
         const crypto = require('crypto');
         const articleHash = crypto.randomBytes(20).toString('hex')+new Date();
@@ -382,9 +447,15 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
         const bip21Str = `${address}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`;
         setIsUploading(true);
         try {
-            toast('Uploading to IPFS, please wait...');
+            toast({
+                title: "Uploading",
+                description: `Uploading to IPFS, please wait...`,
+              });
             const ipfsHash = await pinata.upload.file(fileSelected);
-            toast('IPFS upload complete');
+            toast({
+                title: "✅Complete",
+                description: `IPFS upload complete`,
+              });
 
             if (isMobile) {
                 window.open(
@@ -412,6 +483,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 paywallPrice: paywallAmountXec,
                 disbleReplies: disableArticleReplies,
                 ipfsHash: ipfsHash.IpfsHash,
+                premiumFlag: premiumArticleFlag,
                 date: Date.now(),
             };
 
@@ -421,7 +493,10 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 return articleHash === thisArticle.hash;
             });
             if (isDuplicateArticle) {
-                toast('This audio article already exists.');
+                toast({
+                    title: "oops",
+                    description: `This audio article already exists.`,
+                  });
                 return;
             }
             updatedArticles.push(articleObject);
@@ -437,13 +512,15 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     };
 
     // Pass an article tx BIP21 query string to cashtab extensions
-    const sendArticle = async () => {
+    const sendArticle = async (premiumArticleFlag = false) => {
         const crypto = require('crypto');
         const articleHash = crypto.createHash('sha1').update(article).digest('hex');
 
         // Encode the op_return article script
         const opReturnRaw = encodeBip21Article(articleHash);
-        const bip21Str = `${address}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`;
+        const bip21Str = premiumArticleFlag
+            ? `${address}?amount=${appConfig.premiumArticleFee}&op_return_raw=${opReturnRaw}`
+            : `${address}?amount=${appConfig.dustXec}&op_return_raw=${opReturnRaw}`;
 
         if (isMobile) {
             window.open(
@@ -470,6 +547,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             category: articleCategory,
             paywallPrice: paywallAmountXec,
             disbleReplies: disableArticleReplies,
+            premiumFlag: premiumArticleFlag,
             date: Date.now(),
         };
 
@@ -479,7 +557,10 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             return articleHash === thisArticle.hash;
         });
         if (isDuplicateArticle) {
-            toast('This article already exists.');
+            toast({
+                title: "oops",
+                description: `This article already exists.`,
+              });
             return;
         }
         updatedArticles.push(articleObject);
@@ -559,10 +640,8 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
         if (paywallProcessingFeeRatio) {
             const paywallProcessingFee = (Number(paywallPrice)*paywallProcessingFeeRatio).toFixed(2);
-            console.log('paywallProcessingFee: ', paywallProcessingFee)
             bip21Str += `&addr=${appConfig.ipfsPaywallFeeAddress}&amount=${paywallProcessingFee}`;
         }
-        console.log('bip21Str: ', bip21Str)
 
         if (isMobile) {
             window.open(
@@ -619,7 +698,10 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                 )}
                                 <div className="font-medium dark:text-white" onClick={() => {
                                     copy(foundReply.replyAddress);
-                                    toast(`${foundReply.replyAddress} copied to clipboard`);
+                                    toast({
+                                        title: "✅Clipboard",
+                                        description: `${foundReply.replyAddress} copied to clipboard`,
+                                      });
                                 }}>
                                     <Badge className="leading-7 [&:not(:first-child)]:mt-6 py-3px" variant="outline">
                                         {getContactNameIfExist(foundReply.replyAddress, contactList)}
@@ -717,15 +799,15 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     // Validates the author address being filtered for
     const handleAddressChange = e => {
         const { value } = e.target;
-        if (
-            isValidRecipient(value) === true &&
-            value.trim() !== ''
-        ) {
-            setAddressToSearchError(false);
-        } else {
+        setAddressToSearch(value);
+    
+        if (value.trim() === '') {
+            setAddressToSearchError(false); 
+        } else if (isValidRecipient(value) === true) {
+            setAddressToSearchError(false); 
+        } else if (value.length >= 10) { 
             setAddressToSearchError('Invalid eCash address');
         }
-        setAddressToSearch(value);
     };
 
    // Filters articleHistory for txs where the author address matches
@@ -750,9 +832,16 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
     const savedDraftArticleToLocalStorage = async () => {
         try {
             await localforage.setItem('draftArticle', article);
-            toast('Draft article saved');
+            toast({
+                title: '✅Saved',
+                description: 'Draft article saved',
+              });
         } catch (err) {
-            toast('Failed to save draft article to local storage');
+            toast({
+                title: 'error',
+                description: 'Failed to save draft article to local storage',
+                variant: 'destructive',
+              });
         }
     };
 
@@ -762,10 +851,17 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
             const draftArticle = await localforage.getItem('draftArticle');
             if (draftArticle) {
                 setArticle(draftArticle);
-                toast('Draft article loaded');
+                toast({
+                    title: '✅Loaded',
+                    description: 'Draft article loaded',
+                  });
             }
         } catch (err) {
-            toast('Failed to load draft article from local storage');
+            toast({
+                title: 'error',
+                description: 'Failed to load draft article from local storage',
+                variant: 'destructive',
+              });
         }
     };
 
@@ -876,7 +972,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                     <div className="space-y-2 flex flex-col max-w-xl gap-2 break-words w-full leading-1.5 p-6">
                         <time dateTime={currentArticleTxObj.txTime} className="text-gray-500">
                             By: {getContactNameIfExist(currentArticleTxObj.replyAddress, contactList)}<br />
-                            {currentArticleTxObj.txDate}
+                            {currentArticleTxObj.txDate} {currentArticleTxObj.txTime}
                         </time>
                         <RenderArticle
                             content={currentArticleTxObj.articleObject.content}
@@ -1002,6 +1098,280 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
 
         return (
             <div className="max-w-xl w-full mx-auto">
+               {mvpArticles &&
+                mvpArticles.length > 0 &&
+                mvpArticles.map((tx, index) => (
+                    tx.articleObject && (
+                        <Card key={index} className="max-w-xl w-full mt-2 shadow-none">
+                            <CardHeader>
+                                <div className="flex items-start justify-between gap-x-4 text-xs">
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-y-2 sm:gap-x-4 text-xs">
+                                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                                        <time dateTime={tx.txTime} className="text-muted-foreground">
+                                            {tx.txDate}
+                                        </time>
+
+                                        {tx.articleObject.ipfsHash ? (
+                                            <span className="text-muted-foreground">
+                                                🎵
+                                            </span>
+                                        ) : (
+                                            <span className="text-muted-foreground">
+                                                {getEstiamtedReadingTime(tx.articleObject.content)} min read
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                    <Badge variant="secondary">
+                                        {tx.articleObject.category || 'General'}
+                                    </Badge>
+
+                                    <Popover>
+                            <PopoverTrigger>
+                                <Badge variant="secondary" className="text-primary-foreground border-none bg-gradient-to-br from-purple-100 via-blue-200 to-purple-100 h-9 cursor-pointer">
+                                    <Zap className="h-4 w-4 mr-2" /> Premium
+                                </Badge>
+                            </PopoverTrigger>
+                            <PopoverContent>
+                                <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
+                                    What is a premium article
+                                </h4>
+                                <p className="leading-7 [&:not(:first-child)]:mt-6">
+                                This is a premium article promoted through the use of the eCashChat Article MVP NFT. It expires after 24 hours
+                                </p>
+                            </PopoverContent>
+                        </Popover>
+                                </div>
+                                </div>
+
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger>
+                                            <DotsHorizontalIcon />
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent>
+                                            <DropdownMenuLabel>Action</DropdownMenuLabel>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem
+                                                onClick={(e) => {
+                                                    muteNewContact('Muted user', tx.replyAddress, setMuteList, window);
+                                                }}
+                                            >
+                                                <EyeNoneIcon className="h-4 w-4 mr-2" />
+                                                Mute
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
+                                <CardTitle>{tx.articleObject.title}</CardTitle>
+                                <CardDescription></CardDescription>
+                            </CardHeader>
+                            <CardContent className="relative">
+                                <a
+                                    href="#"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        setCurrentArticleTxObj(tx);
+                                        if (tx.articleObject.paywallPrice > 0) {
+                                            handlePaywallStatus(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress);
+                                        } else {
+                                            setShowArticleModal(true);
+                                        }
+                                    }}
+                                >
+                                    {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) && (
+                                        <Alert
+                                            className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-auto z-10 flex items-center justify-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/5"
+                                        >
+                                            <AlertDescription className="flex items-center justify-center whitespace-nowrap">
+                                                {tx.articleObject.ipfsHash ? (
+                                                    <>
+                                                        <HeadphoneIcon />
+                                                        {`This podcast costs ${formatBalance(tx.articleObject.paywallPrice, getUserLocale(navigator))} XEC to listen`}
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <EncryptionIcon />
+                                                        {`This article costs ${formatBalance(tx.articleObject.paywallPrice, getUserLocale(navigator))} XEC to view`}
+                                                    </>
+                                                )}
+                                            </AlertDescription>
+                                        </Alert>
+                                    )}
+                                    <div className="line-clamp-3">
+                                        <p
+                                            className={`mt-0 text-sm leading-6 text-gray-600 break-words max-h-80 ${
+                                                tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) ? 'blur-sm pt-6 pb-2' : ''
+                                            }`}
+                                        >
+                                            {tx.articleObject.paywallPrice > 0 && !checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) ? (
+                                                tx.articleObject.ipfsHash ? (
+                                                    <>
+                                                        <Image
+                                                            src="/audiobook.png"
+                                                            alt="ecash podcast"
+                                                            width={156}
+                                                            height={64}
+                                                            priority
+                                                            className="mx-auto mb-2"
+                                                        />
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Skeleton className="h-4 mt-2 w-full" />
+                                                        <Skeleton className="h-4 mt-2 w-2/3" />
+                                                        <Skeleton className="h-4 mt-2 w-1/2" />
+                                                    </>
+                                                )
+                                            ) : tx.articleObject.ipfsHash ? (
+                                                <div className="flex flex-col items-center">
+                                                    <Image
+                                                        src="/audiobook.png"
+                                                        alt="ecash podcast"
+                                                        width={156}
+                                                        height={64}
+                                                        priority
+                                                        className="mx-auto mb-2"
+                                                    />
+                                                    <div className="flex items-center justify-center">
+                                                        <CirclePlay className="w-4 h-4 mr-1" />
+                                                        <p className="text-sm text-muted-foreground">Click to listen to this podcast</p>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <RenderArticle
+                                                    content={tx.articleObject.content}
+                                                    ipfsAudioHash={tx.articleObject.ipfsHash}
+                                                />
+                                            )}
+                                        </p>
+                                    </div>
+                                </a>
+                            </CardContent>
+                            <CardFooter className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                                <div className="relative mt-2 flex items-center w-full justify-start gap-x-2">
+                                    {tx.senderAvatarLink === false ? (
+                                        <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
+                                    ) : (
+                                        <Avatar className="h-9 w-9">
+                                            <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
+                                            <AvatarFallback><DefaultavatarIcon /></AvatarFallback>
+                                        </Avatar>
+                                    )}
+                                    <div className="text-sm leading-6">
+                                        <p className="font-semibold text-gray-900">
+                                            <Badge variant="outline" className="py-3px">
+                                                <div
+                                                    className="leading-7 [&:not(:first-child)]:mt-6"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        copy(tx.replyAddress);
+                                                        toast({
+                                                            title: '✅Clipboard',
+                                                            description: `${tx.replyAddress} copied to clipboard`,
+                                                          });
+                                                    }}
+                                                >
+                                                    {getContactNameIfExist(tx.replyAddress, contactList)}
+                                                </div>
+                                            </Badge>
+                                        </p>
+                                    </div>
+                                    {/* Add contact popover to input the new contact name */}
+                                    {isExistingContact(tx.replyAddress, contactList) === false && (
+                                        <div
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                            }}
+                                        >
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <Button variant="outline" size="icon" className="mr-2">
+                                                        <IdCardIcon className="h-4 w-4" />
+                                                    </Button>
+                                                </PopoverTrigger>
+                                                <PopoverContent>
+                                                    <div className="space-y-2">
+                                                        <h4 className="flex items-center font-medium leading-none">
+                                                            <Pencil1Icon className="h-4 w-4 mr-1" />
+                                                            New contact
+                                                        </h4>
+                                                        <p className="text-sm text-muted-foreground max-w-96 break-words">
+                                                            Input contact name for <br />{tx.replyAddress}
+                                                        </p>
+                                                    </div>
+                                                    <div className="py-2">
+                                                        <Input
+                                                            id="addContactName"
+                                                            name="addContactName"
+                                                            type="text"
+                                                            ref={newContactNameInput}
+                                                            placeholder="New contact name"
+                                                            className="bg-gray-50"
+                                                            maxLength="30"
+                                                        />
+                                                        <Button
+                                                            type="button"
+                                                            disabled={newContactNameInput?.current?.value === ''}
+                                                            className="mt-2"
+                                                            onClick={e => {
+                                                                addNewContact(newContactNameInput?.current?.value, tx.replyAddress, refreshContactList);
+                                                            }}
+                                                        >
+                                                            Add Contact
+                                                        </Button>
+                                                    </div>
+                                                </PopoverContent>
+                                            </Popover>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="relative mt-2 sm:mt-0 flex items-center justify-between sm:justify-end w-full sm:w-auto">
+                                    {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) && (
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger>
+                                                    <UnlockIcon />
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>This article has been paid.</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    )}
+                                    <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <div className="flex items-center space-x-1 ml-2">
+                                                <ChartNoAxesColumnIncreasing className="w-4 h-4" />
+                                                <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount}`}</span>
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>The amount of unlocks on this article</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <div className="flex items-center space-x-1 ml-2">
+                                                <HandCoins className="w-4 h-4" /> 
+                                                <span>{formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))}</span>
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>The amount of XEC earned from this article</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </div>
+                            </CardFooter>
+                        </Card>
+                    )
+                ))
+            }
+
             {latestArticleHistory &&
             latestArticleHistory.txs &&
             latestArticleHistory.txs.length > 0 ? (
@@ -1120,7 +1490,7 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                                         className="mx-auto mb-2"
                                     />
                                     <div className="flex items-center justify-center">
-                                        <PodcastIcon/>
+                                    <CirclePlay className="w-4 h-4 mr-1" />
                                         <p className="text-sm text-muted-foreground">Click to listen this podcast</p>
                                     </div>
                                 </div>
@@ -1134,145 +1504,131 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                     </div>
                         </a>
                     </CardContent>
-                    <CardFooter>
-                    <div className="relative mt-2 flex items-center gap-x-2">
-                            {tx.senderAvatarLink === false ? (
-                                <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
-                            ) : (
-                                <Avatar className="h-9 w-9">
-                                    <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
-                                    <AvatarFallback><DefaultavatarIcon /></AvatarFallback>
-                                </Avatar>
-                            )}
-                            <div className="text-sm leading-6">
-                                <p className="font-semibold text-gray-900">
-                                    <Badge variant="outline" className="py-3px">
-                                        <div
-                                            className="leading-7 [&:not(:first-child)]:mt-6"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                copy(tx.replyAddress);
-                                                toast(`${tx.replyAddress} copied to clipboard`);
-                                            }}
-                                        >
-                                            {getContactNameIfExist(tx.replyAddress, contactList)}
-                                        </div>
-                                    </Badge>
-                                </p>
-                            </div>
-                            {/* Add contact popover to input the new contact name */}
-                            {isExistingContact(tx.replyAddress, contactList) === false && (
-                                <div
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                    }}
-                                >
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button variant="outline" size="icon" className="mr-2">
-                                                <IdCardIcon className="h-4 w-4" />
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent>
-                                            <div className="space-y-2">
-                                            <h4 className="flex items-center font-medium leading-none">
-                                                <Pencil1Icon className="h-4 w-4 mr-1" />
-                                                New contact
-                                            </h4>
-                                                <p className="text-sm text-muted-foreground max-w-96 break-words">
-                                                    Input contact name for <br />{tx.replyAddress}
-                                                </p>
-                                            </div>
-                                            <div className="py-2">
-                                                <Input
-                                                    id="addContactName"
-                                                    name="addContactName"
-                                                    type="text"
-                                                    ref={newContactNameInput}
-                                                    placeholder="New contact name"
-                                                    className="bg-gray-50"
-                                                    maxLength="30"
-                                                />
-                                                <Button
-                                                    type="button"
-                                                    disabled={newContactNameInput?.current?.value === ''}
-                                                    className="mt-2"
-                                                    onClick={e => {
-                                                        addNewContact(newContactNameInput?.current?.value, tx.replyAddress, refreshContactList);
+                    <CardFooter className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                                <div className="relative mt-2 flex items-center w-full justify-start gap-x-2">
+                                    {tx.senderAvatarLink === false ? (
+                                        <DefaultavatarIcon className="h-10 w-10 rounded-full bg-gray-50" />
+                                    ) : (
+                                        <Avatar className="h-9 w-9">
+                                            <AvatarImage src={tx.senderAvatarLink} alt="User Avatar" />
+                                            <AvatarFallback><DefaultavatarIcon /></AvatarFallback>
+                                        </Avatar>
+                                    )}
+                                    <div className="text-sm leading-6">
+                                        <p className="font-semibold text-gray-900">
+                                            <Badge variant="outline" className="py-3px">
+                                                <div
+                                                    className="leading-7 [&:not(:first-child)]:mt-6"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        copy(tx.replyAddress);
+                                                        toast({
+                                                            title: '✅Clipboard',
+                                                            description: `${tx.replyAddress} copied to clipboard`,
+                                                          });
                                                     }}
                                                 >
-                                                    Add Contact
-                                                </Button>
-                                            </div>
-                                        </PopoverContent>
-                                    </Popover>
+                                                    {getContactNameIfExist(tx.replyAddress, contactList)}
+                                                </div>
+                                            </Badge>
+                                        </p>
+                                    </div>
+                                    {/* Add contact popover to input the new contact name */}
+                                    {isExistingContact(tx.replyAddress, contactList) === false && (
+                                        <div
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                            }}
+                                        >
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <Button variant="outline" size="icon" className="mr-2">
+                                                        <IdCardIcon className="h-4 w-4" />
+                                                    </Button>
+                                                </PopoverTrigger>
+                                                <PopoverContent>
+                                                    <div className="space-y-2">
+                                                        <h4 className="flex items-center font-medium leading-none">
+                                                            <Pencil1Icon className="h-4 w-4 mr-1" />
+                                                            New contact
+                                                        </h4>
+                                                        <p className="text-sm text-muted-foreground max-w-96 break-words">
+                                                            Input contact name for <br />{tx.replyAddress}
+                                                        </p>
+                                                    </div>
+                                                    <div className="py-2">
+                                                        <Input
+                                                            id="addContactName"
+                                                            name="addContactName"
+                                                            type="text"
+                                                            ref={newContactNameInput}
+                                                            placeholder="New contact name"
+                                                            className="bg-gray-50"
+                                                            maxLength="30"
+                                                        />
+                                                        <Button
+                                                            type="button"
+                                                            disabled={newContactNameInput?.current?.value === ''}
+                                                            className="mt-2"
+                                                            onClick={e => {
+                                                                addNewContact(newContactNameInput?.current?.value, tx.replyAddress, refreshContactList);
+                                                            }}
+                                                        >
+                                                            Add Contact
+                                                        </Button>
+                                                    </div>
+                                                </PopoverContent>
+                                            </Popover>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </div>
-                        <div className="relative mt-2 flex items-center gap-x-2 ml-auto md:hidden">
-                            <Popover>
-                                    <PopoverTrigger asChild>
-                                        <Button variant="ghost" size="icon" className="mr-2">
-                                        <Activity className="h-4 w-4 text-muted-foreground" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-120">
-                                    <div className="flex flex-col items-start space-y-1 ml-2">
-                            <div className="flex items-center space-x-1">
-                                <ChatBubbleIcon />
-                                <span>{getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}</span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                            <GraphchartIcon />
-                            <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} `}</span>
-                            </div>
-                            <p>
-                                {getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned.gt(0) && 
-                                `Earned ${formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))} XEC`}
-                            </p>
-                            </div>
-                         </PopoverContent>
-                         </Popover>
-                      </div>
-                        <div className="relative mt-2 flex items-center gap-x-2 ml-auto hidden md:flex">
-                          
-                            {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) && (
+                                <div className="relative mt-2 sm:mt-0 flex items-center justify-between sm:justify-end w-full sm:w-auto">
+                                    {tx.articleObject.paywallPrice > 0 && checkPaywallPayment(tx.txid, tx.articleObject.paywallPrice, false, tx.replyAddress) && (
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger>
+                                                    <UnlockIcon />
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>This article has been paid.</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    )}
+                                    <div className="flex items-center space-x-1 ml-2 ">
+                                        <MessageCircle className="w-4 h-4" />
+                                        <span>{getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}</span>
+                                    </div>
+
+                                    <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <div className="flex items-center space-x-1 ml-2">
+                                                <ChartNoAxesColumnIncreasing className="w-4 h-4" />
+                                                <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount}`}</span>
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>The amount of unlocks on this article</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+
                                 <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger> <UnlockIcon /></TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>This article has been paid.</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            )}
-                              <div className="flex items-center space-x-1 ml-2 ">
-                            <ChatBubbleIcon />
-                            <span>{getTotalCommentsPerArticle(tx.txid, articleHistory.replies)}</span>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <div className="flex items-center space-x-1 ml-2">
+                                                <HandCoins className="w-4 h-4" /> 
+                                                <span>{formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))}</span>
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>The amount of XEC earned from this article</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
                             </div>
-                            
-                            <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger>
-                            
-                            <div className="flex items-center space-x-1 ml-2">
-                            <GraphchartIcon />
-                            <span>{`${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} `}</span>
-                         </div>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                            <p>
-                            {`Earned ${formatBalance(getTotalPaywallEarnedPerArticle(tx.txid).totalPaywallEarned, getUserLocale(navigator))} XEC`}
-                            <br />
-                            {` from ${getTotalPaywallEarnedPerArticle(tx.txid).totalUnlockCount} unlocks`}
-                        </p>
-                            </TooltipContent>
-                        </Tooltip>
-                        </TooltipProvider>        
-                        <div>
-                      </div>
-                        </div>
-                    </CardFooter>
+                            </CardFooter>
                 </Card>
                 )
             ))
@@ -1345,24 +1701,51 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                         id="value-input"
                         aria-describedby="helper-text-explanation"
                         placeholder="Pay-to-read in XEC -optional"
-                        className="bg-white w-[240px]"
+                        className="bg-white md:w-[240px]"
                         value={paywallAmountXec}
                         onChange={e => handlePaywallAmountChange(e)}
                         />
-                          <Button
+                             <Button
                                 type="button"
-                                variant="outline" size="icon"
+                                variant="outline"
+                                className="px-3 w-auto"
                                 onClick={() => savedDraftArticleToLocalStorage()}
                                 >
-                                <RiSave3Fill />
+                                <Save className="h-4 w-4" />
                                 </Button>
+
                                 <Button
                                 type="button"
-                                variant="outline" size="icon"
+                                variant="outline" 
+                                className="px-3 w-auto"
                                 onClick={() => loadDraftArticleFromLocalStorage()}
                                 >
                                 <ImDownload3 />
                                 </Button>
+                                
+                                <Toggle
+                                id="disableReplies"
+                                variant="outline"
+                                className="bg-white"
+                                aria-label="Disable replies to this article"
+                                pressed={disableArticleReplies}
+                                onPressedChange={(state) => {
+                                    setDisableArticleReplies(state);
+                                    if (state) {
+                                        toast({
+                                            title: "🙅Disabled",
+                                            description: "Comments not allowed",
+                                        });
+                                    } else {
+                                        toast({
+                                            title: "✅Enabled",
+                                            description: "Comments allowed on articles",
+                                        });
+                                    }
+                                }}
+                            >
+                                <MessageCircleOff className="h-4 w-4" />
+                            </Toggle>
                     </div>
                   
                     </div>
@@ -1400,80 +1783,93 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                         )}
 
                             <p className="text-sm text-red-600 dark:text-red-500">{articleError !== false && articleError}</p>
-                            <div className="flex flex-col sm:flex-row justify-between items-center mt-2">
+                            <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row justify-between items-center mt-2">
                                 {/* Write article button*/}
 
                                 {articleCategory !== "Podcast" ? (
-                                <Button
-                                    type="button"
-                                    disabled={article === '' || articleError || articleTitle === '' || paywallAmountXecError}                            
-                                    onClick={() => sendArticle()}
-                                >
-                                    <BiSolidNews />&nbsp;Post Article
-                                </Button>
-                                ) : (
-                                <Button
-                                    type="button"
-                                    disabled={articleError || articleTitle === '' || paywallAmountXecError || isFileSelected === false}
-                                    onClick={() => {
-                                        if (articleCategory === 'Podcast' && paywallAmountXec < 110) {
-                                            setPaywallAmountXecError(`Paywall amount for Podcasts must be equal or greater than 110 XEC`);
-                                            return;
-                                        }
-                                        sendAudioArticle()
-                                    }}
-                                >
-                                     {isUploading ? (
                                 <>
-                                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                                    Uploading... please wait
+                                    <Button
+                                        type="button"
+                                        disabled={article === '' || articleError || articleTitle === '' || paywallAmountXecError}
+                                        onClick={() => sendArticle()}
+                                    >
+                                        <BookOpenCheck className="mr-2 w-4 h-4" />Post Article
+                                    </Button>
+                                    {hasArticleMvpNft === true && (
+                                  <Button
+                                  type="button"
+                                  disabled={article === '' || articleError || articleTitle === '' || paywallAmountXecError}
+                                  onClick={() => sendArticle(true)}
+                                  className={`
+                                      bg-gradient-to-br from-purple-300 via-blue-400 to-purple-300
+                                      ${(article === '' || articleError || articleTitle === '' || paywallAmountXecError) ? 'opacity-20 cursor-not-allowed' : 'hover:from-purple-200 hover:via-blue-300 hover:to-purple-200'}
+                                      transition-all duration-500 ease-in-out
+                                  `}
+                              >
+                                  <PenLine className="mr-2 w-4 h-4"/>Post Premium Article
+                              </Button>
+                                    )}
                                 </>
                                 ) : (
                                 <>
-                                    <BiSolidNews />&nbsp;Post Podcast
+                                    <Button
+                                        type="button"
+                                        disabled={articleError || articleTitle === '' || paywallAmountXecError || isFileSelected === false}
+                                        onClick={() => {
+                                            if (articleCategory === 'Podcast' && paywallAmountXec < 110) {
+                                                setPaywallAmountXecError(`Paywall amount for Podcasts must be equal or greater than 110 XEC`);
+                                                return;
+                                            }
+                                            sendAudioArticle()
+                                        }}
+                                    >
+                                        {isUploading ? (
+                                    <>
+                                        <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                                        Uploading... please wait
+                                    </>
+                                    ) : (
+                                    <>
+                                        <MicVocal className="mr-2 w-4 h-4" />Post Podcast
+                                    </>
+                                    )}
+                                    </Button>
+
+                                    {hasArticleMvpNft === true && (
+                                  <Button
+                                  type="button"
+                                  disabled={articleError || articleTitle === '' || paywallAmountXecError || isFileSelected === false}
+                                  onClick={() => {
+                                      if (articleCategory === 'Podcast' && paywallAmountXec < 110) {
+                                          setPaywallAmountXecError(`Paywall amount for Podcasts must be equal or greater than 110 XEC`);
+                                          return;
+                                      }
+                                      sendAudioArticle(true)
+                                  }}
+                                  className={`
+                                      bg-gradient-to-br from-purple-300 via-blue-400 to-purple-300
+                                      ${(articleError || articleTitle === '' || paywallAmountXecError || isFileSelected === false) ? 'opacity-20 cursor-not-allowed' : 'hover:from-purple-200 hover:via-blue-300 hover:to-purple-200'}
+                                      transition-all duration-500 ease-in-out
+                                  `}
+                              >
+                                  {isUploading ? (
+                                  <>
+                                      <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                                      Uploading... please wait
+                                  </>
+                                  ) : (
+                                  <>
+                                      <Podcast className="mr-2 w-4 h-4" />Post Premium Podcast
+                                  </>
+                                  )}
+                              </Button>
+                                    )}
                                 </>
-                                )}
-                                </Button>
                                 )
                                 }
-                                <br />
-                                <div className="sm:flex">
-                               
-                                </div>
-                                <div className="relative flex items-start mt-2">
-                                    <div className="flex h-6 items-center py-2">
-                                        <Checkbox
-                                        id="comments"
-                                        checked={disableArticleReplies}
-                                        onCheckedChange={() => setDisableArticleReplies(!disableArticleReplies)}
-                                        className="rounded"
-                                        />
-                                    </div>
-                                    <div className="ml-3 text-sm leading-6">
-                                        <Label htmlFor="comments" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                        Disable replies to this article
-                                        </Label>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                 )}
-               
-                <div className="relative flex items-start mt-2 mb-2">
-                    <div className="flex h-6 items-center py-2">
-                        <Checkbox
-                        id="curateByContacts"
-                        checked={curateByContacts}
-                        onCheckedChange={() => handleCurateByContactsChange(!curateByContacts)}
-                        className="rounded"
-                        />
-                    </div>
-                    <div className="ml-3 text-sm leading-6">
-                        <Label htmlFor="curateByContacts" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Only show articles by your contacts
-                        </Label>
-                    </div>
-                </div>
 
                 {/*Set up pagination menu*/}
                 <span>
@@ -1542,49 +1938,62 @@ export default function Article( { chronik, address, isMobile, sharedArticleTxid
                 
                 {/* Filter by article author */}
                 {showSearchBar && (
-                <form className="space-y-6" action="#" method="POST">
                     <div>
                         <div className="max-w-xl mt-2 w-full mx-auto">
                             <div className="flex items-center space-x-2">
-                                <Input
+                            <div className="relative w-full">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4" />
+                            <Input
                                 id="address"
                                 name="address"
-                                type="text"
+                                type="search"
                                 value={addressToSearch}
                                 required
-                                className="bg-gray-50"
-                                placeholder='Search By Author Address'
-                                onChange={e => handleAddressChange(e)}
-                                />
-
-                                <Button
-                                type="button"
-                                variant="outline"
-                                disabled={addressToSearchError}
-                                onClick={e => {
-                                    getTxHistoryByAddress(e);
+                                className="pl-8 bg-white"
+                                placeholder="Search By Address"
+                                onChange={handleAddressChange}
+                                onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault(); 
+                                    getTxHistoryByAddress(); 
+                                }
                                 }}
-                                >
-                                <MagnifyingGlassIcon className="h-4 w-4" />
-                                </Button>
+                                onBlur={getTxHistoryByAddress} 
+                            />
+                        </div>
 
-                                <Button
-                                type="button"
+                             <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="px-3 w-auto"
+                            onClick={() => {
+                                setTxHistoryByAddress('');
+                                setAddressToSearch('');
+                                setCurateByContacts(false); 
+                                setAddressToSearchError(false);
+                            }}
+                            >
+                            <ResetIcon className="h-4 w-4"/>
+                            </Button>
+                  
+                                <Toggle
                                 variant="outline"
-                                onClick={() => {
-                                    setTxHistoryByAddress('');
-                                    setAddressToSearch('');
-                                }}
-                                >
-                                <ResetIcon />
-                                </Button>
+                                className="bg-white"
+                                aria-label="Only show messages by your contacts"
+                                pressed={curateByContacts}
+                                onPressedChange={(state) => handleCurateByContactsChange(state)}
+                            >
+                                <UserRoundSearch className="h-4 w-4"/>
+                            </Toggle>
+                            
+                               
                             </div>
                             <p className="mt-2 text-sm text-red-600 dark:text-red-500">
                                 {addressToSearchError !== false && addressToSearchError}
                             </p>
                         </div>
                     </div>
-                </form>
                 )}
 
                 {/* Render article listings */}

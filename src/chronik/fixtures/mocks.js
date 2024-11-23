@@ -74,7 +74,9 @@ export const mockParsedXecEncryptedSendTxWithOpReturn = {
     "nftShowcaseId": false,
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
-    "authenticationTx": false
+    "authenticationTx": false,
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1713836952
 };
 
 export const mockXecSendTxWithOpReturnTweet = {
@@ -152,7 +154,9 @@ export const mockParsedXecSendTxWithOpReturnTweet = {
     "nftShowcaseId": false,
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
-    "authenticationTx": false
+    "authenticationTx": false,
+    "iseCashChatPremiumPost": false,
+    "timestamp": false
 };
 
 export const mockXecSendTxWithOpReturnEmoji = {
@@ -226,7 +230,9 @@ export const mockParsedXecSendTxWithOpReturnEmoji = {
     "nftShowcaseId": false,
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
-    "authenticationTx": false
+    "authenticationTx": false,
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1711415298
 };
 
 export const mockXecSendTxWithOpReturnVideo = {
@@ -300,7 +306,9 @@ export const mockParsedXecSendTxWithOpReturnVideo = {
     "nftShowcaseId": false,
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
-    "authenticationTx": false
+    "authenticationTx": false,
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1711415207
 };
 
 export const mockXecSendTxWithOpReturnImage = {
@@ -374,7 +382,9 @@ export const mockParsedXecSendTxWithOpReturnImage = {
     "nftShowcaseId": false,
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
-    "authenticationTx": false
+    "authenticationTx": false,
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1711415040
 };
 
 export const mockXecSendTxWithOpReturn = {
@@ -448,7 +458,9 @@ export const mockParsedXecSendTxWithOpReturn = {
     "nftShowcaseId": false,
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
-    "authenticationTx": false
+    "authenticationTx": false,
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1711414909
 };
 
 export const mockXecSendTxWithOpReturnTownhallPost = {
@@ -527,7 +539,9 @@ export const mockParsedXecSendTxWithOpReturnTownhallPost = {
     "nftShowcaseId": false,
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
-    "authenticationTx": false
+    "authenticationTx": false,
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1712201369
 };
 
 export const mockXecSendTxWithOpReturnTownhallReplyPost = {
@@ -606,7 +620,9 @@ export const mockParsedXecSendTxWithOpReturnTownhallReplyPost = {
     "nftShowcaseId": false,
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
-    "authenticationTx": false
+    "authenticationTx": false,
+    "iseCashChatPremiumPost": false,
+    "timestamp": false
 };
 
 export const mockXecSendTxWithOpReturnNftShowcase = {
@@ -685,7 +701,9 @@ export const mockParsedXecSendTxWithOpReturnNftShowcase = {
     "nftShowcaseId": "076fc97838cea01911b1b83e26f5ec5c040e4aed039f24df6e3d076737c43482",
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
-    "authenticationTx": false
+    "authenticationTx": false,
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1714995866
 };
 
 export const mockXecSendTxWithOpReturnArticle = {
@@ -769,7 +787,9 @@ export const mockParsedXecSendTxWithOpReturnArticle = {
     "paywallPayment": false,
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
-    "authenticationTx": false
+    "authenticationTx": false,
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1717642255
 };
 
 export const mockXecSendTxWithOpReturnArticleReply = {
@@ -839,7 +859,9 @@ export const mockParsedXecSendTxWithOpReturnArticleReply = {
     "paywallPayment": false,
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
-    "authenticationTx": false
+    "authenticationTx": false,
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1717642506
 };
 
 export const mockXecSendTxWithOpReturnPaywallPayment = {
@@ -936,7 +958,9 @@ export const mockParsedXecSendTxWithOpReturnPaywallPayment = {
     "paywallPayment": "10",
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
-    "authenticationTx": false
+    "authenticationTx": false,
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1716987086
 };
 
 export const mockXecSendTxWithOpReturnArticleXecTip = {
@@ -1010,6 +1034,8 @@ export const mockParsedXecSendTxWithOpReturnArticleXecTip = {
     "paywallPayment": false,
     "receiverAvatarLink": false,
     "senderAvatarLink": false,
-    "authenticationTx": false
+    "authenticationTx": false,
+    "iseCashChatPremiumPost": false,
+    "timestamp": 1717042206
 };
 
