@@ -279,7 +279,16 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                     variant="outline"
                     className="mr-2"
                 >
-                    Mint NFTs on cashtab
+                    Mint NFTs
+                </Button>
+            </a>
+            <a href="https://cashtab.com/#/nfts" target="_blank">
+                <Button
+                    type="button"
+                    variant="outline"
+                    className="mr-2"
+                >
+                    Trade NFTs
                 </Button>
             </a>
             <Button
