@@ -63,6 +63,7 @@
     "next-themes": "^0.3.0",
     "pinata": "^0.4.0",
     "react": "^18",
+    "react-alice-carousel": "^2.9.1",
     "react-dom": "^18",
     "react-h5-audio-player": "^3.9.3",
     "react-lite-youtube-embed": "^2.4.0",
