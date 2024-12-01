@@ -48,7 +48,7 @@
     "cmdk": "^1.0.0",
     "copy-to-clipboard": "^3.3.3",
     "dompurify": "^3.1.4",
-    "ecash-agora": "^0.2.0",
+    "ecash-agora": "^0.2.2-rc",
     "ecash-script": "^2.1.2",
     "ecashaddrjs": "^1.6.2",
     "emoji-mart": "^5.5.2",

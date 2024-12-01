@@ -4,9 +4,8 @@ import { appConfig } from '../config/app';
 import { Tooltip, Alert as InfoBox, Modal } from "flowbite-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
-import { postHasErrors, replyHasErrors, isValidRecipient } from '../validation/validation';
+import { postHasErrors, replyHasErrors } from '../validation/validation';
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator"
 import { Toggle } from "@/components/ui/toggle";
 import { Zap, BookDashed, UserRoundSearch, User, SmilePlus, Link, FileImage, Youtube, Twitter} from "lucide-react"
 import { useToast } from "@/hooks/use-toast";
@@ -61,7 +60,6 @@ import {
 } from "@/components/ui/accordion";
 import {
     getPaginatedHistoryPage,
-    encodeBip21Message,
     encodeBip21Post,
     encodeBip21ReplyPost,
     encodeBip2XecTip,
@@ -70,20 +68,13 @@ import {
     RenderTipping,
     isExistingContact,
     muteNewContact,
+    formatBalance,
 } from '../utils/utils';
 import {
     getTxHistory,
-    getReplyTxDetails,
-    parseChronikTx,
     txListener,
-    getTxDetails,
 } from '../chronik/chronik';
 import copy from 'copy-to-clipboard';
-import {
-    Alert,
-    AlertDescription,
-    AlertTitle,
-  } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { chronik as chronikConfig } from '../config/chronik';
 import { ChronikClient } from 'chronik-client';
@@ -100,11 +91,10 @@ import {
 } from "@/components/ui/pagination"
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { addNewContact } from '../utils/utils';
 import localforage from 'localforage';
 import { opReturn as opreturnConfig } from '../config/opreturn';
+import { Agora } from 'ecash-agora';
 
 export default function TownHall({ address, isMobile, tabEntry, setsSyncronizingState }) {
     const [townHallHistory, setTownHallHistory] = useState(''); // current history rendered on screen
@@ -115,6 +105,9 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
     const [replyPostError, setReplyPostError] = useState(false);
     const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
     const [showMessagePreview, setShowMessagePreview] = useState(false);
+    const [showNftListingDetails, setShowNftListingDetails] = useState(false);
+    const [nftTxInFocus, setNftTxInFocus] = useState(false);
+    const [nftPriceInFocus, setNftPriceInFocus] = useState('');
     const [showPremiumMessagePreview, setShowPremiumMessagePreview] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here
@@ -126,6 +119,7 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
     const [hasTownhallMvpNft, setHasTownhallMvpNft] = useState(false);
     const [mvpPosts, setMpvPosts] = useState([]);
     const { toast } = useToast();
+    const agora = new Agora(chronik);
 
     useEffect(() => {
       const handleResize = () => {
@@ -574,6 +568,68 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
         );
     };
 
+    const NftListingModal = () => {
+      if (!nftTxInFocus) {
+        return;
+      }
+
+      const thisNftId = nftTxInFocus.url.split(appConfig.cashtabTokenUrl+'\/')[1];
+      let nftInfoById;
+      (async () => {
+        nftInfoById = await agora.activeOffersByTokenId(thisNftId);
+        if (nftInfoById && nftInfoById.length > 0) {
+          setNftPriceInFocus(Number(nftInfoById[0].variant.params.enforcedOutputs[1].value));
+        }
+      })();
+
+      return (
+          <Modal show={showNftListingDetails} onClose={() => setShowNftListingDetails(false)}>
+              <Modal.Header className='border-b-0'><BookDashed/></Modal.Header>
+              <Modal.Body>
+                  {nftInfoById && nftInfoById.length === 0 ? 
+                    <p className="text-sm font-normal text-gray-900 dark:text-white text-ellipsis break-words min-w-0">
+                      No active offers for this NFT
+                    </p>
+                    :
+                    <div className="space-y-6">
+                        <p className="text-base leading-relaxed">
+                            {(
+                              <p className="text-lg font-normal text-sky-900 dark:text-white text-ellipsis break-words min-w-0">
+                                  <b>NFT ID: </b> {' ' + thisNftId.substring(0, 15)}...{thisNftId.substring(thisNftId.length - 10)}<br />
+                                  <b>Price: </b> {nftPriceInFocus > 0 ?
+                                    ` ${formatBalance(nftPriceInFocus/100)} XEC`
+                                    : ' No active listing'
+                                  }<br />
+                                  <img src={`${appConfig.tokenIconsUrl}/256/${thisNftId}.png`} className="rounded-lg w-full" />
+                              </p>
+                            )}
+                        </p>
+                    </div>
+                  }
+              </Modal.Body>
+              <Modal.Footer className="flex justify-end space-x-2">
+                <Button 
+                  onClick={() => {
+                    setNftPriceInFocus(0)
+                    setShowNftListingDetails(false)
+                  }}
+                  variant="secondary"
+                >
+                  Cancel
+                </Button>
+                <a href={nftTxInFocus.url} target='_blank'>
+                  <Button onClick={() => {
+                    setNftPriceInFocus(0)
+                    setShowNftListingDetails(false)
+                  }}>
+                  <PostIcon  />  Trade on Cashtab
+                  </Button>
+                </a>
+              </Modal.Footer>
+          </Modal>
+      );
+  };
+
     // Handle the checkbox to curate posts from contacts only
     const handleCurateByContactsChange = async (newState) => {
         setCurateByContacts(newState);
@@ -743,6 +799,7 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
       <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px]">
         <MessagePreviewModal />
         <PremiumMessagePreviewModal />
+        <NftListingModal />
         <>
           <div className="max-w-xl w-full mx-auto overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring">
             {/* Post input field */}
@@ -1260,22 +1317,40 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                       <LiteYouTubeEmbed id={tx.videoId} />
                     )}
                     {tx.tweetId !== false && <Tweet id={tx.tweetId} />}
-                    <p className="line-clamp-1">
-                      {tx.url !== false && (
-                        <InfoBox
-                          color="info"
-                          className="flex-nowrap bg-muted text-sm text-muted-foreground break-words"
-                        >
-                          <a
-                            href={tx.url}
-                            target="_blank"
-                            className="break-words"
+                    {tx.url !== false && (
+                    <>
+                      {/* If this url contains a Cashtab NFT listing */}
+                      {tx.url.includes(appConfig.cashtabTokenUrl) ?
+                        <>
+                          <div onClick={() => {
+                            setNftTxInFocus(tx)
+                            setShowNftListingDetails(true)
+                          }}>
+                            <Badge className="leading-7 shadow-sm bg-accent py-3px" variant="outline">
+                              <img src='/cashtabfavicon.ico' />&emsp;Cashtab NFT Listing
+                            </Badge>
+                              <img src={`${appConfig.tokenIconsUrl}/256/${tx.url.split(appConfig.cashtabTokenUrl+'\/')[1]}.png`} className="rounded-lg w-full shadow-2xl" />
+                          </div>
+                        </>
+                        : 
+                        <p className="line-clamp-1">
+                          <InfoBox
+                            color="info"
+                            className="flex-nowrap text-sm bg-muted text-muted-foreground break-words"
                           >
+                            <a
+                              href={tx.url}
+                              target="_blank"
+                              className="break-words"
+                            >
                             {tx.url}
-                          </a>
-                        </InfoBox>
-                      )}
-                    </p>
+                            </a>
+                          </InfoBox>
+                        </p>
+                        }
+                      </>
+                    )}
+
                     {/* Date and timestamp */}
                     <span className="text-sm text-muted-foreground">
                       {tx.txDate}&nbsp;at&nbsp;{tx.txTime}
@@ -1677,22 +1752,39 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                       <LiteYouTubeEmbed id={tx.videoId} />
                     )}
                     {tx.tweetId !== false && <Tweet id={tx.tweetId} />}
-                    <p className="line-clamp-1">
-                      {tx.url !== false && (
-                        <InfoBox
-                          color="info"
-                          className="flex-nowrap text-sm bg-muted text-muted-foreground break-words"
-                        >
-                          <a
-                            href={tx.url}
-                            target="_blank"
-                            className="break-words"
-                          >
-                            {tx.url}
-                          </a>
-                        </InfoBox>
-                      )}
-                    </p>
+                    {tx.url !== false && (
+                        <>
+                        {/* If this url contains a Cashtab NFT listing */}
+                        {tx.url.includes(appConfig.cashtabTokenUrl) ?
+                          <>
+                            <div onClick={() => {
+                                setNftTxInFocus(tx)
+                                setShowNftListingDetails(true)
+                            }}>
+                              <Badge className="leading-7 shadow-sm bg-accent py-3px" variant="outline">
+                                <img src='/cashtabfavicon.ico' />&emsp;Cashtab NFT Listing
+                              </Badge>
+                              <img src={`${appConfig.tokenIconsUrl}/256/${tx.url.split(appConfig.cashtabTokenUrl+'\/')[1]}.png`} className="rounded-lg w-full shadow-2xl" />
+                            </div>
+                          </>
+                        : 
+                          <p className="line-clamp-1">
+                          <InfoBox
+                              color="info"
+                              className="flex-nowrap text-sm bg-muted text-muted-foreground break-words"
+                            >
+                              <a
+                                href={tx.url}
+                                target="_blank"
+                                className="break-words"
+                              >
+                                {tx.url}
+                              </a>
+                            </InfoBox>
+                            </p>
+                          }
+                      </>
+                    )}
                     {/* Date and timestamp */}
                     <span className="text-sm text-muted-foreground">
                       {tx.txDate}&nbsp;at&nbsp;{tx.txTime}

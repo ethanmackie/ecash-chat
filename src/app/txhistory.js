@@ -541,9 +541,9 @@ export default function TxHistory({ address, isMobile }) {
                         {tx.videoId !== false && (<LiteYouTubeEmbed id={tx.videoId} />)}
                         {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
                         {tx.url !== false && (
-                           <InfoBox className="bg-muted text-muted-foreground">
-                           <a href={tx.url} target="_blank" rel="noopener noreferrer">{tx.url}</a>
-                         </InfoBox>
+                          <InfoBox className="bg-muted text-muted-foreground">
+                            <a href={tx.url} target="_blank" rel="noopener noreferrer">{tx.url}</a>
+                          </InfoBox>
                         )}
 
                         <div className="flex my-2 h-5 items-center space-x-4 text-sm text-muted-foreground">
