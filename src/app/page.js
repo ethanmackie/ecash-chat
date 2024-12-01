@@ -79,8 +79,8 @@ import { useTheme } from "next-themes"
 import { YoutubeIcon, EcashchatIcon, Home3Icon, File3Icon, Nft3Icon, Send3Icon, Info3icon, User3icon, QrcodeIcon, Logout3Icon } from "@/components/ui/social";
 const crypto = require('crypto');
 import { chronik as chronikConfig } from '../config/chronik';
-import { ChronikClientNode } from 'chronik-client';
-const chronik = new ChronikClientNode(chronikConfig.urls);
+import { ChronikClient } from 'chronik-client';
+const chronik = new ChronikClient(chronikConfig.urls);
 import YouTubeVideoId from 'youtube-video-id';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'

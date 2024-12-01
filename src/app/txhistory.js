@@ -4,7 +4,7 @@ import { appConfig } from '../config/app';
 import { getTxHistory, txListener } from '../chronik/chronik';
 import { chronik as chronikConfig } from '../config/chronik';
 import { Search, UserRoundSearch, ArrowRightLeft} from "lucide-react"
-import { ChronikClientNode } from 'chronik-client';
+import { ChronikClient } from 'chronik-client';
 import cashaddr from 'ecashaddrjs';
 import { isValidRecipient } from '../validation/validation';
 import { Skeleton } from "@/components/ui/skeleton";
@@ -71,7 +71,7 @@ import { useToast } from "@/hooks/use-toast";
 import { addNewContact } from '../utils/utils';
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-const chronik = new ChronikClientNode(chronikConfig.urls);
+const chronik = new ChronikClient(chronikConfig.urls);
 import localforage from 'localforage';
 
 export default function TxHistory({ address, isMobile }) {

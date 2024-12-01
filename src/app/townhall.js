@@ -86,8 +86,8 @@ import {
   } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { chronik as chronikConfig } from '../config/chronik';
-import { ChronikClientNode } from 'chronik-client';
-const chronik = new ChronikClientNode(chronikConfig.urls);
+import { ChronikClient } from 'chronik-client';
+const chronik = new ChronikClient(chronikConfig.urls);
 import YouTubeVideoId from 'youtube-video-id';
 import {
   Pagination,
