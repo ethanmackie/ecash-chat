@@ -21,11 +21,9 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
-import AliceCarousel from 'react-alice-carousel';
 import 'react-alice-carousel/lib/alice-carousel.css';
 
 export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) {
@@ -37,8 +35,6 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
     const [manualRefresh, setManualRefresh] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const { toast } = useToast();
-    // NFT carousel handler
-    const handleDragStart = (e) => e.preventDefault();
 
     useEffect(() => {
         (async () => {

@@ -29,7 +29,6 @@ import {
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -69,8 +68,6 @@ const crypto = require('crypto');
 import copy from 'copy-to-clipboard';
 import { useToast } from "@/hooks/use-toast";
 import { addNewContact } from '../utils/utils';
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 const chronik = new ChronikClient(chronikConfig.urls);
 import localforage from 'localforage';
 

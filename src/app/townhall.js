@@ -622,7 +622,7 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                     setNftPriceInFocus(0)
                     setShowNftListingDetails(false)
                   }}>
-                  <PostIcon  />  Trade on Cashtab
+                  <PostIcon />  Trade on Cashtab
                   </Button>
                 </a>
               </Modal.Footer>
