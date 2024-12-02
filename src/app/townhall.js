@@ -105,9 +105,9 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
     const [replyPostError, setReplyPostError] = useState(false);
     const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
     const [showMessagePreview, setShowMessagePreview] = useState(false);
-    const [showNftListingDetails, setShowNftListingDetails] = useState(false);
-    const [nftTxInFocus, setNftTxInFocus] = useState(false);
-    const [nftPriceInFocus, setNftPriceInFocus] = useState('');
+    const [showTokenListingDetails, setShowTokenListingDetails] = useState(false);
+    const [tokenTxInFocus, setTokenTxInFocus] = useState(false);
+    const [tokenPriceInFocus, setTokenPriceInFocus] = useState('');
     const [showPremiumMessagePreview, setShowPremiumMessagePreview] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here
@@ -568,22 +568,33 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
         );
     };
 
-    const NftListingModal = () => {
-      if (!nftTxInFocus) {
+    const TokenListingModal = () => {
+      if (!tokenTxInFocus) {
         return;
       }
 
-      const thisNftId = nftTxInFocus.url.split(appConfig.cashtabTokenUrl+'\/')[1];
+      const thisNftId = tokenTxInFocus.url.split(appConfig.cashtabTokenUrl+'\/')[1];
       let nftInfoById;
       (async () => {
         nftInfoById = await agora.activeOffersByTokenId(thisNftId);
         if (nftInfoById && nftInfoById.length > 0) {
-          setNftPriceInFocus(Number(nftInfoById[0].variant.params.enforcedOutputs[1].value));
+          if (nftInfoById[0].token.tokenType.number === 1) {
+            // If this is an eToken
+            setTokenPriceInFocus(0);
+          } else if (nftInfoById[0].token.tokenType.number === 65) {
+            // If this is a Child NFT
+            setTokenPriceInFocus(Number(nftInfoById[0].variant.params.enforcedOutputs[1].value));
+          } else if (nftInfoById[0].token.tokenType.number === 129) {
+            // If this is a Parent NFT
+            setTokenPriceInFocus(Number(nftInfoById[0].variant.params.enforcedOutputs[1].value));
+          } else {
+            setTokenPriceInFocus(0);
+          }
         }
       })();
 
       return (
-          <Modal show={showNftListingDetails} onClose={() => setShowNftListingDetails(false)}>
+          <Modal show={showTokenListingDetails} onClose={() => setShowTokenListingDetails(false)}>
               <Modal.Header className='border-b-0'><BookDashed/></Modal.Header>
               <Modal.Body>
                   {nftInfoById && nftInfoById.length === 0 ? 
@@ -595,10 +606,10 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                         <p className="text-base leading-relaxed">
                             {(
                               <p className="text-lg font-normal text-sky-900 dark:text-white text-ellipsis break-words min-w-0">
-                                  <b>NFT ID: </b> {' ' + thisNftId.substring(0, 15)}...{thisNftId.substring(thisNftId.length - 10)}<br />
-                                  <b>Price: </b> {nftPriceInFocus > 0 ?
-                                    ` ${formatBalance(nftPriceInFocus/100)} XEC`
-                                    : ' No active listing'
+                                  <b>Token ID: </b> {' ' + thisNftId.substring(0, 7)}...{thisNftId.substring(thisNftId.length - 7)}<br />
+                                  <b>Price: </b> {tokenPriceInFocus > 0 ?
+                                    ` ${formatBalance(tokenPriceInFocus/100)} XEC`
+                                    : ' Refer to Cashtab Orderbook'
                                   }<br />
                                   <img src={`${appConfig.tokenIconsUrl}/256/${thisNftId}.png`} className="rounded-lg w-full" />
                               </p>
@@ -610,17 +621,17 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
               <Modal.Footer className="flex justify-end space-x-2">
                 <Button 
                   onClick={() => {
-                    setNftPriceInFocus(0)
-                    setShowNftListingDetails(false)
+                    setTokenPriceInFocus(0)
+                    setShowTokenListingDetails(false)
                   }}
                   variant="secondary"
                 >
                   Cancel
                 </Button>
-                <a href={nftTxInFocus.url} target='_blank'>
+                <a href={tokenTxInFocus.url} target='_blank'>
                   <Button onClick={() => {
-                    setNftPriceInFocus(0)
-                    setShowNftListingDetails(false)
+                    setTokenPriceInFocus(0)
+                    setShowTokenListingDetails(false)
                   }}>
                   <PostIcon />  Trade on Cashtab
                   </Button>
@@ -799,7 +810,7 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
       <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px]">
         <MessagePreviewModal />
         <PremiumMessagePreviewModal />
-        <NftListingModal />
+        <TokenListingModal />
         <>
           <div className="max-w-xl w-full mx-auto overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring">
             {/* Post input field */}
@@ -1323,8 +1334,8 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                       {tx.url.includes(appConfig.cashtabTokenUrl) ?
                         <>
                           <div onClick={() => {
-                            setNftTxInFocus(tx)
-                            setShowNftListingDetails(true)
+                            setTokenTxInFocus(tx)
+                            setShowTokenListingDetails(true)
                           }}>
                             <Badge className="leading-7 shadow-sm bg-accent py-3px" variant="outline">
                               <img src='/cashtabfavicon.ico' />&emsp;Cashtab NFT Listing
@@ -1758,8 +1769,8 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                         {tx.url.includes(appConfig.cashtabTokenUrl) ?
                           <>
                             <div onClick={() => {
-                                setNftTxInFocus(tx)
-                                setShowNftListingDetails(true)
+                                setTokenTxInFocus(tx)
+                                setShowTokenListingDetails(true)
                             }}>
                               <Badge className="leading-7 shadow-sm bg-accent py-3px" variant="outline">
                                 <img src='/cashtabfavicon.ico' />&emsp;Cashtab NFT Listing
