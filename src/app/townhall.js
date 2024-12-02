@@ -1338,7 +1338,7 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                             setShowTokenListingDetails(true)
                           }}>
                             <Badge className="leading-7 shadow-sm bg-accent py-3px" variant="outline">
-                              <img src='/cashtabfavicon.ico' />&emsp;Cashtab NFT Listing
+                              <img src='/cashtabfavicon.ico' />&emsp;Cashtab Token Listing
                             </Badge>
                               <img src={`${appConfig.tokenIconsUrl}/256/${tx.url.split(appConfig.cashtabTokenUrl+'\/')[1]}.png`} className="rounded-lg w-full shadow-2xl" />
                           </div>
@@ -1773,7 +1773,7 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                                 setShowTokenListingDetails(true)
                             }}>
                               <Badge className="leading-7 shadow-sm bg-accent py-3px" variant="outline">
-                                <img src='/cashtabfavicon.ico' />&emsp;Cashtab NFT Listing
+                                <img src='/cashtabfavicon.ico' />&emsp;Cashtab Token Listing
                               </Badge>
                               <img src={`${appConfig.tokenIconsUrl}/256/${tx.url.split(appConfig.cashtabTokenUrl+'\/')[1]}.png`} className="rounded-lg w-full shadow-2xl" />
                             </div>
