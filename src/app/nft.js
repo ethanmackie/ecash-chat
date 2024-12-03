@@ -22,7 +22,14 @@ import {
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuTrigger,
-  } from "@/components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from "@/components/ui/carousel";
 import { useToast } from "@/hooks/use-toast";
 import 'react-alice-carousel/lib/alice-carousel.css';
 
@@ -301,48 +308,56 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
             </Button>
             </div>
             <br />
-            <div className="grid grid-cols-2 max-w-xl gap-2">
-                {nftParents && nftParents.length > 0 && nftParents.map(
-                    (nftParent, index) => (
-                        <>
-                        <Card
-                            key={'nftParent'+index}
-                            onClick={() => {
-                                setParentNftInFocus(nftParent);
-                                setShowNftModal(true);
-                            }}
-                            className="transition-shadow shadow-none duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50"
-                        >
-                            <CardHeader>
-                                <CardTitle>
-                                    <span className="text-sm break-word">
-                                        {nftParent.genesisInfo.tokenName} {nftParent.genesisInfo.tokenTicker}
-                                    </span>
-                                </CardTitle>
-                                <CardDescription>
-                                    {nftParent.tokenId !== 0 && (
-                                        <span className="break-all">
-                                            Url: {nftParent.genesisInfo.url}
-                                        </span>
-                                    )}
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <img
-                                    src={nftParent.tokenId === 1 && nftParent.genesisInfo.tokenName === 'Premium eCashChat NFTs' ? '/eccNFTParent.jpeg' : nftParent.tokenId === 0 ? '/ecash-chat-logo.png' : `${appConfig.tokenIconsUrl}/256/${nftParent.tokenId}.png`}
-                                    width={256}
-                                    height={256}
-                                    className="rounded-lg object-cover"
-                                    alt={`icon for ${nftParent.tokenId}`}
-                                />
-                                {nftParent.tokenId !== 0 && (<p className="text-sm font-medium leading-none mt-4">Supply: {nftParent.genesisSupply} NFTs</p>)}
-                                {nftParent.tokenId !== 0 && (<p className="text-sm font-medium leading-none">Created: {nftParent.block && nftParent.block.timestamp && formatDate(nftParent.block.timestamp, navigator.language)}</p>)}
-                            </CardContent>
-                        </Card>
-                        </>
-                    )
-                )}
-                <RenderChildNfts />
+            <div>
+            <Carousel className="w-full max-w-sm">
+                <CarouselContent>
+                    {nftParents && nftParents.length > 0 && nftParents.map(
+                        (nftParent, index) => (
+                            <>
+                            <CarouselItem key={index} className="lg:basis-1/2">
+                                <Card
+                                    key={'nftParent'+index}
+                                    onClick={() => {
+                                        setParentNftInFocus(nftParent);
+                                        setShowNftModal(true);
+                                    }}
+                                    className="transition-shadow shadow-none duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50"
+                                >
+                                    <CardHeader>
+                                        <CardTitle>
+                                            <span className="text-sm break-word">
+                                                {nftParent.genesisInfo.tokenName} {nftParent.genesisInfo.tokenTicker}
+                                            </span>
+                                        </CardTitle>
+                                        <CardDescription>
+                                            {nftParent.tokenId !== 0 && (
+                                                <span className="break-all">
+                                                    Url: {nftParent.genesisInfo.url}
+                                                </span>
+                                            )}
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="items-center justify-center">
+                                        <img
+                                            src={nftParent.tokenId === 1 && nftParent.genesisInfo.tokenName === 'Premium eCashChat NFTs' ? '/eccNFTParent.jpeg' : nftParent.tokenId === 0 ? '/ecash-chat-logo.png' : `${appConfig.tokenIconsUrl}/256/${nftParent.tokenId}.png`}
+                                            width={256}
+                                            height={256}
+                                            className="rounded-lg object-cover"
+                                            alt={`icon for ${nftParent.tokenId}`}
+                                        />
+                                        {nftParent.tokenId !== 0 && (<p className="text-sm font-medium leading-none mt-4">Supply: {nftParent.genesisSupply} NFTs</p>)}
+                                        {nftParent.tokenId !== 0 && (<p className="text-sm font-medium leading-none">Created: {nftParent.block && nftParent.block.timestamp && formatDate(nftParent.block.timestamp, navigator.language)}</p>)}
+                                    </CardContent>
+                                </Card>
+                            </CarouselItem>
+                            </>
+                        )
+                    )}
+                    <RenderChildNfts />
+                    </CarouselContent>
+                    <CarouselPrevious />
+                <CarouselNext />
+                </Carousel>
             </div>
         </div>
     );

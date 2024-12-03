@@ -1,6 +1,6 @@
 {
   "name": "ecash-chat",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -51,6 +51,7 @@
     "ecash-agora": "^0.2.2-rc",
     "ecash-script": "^2.1.2",
     "ecashaddrjs": "^1.6.2",
+    "embla-carousel-react": "^8.5.1",
     "emoji-mart": "^5.5.2",
     "flowbite": "^2.3.0",
     "flowbite-react": "^0.7.8",
