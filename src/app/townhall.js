@@ -108,6 +108,7 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
     const [showTokenListingDetails, setShowTokenListingDetails] = useState(false);
     const [tokenTxInFocus, setTokenTxInFocus] = useState(false);
     const [tokenPriceInFocus, setTokenPriceInFocus] = useState('');
+    const [tokenOrderbookInFocus, setTokenOrderbookInFocus] = useState('');
     const [showPremiumMessagePreview, setShowPremiumMessagePreview] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [maxPagesToShow, setMaxPagesToShow] = useState(7); // default 7 here
@@ -573,31 +574,37 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
         return;
       }
 
-      const thisNftId = tokenTxInFocus.url.split(appConfig.cashtabTokenUrl+'\/')[1];
-      let nftInfoById;
+      const thisTokenId = tokenTxInFocus.url.split(appConfig.cashtabTokenUrl+'\/')[1];
+      let tokenInfoById;
       (async () => {
-        nftInfoById = await agora.activeOffersByTokenId(thisNftId);
-        if (nftInfoById && nftInfoById.length > 0) {
-          if (nftInfoById[0].token.tokenType.number === 1) {
+        tokenInfoById = await agora.activeOffersByTokenId(thisTokenId);
+        if (tokenInfoById && tokenInfoById.length > 0) {
+          if (tokenInfoById[0].token.tokenType.number === 1) {
             // If this is an eToken
             setTokenPriceInFocus(0);
-          } else if (nftInfoById[0].token.tokenType.number === 65) {
+          } else if (tokenInfoById[0].token.tokenType.number === 65) {
             // If this is a Child NFT
-            setTokenPriceInFocus(Number(nftInfoById[0].variant.params.enforcedOutputs[1].value));
-          } else if (nftInfoById[0].token.tokenType.number === 129) {
+            setTokenPriceInFocus(Number(tokenInfoById[0].variant.params.enforcedOutputs[1].value));
+          } else if (tokenInfoById[0].token.tokenType.number === 129) {
             // If this is a Parent NFT
-            setTokenPriceInFocus(Number(nftInfoById[0].variant.params.enforcedOutputs[1].value));
+            setTokenPriceInFocus(Number(tokenInfoById[0].variant.params.enforcedOutputs[1].value));
           } else {
-            setTokenPriceInFocus(0);
+            // TODO: support ALP at some stage
           }
         }
       })();
 
       return (
           <Modal show={showTokenListingDetails} onClose={() => setShowTokenListingDetails(false)}>
-              <Modal.Header className='border-b-0'><BookDashed/></Modal.Header>
+              <Modal.Header className='border-b-0'>
+                <span className="flex">
+                  <BookDashed/>
+                  {tokenPriceInFocus === 0 ? ` eToken ` : ` NFT `}
+                  {`Details`}
+                </span>
+              </Modal.Header>
               <Modal.Body>
-                  {nftInfoById && nftInfoById.length === 0 ? 
+                  {tokenInfoById && tokenInfoById.length === 0 ? 
                     <p className="text-sm font-normal text-gray-900 dark:text-white text-ellipsis break-words min-w-0">
                       No active offers for this NFT
                     </p>
@@ -606,12 +613,12 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                         <p className="text-base leading-relaxed">
                             {(
                               <p className="text-lg font-normal text-sky-900 dark:text-white text-ellipsis break-words min-w-0">
-                                  <b>Token ID: </b> {' ' + thisNftId.substring(0, 7)}...{thisNftId.substring(thisNftId.length - 7)}<br />
-                                  <b>Price: </b> {tokenPriceInFocus > 0 ?
+                                  <b>Token ID: </b> {' ' + thisTokenId.substring(0, 7)}...{thisTokenId.substring(thisTokenId.length - 7)}<br />
+                                  <b>Price: </b> {tokenPriceInFocus ?
                                     ` ${formatBalance(tokenPriceInFocus/100)} XEC`
-                                    : ' Refer to Cashtab Orderbook'
+                                    : <a href={tokenTxInFocus.url} target='_blank'>Refer to Cashtab Orderbook</a>
                                   }<br />
-                                  <img src={`${appConfig.tokenIconsUrl}/256/${thisNftId}.png`} className="rounded-lg w-full" />
+                                  <img src={`${appConfig.tokenIconsUrl}/256/${thisTokenId}.png`} className="rounded-lg w-full" />
                               </p>
                             )}
                         </p>
@@ -623,6 +630,7 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                   onClick={() => {
                     setTokenPriceInFocus(0)
                     setShowTokenListingDetails(false)
+                    setTokenPriceInFocus(false)
                   }}
                   variant="secondary"
                 >
@@ -632,6 +640,7 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
                   <Button onClick={() => {
                     setTokenPriceInFocus(0)
                     setShowTokenListingDetails(false)
+                    setTokenPriceInFocus(false)
                   }}>
                   <PostIcon />  Trade on Cashtab
                   </Button>
