@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { appConfig } from '../config/app';
 import { getTxHistory, txListener } from '../chronik/chronik';
 import { chronik as chronikConfig } from '../config/chronik';
-import { Search, UserRoundSearch, ArrowRightLeft} from "lucide-react"
+import { Search, UserRoundSearch, ArrowRightLeft, RefreshCcw, Loader } from "lucide-react"
 import { ChronikClient } from 'chronik-client';
 import cashaddr from 'ecashaddrjs';
 import { isValidRecipient } from '../validation/validation';
@@ -90,6 +90,7 @@ export default function TxHistory({ address, isMobile }) {
     const newReplierContactNameInput = useRef('');
     const [curateByContacts, setCurateByContacts] = useState(false);
     const [muteList, setMuteList] = useState('');
+    const [loader, setLoader] = useState(false);
     const { toast } = useToast();
 
     useEffect(() => {
@@ -107,8 +108,9 @@ export default function TxHistory({ address, isMobile }) {
     useEffect(() => {
         // Render the first page by default upon initial load
         (async () => {
+          console.log('loading txhistory.js')
             await refreshContactList();
-            await getTxHistoryByPage(0);
+            console.log('finished loading txhistory.js')
         })();
     }, [muteList]);
 
@@ -864,16 +866,29 @@ export default function TxHistory({ address, isMobile }) {
                     </p>
                   </div>
               </div>
-  
           <RenderTxHistory />
           </>
            ) : 
-           <div className="flex flex-col space-y-3">
-           <div className="space-y-2">
-             <Skeleton className="h-4 w-[400px]" />
-             <Skeleton className="h-4 w-[350px]" />
-             <Skeleton className="h-4 w-[300px]" />
-           </div>
+           <div className="flex flex-col space-y-3">   
+            <Button 
+              onClick={async () => {
+                setLoader(true)
+                await getTxHistoryByPage(0);
+                setLoader(false)
+              }}
+            >
+              {loader 
+                ? <Loader className="h-4 w-4 animate-spin" />
+                : <RefreshCcw className="h-4 w-4" />}
+              &nbsp;Retrieve latest messages
+            </Button>
+            {loader && (
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-[400px]" />
+                <Skeleton className="h-4 w-[350px]" />
+                <Skeleton className="h-4 w-[300px]" />
+              </div>
+            )}
          </div>
          }
          </div>    

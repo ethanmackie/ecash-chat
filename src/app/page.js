@@ -125,9 +125,12 @@ export default function Home() {
         })();
         setShowLoadingSpinner(false);
 
+       
         (async () => {
+          console.log('loading artcle listing in page.js')
             const latestArticles = await getArticleListing();
             await localforage.setItem(appConfig.localArticlesParam, latestArticles);
+            console.log('finished loading artcle listing in page.js')
         })();
 
         // Check if this app is accessed via a shared article link

@@ -36,6 +36,7 @@ export default function ProfilePanel({ address, avatarLink, xecBalance, latestAv
 
     useEffect(() => {
         (async () => {
+          console.log('loading paywall.js')
             const paywallTxs = await localforage.getItem(appConfig.localpaywallTxsParam);
 
             if (paywallTxs !== null) {
@@ -46,6 +47,7 @@ export default function ProfilePanel({ address, avatarLink, xecBalance, latestAv
               let contactList = await localforage.getItem(appConfig.localContactsParam);
               setContactList(contactList);
             }
+            console.log('finished loading paywall.js')
         })();
     }, []);
 

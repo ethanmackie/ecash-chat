@@ -178,6 +178,7 @@ export default function Article( {
   
     useEffect(() => {
         (async () => {
+            console.log('loading article.js')
             setIsLoading(true);
 
             await refreshContactList();
@@ -255,6 +256,8 @@ export default function Article( {
             const updatedCache = await refreshUtxos(chronik, address);
             setXecBalance(updatedCache.xecBalance);
         })();
+
+        console.log('finished loading article.js')
     }, [muteList]);
 
     const getMvpArticles = (txs) => {

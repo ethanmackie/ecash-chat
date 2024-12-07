@@ -45,6 +45,7 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
 
     useEffect(() => {
         (async () => {
+            console.log('loading nft.js')
             setIsRefreshing(true);
             const chatCache = await localforage.getItem('chatCache');
             if (!chatCache || !chronik || typeof chatCache === 'undefined') {
@@ -139,6 +140,7 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
             setNftParents(chatCache.parentNftList);
             setNftChilds(chatCache.childNftList);
             setIsRefreshing(false);
+            console.log('finished loading nft.js')
         })();
     }, [manualRefresh]);
 
