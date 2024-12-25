@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import TxHistory from './txhistory';
@@ -10,19 +9,11 @@ import Article from './article';
 import cashaddr from 'ecashaddrjs';
 import ProfilePanel from './profile';
 import ContactListPanel from './contact';
-import { queryAliasServer } from '../alias/alias-server';
 import { encodeBip21Message, getTweetId, getNFTAvatarLink, encodeBip21Auth } from '../utils/utils';
 import { Toggle } from "@/components/ui/toggle";
 import { Loader, LockKeyhole, SendHorizontal } from "lucide-react"
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from "@/components/ui/accordion";
 import { isMobileDevice } from '../utils/mobileCheck';
 import { txListener, txListenerOngoing, getArticleListing, updateAvatars, authTxListener } from '../chronik/chronik';
 import { appConfig } from '../config/app';
@@ -36,28 +27,13 @@ import {
     Popover as PopoverShad,
     PopoverContent as PopoverContentShad,
     PopoverTrigger as PopoverTriggerShad,
-  } from "@/components/ui/popover";
-  import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuPortal,
-    DropdownMenuSeparator,
-    DropdownMenuShortcut,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
-    DropdownMenuTrigger,
-  } from "@/components/ui/dropdown-menu";
+} from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
     Card,
     CardContent,
     CardFooter,
     CardHeader,
-    CardTitle,
   } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
@@ -74,13 +50,13 @@ import copy from 'copy-to-clipboard';
 import { Tooltip, Tabs, Alert, Modal, Popover } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
 import { useToast } from "@/hooks/use-toast";
-import { FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon, Cross2Icon, MoonIcon, SunIcon } from '@radix-ui/react-icons';
+import { FaceIcon, ImageIcon, TwitterLogoIcon as UITwitterIcon, Link2Icon, RocketIcon, Cross2Icon } from '@radix-ui/react-icons';
 import { useTheme } from "next-themes"
 import { YoutubeIcon, EcashchatIcon, Home3Icon, File3Icon, Nft3Icon, Send3Icon, Info3icon, User3icon, QrcodeIcon, Logout3Icon } from "@/components/ui/social";
 const crypto = require('crypto');
 import { chronik as chronikConfig } from '../config/chronik';
-import { ChronikClientNode } from 'chronik-client';
-const chronik = new ChronikClientNode(chronikConfig.urls);
+import { ChronikClient } from 'chronik-client';
+const chronik = new ChronikClient(chronikConfig.urls);
 import YouTubeVideoId from 'youtube-video-id';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css'
@@ -89,7 +65,6 @@ const packageJson = require('../../package.json');
 import localforage from 'localforage';
 import xecMessage from 'bitcoinjs-message';
 import * as utxolib from '@bitgo/utxo-lib';
-import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { Separator } from "@/components/ui/separator"
 
 
@@ -100,10 +75,6 @@ export default function Home() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [step, setStep] = useState('pending');
-    const [aliases, setAliases] = useState({
-            registered: [],
-            pending: [],
-        });
     const [recipient, setRecipient] = useState('');
     const [recipientError, setRecipientError] = useState(false);
     const [signature, setSignature] = useState('');
@@ -112,7 +83,6 @@ export default function Home() {
     const [messageError, setMessageError] = useState(false);
     const [sendAmountXec, setSendAmountXec] = useState(5.5);
     const [sendAmountXecError, setSendAmountXecError] = useState(false);
-    const [renderEmojiPicker, setRenderEmojiPicker] = useState(false);
     const [xecBalance, setXecBalance] = useState(null);
     const [encryptionMode, setEncryptionMode] = useState(false);
     const [showMessagePreview, setShowMessagePreview] = useState(false);
@@ -155,9 +125,12 @@ export default function Home() {
         })();
         setShowLoadingSpinner(false);
 
+       
         (async () => {
+          console.log('loading artcle listing in page.js')
             const latestArticles = await getArticleListing();
             await localforage.setItem(appConfig.localArticlesParam, latestArticles);
+            console.log('finished loading artcle listing in page.js')
         })();
 
         // Check if this app is accessed via a shared article link
@@ -266,30 +239,6 @@ export default function Home() {
         });
         setOpenSaveLoginModal(false);
     }
-
-    // Retrieves the aliases associated with this address
-    const getAliasesByAddress = async (thisAddress) => {
-        try {
-            const aliasesForThisAddress = await queryAliasServer(
-                'address',
-                thisAddress,
-            );
-            if (aliasesForThisAddress.error) {
-                // If an error is returned from the address endpoint
-                throw new Error(aliasesForThisAddress.error);
-            }
-            setAliases({
-                registered: aliasesForThisAddress.registered.sort((a, b) =>
-                    a.alias.localeCompare(b.alias),
-                ),
-                pending: aliasesForThisAddress.pending.sort((a, b) =>
-                    a.alias.localeCompare(b.alias),
-                ),
-            });
-        } catch (err) {
-            console.log(`getAliasesByAddress(): ${err}`);
-        }
-    };
 
     const confirmCashtabProviderStatus = () => {
         const cashTabStatus = getCashtabProviderStatus();

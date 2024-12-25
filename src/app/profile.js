@@ -14,7 +14,6 @@ import {
     CardDescription,
     CardHeader,
     CardTitle,
-    CardFooter,
   } from "@/components/ui/card"
 import {
     Avatar,
@@ -37,16 +36,18 @@ export default function ProfilePanel({ address, avatarLink, xecBalance, latestAv
 
     useEffect(() => {
         (async () => {
+          console.log('loading paywall.js')
             const paywallTxs = await localforage.getItem(appConfig.localpaywallTxsParam);
 
             if (paywallTxs !== null) {
               const paywallResponse = totalPaywallEarnedByAddress(address, paywallTxs);
               setPaywallRevenueXec(paywallResponse.xecEarned);
               setPaywallRevenueCount(paywallResponse.unlocksEarned);
-              setPaywallLeaderboard(getPaywallLeaderboard(paywallTxs));
+              //setPaywallLeaderboard(getPaywallLeaderboard(paywallTxs));
               let contactList = await localforage.getItem(appConfig.localContactsParam);
               setContactList(contactList);
             }
+            console.log('finished loading paywall.js')
         })();
     }, []);
 
@@ -115,6 +116,7 @@ export default function ProfilePanel({ address, avatarLink, xecBalance, latestAv
         <p className="text-xs text-muted-foreground">Total Paywall Unlocks Earned</p>
       </CardContent>
     </Card>
+    {/*
     <Card className="mt-2">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">Top 10 paywall earners by unlocks</CardTitle>
@@ -139,6 +141,7 @@ export default function ProfilePanel({ address, avatarLink, xecBalance, latestAv
         ))}
       </CardContent>
     </Card>
+    */}
   </SheetContent>
 </Sheet>
         </button>

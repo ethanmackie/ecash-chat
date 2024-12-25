@@ -217,6 +217,9 @@ export const getArticleHistory = async (chronik, address, page = 0) => {
         const paywallPaymentHistoryPromises = [];
         if (paywallPaymentsHistory && paywallPaymentsHistory.numPages > 1) {
             for (let i = 1; i < paywallPaymentsHistory.numPages; i += 1) {
+                if (i > chronikConfig.chronikHistoryPageCap) {
+                    break;
+                }
                 const thisPaywallHistoryPromise = new Promise((resolve, reject) => {
                     chronik
                     .lokadId(

@@ -3,7 +3,6 @@ import {
     Sheet,
     SheetContent,
     SheetTitle,
-    SheetDescription,
     SheetHeader,
     SheetTrigger,
 } from "@/components/ui/sheet";
@@ -12,7 +11,6 @@ import { Cross2Icon, Pencil1Icon, FileTextIcon} from '@radix-ui/react-icons';
 import {
     Card,
     CardContent,
-    CardDescription,
     CardHeader,
     CardTitle,
     CardFooter,
@@ -49,7 +47,9 @@ export default function ContactListPanel({ latestAvatars }) {
 
     useEffect(() => {
         (async () => {
+          console.log('loading contact.js')
             await refreshContacts();
+            console.log('finished loading contact.js')
         })();
     }, []);
 

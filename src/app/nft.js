@@ -1,14 +1,12 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { getNfts, nftTxListener, addAvatar, updateAvatars } from '../chronik/chronik';
-import Image from "next/image";
 import { appConfig } from '../config/app';
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import localforage from 'localforage';
 import { Modal } from "flowbite-react";
 import { encodeBip21NftShowcase, formatDate } from '../utils/utils';
 import { Button } from "@/components/ui/button";
-import { MagicIcon} from "@/components/ui/social";
 import { Loader, RefreshCcw } from "lucide-react"
 import {
     Card,
@@ -23,11 +21,18 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
-  } from "@/components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from "@/components/ui/carousel";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { ReloadIcon } from "@radix-ui/react-icons";
+import 'react-alice-carousel/lib/alice-carousel.css';
 
 export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) {
     const [nftParents, setNftParents] = useState([]);
@@ -35,108 +40,105 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
     const [showNftModal, setShowNftModal] = useState(false);
     const [parentNftInFocus, setParentNftInFocus] = useState(null);
     const [fullNfts, setFullNfts] = useState([]);
-    const [manualRefresh, setManualRefresh] = useState(false);
-    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [loader, setLoader] = useState(false);
     const { toast } = useToast();
 
-    useEffect(() => {
-        (async () => {
-            setIsRefreshing(true);
-            const chatCache = await localforage.getItem('chatCache');
-            if (!chatCache || !chronik || typeof chatCache === 'undefined') {
-                return;
-            }
+    const scanWalletForNfts = async () => {
+        console.log('loading nft.js')
+        const chatCache = await localforage.getItem('chatCache');
+        if (!chatCache || !chronik || typeof chatCache === 'undefined') {
+            return;
+        }
 
-            // Retrieve Child NFTs for each known parent
-            const thisFullNfts = [];
-            const childNftIds = [];
-            for (const nftParent of chatCache.parentNftList) {
-                const childNfts = await getNfts(chronik, nftParent.tokenId);
-                for (const childNft of childNfts) {
-                    childNftIds.push(childNft.tokenId);
+        // Retrieve Child NFTs for each known parent
+        const thisFullNfts = [];
+        const childNftIds = [];
+        for (const nftParent of chatCache.parentNftList) {
+            const childNfts = await getNfts(chronik, nftParent.tokenId);
+            for (const childNft of childNfts) {
+                childNftIds.push(childNft.tokenId);
+            }
+            thisFullNfts.push({
+                parentNft: nftParent,
+                childNft: childNfts,
+            });
+        }
+
+        // Add any standlone child NFTs
+        const standaloneNfts = [];
+        const eccPremiumNfts = [];
+        for (const nftChild of chatCache.childNftList) {
+            // If this childNft does not have a parentNft in this wallet
+            if (!childNftIds.includes(nftChild.token.tokenId)) {
+                // Add genesis info to childNft
+                const fullNftInfo = await chronik.token(nftChild.token.tokenId);
+                nftChild.genesisInfo = fullNftInfo.genesisInfo;
+                nftChild.tokenId = fullNftInfo.tokenId;
+                if (fullNftInfo.block && fullNftInfo.block.timestamp) {
+                    nftChild.standaloneTimestamp = fullNftInfo.block.timestamp;
                 }
-                thisFullNfts.push({
-                    parentNft: nftParent,
-                    childNft: childNfts,
-                });
-            }
 
-            // Add any standlone child NFTs
-            const standaloneNfts = [];
-            const eccPremiumNfts = [];
-            for (const nftChild of chatCache.childNftList) {
-                // If this childNft does not have a parentNft in this wallet
-                if (!childNftIds.includes(nftChild.token.tokenId)) {
-                    // Add genesis info to childNft
-                    const fullNftInfo = await chronik.token(nftChild.token.tokenId);
-                    nftChild.genesisInfo = fullNftInfo.genesisInfo;
-                    nftChild.tokenId = fullNftInfo.tokenId;
-                    if (fullNftInfo.block && fullNftInfo.block.timestamp) {
-                        nftChild.standaloneTimestamp = fullNftInfo.block.timestamp;
-                    }
-
-                    if (
-                        opreturnConfig.townhallMvpTokenIds.includes(nftChild.token.tokenId) ||
-                        opreturnConfig.articleMvpTokenIds.includes(nftChild.token.tokenId)
-                    ) {
-                        eccPremiumNfts.push(nftChild);
-                    } else {
-                        standaloneNfts.push(nftChild);
-                    }
+                if (
+                    opreturnConfig.townhallMvpTokenIds.includes(nftChild.token.tokenId) ||
+                    opreturnConfig.articleMvpTokenIds.includes(nftChild.token.tokenId)
+                ) {
+                    eccPremiumNfts.push(nftChild);
+                } else {
+                    standaloneNfts.push(nftChild);
                 }
             }
+        }
 
-            if (standaloneNfts.length > 0) {
-                // Set a generic parent collection for the standalone child NFTs
-                const standaloneNftParent = {
-                    tokenId: 0,
-                    genesisInfo: {
-                        tokenName: 'Miscellaneous NFTs',
-                        tokenTicker: '',
-                        url: '',
-                    },
-                    genesisOutputScripts: {
-                        timeFirstSeen: '',
-                    },
-                    genesisSupply: 0,
-                };
-                chatCache.parentNftList.push(standaloneNftParent);
+        if (standaloneNfts.length > 0) {
+            // Set a generic parent collection for the standalone child NFTs
+            const standaloneNftParent = {
+                tokenId: 0,
+                genesisInfo: {
+                    tokenName: 'Miscellaneous NFTs',
+                    tokenTicker: '',
+                    url: '',
+                },
+                genesisOutputScripts: {
+                    timeFirstSeen: '',
+                },
+                genesisSupply: 0,
+            };
+            chatCache.parentNftList.push(standaloneNftParent);
 
-                // Append standalone NFTs under the generic parent
-                thisFullNfts.push({
-                    parentNft: standaloneNftParent,
-                    childNft: standaloneNfts,
-                });
-            }
-            if (eccPremiumNfts.length > 0) {
-                // Set a generic parent collection for the standalone premium ECC NFTs
-                const standaloneEccNftParent = {
-                    tokenId: 1,
-                    genesisInfo: {
-                        tokenName: 'Premium eCashChat NFTs',
-                        tokenTicker: '',
-                        url: '',
-                    },
-                    genesisOutputScripts: {
-                        timeFirstSeen: '',
-                    },
-                    genesisSupply: 0,
-                };
-                chatCache.parentNftList.push(standaloneEccNftParent);
+            // Append standalone NFTs under the generic parent
+            thisFullNfts.push({
+                parentNft: standaloneNftParent,
+                childNft: standaloneNfts,
+            });
+        }
+        if (eccPremiumNfts.length > 0) {
+            // Set a generic parent collection for the standalone premium ECC NFTs
+            const standaloneEccNftParent = {
+                tokenId: 1,
+                genesisInfo: {
+                    tokenName: 'Premium eCashChat NFTs',
+                    tokenTicker: '',
+                    url: '',
+                },
+                genesisOutputScripts: {
+                    timeFirstSeen: '',
+                },
+                genesisSupply: 0,
+            };
+            chatCache.parentNftList.push(standaloneEccNftParent);
 
-                // Append standalone NFTs under the generic parent
-                thisFullNfts.push({
-                    parentNft: standaloneEccNftParent,
-                    childNft: eccPremiumNfts,
-                });
-            }
+            // Append standalone NFTs under the generic parent
+            thisFullNfts.push({
+                parentNft: standaloneEccNftParent,
+                childNft: eccPremiumNfts,
+            });
+        }
 
-            setFullNfts(thisFullNfts);
-            setNftParents(chatCache.parentNftList);
-            setNftChilds(chatCache.childNftList);
-            setIsRefreshing(false);
-        })();
-    }, [manualRefresh]);
+        setFullNfts(thisFullNfts);
+        setNftParents(chatCache.parentNftList);
+        setNftChilds(chatCache.childNftList);
+        console.log('finished loading nft.js')
+    }
 
     // Pass an NFT showcase tx BIP21 query string to cashtab extensions
     const nftShowCasePost = (nftId, showcaseMsg) => {
@@ -279,67 +281,92 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
                     variant="outline"
                     className="mr-2"
                 >
-                    Mint NFTs on cashtab
+                    Mint NFTs
                 </Button>
             </a>
-            <Button
-                type="button"
-                variant="outline" size="icon"
-                onClick={() => setManualRefresh(!manualRefresh)}
-            >
-                 {isRefreshing ? (
-                <Loader className="h-4 w-4 animate-spin" />
-                ) : (
-                <RefreshCcw className="h-4 w-4" />
-                )}
-            </Button>
+            <a href="https://cashtab.com/#/nfts" target="_blank">
+                <Button
+                    type="button"
+                    variant="outline"
+                    className="mr-2"
+                >
+                    Trade NFTs
+                </Button>
+            </a>
             </div>
             <br />
-                <div className="grid grid-cols-2 max-w-xl gap-2">
-                    {nftParents && nftParents.length > 0 && nftParents.map(
-                        (nftParent, index) => (
-                            <>
-                       <Card
-                        key={'nftParent'+index}
-                        onClick={() => {
-                            setParentNftInFocus(nftParent);
-                            setShowNftModal(true);
-                        }}
-                        className="transition-shadow shadow-none duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50"
-                    >
-                        <CardHeader>
-                        <CardTitle>
-                            <span className="text-sm break-word">
-                                {nftParent.genesisInfo.tokenName} {nftParent.genesisInfo.tokenTicker}
-                            </span>
-                        </CardTitle>
-                            <CardDescription>
-                        {nftParent.tokenId !== 0 && (
-                            <span className="break-all">
-                                Url: {nftParent.genesisInfo.url}
-                            </span>
-                        )}
-                    </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <img
-                                src={nftParent.tokenId === 1 && nftParent.genesisInfo.tokenName === 'Premium eCashChat NFTs' ? '/eccNFTParent.jpeg' : nftParent.tokenId === 0 ? '/ecash-chat-logo.png' : `${appConfig.tokenIconsUrl}/256/${nftParent.tokenId}.png`}
-                                width={256}
-                                height={256}
-                                className="rounded-lg object-cover"
-                                alt={`icon for ${nftParent.tokenId}`}
-                            />
-                            {nftParent.tokenId !== 0 && (<p className="text-sm font-medium leading-none mt-4">Supply: {nftParent.genesisSupply} NFTs</p>)}
-                            {nftParent.tokenId !== 0 && (<p className="text-sm font-medium leading-none">Created: {nftParent.block && nftParent.block.timestamp && formatDate(nftParent.block.timestamp, navigator.language)}</p>)}
-                        </CardContent>
-                        <CardFooter>
-                        </CardFooter>
-                        </Card>
-                            </>
-                        )
-                    )}
-                    <RenderChildNfts />
+            <Button 
+              onClick={async () => {
+                setLoader(true)
+                await scanWalletForNfts();
+                setLoader(false)
+              }}
+            >
+              {loader 
+                ? <Loader className="h-4 w-4 animate-spin" />
+                : <RefreshCcw className="h-4 w-4" />}
+              &nbsp;Retrieve NFTs from wallet
+            </Button>
+            {loader && (
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-[400px]" />
+                <Skeleton className="h-4 w-[350px]" />
+                <Skeleton className="h-4 w-[300px]" />
+              </div>
+            )}
+            {fullNfts && Array.isArray(fullNfts) && fullNfts.length > 0 && (
+                <div>
+                    <Carousel className="w-full max-w-sm">
+                        <CarouselContent>
+                            {nftParents && nftParents.length > 0 && nftParents.map(
+                                (nftParent, index) => (
+                                    <>
+                                    <CarouselItem key={index} className="lg:basis-1/2">
+                                        <Card
+                                            key={'nftParent'+index}
+                                            onClick={() => {
+                                                setParentNftInFocus(nftParent);
+                                                setShowNftModal(true);
+                                            }}
+                                            className="transition-shadow shadow-none duration-300 ease-in-out hover:shadow-lg hover:bg-slate-50"
+                                        >
+                                            <CardHeader>
+                                                <CardTitle>
+                                                    <span className="text-sm break-word">
+                                                        {nftParent.genesisInfo.tokenName} {nftParent.genesisInfo.tokenTicker}
+                                                    </span>
+                                                </CardTitle>
+                                                <CardDescription>
+                                                    {nftParent.tokenId !== 0 && (
+                                                        <span className="break-all">
+                                                            Url: {nftParent.genesisInfo.url}
+                                                        </span>
+                                                    )}
+                                                </CardDescription>
+                                            </CardHeader>
+                                            <CardContent className="items-center justify-center">
+                                                <img
+                                                    src={nftParent.tokenId === 1 && nftParent.genesisInfo.tokenName === 'Premium eCashChat NFTs' ? '/eccNFTParent.jpeg' : nftParent.tokenId === 0 ? '/ecash-chat-logo.png' : `${appConfig.tokenIconsUrl}/256/${nftParent.tokenId}.png`}
+                                                    width={256}
+                                                    height={256}
+                                                    className="rounded-lg object-cover"
+                                                    alt={`icon for ${nftParent.tokenId}`}
+                                                />
+                                                {nftParent.tokenId !== 0 && (<p className="text-sm font-medium leading-none mt-4">Supply: {nftParent.genesisSupply} NFTs</p>)}
+                                                {nftParent.tokenId !== 0 && (<p className="text-sm font-medium leading-none">Created: {nftParent.block && nftParent.block.timestamp && formatDate(nftParent.block.timestamp, navigator.language)}</p>)}
+                                            </CardContent>
+                                        </Card>
+                                    </CarouselItem>
+                                    </>
+                                )
+                            )}
+                            <RenderChildNfts />
+                            </CarouselContent>
+                            <CarouselPrevious />
+                        <CarouselNext />
+                    </Carousel>
                 </div>
+            )}
         </div>
     );
 };

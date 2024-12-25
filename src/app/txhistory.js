@@ -3,8 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { appConfig } from '../config/app';
 import { getTxHistory, txListener } from '../chronik/chronik';
 import { chronik as chronikConfig } from '../config/chronik';
-import { Search, UserRoundSearch, ArrowRightLeft} from "lucide-react"
-import { ChronikClientNode } from 'chronik-client';
+import { Search, UserRoundSearch, ArrowRightLeft, RefreshCcw, Loader } from "lucide-react"
+import { ChronikClient } from 'chronik-client';
 import cashaddr from 'ecashaddrjs';
 import { isValidRecipient } from '../validation/validation';
 import { Skeleton } from "@/components/ui/skeleton";
@@ -29,7 +29,6 @@ import {
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -69,9 +68,7 @@ const crypto = require('crypto');
 import copy from 'copy-to-clipboard';
 import { useToast } from "@/hooks/use-toast";
 import { addNewContact } from '../utils/utils';
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-const chronik = new ChronikClientNode(chronikConfig.urls);
+const chronik = new ChronikClient(chronikConfig.urls);
 import localforage from 'localforage';
 
 export default function TxHistory({ address, isMobile }) {
@@ -93,6 +90,7 @@ export default function TxHistory({ address, isMobile }) {
     const newReplierContactNameInput = useRef('');
     const [curateByContacts, setCurateByContacts] = useState(false);
     const [muteList, setMuteList] = useState('');
+    const [loader, setLoader] = useState(false);
     const { toast } = useToast();
 
     useEffect(() => {
@@ -110,8 +108,9 @@ export default function TxHistory({ address, isMobile }) {
     useEffect(() => {
         // Render the first page by default upon initial load
         (async () => {
+          console.log('loading txhistory.js')
             await refreshContactList();
-            await getTxHistoryByPage(0);
+            console.log('finished loading txhistory.js')
         })();
     }, [muteList]);
 
@@ -541,9 +540,9 @@ export default function TxHistory({ address, isMobile }) {
                         {tx.videoId !== false && (<LiteYouTubeEmbed id={tx.videoId} />)}
                         {tx.tweetId !== false && (<Tweet id={tx.tweetId} />)}
                         {tx.url !== false && (
-                           <InfoBox className="bg-muted text-muted-foreground">
-                           <a href={tx.url} target="_blank" rel="noopener noreferrer">{tx.url}</a>
-                         </InfoBox>
+                          <InfoBox className="bg-muted text-muted-foreground">
+                            <a href={tx.url} target="_blank" rel="noopener noreferrer">{tx.url}</a>
+                          </InfoBox>
                         )}
 
                         <div className="flex my-2 h-5 items-center space-x-4 text-sm text-muted-foreground">
@@ -867,16 +866,29 @@ export default function TxHistory({ address, isMobile }) {
                     </p>
                   </div>
               </div>
-  
           <RenderTxHistory />
           </>
            ) : 
-           <div className="flex flex-col space-y-3">
-           <div className="space-y-2">
-             <Skeleton className="h-4 w-[400px]" />
-             <Skeleton className="h-4 w-[350px]" />
-             <Skeleton className="h-4 w-[300px]" />
-           </div>
+           <div className="flex flex-col space-y-3">   
+            <Button 
+              onClick={async () => {
+                setLoader(true)
+                await getTxHistoryByPage(0);
+                setLoader(false)
+              }}
+            >
+              {loader 
+                ? <Loader className="h-4 w-4 animate-spin" />
+                : <RefreshCcw className="h-4 w-4" />}
+              &nbsp;Retrieve latest messages
+            </Button>
+            {loader && (
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-[400px]" />
+                <Skeleton className="h-4 w-[350px]" />
+                <Skeleton className="h-4 w-[300px]" />
+              </div>
+            )}
          </div>
          }
          </div>    

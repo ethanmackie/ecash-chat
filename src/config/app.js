@@ -27,6 +27,7 @@ export const appConfig = {
     ipfsAudioSizeLimitMb: 50,
     ipfsPaywallFeeRatio: 0.05,
     tokenIconsUrl: 'https://icons.etokens.cash',
+    cashtabTokenUrl: 'https://cashtab.com/#/token',
     vercelKvParam: 'article1',
     localArticlesParam: 'localArticles',
     localAvatarsParam: 'localAvatars',

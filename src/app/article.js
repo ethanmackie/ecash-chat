@@ -28,7 +28,6 @@ import {
     PopoverContent,
     PopoverTrigger,
   } from "@/components/ui/popover";
-import { Checkbox } from "@/components/ui/checkbox";
 import { MagnifyingGlassIcon, ResetIcon, Share1Icon, ReloadIcon, Pencil1Icon, DotsHorizontalIcon, EyeNoneIcon} from "@radix-ui/react-icons";
 import { ImDownload3 } from "react-icons/im";
 import {
@@ -61,12 +60,9 @@ import {
 import {
     Alert,
     AlertDescription,
-    AlertTitle,
-} from "@/components/ui/alert"
-import { Label } from "@/components/ui/label";
+} from "@/components/ui/alert";
 import {
     getArticleHistory,
-    getReplyTxDetails,
     parseChronikTx,
     getArticleListing,
     txListener,
@@ -92,7 +88,6 @@ import {
 import { DefaultavatarIcon, ReplieduseravatarIcon, HeadphoneIcon } from "@/components/ui/social";
 import { useToast } from "@/hooks/use-toast";
 import { Toggle } from "@/components/ui/toggle";
-import { BiSolidNews } from "react-icons/bi";
 import {
     Pagination,
     PaginationContent,
@@ -183,6 +178,7 @@ export default function Article( {
   
     useEffect(() => {
         (async () => {
+            console.log('loading article.js')
             setIsLoading(true);
 
             await refreshContactList();
@@ -260,6 +256,8 @@ export default function Article( {
             const updatedCache = await refreshUtxos(chronik, address);
             setXecBalance(updatedCache.xecBalance);
         })();
+
+        console.log('finished loading article.js')
     }, [muteList]);
 
     const getMvpArticles = (txs) => {
