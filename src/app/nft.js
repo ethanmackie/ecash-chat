@@ -308,7 +308,7 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
               &nbsp;Retrieve NFTs from wallet
             </Button>
             {loader && (
-              <div className="space-y-2">
+              <div className="space-y-2 mt-2">
                 <Skeleton className="h-4 w-[400px]" />
                 <Skeleton className="h-4 w-[350px]" />
                 <Skeleton className="h-4 w-[300px]" />
