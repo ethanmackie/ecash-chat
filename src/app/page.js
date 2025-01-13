@@ -11,7 +11,7 @@ import ProfilePanel from './profile';
 import ContactListPanel from './contact';
 import { encodeBip21Message, getTweetId, getNFTAvatarLink, encodeBip21Auth } from '../utils/utils';
 import { Toggle } from "@/components/ui/toggle";
-import { Loader, LockKeyhole, SendHorizontal } from "lucide-react"
+import { Loader, LockKeyhole, SendHorizontal, WandSparkles } from "lucide-react"
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { isMobileDevice } from '../utils/mobileCheck';
@@ -44,6 +44,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
+  AlertDialogCancel,
 } from "@/components/ui/alert-dialog"
 import QRCode from "react-qr-code";
 import copy from 'copy-to-clipboard';
@@ -66,6 +67,14 @@ import localforage from 'localforage';
 import xecMessage from 'bitcoinjs-message';
 import * as utxolib from '@bitgo/utxo-lib';
 import { Separator } from "@/components/ui/separator"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 
 const words = `Continue with Cashtab Extension`;
@@ -655,6 +664,24 @@ export default function Home() {
 
               {isMobile && isLoggedIn ? (
                 <div>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="icon" className="mr-2">
+                        <WandSparkles className="h-4 w-4" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="p-10 max-w-xl">
+                      <div className="h-full overflow-y-auto">
+                        <iframe 
+                          src="https://www.echan.cash/"
+                          style={{ width: '100%', height: '100%', minHeight: '700px' }}
+                          allow="microphone"
+                          title="eChan"
+                        />
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
                   <Button
                     onClick={async () => {
                       setIsLoggedIn(false);
@@ -674,6 +701,25 @@ export default function Home() {
               ) : (
                 !isMobile && (
                   <div>
+                      <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="icon" className="mr-2">
+                          <WandSparkles className="h-4 w-4" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-xl p-10">
+
+                        <div className="h-full overflow-y-auto">
+                          <iframe 
+                            src="https://www.echan.cash/"
+                            style={{ width: '100%', height: '100%', minHeight: '700px' }}
+                            allow="microphone"
+                            title="eChan"
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+
                     <Button
                       onClick={
                         isLoggedIn
