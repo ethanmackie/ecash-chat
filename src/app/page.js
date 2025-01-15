@@ -280,15 +280,73 @@ export default function Home() {
 
     const handleAddressChange = e => {
         const { value } = e.target;
-        if (
-            isValidRecipient(value) === true &&
-            value.trim() !== ''
-        ) {
-            setRecipientError(false);
-        } else {
-            setRecipientError('Invalid eCash address');
+        
+        // Check if it's an ecashchat encoded string
+        if (value.startsWith('ecashchat') && value.endsWith('ecashchat')) {
+            try {
+                // Remove ecashchat prefix/suffix and decode
+                const encodedPart = value.slice(9, -9);
+                const decodedValue = atob(encodedPart);
+                
+                // Parse address and signature
+                const [address, signature] = decodedValue.split('_');
+                
+                if (isValidRecipient(address) === true && address.trim() !== '') {
+                    setRecipientError(false);
+                } else {
+                    setRecipientError('Invalid eCash address');
+                }
+                setRecipient(address);
+                setSignature(signature);
+                return;
+            } catch (error) {
+                console.error('Decode failed:', error);
+                setRecipientError('Invalid format');
+                return;
+            }
         }
-        setRecipient(value);
+        
+        // Original handling logic
+        if (value.includes('_')) {
+            const [address, signature] = value.split('_');
+            if (isValidRecipient(address) === true && address.trim() !== '') {
+                setRecipientError(false);
+            } else {
+                setRecipientError('Invalid eCash address');
+            }
+            setRecipient(address);
+            setSignature(signature);
+        } else {
+            if (isValidRecipient(value) === true && value.trim() !== '') {
+                setRecipientError(false);
+            } else {
+                setRecipientError('Invalid eCash address');
+            }
+            setRecipient(value);
+        }
+    };
+
+    const handleSignatureChange = e => {
+        const { value } = e.target;
+        
+        // Check if contains underscore separator
+        if (value.includes('_')) {
+            const [address, signature] = value.split('_');
+            if (
+                isValidRecipient(address) === true &&
+                address.trim() !== ''
+            ) {
+                setRecipientError(false);
+            } else {
+                setRecipientError('Invalid eCash address');
+            }
+            setRecipient(address);
+
+            setSignature(signature);
+        } else {
+            // If no separator, just update signature
+            setSignature(value);
+        }
     };
 
     const handleMessageChange = e => {
@@ -579,11 +637,31 @@ export default function Home() {
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                    <AlertDialogTitle>Save login details?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Saving login details will reduce the number of times you're asked to login.<br />
-                        Please ensure you're the only person who uses this device.
-                    </AlertDialogDescription>
+                        <AlertDialogTitle>Save login details?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Saving login details will reduce the number of times you're asked to login.<br />
+                            Please ensure you're the only person who uses this device.<br /><br />
+                            {recipient && signature && (
+                                <>
+                                    <div className="flex items-center gap-2 p-3 bg-muted rounded-md">
+                                        <code className="text-sm break-all">
+                                            {`ecashchat${btoa(`${recipient}_${signature}`)}ecashchat`}
+                                        </code>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8"
+                                            onClick={() => copy(`ecashchat${btoa(`${recipient}_${signature}`)}ecashchat`)}
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                                        </Button>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground mt-2">
+                                        👆 You can copy this credential for future login
+                                    </p>
+                                </>
+                            )}
+                        </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                     <Button
@@ -700,7 +778,7 @@ export default function Home() {
                 </div>
               ) : (
                 !isMobile && (
-                  <div>
+                  <div className="flex items-center">
                       <Dialog>
                       <DialogTrigger asChild>
                         <Button variant="outline" size="icon" className="mr-2">
@@ -708,7 +786,6 @@ export default function Home() {
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="max-w-xl p-10">
-
                         <div className="h-full overflow-y-auto">
                           <iframe 
                             src="https://www.echan.cash/"
@@ -815,7 +892,7 @@ export default function Home() {
                           placeholder="Enter your signature..."
                           value={signature}
                           required
-                          onChange={(e) => setSignature(e.target.value)}
+                          onChange={(e) => handleSignatureChange(e)}
                         />
                       </div>
                       <Button
