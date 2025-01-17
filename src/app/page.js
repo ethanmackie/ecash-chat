@@ -306,7 +306,7 @@ export default function Home() {
             }
         }
         
-        // Original handling logic
+        // Original handling logic for non-encoded inputs
         if (value.includes('_')) {
             const [address, signature] = value.split('_');
             if (isValidRecipient(address) === true && address.trim() !== '') {
@@ -329,22 +329,41 @@ export default function Home() {
     const handleSignatureChange = e => {
         const { value } = e.target;
         
-        // Check if contains underscore separator
+        // Check if it's an ecashchat encoded string
+        if (value.startsWith('ecashchat') && value.endsWith('ecashchat')) {
+            try {
+                // Remove ecashchat prefix/suffix and decode
+                const encodedPart = value.slice(9, -9);
+                const decodedValue = atob(encodedPart);
+                
+                // Parse address and signature
+                const [address, signature] = decodedValue.split('_');
+                
+                if (isValidRecipient(address) === true && address.trim() !== '') {
+                    setRecipientError(false);
+                } else {
+                    setRecipientError('Invalid eCash address');
+                }
+                setRecipient(address);
+                setSignature(signature);
+                return;
+            } catch (error) {
+                console.error('Decode failed:', error);
+                return;
+            }
+        }
+        
+        // Original handling logic
         if (value.includes('_')) {
             const [address, signature] = value.split('_');
-            if (
-                isValidRecipient(address) === true &&
-                address.trim() !== ''
-            ) {
+            if (isValidRecipient(address) === true && address.trim() !== '') {
                 setRecipientError(false);
             } else {
                 setRecipientError('Invalid eCash address');
             }
             setRecipient(address);
-
             setSignature(signature);
         } else {
-            // If no separator, just update signature
             setSignature(value);
         }
     };
