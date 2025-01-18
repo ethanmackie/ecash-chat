@@ -7,10 +7,7 @@ import Townhall from './townhall';
 import Nft from './nft';
 import Article from './article';
 import cashaddr from 'ecashaddrjs';
-import ProfilePanel from './profile';
-import ContactListPanel from './contact';
 import { encodeBip21Message, getTweetId, getNFTAvatarLink, encodeBip21Auth } from '../utils/utils';
-import { Toggle } from "@/components/ui/toggle";
 import { Loader, LockKeyhole, SendHorizontal, WandSparkles } from "lucide-react"
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -67,15 +64,8 @@ import localforage from 'localforage';
 import xecMessage from 'bitcoinjs-message';
 import * as utxolib from '@bitgo/utxo-lib';
 import { Separator } from "@/components/ui/separator"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 import SaveLoginModal from '@/components/SaveLoginModal';
+import Header from "@/components/Header";
 
 
 const words = `Continue with Cashtab Extension`;
@@ -597,7 +587,7 @@ export default function Home() {
                     {address !== '' && (
                     <QRCode
                         value={address}
-                        size={128} // 设置较大的尺寸
+                        size={128} 
                         style={{ height: 'auto', maxWidth: '100%', maxHeight: '100%' }}
                         viewBox={`0 0 256 256`}
                     />
@@ -668,138 +658,20 @@ export default function Home() {
           <div className="background_content"></div>
         </div>
 
-
-        <header className="fixed mt-4 flex top-0 z-50 w-full justify-center ">
-          <div className="container flex items-center justify-between rounded-lg flex bg-black w-full h-14 mx-4 md:mx-auto md:max-w-xl lg:max-w-3xl border-b border-border/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/40">
-            <div className="sm:flex">
-              <a className="flex items-center space-x-2" href="#">
-                <EcashchatIcon />
-                <Image
-                  src="/ecashchat.png" 
-                  alt="eCashChat"
-                  width={90} 
-                  height={24}
-                  priority
-                  className="hidden sm:inline-block" 
-                />
-              </a>
-            </div>
-
-            {syncronizingState && (
-              <>
-              <Loader className="h-4 w-4 animate-spin" />
-              </>
-            )}
-
-            <div className="flex">
-        
-            {isLoggedIn && (
-            <Toggle
-                variant="outline"
-                aria-label="Toggle italic"
-                className="mr-2 w-9 px-0"
-                onClick={() => setShowCard((prev) => !prev)}
-            >
-                <User3icon className="h-4 w-4" />
-            </Toggle>
-            )}
-
-              {isLoggedIn && <ContactListPanel latestAvatars={latestAvatars} />}
-
-              {isLoggedIn && (
-                <ProfilePanel
-                  address={address}
-                  avatarLink={userAvatarLink}
-                  xecBalance={xecBalance}
-                  latestAvatars={latestAvatars}
-                />
-              )}
-
-              {isMobile && isLoggedIn ? (
-                <div>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" size="icon" className="mr-2">
-                        <WandSparkles className="h-4 w-4" />
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="p-10 max-w-xl">
-                      <div className="h-full overflow-y-auto">
-                        <iframe 
-                          src="https://www.echan.cash/"
-                          style={{ width: '100%', height: '100%', minHeight: '700px' }}
-                          allow="microphone"
-                          title="eChan"
-                        />
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-
-                  <Button
-                    onClick={async () => {
-                      setIsLoggedIn(false);
-                      setSavedLogin(false);
-                      await localforage.setItem("savedLoginAddress", false);
-                      toast({
-                        title: "👋",
-                        description: `Logged out of ${address}`,
-                      });
-                    }}
-                    variant="outline"
-                    size="icon"
-                  >
-                    <Logout3Icon />
-                  </Button>
-                </div>
-              ) : (
-                !isMobile && (
-                  <div className="flex items-center">
-                      <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" size="icon" className="mr-2">
-                          <WandSparkles className="h-4 w-4" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-xl p-10">
-                        <div className="h-full overflow-y-auto">
-                          <iframe 
-                            src="https://www.echan.cash/"
-                            style={{ width: '100%', height: '100%', minHeight: '700px' }}
-                            allow="microphone"
-                            title="eChan"
-                          />
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-
-                    <Button
-                      onClick={
-                        isLoggedIn
-                          ? async () => {
-                              setIsLoggedIn(false);
-                              setSavedLogin(false);
-                              await localforage.setItem(
-                                "savedLoginAddress",
-                                false
-                              );
-                              toast({
-                                title: "👋",
-                                description: `Logged out of ${address}`,
-                              });
-                            }
-                          : () => getAddress()
-                      }
-                      variant="outline"
-                      {...(isLoggedIn ? { size: "icon" } : {})}
-                    >
-                      {isLoggedIn ? <Logout3Icon /> : "Signin"}
-                    </Button>
-                  </div>
-                )
-              )}
-            </div>
-          </div>
-        </header>
+        <Header 
+          isLoggedIn={isLoggedIn}
+          isMobile={isMobile}
+          showCard={showCard}
+          setShowCard={setShowCard}
+          address={address}
+          userAvatarLink={userAvatarLink}
+          xecBalance={xecBalance}
+          latestAvatars={latestAvatars}
+          syncronizingState={syncronizingState}
+          setIsLoggedIn={setIsLoggedIn}
+          setSavedLogin={setSavedLogin}
+          getAddress={getAddress}
+        />
 
         <main className="sm:flex flex-col items-center justify-center p-1 sm:px-5 relative z-10">
           {isLoggedIn === false ? (
