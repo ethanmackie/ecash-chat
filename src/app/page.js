@@ -7,11 +7,8 @@ import Townhall from './townhall';
 import Nft from './nft';
 import Article from './article';
 import cashaddr from 'ecashaddrjs';
-import ProfilePanel from './profile';
-import ContactListPanel from './contact';
 import { encodeBip21Message, getTweetId, getNFTAvatarLink, encodeBip21Auth } from '../utils/utils';
-import { Toggle } from "@/components/ui/toggle";
-import { Loader, LockKeyhole, SendHorizontal } from "lucide-react"
+import { Loader, LockKeyhole, SendHorizontal, WandSparkles } from "lucide-react"
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { isMobileDevice } from '../utils/mobileCheck';
@@ -44,6 +41,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
+  AlertDialogCancel,
 } from "@/components/ui/alert-dialog"
 import QRCode from "react-qr-code";
 import copy from 'copy-to-clipboard';
@@ -66,6 +64,8 @@ import localforage from 'localforage';
 import xecMessage from 'bitcoinjs-message';
 import * as utxolib from '@bitgo/utxo-lib';
 import { Separator } from "@/components/ui/separator"
+import SaveLoginModal from '@/components/SaveLoginModal';
+import Header from "@/components/Header";
 
 
 const words = `Continue with Cashtab Extension`;
@@ -271,15 +271,92 @@ export default function Home() {
 
     const handleAddressChange = e => {
         const { value } = e.target;
-        if (
-            isValidRecipient(value) === true &&
-            value.trim() !== ''
-        ) {
-            setRecipientError(false);
-        } else {
-            setRecipientError('Invalid eCash address');
+        
+        // Check if it's an ecashchat encoded string
+        if (value.startsWith('ecashchat') && value.endsWith('ecashchat')) {
+            try {
+                // Remove ecashchat prefix/suffix and decode
+                const encodedPart = value.slice(9, -9);
+                const decodedValue = atob(encodedPart);
+                
+                // Parse address and signature
+                const [address, signature] = decodedValue.split('_');
+                
+                if (isValidRecipient(address) === true && address.trim() !== '') {
+                    setRecipientError(false);
+                } else {
+                    setRecipientError('Invalid eCash address');
+                }
+                setRecipient(address);
+                setSignature(signature);
+                return;
+            } catch (error) {
+                console.error('Decode failed:', error);
+                setRecipientError('Invalid format');
+                return;
+            }
         }
-        setRecipient(value);
+        
+        // Original handling logic for non-encoded inputs
+        if (value.includes('_')) {
+            const [address, signature] = value.split('_');
+            if (isValidRecipient(address) === true && address.trim() !== '') {
+                setRecipientError(false);
+            } else {
+                setRecipientError('Invalid eCash address');
+            }
+            setRecipient(address);
+            setSignature(signature);
+        } else {
+            if (isValidRecipient(value) === true && value.trim() !== '') {
+                setRecipientError(false);
+            } else {
+                setRecipientError('Invalid eCash address');
+            }
+            setRecipient(value);
+        }
+    };
+
+    const handleSignatureChange = e => {
+        const { value } = e.target;
+        
+        // Check if it's an ecashchat encoded string
+        if (value.startsWith('ecashchat') && value.endsWith('ecashchat')) {
+            try {
+                // Remove ecashchat prefix/suffix and decode
+                const encodedPart = value.slice(9, -9);
+                const decodedValue = atob(encodedPart);
+                
+                // Parse address and signature
+                const [address, signature] = decodedValue.split('_');
+                
+                if (isValidRecipient(address) === true && address.trim() !== '') {
+                    setRecipientError(false);
+                } else {
+                    setRecipientError('Invalid eCash address');
+                }
+                setRecipient(address);
+                setSignature(signature);
+                return;
+            } catch (error) {
+                console.error('Decode failed:', error);
+                return;
+            }
+        }
+        
+        // Original handling logic
+        if (value.includes('_')) {
+            const [address, signature] = value.split('_');
+            if (isValidRecipient(address) === true && address.trim() !== '') {
+                setRecipientError(false);
+            } else {
+                setRecipientError('Invalid eCash address');
+            }
+            setRecipient(address);
+            setSignature(signature);
+        } else {
+            setSignature(value);
+        }
     };
 
     const handleMessageChange = e => {
@@ -510,7 +587,7 @@ export default function Home() {
                     {address !== '' && (
                     <QRCode
                         value={address}
-                        size={128} // 设置较大的尺寸
+                        size={128} 
                         style={{ height: 'auto', maxWidth: '100%', maxHeight: '100%' }}
                         viewBox={`0 0 256 256`}
                     />
@@ -562,146 +639,39 @@ export default function Home() {
         );
     };
 
-    const RenderSaveLoginModal = () => {
-        return (
-            <AlertDialog open={openSaveLoginModal} onOpenChange={setOpenSaveLoginModal}>
-                <AlertDialogTrigger asChild>
-                    <button className="hidden">Open</button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                    <AlertDialogTitle>Save login details?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Saving login details will reduce the number of times you're asked to login.<br />
-                        Please ensure you're the only person who uses this device.
-                    </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                    <Button
-                     className="mt-2 sm:mt-0"
-                        onClick={() => setOpenSaveLoginModal(false)}
-                        variant="outline"
-                            >
-                            Don't save login
-                    </Button>
-                    <Button
-                        onClick={() => {
-                        saveLoginAddressToLocalStorage();
-                        }}
-                    >
-                        Save login
-                    </Button>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-                </AlertDialog>
-          )
-    };
-
     return (
       <>
         <ToastContainer autoClose={appConfig.toastDuration} />
-        {openSaveLoginModal === true && <RenderSaveLoginModal />}
+        <SaveLoginModal 
+          open={openSaveLoginModal}
+          onOpenChange={setOpenSaveLoginModal}
+          recipient={recipient}
+          signature={signature}
+          address={address}
+          onSave={() => {
+            saveLoginAddressToLocalStorage();
+          }}
+          onClose={() => setOpenSaveLoginModal(false)}
+        />
 
         <div className="sm:flex flex-col items-center justify-center p-5 relative z-10">
           <div className="background_content"></div>
         </div>
 
-
-        <header className="fixed mt-4 flex top-0 z-50 w-full justify-center ">
-          <div className="container flex items-center justify-between rounded-lg flex bg-black w-full h-14 mx-4 md:mx-auto md:max-w-xl lg:max-w-3xl border-b border-border/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/40">
-            <div className="sm:flex">
-              <a className="flex items-center space-x-2" href="#">
-                <EcashchatIcon />
-                <Image
-                  src="/ecashchat.png" 
-                  alt="eCashChat"
-                  width={90} 
-                  height={24}
-                  priority
-                  className="hidden sm:inline-block" 
-                />
-              </a>
-            </div>
-
-            {syncronizingState && (
-              <>
-              <Loader className="h-4 w-4 animate-spin" />
-              </>
-            )}
-
-            <div className="flex">
-        
-            {isLoggedIn && (
-            <Toggle
-                variant="outline"
-                aria-label="Toggle italic"
-                className="mr-2 w-9 px-0"
-                onClick={() => setShowCard((prev) => !prev)}
-            >
-                <User3icon className="h-4 w-4" />
-            </Toggle>
-            )}
-
-              {isLoggedIn && <ContactListPanel latestAvatars={latestAvatars} />}
-
-              {isLoggedIn && (
-                <ProfilePanel
-                  address={address}
-                  avatarLink={userAvatarLink}
-                  xecBalance={xecBalance}
-                  latestAvatars={latestAvatars}
-                />
-              )}
-
-              {isMobile && isLoggedIn ? (
-                <div>
-                  <Button
-                    onClick={async () => {
-                      setIsLoggedIn(false);
-                      setSavedLogin(false);
-                      await localforage.setItem("savedLoginAddress", false);
-                      toast({
-                        title: "👋",
-                        description: `Logged out of ${address}`,
-                      });
-                    }}
-                    variant="outline"
-                    size="icon"
-                  >
-                    <Logout3Icon />
-                  </Button>
-                </div>
-              ) : (
-                !isMobile && (
-                  <div>
-                    <Button
-                      onClick={
-                        isLoggedIn
-                          ? async () => {
-                              setIsLoggedIn(false);
-                              setSavedLogin(false);
-                              await localforage.setItem(
-                                "savedLoginAddress",
-                                false
-                              );
-                              toast({
-                                title: "👋",
-                                description: `Logged out of ${address}`,
-                              });
-                            }
-                          : () => getAddress()
-                      }
-                      variant="outline"
-                      {...(isLoggedIn ? { size: "icon" } : {})}
-                    >
-                      {isLoggedIn ? <Logout3Icon /> : "Signin"}
-                    </Button>
-                  </div>
-                )
-              )}
-            </div>
-          </div>
-        </header>
+        <Header 
+          isLoggedIn={isLoggedIn}
+          isMobile={isMobile}
+          showCard={showCard}
+          setShowCard={setShowCard}
+          address={address}
+          userAvatarLink={userAvatarLink}
+          xecBalance={xecBalance}
+          latestAvatars={latestAvatars}
+          syncronizingState={syncronizingState}
+          setIsLoggedIn={setIsLoggedIn}
+          setSavedLogin={setSavedLogin}
+          getAddress={getAddress}
+        />
 
         <main className="sm:flex flex-col items-center justify-center p-1 sm:px-5 relative z-10">
           {isLoggedIn === false ? (
@@ -769,7 +739,7 @@ export default function Home() {
                           placeholder="Enter your signature..."
                           value={signature}
                           required
-                          onChange={(e) => setSignature(e.target.value)}
+                          onChange={(e) => handleSignatureChange(e)}
                         />
                       </div>
                       <Button
