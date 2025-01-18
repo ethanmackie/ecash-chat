@@ -16,10 +16,7 @@ export default function User() {
         <>
             <Card className="mt-2">
                 <CardHeader>
-                    <div className="flex items-center">
-                    <div>
-                        <AnonAvatar />
-                    </div>
+                    <div className="flex items-left">
                     <div className="ml-3">
                         <p className="font-semibold leading-none tracking-tight">Address</p>
                         <p className="text-sm text-muted-foreground max-w-lg break-words text-balance leading-relaxed">
