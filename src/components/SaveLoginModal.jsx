@@ -9,6 +9,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import copy from 'copy-to-clipboard';
+import { useToast } from "@/hooks/use-toast"
 
 export default function SaveLoginModal({ 
   open, 
@@ -19,6 +20,17 @@ export default function SaveLoginModal({
   onSave,
   onClose 
 }) {
+  const { toast } = useToast()
+
+  const handleCopy = () => {
+    const credential = `ecashchat${btoa(`${recipient}_${signature}`)}ecashchat`
+    copy(credential)
+    toast({
+      title: "✅Copy",
+      description: "Copied"
+    })
+  }
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogTrigger asChild>
@@ -40,7 +52,7 @@ export default function SaveLoginModal({
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8"
-                    onClick={() => copy(`ecashchat${btoa(`${recipient}_${signature}`)}ecashchat`)}
+                    onClick={handleCopy}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                   </Button>
