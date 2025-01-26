@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Header from "@/components/Header";
 import { useSearchParams } from 'next/navigation';
 import {
     Card,
@@ -13,7 +14,15 @@ export default function User() {
     const searchParams = useSearchParams();
     const address = searchParams.get("address");
     return (
+
+        <div className="flex min-h-full flex-1 flex-col justify-center px-4 sm:px-6 lg:px-8 w-full lg:min-w-[576px]">
         <>
+            <div className="max-w-xl w-full mx-auto overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring">
+                <Header 
+                address={address}
+                />
+            </div>
+
             <Card className="mt-2">
                 <CardHeader>
                     <div className="flex items-left">
@@ -33,5 +42,6 @@ export default function User() {
                 </CardContent>
             </Card>
         </>
+        </div>
     )
 };

@@ -5,6 +5,7 @@ import { appConfig } from '../config/app';
 import { opReturn as opreturnConfig } from '../config/opreturn';
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import Link from 'next/link';
 import { Modal } from "flowbite-react";
 import { Button } from "@/components/ui/button";
 import { Search, UserRoundSearch, Activity, BookOpenCheck, PenLine, MessageCircleOff, MicVocal, Podcast, Save, Zap, MessageCircle, ChartNoAxesColumnIncreasing, HandCoins, CirclePlay} from "lucide-react"
@@ -694,16 +695,12 @@ export default function Article( {
                                 <AvatarFallback><DefaultavatarIcon/></AvatarFallback>
                             </Avatar>
                                 )}
-                                <div className="font-medium dark:text-white" onClick={() => {
-                                    copy(foundReply.replyAddress);
-                                    toast({
-                                        title: "✅Clipboard",
-                                        description: `${foundReply.replyAddress} copied to clipboard`,
-                                      });
-                                }}>
+                                <div className="font-medium dark:text-white">
+                                    <Link href={`/User?address=${foundReply.replyAddress}`}>
                                     <Badge className="leading-7 [&:not(:first-child)]:mt-6 py-3px" variant="outline">
                                         {getContactNameIfExist(foundReply.replyAddress, contactList)}
                                     </Badge>
+                                    </Link>
                                 </div>
                                 <RenderTipping address={foundReply.replyAddress} sendXecTip={sendXecTip} />
 
@@ -1258,18 +1255,10 @@ export default function Article( {
                                     <div className="text-sm leading-6">
                                         <p className="font-semibold text-gray-900">
                                             <Badge variant="outline" className="py-3px">
-                                                <div
-                                                    className="leading-7 [&:not(:first-child)]:mt-6"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        copy(tx.replyAddress);
-                                                        toast({
-                                                            title: '✅Clipboard',
-                                                            description: `${tx.replyAddress} copied to clipboard`,
-                                                          });
-                                                    }}
-                                                >
+                                                <div className="leading-7 [&:not(:first-child)]:mt-6">
+                                                    <Link href={`/User?address=${tx.replyAddress}`}>
                                                     {getContactNameIfExist(tx.replyAddress, contactList)}
+                                                    </Link>
                                                 </div>
                                             </Badge>
                                         </p>
@@ -1515,18 +1504,10 @@ export default function Article( {
                                     <div className="text-sm leading-6">
                                         <p className="font-semibold text-gray-900">
                                             <Badge variant="outline" className="py-3px">
-                                                <div
-                                                    className="leading-7 [&:not(:first-child)]:mt-6"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        copy(tx.replyAddress);
-                                                        toast({
-                                                            title: '✅Clipboard',
-                                                            description: `${tx.replyAddress} copied to clipboard`,
-                                                          });
-                                                    }}
-                                                >
+                                                <div className="leading-7 [&:not(:first-child)]:mt-6">
+                                                    <Link href={`/User?address=${tx.replyAddress}`}>
                                                     {getContactNameIfExist(tx.replyAddress, contactList)}
+                                                    </Link>
                                                 </div>
                                             </Badge>
                                         </p>
