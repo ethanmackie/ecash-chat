@@ -67,7 +67,6 @@ import { Separator } from "@/components/ui/separator"
 import SaveLoginModal from '@/components/SaveLoginModal';
 import Header from "@/components/Header";
 
-
 const words = `Continue with Cashtab Extension`;
 
 export default function Home() {
@@ -100,7 +99,6 @@ export default function Home() {
     const [syncronizingState, setsSyncronizingState] = useState(false);
     const [townhallTabEntry, setTownhallTabEntry] = useState(false);
     const { toast } = useToast();
-    const { setTheme } = useTheme()
 
     useEffect(() => {
         // Check whether Cashtab Extensions is installed
@@ -127,10 +125,8 @@ export default function Home() {
 
        
         (async () => {
-          console.log('loading artcle listing in page.js')
             const latestArticles = await getArticleListing();
             await localforage.setItem(appConfig.localArticlesParam, latestArticles);
-            console.log('finished loading artcle listing in page.js')
         })();
 
         // Check if this app is accessed via a shared article link
@@ -174,6 +170,7 @@ export default function Home() {
             setUserAvatarLink(
                 getNFTAvatarLink(address, latestAvatars),
             );
+            await updateAppContext();
         })();
     }, [address]);
 
@@ -268,6 +265,16 @@ export default function Home() {
           '*',
       );
     };
+
+    const updateAppContext = async () => {
+      await localforage.setItem('appContext', {
+        isLoggedIn: isLoggedIn,
+        isMobile: isMobile,
+        showCard: showCard,
+        latestAvatars: latestAvatars,
+        syncronizingState: syncronizingState,
+      });
+    }
 
     const handleAddressChange = e => {
         const { value } = e.target;

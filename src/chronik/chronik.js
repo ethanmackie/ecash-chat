@@ -310,6 +310,7 @@ export const updateAvatars = async (setLatestAvatars) => {
         const avatars = await getAvatarListing();
         await localforage.setItem(appConfig.localAvatarsParam, avatars);
         setLatestAvatars(avatars);
+        return avatars;
     } catch (err) {
         console.log('Error retrieving avatars: ', err);
     }

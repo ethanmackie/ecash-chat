@@ -179,7 +179,6 @@ export default function Article( {
   
     useEffect(() => {
         (async () => {
-            console.log('loading article.js')
             setIsLoading(true);
 
             await refreshContactList();
@@ -257,8 +256,6 @@ export default function Article( {
             const updatedCache = await refreshUtxos(chronik, address);
             setXecBalance(updatedCache.xecBalance);
         })();
-
-        console.log('finished loading article.js')
     }, [muteList]);
 
     const getMvpArticles = (txs) => {
@@ -697,9 +694,9 @@ export default function Article( {
                                 )}
                                 <div className="font-medium dark:text-white">
                                     <Link href={`/User?address=${foundReply.replyAddress}`}>
-                                    <Badge className="leading-7 [&:not(:first-child)]:mt-6 py-3px" variant="outline">
-                                        {getContactNameIfExist(foundReply.replyAddress, contactList)}
-                                    </Badge>
+                                        <Badge className="leading-7 [&:not(:first-child)]:mt-6 py-3px" variant="outline">
+                                            {getContactNameIfExist(foundReply.replyAddress, contactList)}
+                                        </Badge>
                                     </Link>
                                 </div>
                                 <RenderTipping address={foundReply.replyAddress} sendXecTip={sendXecTip} />
@@ -1257,7 +1254,7 @@ export default function Article( {
                                             <Badge variant="outline" className="py-3px">
                                                 <div className="leading-7 [&:not(:first-child)]:mt-6">
                                                     <Link href={`/User?address=${tx.replyAddress}`}>
-                                                    {getContactNameIfExist(tx.replyAddress, contactList)}
+                                                        {getContactNameIfExist(tx.replyAddress, contactList)}
                                                     </Link>
                                                 </div>
                                             </Badge>
@@ -1506,7 +1503,7 @@ export default function Article( {
                                             <Badge variant="outline" className="py-3px">
                                                 <div className="leading-7 [&:not(:first-child)]:mt-6">
                                                     <Link href={`/User?address=${tx.replyAddress}`}>
-                                                    {getContactNameIfExist(tx.replyAddress, contactList)}
+                                                        {getContactNameIfExist(tx.replyAddress, contactList)}
                                                     </Link>
                                                 </div>
                                             </Badge>

@@ -108,9 +108,7 @@ export default function TxHistory({ address, isMobile }) {
     useEffect(() => {
         // Render the first page by default upon initial load
         (async () => {
-          console.log('loading txhistory.js')
             await refreshContactList();
-            console.log('finished loading txhistory.js')
         })();
     }, [muteList]);
 

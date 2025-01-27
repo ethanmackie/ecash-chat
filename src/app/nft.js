@@ -44,7 +44,6 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
     const { toast } = useToast();
 
     const scanWalletForNfts = async () => {
-        console.log('loading nft.js')
         const chatCache = await localforage.getItem('chatCache');
         if (!chatCache || !chronik || typeof chatCache === 'undefined') {
             return;
@@ -137,7 +136,6 @@ export default function Nft( { chronik, address, isMobile, setLatestAvatars } ) 
         setFullNfts(thisFullNfts);
         setNftParents(chatCache.parentNftList);
         setNftChilds(chatCache.childNftList);
-        console.log('finished loading nft.js')
     }
 
     // Pass an NFT showcase tx BIP21 query string to cashtab extensions

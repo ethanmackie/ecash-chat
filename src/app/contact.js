@@ -47,9 +47,7 @@ export default function ContactListPanel({ latestAvatars }) {
 
     useEffect(() => {
         (async () => {
-          console.log('loading contact.js')
             await refreshContacts();
-            console.log('finished loading contact.js')
         })();
     }, []);
 

@@ -137,7 +137,6 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
     useEffect(() => {
         // Check whether townhall history is cached
         (async () => {
-          console.log('loading townhall.js')
             await refreshContactList();
             const townhallCache = await localforage.getItem(appConfig.localTownhallCacheParam);
             // If cache exists, set initial render to cached history
@@ -154,7 +153,6 @@ export default function TownHall({ address, isMobile, tabEntry, setsSyncronizing
             }
 
             await hasMvpTownhallNft();
-            console.log('finished townhall.js')
         })();
     }, [muteList, tabEntry]);
 
