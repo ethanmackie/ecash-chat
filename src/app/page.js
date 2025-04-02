@@ -1119,6 +1119,7 @@ export default function Home() {
                   <Tabs.Item
                     title="Town Hall"
                     icon={Home3Icon}
+                    active
                   >
                     <Townhall
                       address={address}
@@ -1128,7 +1129,7 @@ export default function Home() {
                     />
                   </Tabs.Item>
 
-                  <Tabs.Item title="Articles" active icon={File3Icon}>
+                  <Tabs.Item title="Articles" icon={File3Icon}>
                     <Article
                       chronik={chronik}
                       address={address}
